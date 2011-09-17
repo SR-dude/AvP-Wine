@@ -5,7 +5,7 @@ extern "C"
 	//#include "intro.hpp"
 	#include "inline.h"
 	#include "smacker.h"
-	#include "AvP_Menus.h"
+	#include "avp_menus.h"
 	extern int NormalFrameTime;
 	extern SCREENDESCRIPTORBLOCK ScreenDescriptorBlock;
 	extern DDPIXELFORMAT DisplayPixelFormat;

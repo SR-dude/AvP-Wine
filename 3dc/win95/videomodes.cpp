@@ -3,7 +3,7 @@ extern "C"
 
 #include "3dc.h"
 #include "videomodes.h"
-#include "awTexLd.h" // to set the surface format for Aw gfx dd surface loads
+#include "awtexld.h" // to set the surface format for Aw gfx dd surface loads
 
 extern LPDIRECTDRAW            lpDD;
 DEVICEANDVIDEOMODESDESC DeviceDescriptions[MAX_DEVICES];

@@ -5,7 +5,7 @@
 	#define DB_LEVEL 4
 #endif
 #include "db.h"
-#include "awTexLd.h"
+#include "awtexld.h"
 #include "chnkload.hpp"
 #include "chunkpal.hpp"
 

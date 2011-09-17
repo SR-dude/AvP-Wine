@@ -8,11 +8,11 @@
 #endif
 
 #pragma warning(disable: 4701)
-#include "awTexLd.hpp"
+#include "awtexld.hpp"
 #pragma warning(default: 4701)
 
 #include "iff.hpp"
-#include "iff_ILBM.hpp"
+#include "iff_ilbm.hpp"
 
 #include "list_tem.hpp"
 

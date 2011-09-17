@@ -24,7 +24,7 @@ extern "C" {
 #include "kshape.h"
 #include "krender.h"
 #include "chnktexi.h"
-#include "awTexLd.h"
+#include "awtexld.h"
 #include "ffstdio.h"
 
 

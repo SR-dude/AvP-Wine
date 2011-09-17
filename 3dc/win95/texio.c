@@ -4,7 +4,7 @@
 #include "3dc.h"
 
 #include <conio.h>
-#include <sys\stat.h>
+#include <sys/stat.h>
 
 #include "inline.h"
 
@@ -19,7 +19,7 @@
 
 #include <stdio.h>
 #include <conio.h>
-#include <sys\stat.h>
+#include <sys/stat.h>
 
 #include "system.h"
 #include "equates.h"
@@ -36,7 +36,7 @@
 #endif
 
 
-#include "awTexLd.h"
+#include "awtexld.h"
 #include "alt_tab.h"
 
 /*

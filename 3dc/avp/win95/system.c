@@ -31,7 +31,7 @@ New sound system
 #include "progress_bar.h"
 #include "bh_rubberduck.h"
 #include "game_statistics.h"
-#include "CDTrackSelection.h"
+#include "cdtrackselection.h"
 
 
 // EXTERNS

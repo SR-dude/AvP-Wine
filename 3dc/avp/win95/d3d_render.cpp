@@ -28,7 +28,7 @@ extern "C++"{
 #include "r2base.h"
 #include <math.h> // for sqrt
 };
-#include "HUD_layout.h"
+#include "hud_layout.h"
 #define HAVE_VISION_H 1
 #include "vision.h"
 #include "lighting.h"

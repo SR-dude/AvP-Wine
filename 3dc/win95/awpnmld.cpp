@@ -4,7 +4,7 @@
 #endif
 #include "db.h"
 
-#include "awTexLd.hpp"
+#include "awtexld.hpp"
 
 // PNM loaders
 

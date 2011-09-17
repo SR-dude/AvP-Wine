@@ -43,11 +43,11 @@
 
 #include "consbind.hpp"
 
-#include "AvpReg.hpp"
+#include "avpreg.hpp"
 #include "mempool.h"
-#include "GammaControl.h"
+#include "gammacontrol.h"
 
-#include "CDTrackSelection.h"
+#include "cdtrackselection.h"
 
 /*------------Patrick 1/6/97---------------
 New sound system 
@@ -56,7 +56,7 @@ New sound system
 
 #define FRAMEAV 100
 
-#include "AvP_UserProfile.h"
+#include "avp_userprofile.h"
 
 #define PROFILING_ON 0
 #if PROFILING_ON

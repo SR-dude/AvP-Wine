@@ -45,7 +45,7 @@
 #include "pvisible.h"
 #include "psndplat.h"
 #include "jsndsup.h"
-#include "AvpReg.hpp"
+#include "avpreg.hpp"
 #include "ffstdio.h"
 
 #include "decal.h"

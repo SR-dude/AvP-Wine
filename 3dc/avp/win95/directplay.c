@@ -16,8 +16,8 @@
 #include "dp_func.h"
 #include "dxlog.h"
 
-#include "AvP_Menus.h"
-#include "AvP_MP_Config.h"
+#include "avp_menus.h"
+#include "avp_mp_config.h"
 
 #define UseLocalAssert Yes
 #include "ourasert.h"

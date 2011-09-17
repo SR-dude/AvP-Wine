@@ -1,6 +1,6 @@
 #include "3dc.h"
 
-#include <sys\stat.h>
+#include <sys/stat.h>
 #include <string.h>
 
 #include "inline.h"

@@ -1,5 +1,5 @@
 #include "hierchnk.hpp"
-#include "Animobs.hpp"
+#include "animobs.hpp"
 #include "list_tem.hpp"
 #include <math.h>
 

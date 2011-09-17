@@ -1,13 +1,13 @@
 #include "3dc.h"
 #include "bmp2.h"
 #include "endianio.h"
-#include <String.hpp>
+#include "../../win95/string.hpp"
 #include "scrshot.hpp"
 #include "module.h"
 #include "stratdef.h"
 #include "gamedef.h"
 #include "ourasert.h"
-#include "frontend\avp_menus.h"
+#include "frontend/avp_menus.h"
 extern "C"{
  extern DDPIXELFORMAT DisplayPixelFormat;
  extern SCREENDESCRIPTORBLOCK ScreenDescriptorBlock;
@@ -97,6 +97,7 @@ void HandleScreenShot()
 					 
 void ScreenShot()
 {
+	char i;
 	char Name[40];
 	strcpy(Name,"AVP");
 	int length=strlen(Name);

@@ -16,7 +16,7 @@ extern "C" {
 
 #include "3dc.h"
 
-#include "awTexLd.h"
+#include "awtexld.h"
 
 #include "dxlog.h"
 #include "module.h"

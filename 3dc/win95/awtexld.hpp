@@ -1,7 +1,7 @@
 #ifndef _INCLUDED_AWTEXLD_HPP_
 #define _INCLUDED_AWTEXLD_HPP_
 
-#include "awTexLd.h"
+#include "awtexld.h"
 #include "media.hpp"
 #include "db.h"
 #ifndef DB_COMMA

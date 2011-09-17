@@ -19,9 +19,9 @@
 #include <stdarg.h>
 #include <limits.h>
 
-#include "awTexLd.h"
+#include "awtexld.h"
 #pragma warning(disable: 4701)
-#include "awTexLd.hpp"
+#include "awtexld.hpp"
 #pragma warning(default: 4701)
 
 #ifdef _CPPRTTI

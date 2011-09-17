@@ -24,7 +24,7 @@ d  ----------------------------------------------------------------------*/
 #include "psndplat.h"
 #include "bh_corpse.h"
 #include "bh_weap.h"
-#include "ShowCmds.h"
+#include "showcmds.h"
 
 #define UseLocalAssert Yes
 #include "ourasert.h"

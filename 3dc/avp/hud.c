@@ -42,7 +42,7 @@
 #include "ourasert.h"
 
 #include "vision.h"
-#include "BonusAbilities.h"
+#include "bonusabilities.h"
 #include "avp_menus.h"
 #include "showcmds.h"
 #include "game_statistics.h"

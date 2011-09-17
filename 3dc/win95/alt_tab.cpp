@@ -12,7 +12,7 @@
 	#include <typeinfo>
 #endif
 
-#include "awTexLd.h"
+#include "awtexld.h"
 
 #include "alt_tab.h"
 

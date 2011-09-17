@@ -46,7 +46,7 @@
 
 #define UseLocalAssert Yes
 #include "ourasert.h"
-#include "ShowCmds.h"
+#include "showcmds.h"
 #define DB_LEVEL 3
 #include "db.h"
 

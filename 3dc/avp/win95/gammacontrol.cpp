@@ -5,7 +5,7 @@ extern "C"
 #include "module.h"
 #include "inline.h"
 #include "d3dmacs.h"
-#include "GammaControl.h"
+#include "gammacontrol.h"
 
 extern LPDIRECTDRAWSURFACE lpDDSPrimary;
 static int ActualGammaSetting;

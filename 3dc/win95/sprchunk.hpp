@@ -1,7 +1,7 @@
 #ifndef _sprchunk_hpp
 #define _sprchunk_hpp
 #include "chunk.hpp"
-#include "Chnktype.hpp"
+#include "chnktype.hpp"
 //#include "stdafx.h"
 struct Frame
 {

@@ -5,7 +5,7 @@ extern "C" {
 #include "dxlog.h"
 #include "inline.h"
 #include "scrshot.hpp"
-#include "awTexLd.h" // to set the surface format for Aw gfx dd surface loads
+#include "awtexld.h" // to set the surface format for Aw gfx dd surface loads
 
 #define UseLocalAssert No
 #include "ourasert.h"
