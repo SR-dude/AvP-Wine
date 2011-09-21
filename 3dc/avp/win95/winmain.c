@@ -137,7 +137,8 @@ extern void BuildMultiplayerLevelNameArray();
 extern int WindowMode;
 void exit_break_point_fucntion ()
 {
-	#if debug
+//	#if debug  SR
+	#if 0
 	if (WindowMode == WindowModeSubWindow)
 	{
 		__asm int 3;
@@ -618,7 +619,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 						FlushSoftwareZBuffer();
 						#else
 						FlushD3DZBuffer();
-						#endifÿ
+						#endif
 						{
 							extern void ThisFramesRenderingHasBegun(void);
 							ThisFramesRenderingHasBegun();

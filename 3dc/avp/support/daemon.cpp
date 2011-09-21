@@ -371,13 +371,13 @@ void Daemon :: Maintain(int FixP_Time_ToUse)
 void DAEMON_Init(void)
 {
 }
-
+extern "C" {
 #if UseRealFrameTime
-extern "C" extern int RealFrameTime;
+extern int RealFrameTime;
 #else
-extern "C" extern int NormalFrameTime;
+extern int NormalFrameTime;
 #endif
-
+}
 void DAEMON_Maintain(void)
 {
 	#if 0

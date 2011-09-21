@@ -709,9 +709,9 @@ extern void ObjectDynamics(void)
 			/* skip to next report */
 			reportPtr = reportPtr->NextCollisionReportPtr;
 		}
-		PrintDebuggingText("€‚ƒ ©¸ä\n");
+		PrintDebuggingText("\80\81\82\83 \A9\B8\E4\n");
 		if(!Player->ObStrategyBlock->DynPtr->IsInContactWithFloor)
-			NewOnScreenMessage("€‚ƒ word ©¸ä word €‚ƒ word ¸ä word\n");
+			NewOnScreenMessage("\80\81\82\83 word \A9\B8\E4 word \80\81\82\83 word \B8\E4 word\n");
 	}
 	#endif
 	//NewTrailPoint(Player->ObStrategyBlock->DynPtr);
@@ -1332,6 +1332,7 @@ extern void DynamicallyRotateObject(DYNAMICSBLOCK *dynPtr)
  	MatrixToEuler(&dynPtr->OrientMat, &dynPtr->OrientEuler);
 }
 
+static int InterferenceAt(int lambda, DYNAMICSBLOCK *dynPtr);
 /* Move an object. At this stage, we have a list of the polygons in the
 environment with which the object the may collide. */									   
 static int MoveObject(STRATEGYBLOCK *sbPtr)
@@ -5767,6 +5768,7 @@ static int RelocatedDueToFallout(DYNAMICSBLOCK *dynPtr)
 
 #if 1
 
+static signed int DistanceMovedBeforeParticleHitsPolygon(PARTICLE *particlePtr, struct ColPolyTag *polyPtr, int distanceToMove);
 /*KJL****************
 * PARTICLE DYNAMICS *
 ****************KJL*/

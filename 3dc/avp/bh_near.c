@@ -798,6 +798,7 @@ int Alien_Special_Pounce_Condition(STRATEGYBLOCK *sbPtr) {
 	return(0);
 }
 
+static int StartAlienPounce(STRATEGYBLOCK *sbPtr);
 #define ALIEN_CURVETOPLAYERDIST 8000
 static void AlienNearState_Approach(STRATEGYBLOCK *sbPtr)
 {

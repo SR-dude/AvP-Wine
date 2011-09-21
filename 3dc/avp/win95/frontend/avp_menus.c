@@ -772,6 +772,7 @@ extern void AvP_UpdateMenus(void)
 
 }
 
+static int HeightOfMenuElement(AVPMENU_ELEMENT *elementPtr);
 static void SetupNewMenu(enum AVPMENU_ID menuID)
 {
 	enum AVPMENU_ID previousMenuID = AvPMenus.CurrentMenu;

@@ -1600,7 +1600,7 @@ static int VectorIntersects2dZVector(VECTORCH *vecStart,VECTORCH *vecEnd, int zE
   Tries to find a floor polygon for a given world space location in
   a given module
   --------------------------------------------------------------------*/
-int FindMyFloorPoly(VECTORCH* currentPosition, MODULE* currentModule)
+static int FindMyFloorPoly(VECTORCH* currentPosition, MODULE* currentModule)
 {
         struct ColPolyTag polygonData;
         int positionPoints[2];

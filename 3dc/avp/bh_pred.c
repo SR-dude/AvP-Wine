@@ -1003,6 +1003,7 @@ void CentrePredatorElevation(STRATEGYBLOCK *sbPtr) {
 
 }
 
+static PRED_RETURN_CONDITION Execute_PNS_SelfDestruct(STRATEGYBLOCK *sbPtr);
 void PredatorBehaviour(STRATEGYBLOCK *sbPtr)
 {
         PREDATOR_STATUS_BLOCK *predatorStatusPointer;    

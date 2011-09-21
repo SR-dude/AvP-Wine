@@ -23,6 +23,8 @@ static const unsigned char * grab_pixel_data(int ssize, unsigned char const * sd
 
 
 
+class Environment_Data_Chunk;
+
 class Environment_Palette_Chunk : public Chunk
 {
 

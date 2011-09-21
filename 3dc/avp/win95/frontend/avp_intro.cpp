@@ -17,7 +17,7 @@ extern "C"
 extern void DirectReadKeyboard(void);
 
 
-static IntroHasAlreadyBeenPlayed = 1;
+static bool IntroHasAlreadyBeenPlayed = 1;
 
 
 void Show_CopyrightInfo(void);

@@ -41,6 +41,7 @@ extern BOOL copy_preprocessed_to_shapeheader (
 							const ChunkObject* object=0	  //object used so that conversion from float to int can be done in world coordinates
 							);
 							
+class Sprite_Header_Chunk;
 extern BOOL copy_sprite_to_shapeheader (RIFFHANDLE, SHAPEHEADER *& shphd,Sprite_Header_Chunk* shc, int listpos = GLS_NOTINLIST);
 
 

@@ -110,6 +110,7 @@ BOOL DirectPlay_UpdateSessionDescForLobbiedGame(int gamestyle,int level)
 	return TRUE;
 }
 
+static BOOL DirectPlay_CreatePlayer(char* FormalName,char* FriendlyName);
 int DirectPlay_HostGame(char *playerName, char *sessionName,int species,int gamestyle,int level)
 {
 	int maxPlayers=DetermineAvailableCharacterTypes(FALSE);

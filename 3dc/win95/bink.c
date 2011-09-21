@@ -18,6 +18,9 @@ extern void DirectReadKeyboard(void);
 
 static int BinkSurfaceType;
 
+static int NextBinkFrame(BINK *binkHandle);
+static int GetBinkPixelFormat(void);
+
 void PlayBinkedFMV(char *filenamePtr)
 {
 	BINK* binkHandle;
