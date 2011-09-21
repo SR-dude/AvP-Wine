@@ -193,10 +193,10 @@ int CDDA_CheckNumberOfTracks()
 
 
 /* win95 specific */
-
+static void PlatGetCDDAVolumeControl(void);
 int PlatStartCDDA(void)
 {
-	static void PlatGetCDDAVolumeControl(void);
+	
 	DWORD dwReturn;
 	MCI_OPEN_PARMS mciOpenParms;
 

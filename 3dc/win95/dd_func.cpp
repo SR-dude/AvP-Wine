@@ -2187,7 +2187,7 @@ HRESULT WINAPI InitTripleBuffers(LPDIRECTDRAWSURFACE lpdd,
 
 
 /* new versions of these functions, provided by neil */
-static GDIObjectReferenceCount = 0;
+static int GDIObjectReferenceCount = 0;
 BOOL GetGDISurface(void)
 {
 	HRESULT hr = DD_OK;

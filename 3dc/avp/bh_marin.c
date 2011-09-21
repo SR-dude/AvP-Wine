@@ -2887,6 +2887,9 @@ void InitMission(STRATEGYBLOCK *sbPtr,MARINE_MISSION mission) {
 
 }
 
+static STATE_RETURN_CONDITION Execute_MFS_Respond(STRATEGYBLOCK *sbPtr);
+static STATE_RETURN_CONDITION Execute_MFS_Retreat(STRATEGYBLOCK *sbPtr);
+static STATE_RETURN_CONDITION Execute_MNS_PumpAction(STRATEGYBLOCK *sbPtr);
 void WanderMission_Control(STRATEGYBLOCK *sbPtr) {
 
 	MARINE_STATUS_BLOCK *marineStatusPointer;
