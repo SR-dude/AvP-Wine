@@ -54,6 +54,8 @@ extern "C"
 struct hierarchy_variant_data;
 };
 
+class File_Chunk;
+
 class Global_Hierarchy_Store
 {
 

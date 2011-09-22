@@ -52,11 +52,11 @@ static struct DigitPropertiesTag LoresMarineHUDDigitProperties[] =
 };
 static char *LoresMarineHUDGfxFilenamePtr[]=
 {
-    {"blips.pg0"}, 	//MARINE_HUD_GFX_MOTIONTRACKERBLIP,
-    {"num.pg0"},	//MARINE_HUD_GFX_NUMERALS,
-	{"gunsight.pg0"},	//MARINE_HUD_GFX_GUNSIGHTS,
-	{"trakfont.pg0"},
-	{"bluebar.pg0"},
+    "blips.pg0", 	//MARINE_HUD_GFX_MOTIONTRACKERBLIP,
+    "num.pg0",	//MARINE_HUD_GFX_NUMERALS,
+	"gunsight.pg0",	//MARINE_HUD_GFX_GUNSIGHTS,
+	"trakfont.pg0",
+	"bluebar.pg0"
 };
 static struct HUDFontDescTag LoresHUDFontDesc[] =
 {
@@ -148,11 +148,11 @@ static struct DigitPropertiesTag MedresMarineHUDDigitProperties[] =
 };
 static char *MedresMarineHUDGfxFilenamePtr[]=
 {
-    {"blipsHRz.pg0"}, 	//MARINE_HUD_GFX_MOTIONTRACKERBLIP,
-    {"numMR.pg0"},	//MARINE_HUD_GFX_NUMERALS,
-	{"sightsmr.pg0"},	//MARINE_HUD_GFX_GUNSIGHTS,
-	{"trkfntmr.pg0"},
-	{"blubarmr.pg0"},
+    "blipsHRz.pg0", 	//MARINE_HUD_GFX_MOTIONTRACKERBLIP,
+    "numMR.pg0",	//MARINE_HUD_GFX_NUMERALS,
+	"sightsmr.pg0",	//MARINE_HUD_GFX_GUNSIGHTS,
+	"trkfntmr.pg0",
+	"blubarmr.pg0"
 };
 static struct HUDFontDescTag MedresHUDFontDesc[] =
 {
@@ -248,11 +248,11 @@ static struct DigitPropertiesTag HiresMarineHUDDigitProperties[] =
 };
 static char *HiresMarineHUDGfxFilenamePtr[]=
 {
-    {"blipsHRz.pg0"}, 	//MARINE_HUD_GFX_MOTIONTRACKERBLIP,
-    {"numhR.pg0"},	//MARINE_HUD_GFX_NUMERALS,
-	{"sightsmr.pg0"},	//MARINE_HUD_GFX_GUNSIGHTS,
-	{"trkfnthr.pg0"},
-	{"blubarhr.pg0"},
+    "blipsHRz.pg0", 	//MARINE_HUD_GFX_MOTIONTRACKERBLIP,
+    "numhR.pg0",	//MARINE_HUD_GFX_NUMERALS,
+	"sightsmr.pg0",	//MARINE_HUD_GFX_GUNSIGHTS,
+	"trkfnthr.pg0",
+	"blubarhr.pg0"
 };
 static struct HUDFontDescTag HiresHUDFontDesc[] =
 {
@@ -291,41 +291,22 @@ static struct LittleMDescTag HiresHUDLittleM =
 };
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* PREDATOR */
 
 
 static char *LoresPredatorHUDGfxFilenamePtr[]=
 {
-	{"topmask.pg0"},	//PREDATOR_HUD_GFX_TOP,
-	{"botmmask.pg0"},	//PREDATOR_HUD_GFX_BOTTOM,
-   	{"prednum.pg0"},	//PREDATOR_HUD_GFX_NUMBERS,
-    {"predsymb.pg0"},   //PREDATOR_HUD_GFX_SYMBOLS,
+	"topmask.pg0",	//PREDATOR_HUD_GFX_TOP,
+	"botmmask.pg0",	//PREDATOR_HUD_GFX_BOTTOM,
+   	"prednum.pg0",	//PREDATOR_HUD_GFX_NUMBERS,
+    "predsymb.pg0"   //PREDATOR_HUD_GFX_SYMBOLS,
 };
 static char *MedresPredatorHUDGfxFilenamePtr[]=
 {
-	{"prhdtpMR.pg0"},	//PREDATOR_HUD_GFX_TOP,
-	{"prhdbmMR.pg0"},	//PREDATOR_HUD_GFX_BOTTOM,
-   	{"prednum.pg0"},	//PREDATOR_HUD_GFX_NUMBERS,
-    {"predsymb.pg0"},   //PREDATOR_HUD_GFX_SYMBOLS,
+	"prhdtpMR.pg0",	//PREDATOR_HUD_GFX_TOP,
+	"prhdbmMR.pg0",	//PREDATOR_HUD_GFX_BOTTOM,
+   	"prednum.pg0",	//PREDATOR_HUD_GFX_NUMBERS,
+    "predsymb.pg0"   //PREDATOR_HUD_GFX_SYMBOLS,
 };
 static struct DigitPropertiesTag LoresPredatorHUDDigitProperties[] =
 {
@@ -386,19 +367,19 @@ static struct DigitPropertiesTag MedresPredatorHUDDigitProperties[] =
 /* ALIEN */
 static char *LoresAlienHUDGfxFilenamePtr[]=
 {
-	{"AlHudBot.pg0"}, // ALIEN_HUD_GFX_BOTTOM
-	{"AlHudLft.pg0"}, // ALIEN_HUD_GFX_LEFT
-	{"AlHudRgt.pg0"}, // ALIEN_HUD_GFX_RIGHT
-   	{"AlHudTop.pg0"}, // ALIEN_HUD_GFX_TOP
-    {"AlienNum.pg0"}, // ALIEN_HUD_GFX_NUMBERS
+	"AlHudBot.pg0", // ALIEN_HUD_GFX_BOTTOM
+	"AlHudLft.pg0", // ALIEN_HUD_GFX_LEFT
+	"AlHudRgt.pg0", // ALIEN_HUD_GFX_RIGHT
+   	"AlHudTop.pg0", // ALIEN_HUD_GFX_TOP
+    "AlienNum.pg0" // ALIEN_HUD_GFX_NUMBERS
 };
 static char *MedresAlienHUDGfxFilenamePtr[]=
 {
-	{"ahMRBtm.pg0"}, // ALIEN_HUD_GFX_BOTTOM
-	{"ahMRLft.pg0"}, // ALIEN_HUD_GFX_LEFT
-	{"ahMRRgt.pg0"}, // ALIEN_HUD_GFX_RIGHT
-   	{"ahMRTop.pg0"}, // ALIEN_HUD_GFX_TOP
-    {"ahMRNum.pg0"}, // ALIEN_HUD_GFX_NUMBERS
+	"ahMRBtm.pg0", // ALIEN_HUD_GFX_BOTTOM
+	"ahMRLft.pg0", // ALIEN_HUD_GFX_LEFT
+	"ahMRRgt.pg0", // ALIEN_HUD_GFX_RIGHT
+   	"ahMRTop.pg0", // ALIEN_HUD_GFX_TOP
+    "ahMRNum.pg0" // ALIEN_HUD_GFX_NUMBERS
 };
 static struct DigitPropertiesTag LoresAlienHUDDigitProperties[] =
 {

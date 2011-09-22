@@ -432,24 +432,24 @@ class _base_HashTable
 				// remove the current entry pointed to, advancing to the next
 				void Remove()
 				{
-					if (!nEntriesRemaining)
+					if (!ConstIterator::nEntriesRemaining)
 					{
 						HT_FAIL("HTT: Tried to Remove() via an iterator which was Done()");
 					}
-					Node * oldP = *nodePP;
-					*nodePP = oldP->nextP;
+					Node * oldP = *ConstIterator::nodePP;
+					*ConstIterator::nodePP = oldP->nextP;
 					delete oldP;
-					if (!*nodePP)
+					if (!*ConstIterator::nodePP)
 					{
 						do
 						{
-							++ chainPP;
-							-- nChainsRemaining;
+							++ ConstIterator::chainPP;
+							-- ConstIterator::nChainsRemaining;
 						}
-						while (nChainsRemaining && !*chainPP);
-						nodePP = chainPP;
+						while (ConstIterator::nChainsRemaining && !*ConstIterator::chainPP);
+						ConstIterator::nodePP = ConstIterator::chainPP;
 					}
-					-- nEntriesRemaining;
+					-- ConstIterator::nEntriesRemaining;
 					-- *tableNEntriesP;
 				}
 
@@ -691,6 +691,7 @@ _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::_base_HashTable(unsigned _initialTa
 		chainPA[i] = NULL;
 }
 
+template <class TYPE> class HashTable;
 template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
 inline _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::_base_HashTable(_base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE> const & ht)
 	: nEntries(0)
@@ -700,7 +701,7 @@ inline _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::_base_HashTable(_base_HashTa
 {
 	for (unsigned i=0; i<tableSize; ++i) { chainPA[i] = NULL; }
 
-	for( HashTable<TYPE>::ConstIterator it(ht); !it.Done(); it.Next() )
+	for( typename HashTable<TYPE>::ConstIterator it(ht); !it.Done(); it.Next() )
 	{
 		AddRegardless( it.Get() );
 	}
@@ -811,13 +812,13 @@ void _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::RemoveAsserted(CMP_ARG_TYPE _d
 }
 
 template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
-_base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::Node * _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::NewNode(ARG_TYPE _dataR,Node * _nextP)
+typename _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::Node * _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::NewNode(ARG_TYPE _dataR,Node * _nextP)
 {
 	return new Node(_dataR,_nextP);
 }
 
 template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
-_base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::Node * _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::NewNode()
+typename _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::Node * _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::NewNode()
 {
 	return new Node;
 }
@@ -828,7 +829,7 @@ void _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::DeleteNode(Node * _nodeP)
 	delete _nodeP;
 }
 
-template <class TYPE> class HashTable;
+
 
 #define HT_DEFINITION(T1,T2,T3) \
 	: public _base_HashTable<T1,T2,T3> { public: HashTable(unsigned _initialTableSizeShift = HT_DEFAULTTABLESIZESHIFT) : _base_HashTable<T1,T2,T3>(_initialTableSizeShift){} };

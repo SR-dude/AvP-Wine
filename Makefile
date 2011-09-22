@@ -9,7 +9,7 @@ CXX=wineg++
 CXXFLAGS=$(CFLAGS)
 RC=windres -O COFF
 ifeq "$(CFG)"  "AvP - Win32 Release"
-CFLAGS+=-I/usr/include/wine/msvcrt -I/usr/include/wine/windows -DWIN32 -D_WINDOWS -w -D_MBCS -fexceptions -fpermissive -O2 -I3dc -I3dc/avp -Dengine=1 -I3dc/avp/support -I3dc/avp/win95 -DAVP_DEBUG_VERSION -I3dc/avp/win95/frontend -I3dc/avp/win95/gadgets -I3dc/include -I3dc/win95
+CFLAGS+=-I/usr/include/wine/msvcrt -I/usr/include/wine/windows -DWIN32 -D_WINDOWS -w  -fexceptions -fpermissive -O2 -I3dc -I3dc/avp -Dengine=1 -I3dc/avp/support -I3dc/avp/win95 -DAVP_DEBUG_VERSION -I3dc/avp/win95/frontend -I3dc/avp/win95/gadgets -I3dc/include -I3dc/win95
 LD=$(CXX) $(CXXFLAGS)
 LDFLAGS=
 TARGET=avpprog.exe
@@ -17,7 +17,7 @@ LDFLAGS+=-L3dc -Wl,--subsystem,windows
 LIBS+=-lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -luuid -lodbc32 -lodbccp32 -lddraw -ldsound -ldplayx -ldinput -lsmackw32 -lbinkw32 -lwinmm
 else
 ifeq "$(CFG)"  "AvP - Win32 Debug"
-CFLAGS+=-I/usr/include/wine/msvcrt -I/usr/include/wine/windows -I3dc/include -I3dc/win95 -w -DWIN32 -fexceptions -fpermissive -g -O0 -D_DEBUG -I3dc -D_WINDOWS -I3dc/avp -D_MBCS -I3dc/avp/support -Dengine=1 -I3dc/avp/win95 -I3dc/avp/win95/frontend -DAVP_DEBUG_VERSION -I3dc/avp/win95/gadgets
+CFLAGS+=-I/usr/include/wine/msvcrt -I/usr/include/wine/windows -I3dc/include -I3dc/win95 -w -DWIN32 -fexceptions -fpermissive -g -O0 -D_DEBUG -I3dc -D_WINDOWS -I3dc/avp  -I3dc/avp/support -Dengine=1 -I3dc/avp/win95 -I3dc/avp/win95/frontend -DAVP_DEBUG_VERSION -I3dc/avp/win95/gadgets
 LD=$(CXX) $(CXXFLAGS)
 LDFLAGS=
 TARGET=debug_AvP.exe
@@ -25,7 +25,7 @@ LDFLAGS+=-L3dc -Wl,--subsystem,windows
 LIBS+=-lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -luuid -lodbc32 -lodbccp32 -lddraw -ldsound -ldplayx -ldinput -lsmackw32 -lbinkw32 -lwinmm
 else
 ifeq "$(CFG)"  "AvP - Win32 Release For Fox"
-CFLAGS+=-I/usr/include/wine/msvcrt -I/usr/include/wine/windows -DWIN32 -D_WINDOWS -w -D_MBCS -fexceptions -fpermissive -O2 -I3dc -I3dc/avp -Dengine=1 -I3dc/avp/support -I3dc/avp/win95 -I3dc/avp/win95/frontend -I3dc/avp/win95/gadgets -I3dc/include -I3dc/win95
+CFLAGS+=-I/usr/include/wine/msvcrt -I/usr/include/wine/windows -DWIN32 -D_WINDOWS -w -fexceptions -fpermissive -O2 -I3dc -I3dc/avp -Dengine=1 -I3dc/avp/support -I3dc/avp/win95 -I3dc/avp/win95/frontend -I3dc/avp/win95/gadgets -I3dc/include -I3dc/win95
 LD=$(CXX) $(CXXFLAGS)
 LDFLAGS=
 TARGET=AvP.exe
@@ -151,7 +151,6 @@ SOURCE_FILES= \
 	3dc/win95/debuglog.cpp \
 	3dc/avp/decal.c \
 	3dc/avp/detaillevels.c \
-#	3dc/win95/di_func.cpp \
 	3dc/avp/win95/directplay.c \
 	3dc/avp/win95/dp_func.c \
 	3dc/avp/win95/dplayext.c \
@@ -298,7 +297,9 @@ SOURCE_FILES= \
 	3dc/avp/win95/winmain.c \
 	3dc/win95/wpchunk.cpp \
 	3dc/avp/support/wrapstr.cpp \
-	3dc/win95/zsp.cpp
+	3dc/win95/zsp.cpp \
+	3dc/win95/di_func.cpp
+
 HEADER_FILES= \
 	3dc/win95/advwin32.h \
 	3dc/avp/win95/gadgets/ahudgadg.hpp \

@@ -35,6 +35,7 @@ class AltTabAwRestore : public AltTabRestore<DX_PTR>
 		virtual void DoRestore(DX_PTR * pDxGraphic);
 };
 
+template <>
 void AltTabAwRestore<DDSurface>::DoRestore(DDSurface * pSurface)
 {
 	DDSurface * pNewSurface = AwCreateSurface("rtf",m_hBackup,pSurface,AW_TLF_PREVSRCALL);
@@ -46,6 +47,7 @@ void AltTabAwRestore<DDSurface>::DoRestore(DDSurface * pSurface)
 	pNewSurface->Release();
 }
 
+template <>
 void AltTabAwRestore<D3DTexture>::DoRestore(D3DTexture * pTexture)
 {
 	D3DTexture * pNewTexture = AwCreateTexture("rtf",m_hBackup,pTexture,AW_TLF_PREVSRCALL);

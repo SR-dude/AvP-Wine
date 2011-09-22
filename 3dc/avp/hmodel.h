@@ -390,7 +390,8 @@ extern void Verify_Positions_In_HModel(struct strategyblock *sbPtr,HMODELCONTROL
 extern int HModel_DepthTest(HMODELCONTROLLER *controller,SECTION_DATA *test_section_data,int depth);
 extern void DeInitialise_HModel(HMODELCONTROLLER *controller);
 
-
+//       void LoadHierarchy(SAVE_BLOCK_HEADER* header,HMODELCONTROLLER* controller)
+struct save_block_header;
 extern void LoadHierarchy(struct save_block_header* header,HMODELCONTROLLER* controller);
 extern void SaveHierarchy(HMODELCONTROLLER* controller);
 
