@@ -91,6 +91,7 @@ int db_option = 0; /* Default is off. */
 
 /* Cause a brakepoint. */
 //#define DB_FORCE_BRAKEPOINT()	do {__asm int 3} while(0)
+inline void DB_FORCE_BRAKEPOINT(void ) { }
 
 /* T Y P E S ********************************************************** */
 

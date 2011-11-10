@@ -653,7 +653,7 @@ RADEXPFUNC void RADEXPLINK radfree(void PTR4* ptr);
 // for multi-processor machines
 
 #if 0
-// don't choose the inline assembly version  - SR
+// don't choose the inline assembly version  - adj
 //#ifdef __RADNT__
   #define LockedIncrement(var) __asm { lock inc [var] }
   #define LockedDecrement(var) __asm { lock dec [var] }
@@ -673,8 +673,8 @@ RADEXPFUNC void RADEXPLINK radfree(void PTR4* ptr);
 
 #else
   
-//SR  #ifdef __RADMAC__
-// I want the generic mac version SR
+//adj  #ifdef __RADMAC__
+// I want the generic mac version adj
 #if 1
     #define LockedIncrement(var) {++(var);}
     #define LockedDecrement(var) {--(var);}
@@ -684,11 +684,11 @@ RADEXPFUNC void RADEXPLINK radfree(void PTR4* ptr);
 
   #else
 
-//sr    #define LockedIncrement(var) __asm { inc [var] }
-//sr    #define LockedDecrement(var) __asm { dec [var] }
-//sr    void __inline LockedIncrementFunc(void PTR4* var) { __asm { mov eax,[var]
+//adj    #define LockedIncrement(var) __asm { inc [var] }
+//adj    #define LockedDecrement(var) __asm { dec [var] }
+//adj    void __inline LockedIncrementFunc(void PTR4* var) { __asm { mov eax,[var]
                                                                 inc [eax] } }
-//sr    void __inline LockedDecrementFunc(void PTR4* var) { __asm { mov eax,[var]
+//adj    void __inline LockedDecrementFunc(void PTR4* var) { __asm { mov eax,[var]
                                                                 dec [eax] } }
   #endif
 

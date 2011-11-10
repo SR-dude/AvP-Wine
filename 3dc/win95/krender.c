@@ -2727,6 +2727,7 @@ typedef struct
 } STARDESC;
 static STARDESC StarArray[NO_OF_STARS];
 #endif
+#if 0
 void CreateStarArray(void)
 {
 	#if 0
@@ -2744,7 +2745,7 @@ void CreateStarArray(void)
 	}
 	#endif
 }
-
+#endif
 /* KJL 12:10:36 9/30/97 - starfield, currently implemented for 8 & 16 bit displays */
 void DrawStarfilledSky(void)
 {

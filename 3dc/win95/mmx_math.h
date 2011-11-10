@@ -3,7 +3,8 @@
 #ifndef _included_mmx_math_h_
 #define _included_mmx_math_h_
 
-#if SUPPORT_MMX
+// #if SUPPORT_MMX
+#if 1
 
 #ifdef __cplusplus
 extern "C" {

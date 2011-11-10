@@ -324,12 +324,12 @@ extern int maxshapes;
 
 
 /*************************** WINDOWS 95 *********************/
-
-#ifdef _MSC_VER
+// adj remove mmx support
+//#ifdef _MSC_VER
 #define SUPPORT_MMX 0
-#else
-#define SUPPORT_MMX 1
-#endif
+//#else
+//#define SUPPORT_MMX 1
+//#endif
 
 #define MaxD3DInstructions 1000 // includes state change instructions!!!
 #define MaxD3DVertices     256

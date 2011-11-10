@@ -253,15 +253,11 @@ BOOL WaitForRasterThread()
   mssetup api
 */
 
-#ifdef __WATCOMC__
-
-unsigned int GetCPUId(void);
-#pragma aux GetCPUId = "mov eax,1" "cpuid" value [edx] modify [eax ebx ecx];
-
-#elif defined(_MSC_VER)
 
 static unsigned int GetCPUId(void)
 {
+// adj
+#if 0
 	unsigned int retval;
 	_asm
 	{
@@ -273,13 +269,9 @@ static unsigned int GetCPUId(void)
 		mov retval,edx
 	}
 	return retval;
+#endif
 }
 
-#else
-
-#error "Unknown compiler"
-
-#endif
 
 
 PROCESSORTYPES ReadProcessorType(void)

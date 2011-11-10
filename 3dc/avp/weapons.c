@@ -3186,10 +3186,10 @@ extern void UpdateWeaponShape(void)
 	}
 
 }
-
+extern SECTION * GetNamedHierarchyFromLibrary(const char * rif_name, const char * hier_name);
 void GetHierarchicalWeapon(char *riffname, char *hierarchyname, int sequence_type, int sub_sequence) {
 
-	extern SECTION * GetNamedHierarchyFromLibrary(const char * rif_name, const char * hier_name);
+	
 	SECTION *root_section;
 	SECTION_DATA *camera_section;
 

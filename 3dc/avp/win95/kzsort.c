@@ -303,6 +303,7 @@ void SortModules(unsigned int noOfItems)
 
 
 
+static int PointIsInModule(VECTORCH *pointPtr,MODULE *modulePtr);
 /* KJL 12:21:51 02/11/97 - This routine is too big and ugly. Split & clean up required! */
 void KRenderItems(VIEWDESCRIPTORBLOCK *VDBPtr)
 {

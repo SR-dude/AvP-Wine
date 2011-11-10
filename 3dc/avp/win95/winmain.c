@@ -137,7 +137,7 @@ extern void BuildMultiplayerLevelNameArray();
 extern int WindowMode;
 void exit_break_point_fucntion ()
 {
-//	#if debug  SR
+//	#if debug  adj
 	#if 0
 	if (WindowMode == WindowModeSubWindow)
 	{

@@ -2094,6 +2094,7 @@ void AddNetMsg_StartGame(void)
 	headerPtr->type = (unsigned char)NetMT_StartGame;	
 }
 
+static int MyPlayerHasAMuzzleFlash(STRATEGYBLOCK *sbPtr);
 extern int UseExtrapolation;
 void AddNetMsg_PlayerState(STRATEGYBLOCK *sbPtr)
 {
@@ -5285,7 +5286,7 @@ void AddNetMsg_PlayerID(DPID playerID,unsigned char message)
 
 }
 
-void AddNetMsg_LastManStanding_RestartTimer(char time) 
+void AddNetMsg_LastManStanding_RestartTimer(unsigned char time) 
 {
 	NETMESSAGEHEADER *headerPtr;
 	NETMESSAGE_LMS_RESTARTTIMER *messagePtr;
