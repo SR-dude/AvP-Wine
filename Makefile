@@ -17,12 +17,13 @@ LDFLAGS+=-L3dc -Wl,--subsystem,windows
 LIBS+=-lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -luuid -lodbc32 -lodbccp32 -lddraw -ldsound -ldplayx -ldinput -lsmackw32 -lbinkw32 -lwinmm
 else
 ifeq "$(CFG)"  "AvP - Win32 Debug"
-CFLAGS+=-I/usr/include/wine/msvcrt -I/usr/include/wine/windows -I3dc/include -I3dc/win95 -w -DWIN32 -fexceptions -fpermissive -g -O0 -D_DEBUG -I3dc -D_WINDOWS -I3dc/avp  -I3dc/avp/support -Dengine=1 -I3dc/avp/win95 -I3dc/avp/win95/frontend -DAVP_DEBUG_VERSION -I3dc/avp/win95/gadgets
-LD=$(CXX) $(CXXFLAGS)
-LDFLAGS=
+CFLAGS+=-I/usr/include/wine/msvcrt -I/usr/include/wine/windows -I3dc/include -I3dc/win95 -w -DWIN32 -fexceptions -fpermissive -march=i686 -g -O0 -D_DEBUG -I3dc -D_WINDOWS -I3dc/avp  -I3dc/avp/support -Dengine=1 -I3dc/avp/win95 -I3dc/avp/win95/frontend -DAVP_DEBUG_VERSION -I3dc/avp/win95/gadgets
+LD=$(CXX)
+LDFLAGS=-m32
 TARGET=debug_AvP.exe
-LDFLAGS+=-L3dc -Wl,--subsystem,windows
-LIBS+=-lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -luuid -lodbc32 -lodbccp32 -lddraw -ldsound -ldplayx -ldinput -lsmackw32 -lbinkw32 -lwinmm
+LDFLAGS+=
+LIBS+=-lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -luuid -lodbc32 -lodbccp32 -lddraw -ldsound -ldplayx -ldinput -lwinmm -lmsvcrt
+#LIBS+=
 else
 ifeq "$(CFG)"  "AvP - Win32 Release For Fox"
 CFLAGS+=-I/usr/include/wine/msvcrt -I/usr/include/wine/windows -DWIN32 -D_WINDOWS -w -fexceptions -fpermissive -O2 -I3dc -I3dc/avp -Dengine=1 -I3dc/avp/support -I3dc/avp/win95 -I3dc/avp/win95/frontend -I3dc/avp/win95/gadgets -I3dc/include -I3dc/win95
@@ -298,7 +299,9 @@ SOURCE_FILES= \
 	3dc/win95/wpchunk.cpp \
 	3dc/avp/support/wrapstr.cpp \
 	3dc/win95/zsp.cpp \
-	3dc/win95/di_func.cpp
+	3dc/win95/di_func.cpp \
+	3dc/mathline.c \
+	stubs.c
 
 HEADER_FILES= \
 	3dc/win95/advwin32.h \
