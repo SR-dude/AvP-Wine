@@ -3,9 +3,6 @@
 //#include "strachnk.hpp"
 //#include "obchunk.hpp"
 
-#ifdef cencon
-#define new my_new
-#endif
 
 //macro for helping to force inclusion of chunks when using libraries
 FORCE_CHUNK_INCLUDE_IMPLEMENT(avpchunk)
@@ -58,38 +55,8 @@ size_t AVP_Generator_Chunk::size_chunk ()
 	return(chunk_size);
 	
 }
-#if UseOldChunkLoader
-AVP_Generator_Chunk::AVP_Generator_Chunk (Chunk_With_Children * parent, const char * data, size_t /*size*/)
-: Chunk (parent, "AVPGENER")
-{
-	location = *((ChunkVector *) data);
-	data += sizeof(ChunkVector);
-	
-	orientation = *((int *) data);
-	data += 4;
-	
-	type = *((int *) data);
-	data += 4;
 
-	flags = *((int *) data);
-	data += 4;
-	
-	textureID = *(data);
-	data ++;
-	
-	sub_type = *(data);
-	data ++;
-	
-	extra1 = *(unsigned char*)(data);
-	data ++;
-	
-	extra2 = *(unsigned char*)(data);
-	data ++;
-	
-	name = new char [strlen(data) + 1];
-	strcpy (name, data);
-}
-#else
+
 AVP_Generator_Chunk::AVP_Generator_Chunk (Chunk_With_Children * parent, const char * data, size_t /*size*/)
 : Chunk (parent, "AVPGENER")
 {
@@ -120,7 +87,6 @@ AVP_Generator_Chunk::AVP_Generator_Chunk (Chunk_With_Children * parent, const ch
 	name = new char [strlen(data) + 1];
 	strcpy (name, data);
 }
-#endif
 
 
 
@@ -143,19 +109,7 @@ ObjectID AVP_Generator_Chunk::CalculateID()
 	if(!chlist.size()) return retval;
 	char Name[100];
 
-	#if InterfaceEngine||cencon
-	//need to check for console specific rif files,and skip the 'sat' or 'psx'
-	//so that they get the same ids as the pc
-	const char* r_name=((RIF_Name_Chunk*)chlist.first_entry())->rif_name;
-	if(tolower(r_name[0])=='p' && tolower(r_name[1])=='s' && tolower(r_name[2])=='x' )
-		strcpy(Name,&r_name[3]);
-	else if (tolower(r_name[0])=='s' && tolower(r_name[1])=='a' && tolower(r_name[2])=='t' )
-		strcpy(Name,&r_name[3]);
-	else
-		strcpy(Name,r_name);
-	#else
 	strcpy(Name,((RIF_Name_Chunk*)chlist.first_entry())->rif_name);
-	#endif
 
 	strcat(Name,name);
 	char buffer[16];
@@ -461,19 +415,7 @@ AVP_Player_Start_Chunk::AVP_Player_Start_Chunk(Chunk_With_Children* parent)
 	moduleID.id2=0;
 
 }
-#if UseOldChunkLoader
-AVP_Player_Start_Chunk::AVP_Player_Start_Chunk(Chunk_With_Children* parent,const char* data,size_t)
-:Chunk(parent,"AVPSTART")
-{
-	location=*(ChunkVector*)data;
-	data+=sizeof(ChunkVector);
-	orientation=*(ChunkMatrix*)data;
-	data+=sizeof(ChunkMatrix);
-	spare1=*(int*)data;
-	data+=4;	
-	spare2=*(int*)data;
-}
-#else
+
 AVP_Player_Start_Chunk::AVP_Player_Start_Chunk(Chunk_With_Children* parent,const char* data,size_t)
 :Chunk(parent,"AVPSTART")
 {
@@ -481,7 +423,6 @@ AVP_Player_Start_Chunk::AVP_Player_Start_Chunk(Chunk_With_Children* parent,const
 	CHUNK_EXTRACT(orientation,ChunkMatrix)
 	CHUNK_EXTRACT(moduleID,ObjectID)
 }
-#endif
 
 void AVP_Player_Start_Chunk::fill_data_block (char * data)
 {

@@ -2,12 +2,6 @@
 #include "conscmnd.hpp"
 #include "strutil.h"
 
-// Includes for the actual commands:
-//#include "consvar.hpp"
-//#include "modcmds.hpp"
-//#include "textexp.hpp"
-//#include "trepgadg.hpp"
-
 #define UseLocalAssert Yes
 #include "ourasert.h"
 
@@ -509,7 +503,6 @@ void CreateGameSpecificConsoleCommands(void)
 	);
 
 
-	#if 1
 	ConsoleCommand::Make
 	(
 		"GUNX",
@@ -541,7 +534,6 @@ void CreateGameSpecificConsoleCommands(void)
 		"MAKE AN ASSERTION FIRE, EXITING THE GAME",
 		ForceAssertionFailure
 	);
-	#endif
 
 	ConsoleCommand::Make
 	(
@@ -549,14 +541,6 @@ void CreateGameSpecificConsoleCommands(void)
 		"RESTARTS A NETWORK GAME FROM SCRATCH",
 		RestartMultiplayer
 	);
-	#if 0
-	ConsoleCommand::Make
-	(
-		"NEWPLANET",
-		"",
-		NewPlanet
-	);
-	#endif
 	ConsoleCommand::Make
 	(
 		"PAINTBALL",
@@ -678,9 +662,7 @@ void CreateGameSpecificConsoleCommands(void)
 		"Become a pistol marine",
 		ChangeToSpecialist_Pistols
 	);
-
 	
-	#if 1
 	ConsoleCommand::Make
 	(
 		"TRASH_FRAME_RATE",
@@ -694,7 +676,6 @@ void CreateGameSpecificConsoleCommands(void)
 		"",
 		CompleteLevel
 	);
-	#endif
 	#endif
 	/* KJL 15:52:41 29/03/98 - version info */
 	ConsoleCommand::Make

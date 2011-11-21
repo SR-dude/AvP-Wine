@@ -1,5 +1,3 @@
-#ifndef NDEBUG
-
 /* ********************************************************************	*
  *																		*
  *	DB.C - Debugging functions.											*
@@ -8,64 +6,27 @@
  *																		*
  * ******************************************************************** */
 
-/* N O T E S ********************************************************** */
-
-/* A lot of these functions should be called via macros defined in db.h */
-
-/* If you don't want to link this file with Windows OS files set the 
- * define DB_NOWINDOWS. This will also stop linking with the Direct Draw
- * stuff, which is, after all, a part of Windows. If you want Windows 
- * stuff, but NOT Direct Draw, define DB_NODIRECTDRAW.
- */
- 
-/* ******************************************************************** *
- * 																		*
- *	I N T E R F A C E - both internal and external.						*
- * 																		*
- * ******************************************************************** */
-
-/* I N C L U D E S **************************************************** */
-
-/* Windows includes. Actually internal, but here to allow pre-compilation. */
 #include "advwin32.h"
-#ifndef DB_NOWINDOWS
-	#include <windows.h>
-	#include "advwin32.h"
-#endif	
-#ifndef DB_NODIRECTDRAW
-	#include <ddraw.h>
-#endif
-#include "db.h"	 /* Contains most off the interface. */
+#include <windows.h>
+#include "advwin32.h"
+#include <ddraw.h>
+#include "db.h"	
 
-/* G L O B A L S ****************************************************** */
-/* Have external linkage. */
-volatile BOOL DZ_NULL;
-
-/* This variable dictates whether macros ending _opt get executed. */
-int db_option = 0; /* Default is off. */
-
-/* ******************************************************************** *
- * 																		*
- *	I N T E R N A L 													*
- * 																		*
- * ******************************************************************** */
-
-/* I N C L U D E S **************************************************** */
-
-/* Defining DB_NOWINDOWS implies DB_NODIRECTDRAW should	also be defined. */
-#ifdef DB_NOWINDOWS
-	#ifndef DB_NODIRECTDRAW
-		#define DB_NODIRECTDRAW
-	#endif
-#endif
-		
-/* ANSI includes. */
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <conio.h>
 #include <direct.h>	/* For getcwd() */
 #include <stdarg.h>	/* For variable arguments. */
+
+
+/* Have external linkage. */
+volatile BOOL DZ_NULL;
+
+/* This variable dictates whether macros ending _opt get executed. */
+int db_option = 0; /* Default is off. */
+	
+
 
 /* C O N S T A N T S ************************************************** */
 
@@ -159,24 +120,17 @@ static const char* db_msg_log_begin_text =
 	"DB: MSG BEGINS";
 static const char* db_msg_log_end_text =
 	"DB: MSG ENDS";
-	
-#ifdef DB_NOWINDOWS
-static char db_log_file_name[261] = LOGFILE_NAME;
-#else
+
 static char db_log_file_name[MAX_PATH+1] = LOGFILE_NAME;
-#endif
+
 
 
 /* P R O T O S ******************************************************** */
 /* Should all be static. */
 
 static void db_do_std_prompt(unsigned yOffset);
-
-#ifndef DB_NOWINDOWS
 static void db_do_win_prompt(const char* titleStrP, const char* bodyStrP);
-#endif /* ifndef DB_NOWINDOWS */
 
-#ifndef DB_NODIRECTDRAW
 
 /* Load debugging font, return NULL if we fail. */
 static fontPtr guiload_font(char *new_fname);
@@ -204,7 +158,6 @@ static void DbFlip(void);
 /* Blits the contents of the draw surface to the visible surface. */
 static void DbBlt(void);
 	
-#endif /* ifndef DB_NODIRECTDRAW */
 
 /* F U N C T I O N S **************************************************	*/
 
@@ -271,7 +224,6 @@ void db_assert_fail(const char *exprP, const char *fileP, int line)
 			printf("\n");
 			db_do_std_prompt( 0 );
 			break;
-#ifndef DB_NODIRECTDRAW			
 		case DB_DIRECTDRAW:
 			{
 				char msg[256];
@@ -291,8 +243,7 @@ void db_assert_fail(const char *exprP, const char *fileP, int line)
 				db_do_std_prompt( 48 );
 			}	
 			break;
-#endif	
-#ifndef DB_NOWINDOWS		
+
 		case DB_WINDOWS:
 			{
 				char fmtMsg[ 256 ];
@@ -306,7 +257,6 @@ void db_assert_fail(const char *exprP, const char *fileP, int line)
 				db_do_win_prompt( db_assert_textA[ 0 ], msg );
 			}
 			break;
-#endif			
 		default:
 			break;
 	}
@@ -327,12 +277,10 @@ void db_msg_fired(const char *strP)
 			printf("%s\n", strP);
 			db_do_std_prompt( 0 );
 			break;
-#ifndef DB_NOWINDOWS			
 		case DB_WINDOWS:
 			db_do_win_prompt( "Debugging Message", strP );
 			break;
-#endif
-#ifndef DB_NODIRECTDRAW			
+
 		case DB_DIRECTDRAW:
 			{
 				unsigned short xLimit = (unsigned short) dd_mode.width;
@@ -345,7 +293,7 @@ void db_msg_fired(const char *strP)
 				db_do_std_prompt( 16 );
 			}	
 			break;	
-#endif
+
 		default:
 			break;				
 	}
@@ -359,11 +307,9 @@ void db_print_fired(int x, int y, const char *strP)
 		case DB_DOS:
 			printf("%s\n", strP);
 			break;
-#ifndef DB_NOWINDOWS			
 		case DB_WINDOWS:
 			break;
-#endif
-#ifndef DB_NODIRECTDRAW		
+
 		case DB_DIRECTDRAW:
 		{
 			unsigned short xLimit = (unsigned short) (dd_mode.width - x);
@@ -371,7 +317,7 @@ void db_print_fired(int x, int y, const char *strP)
 				strP, xLimit, FontP);
 			break;
 		}	
-#endif
+
 		default:
 			break;			
 	}		
@@ -398,13 +344,9 @@ void db_log_fired(const char *strP)
 
 void db_log_init(void)
 {
-	#if ABSOLUTE_PATH
-	sprintf( LogFileNameP, "%s", db_log_file_name ); 
-	#else
 	/* Append the log file name to the current working directory. */
 	sprintf( LogFileNameP, "%s\\%s", getcwd( LogFileNameP, 240 ),
 		db_log_file_name );
-	#endif
 	
 	/* Delete old log file. */
 	remove(LogFileNameP);
@@ -423,7 +365,6 @@ extern void db_set_log_file_ex(const char *strP)
 void db_set_mode_ex(int mode, void *modeInfoP, void *newFontP)
 {
 	db_display_type = mode;	
-#ifndef DB_NODIRECTDRAW	
 	if(dd_mode.visibleSurfaceP)
 	{
 		IDirectDrawSurface_Release((LPDIRECTDRAWSURFACE) dd_mode.visibleSurfaceP);
@@ -463,7 +404,7 @@ void db_set_mode_ex(int mode, void *modeInfoP, void *newFontP)
 			exit(0);
 		}	
 	}	
-#endif	
+
 }
 
 /* Called to set whether exceptions or brakepoints are called. */
@@ -478,7 +419,7 @@ int db_get_mode(void** modeInfoPP, void **FontPP)
 	*FontPP = NULL;
 	*modeInfoPP = NULL;
 
-#ifndef DB_NODIRECTDRAW
+
 	if(db_display_type == DB_DIRECTDRAW)
 	{
 		// copy font data
@@ -487,13 +428,12 @@ int db_get_mode(void** modeInfoPP, void **FontPP)
 		// copy surface data
 		*modeInfoPP = (void *) &dd_mode;
 	}
-#endif
+
 	return db_display_type;
 }
 
 void db_uninit(void)
 {
-	#ifndef DB_NODIRECTDRAW
 	if(FontP)
 	{
 		if(FontP->bitmapP)
@@ -519,7 +459,7 @@ void db_uninit(void)
 		IDirectDrawSurface_Release((LPDIRECTDRAWSURFACE) dd_mode.drawSurfaceP);
 	}
 
-	#endif
+	
 }
 
 /* ******************************************************************** *
@@ -543,7 +483,6 @@ static void db_do_std_prompt(unsigned yOffset)
 			}
 			while((ch != 'N') && (ch != 'Y') && (ch != 'X'));
 			break;
-#ifndef DB_NODIRECTDRAW
 		case DB_DIRECTDRAW:
 		{
 			SHORT response;
@@ -596,8 +535,8 @@ static void db_do_std_prompt(unsigned yOffset)
 			}			
 			break;
 		}
-#endif /* ifndef DB_NODIRECTDRAW */
-	}/* switch(db_display_type) */
+
+	}
 
 	if(ch == 'Y')
 	{
@@ -607,17 +546,16 @@ static void db_do_std_prompt(unsigned yOffset)
 	{
 		if(db_use_brakepoints)
 		{
-//sr			DB_FORCE_BRAKEPOINT();
+//adj			DB_FORCE_BRAKEPOINT();
 		}
 		else
 		{
-//sr			DB_FORCE_EXCEPTION();
+//adj			DB_FORCE_EXCEPTION();
 		}
 	}
 
-}/* db_do_std_prompt() */
+}
 
-#ifndef DB_NOWINDOWS
 static void db_do_win_prompt(const char* titleStrP, const char* bodyStrP)
 {
 	int response;
@@ -648,10 +586,8 @@ static void db_do_win_prompt(const char* titleStrP, const char* bodyStrP)
 			DB_FORCE_EXCEPTION();
 		}
 	}
-}/* db_do_win_prompt() */
-#endif /* ifndef DB_NOWINDOWS */
+}
 
-#ifndef DB_NODIRECTDRAW
 
 static fontPtr guiload_font(char *new_fname)
 {
@@ -1033,8 +969,4 @@ static void DbBlt(void)
 		db_log_fired("Internal debug blit failed - message lost.");	
 }
 
-#endif
 
-#else
-	;
-#endif /* ! NDEBUG */

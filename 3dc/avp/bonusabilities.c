@@ -80,12 +80,6 @@ static void FireGrapplingHook(void)
 		/* CDF 14/4/99 Make a sound... */
 		Sound_Play(SID_GRAPPLE_THROW,"h");
 
-		#if 0
-		/* los */
-		GrapplingHook.Position = PlayersTarget.Position;
-		GrapplingHook.Orientation = Global_VDB_Ptr->VDB_Mat;
-		TransposeMatrixCH(&GrapplingHook.Orientation);
-		#endif
 	}
 
 }
@@ -149,9 +143,7 @@ static DISPLAYBLOCK* CreateGrapplingHook(void)
 		tempModule.m_lightarray = (struct lightblock *)0;
 		tempModule.m_extraitemdata = (struct extraitemdata *)0;
 		tempModule.m_dptr = NULL; /* this is important */
-		#if SupportWIndows95
 		tempModule.name = NULL; /* this is important */
-		#endif
 		AllocateModuleObject(&tempModule); 
 		dPtr = tempModule.m_dptr;		
 		if(dPtr==NULL)
@@ -177,7 +169,6 @@ static DISPLAYBLOCK* CreateGrapplingHook(void)
 		/* make displayblock a dynamic module object */
 		dPtr->ObFlags3 |= ObFlag3_DynamicModuleObject;
 
-//		sbPtr->SBDamageBlock.IsOnFire=1;
 
 		return dPtr;
 	}
@@ -302,9 +293,7 @@ extern void RenderGrapplingHook(void)
 			cable[0].vy = Global_VDB_Ptr->VDB_World.vy-mat.mat32/128+500;
 			cable[0].vz = Global_VDB_Ptr->VDB_World.vz-mat.mat33/128;
 		}
-//		cable[0].vx = Global_VDB_Ptr->VDB_World.vx;
-//		cable[0].vy = Global_VDB_Ptr->VDB_World.vy+500;
-//		cable[0].vz = Global_VDB_Ptr->VDB_World.vz;
+
 
 		for (i=1; i<46; i++)
 		{	
@@ -335,52 +324,6 @@ extern void RenderGrapplingHook(void)
 			MakeMatrixFromDirection(&dir,&mat);
 			D3D_DrawCable(cable, &mat);
 		}
-		#if 0
-		DISPLAYBLOCK displayblock;
-		displayblock.ObWorld=GrapplingHook.Position;
-		displayblock.ObMat=GrapplingHook.Orientation;
-		displayblock.ObShape=GrapplingHook.ShapeIndex;
-		displayblock.ObShapeData=GetShapeData(GrapplingHook.ShapeIndex);
-
-		displayblock.name=NULL;
-		displayblock.ObEuler.EulerX=0;
-		displayblock.ObEuler.EulerY=0;
-		displayblock.ObEuler.EulerZ=0;
-		displayblock.ObFlags=0;
-		displayblock.ObFlags2=0;
-		displayblock.ObFlags3=0;
-		displayblock.ObNumLights=0;
-		displayblock.ObRadius=0;
-		displayblock.ObMaxX=0;
-		displayblock.ObMinX=0;
-		displayblock.ObMaxY=0;
-		displayblock.ObMinY=0;
-		displayblock.ObMaxZ=0;
-		displayblock.ObMinZ=0;
-		displayblock.ObTxAnimCtrlBlks=NULL;
-		displayblock.ObEIDPtr=NULL;
-		displayblock.ObMorphCtrl=NULL;
-		displayblock.ObStrategyBlock=NULL;
-		displayblock.ShapeAnimControlBlock=NULL;
-		displayblock.HModelControlBlock=NULL;
-		displayblock.ObMyModule=NULL;		
-		displayblock.SpecialFXFlags = 0;
-		displayblock.SfxPtr=0;
-
-		MakeVector(&displayblock.ObWorld, &Global_VDB_Ptr->VDB_World, &displayblock.ObView);
-		RotateVector(&displayblock.ObView, &Global_VDB_Ptr->VDB_Mat);
-		RenderThisDisplayblock(&displayblock);
-		{
-			PARTICLE particle;
-			particle.Colour = 0xffffffff;
-			particle.ParticleID = PARTICLE_LASERBEAM;
-			particle.Position = Player->ObStrategyBlock->DynPtr->Position;
-			particle.Position.vy-=1000;
-			particle.Offset = GrapplingHook.DispPtr->ObStrategyBlock->DynPtr->Position;
-			particle.Size = 20;
-			RenderParticle(&particle);
-		}
-		#endif
 
 	}
 }

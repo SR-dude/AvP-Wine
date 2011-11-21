@@ -16,10 +16,10 @@ extern "C"
 #define UseLocalAssert Yes
 #include "ourasert.h"
 
- // Edmond
- #include "pldnet.h"
- #include "dp_func.h"
- #include <time.h>
+// Edmond
+#include "pldnet.h"
+#include "dp_func.h"
+#include <time.h>
 
 static int LoadUserProfiles(void);
 
@@ -49,15 +49,12 @@ extern void ExamineSavedUserProfiles(void)
 	// delete any existing profiles
 	EmptyUserProfilesList();
 	
-//	UserProfilesList.add_entry(profilePtr);
-//	SaveUserProfile(profilePtr);
 	if (LoadUserProfiles())
 	{
 	
 	}
 	else /* No user profile found. We'll have to make one */
-	{
-	//	MakeNewUserProfile();
+	{ /*adj*/
 	}
 
 	AVP_USER_PROFILE *profilePtr = new AVP_USER_PROFILE;
@@ -200,7 +197,6 @@ static int LoadUserProfiles(void)
 
 	if (INVALID_HANDLE_VALUE == hFindFile)
 	{
-//		printf("File Not Found: <%s>\n",load_name);
 		return 0;
 	}
 
@@ -244,7 +240,6 @@ static int LoadUserProfiles(void)
 					FILE_FLAG_RANDOM_ACCESS, 0);
 			if(rif_file==INVALID_HANDLE_VALUE)
 			{
-//				printf("couldn't open %s\n",pszFullPath);
 				delete[] pszFullPath;
 				continue;
 			}
@@ -274,8 +269,7 @@ static int LoadUserProfiles(void)
 
 
 	if (ERROR_NO_MORE_FILES != GetLastError())
-	{
-	   //	printf("Error finding next file\n");
+	{ /*adj*/
 	}
 
 	::FindClose(hFindFile);
@@ -362,8 +356,6 @@ static void SetDefaultProfileOptions(AVP_USER_PROFILE *profilePtr)
 
 	SaveSettingsToUserProfile(profilePtr);
 }
-
-
 
 
 			

@@ -21,13 +21,7 @@
 #define UseLocalAssert Yes
 #include "ourasert.h"
 
-#if PSX
-#include "psx_cdf.h"
-#endif
 
-/* prototypes for this file */
-//static void BuildFM_EntryPoints(MODULE *thisModule);
-//static void BuildFM_ASingleEP(MODULE *thisModule, MODULE *targetModule);
 
 static void BuildFM_AuxilaryLocs(MODULE *thisModule);
 static void GetFarLocHeight(FARVALIDATEDLOCATION *location, MODULE *thisModule);
@@ -41,13 +35,8 @@ extern int ModuleArraySize;
 /* prototypes for external functions */
 int SetupPolygonAccessFromShapeIndex(int shapeIndex);
 int SetupPointAccessFromShapeIndex(int shapeIndex);
-#if PSX
-	SVECTOR* AccessNextPoint(void);
-	SVECTOR* AccessPointFromIndex(int index);
-#else
 	VECTORCH* AccessNextPoint(void);
 	VECTORCH* AccessPointFromIndex(int index);
-#endif
 int *GetPolygonVertexIndices(void);
 
 /* globals for this file */
@@ -66,14 +55,8 @@ static VECTORCH	*FL_AuxData = (VECTORCH *)0;
 
 /* a define for logging location data */
 #define logFarLocData	0
-#if logFarLocData
-static FILE *logfile;
-#endif
 
 #define logFarLocPositions	0
-#if logFarLocPositions
-static FILE *logfile2;
-#endif
 
 /*----------------------Patrick 16/12/96------------------------
   This function builds a list of entry points and auxilary
@@ -89,18 +72,6 @@ void BuildFarModuleLocs(void)
 	MODULE **moduleListPointer;	
 	int moduleCounter;
 
-	/* don't do this for a net game */
-	//in fact do do it in net game
-	#if 0
-	if(AvP.Network != I_No_Network)	
-	{
-		/* Make sure global data is zeroed, then return */
-		FALLP_AuxLocs = (FARLOCATIONSHEADER *)0;
-		FL_TotalNumAuxLocs = 0;
-		FL_AuxData = (VECTORCH *)0;
-		return;
-	}
-	#endif
 
 	LOCALASSERT(ModuleArraySize);
 
@@ -116,18 +87,6 @@ void BuildFarModuleLocs(void)
 		moduleListPointer = ScenePtr->sm_marray;
 	}
 		
-	#if logFarLocData
-	logfile = fopen("E:/3DC/FARLOCS.TXT","w");
-	fprintf(logfile, "MODULE FAR LOCATIONS DATA \n");
-	fprintf(logfile, "ENV: %s \n", Env_List[AvP.CurrentEnv]->main);
-	fprintf(logfile, "************************* \n");
-	fprintf(logfile, "number of modules: %d \n", ModuleArraySize);
-	fprintf(logfile, "grid size: %d \n", FAR_GRID_SIZE);
-	fprintf(logfile, "max locs stored per module: %d \n \n", FAR_MAX_LOCS);
-	fprintf(logfile, "alien box height: %d \n", FAR_BB_HEIGHT);
-	fprintf(logfile, "alien box width: %d \n", FAR_BB_WIDTH);
-	fprintf(logfile, "************************* \n \n");	
-	#endif
 
 	/* initialise infinite module counter */
 	numInfiniteModules = 0;
@@ -144,57 +103,8 @@ void BuildFarModuleLocs(void)
 	NB entry points are are pre-allocated, since they are evaluated in pairs.*/
 	InitFarLocDataAreas(moduleListPointer, ModuleArraySize);
 	
-	#if logFarLocData
-	fprintf(logfile, "********************************* \n");
-	fprintf(logfile, "STARTING ENTRY POINTS.... \n");
-	fprintf(logfile, "********************************* \n \n");
-	#endif
 
-	/* Now go through the module list, and calculate entry points. This step should
-	be done before auxilary locations, to be absolutely sure everything works out */
-	#if 0
-	//set up in projload now
-	for(moduleCounter = 0; moduleCounter < ModuleArraySize; moduleCounter++)
-	{
-		MODULE *thisModule;
-		int ThisModuleIndex;	
-	 		
-	 	/* get a pointer to the next module, and it's index */
-		thisModule = moduleListPointer[moduleCounter]; 
-		LOCALASSERT(thisModule);
-		ThisModuleIndex = thisModule->m_index;
-		LOCALASSERT(ThisModuleIndex >= 0);
-		LOCALASSERT(ThisModuleIndex < ModuleArraySize);
-		
-		#if PSX
-		#ifndef CDEMUL
-		pollhost();
-		#endif
-		#endif
-		
-		#if logFarLocData
-		fprintf(logfile, "********************************* \n");
-		fprintf(logfile, "Module Index: %d %s\n", ThisModuleIndex,thisModule->name);
- 		#endif
 
-		/* reject modules that are not physical */
-		if(ModuleIsPhysical(thisModule)) 
-			BuildFM_EntryPoints(thisModule);
-		else
-		{
-			numInfiniteModules++;
-			#if logFarLocData
-			fprintf(logfile, "NO EPS COMPUTED: NOT PHYSICAL\n \n");
-			#endif
-		}
-	}
-	#endif
-
-	#if logFarLocData
-	fprintf(logfile, "********************************* \n");
-	fprintf(logfile, "STARTING AUXILARY LOCATIONS.... \n");
-	fprintf(logfile, "********************************* \n \n");
-	#endif
 
 	/* now go thro' each module calculating auxilary locations */
 	for(moduleCounter = 0; moduleCounter < ModuleArraySize; moduleCounter++)
@@ -209,77 +119,19 @@ void BuildFarModuleLocs(void)
 		LOCALASSERT(ThisModuleIndex >= 0);
 		LOCALASSERT(ThisModuleIndex < ModuleArraySize);
 		
-		#if logFarLocData
-		fprintf(logfile, "********************************* \n");
-		fprintf(logfile, "Module Index: %d \n", ThisModuleIndex);
-		fprintf(logfile, "Module X range: %d %d \n", thisModule->m_minx, thisModule->m_maxx);
-		fprintf(logfile, "Module Z range: %d %d \n \n", thisModule->m_minz, thisModule->m_maxz);
-		#endif
 		
-		#if PSX
-		  #ifndef CDEMUL
-		    pollhost();
-		  #endif
-    	#endif
 		
 		/* check for entry points into this module if there	aren't any,
 		don't bother with auxilary locations */
 
 		if(thisModule->m_aimodule)
 			BuildFM_AuxilaryLocs(thisModule);
-		/*
-		else
-		{	
-			#if logFarLocData
-			fprintf(logfile, "NO AUXILARY LOCS COMPUTED: NO EPS \n \n");
-			#endif
-		} 
-		*/ 
 	}
 
 	/* deallocate the temporary work spaces */
 	if (auxLocsGrid) DeallocateMem(auxLocsGrid);
 
-	#if logFarLocData
-	fprintf(logfile, "************************************* \n");
-	fprintf(logfile, "FINISHED ! \n");
-	fprintf(logfile, "NUM INFINITE MODULES/TERMINATORS: %d \n", numInfiniteModules);
-	fprintf(logfile, "************************************* \n");
-	fclose(logfile);
-	#endif
 
-	#if logFarLocPositions && 0 //this log will need to updated for the ai modules.
-	logfile2 = fopen("D:/PATRICK/FARLOCS2.TXT","w");
-	fprintf(logfile2, "MODULE EPs AND AUXILARY LOCATIONS \n");
-	fprintf(logfile2, "ENV: %s \n", Env_List[AvP.CurrentEnv]->main);
-	fprintf(logfile2, "************************* \n \n");
-
-	for(moduleCounter = 0; moduleCounter < ModuleArraySize; moduleCounter++)
-	{
-		int i;
-		fprintf(logfile2, "MODULE INDEX: %d \n",moduleCounter);
-		fprintf(logfile2, "  EPs: \n");
-		for(i=0;i<FALLP_EntryPoints[moduleCounter].numEntryPoints;i++)
-		{
-			VECTORCH posn;
-			int index;
-			posn = (FALLP_EntryPoints[moduleCounter].entryPointsList)[i].position;
-			index = (FALLP_EntryPoints[moduleCounter].entryPointsList)[i].donorIndex; 
-			fprintf(logfile2, "  %d %d %d FROM %d \n", posn.vx, posn.vy, posn.vz, index);
-		}
-		fprintf(logfile2, "  AUX: \n");
-		for(i=0;i<FALLP_AuxLocs[moduleCounter].numLocations;i++)
-		{
-			VECTORCH posn;
-			posn = (FALLP_AuxLocs[moduleCounter].locationsList)[i];
-			fprintf(logfile2, "  %d %d %d \n", posn.vx, posn.vy, posn.vz);
-		}
-		fprintf(logfile2, "\n");
-	}
-	fprintf(logfile2, "************************* \n");
-	fprintf(logfile2, "END \n ");
-	fclose(logfile2);
-	#endif
 }
 
 /* allocates and initialises primitive data areas */
@@ -368,9 +220,6 @@ and must be called at some point before the environment re-load
 -------------------------------------------------------------------*/
 void KillFarModuleLocs(void)
 {	
-	/* don't do this for a net game */
-	//in fact do do it in net game
-	//if(AvP.Network != I_No_Network)	return;
 	
 	LOCALASSERT(ModuleArraySize);
 	LOCALASSERT(AIModuleArraySize);
@@ -613,329 +462,7 @@ static int GetModulesIntersection(MODULE *thisModule, MODULE *targetModule);
 static int GetModulePointBox(MODULE *thisModule, EPBBEXTENTS *extents);
 static void AddModuleEP(MODULE* thisModule, MODULE*fromModule, VECTORCH *posn);
 
-/*-----------------------Patrick 16/12/96---------------------------
-This Function checks if a module has any adjacent modules, and if
-so calls BuildFM_ASingleEntryEp for each one.
--------------------------------------------------------------------*/
-#if 0
-static void BuildFM_EntryPoints(MODULE *thisModule)
-{
-	int ThisModuleIndex;
-	MREF *AdjModuleRefPtr;
-		
-	LOCALASSERT(thisModule);
-	ThisModuleIndex = thisModule->m_index;
-	LOCALASSERT(ThisModuleIndex >= 0);
-	LOCALASSERT(ThisModuleIndex < ModuleArraySize);
-		
-	/* check that there is a list of adjacent modules */
-	if(!(NumAdjacentModules(thisModule))) 
-	{
-		#if logFarLocData
-		fprintf(logfile, "No adjacent modules found for this module \n");
-		#endif
-		return;
-	}
-	
-	AdjModuleRefPtr = thisModule->m_link_ptrs;
-	
-	/* go through each adjacent module */			
-	while(AdjModuleRefPtr->mref_ptr != 0)
-	{
-		BuildFM_ASingleEP(thisModule, ((MODULE* )AdjModuleRefPtr->mref_ptr));
-		AdjModuleRefPtr++;
-	}			
-}
-#endif
 
-/*-----------------------Patrick 16/12/96---------------------------
-This Function builds a single entry point pair between two modules.
--------------------------------------------------------------------*/
-#if 0
-static void BuildFM_ASingleEP(MODULE *thisModule, MODULE *targetModule)
-{
-	VECTORCH thisModuleEP; 
-	VECTORCH targetModuleEP;
-	int numpts1, numpts2;
-
-	/* containment check */
-	if(ModuleInModule(thisModule, targetModule))
-	{
-		#if logFarLocData
-		fprintf(logfile, "Against module %d: containment failure \n",targetModule->m_index);
-		#endif
-		targetModule->m_flags |= m_flag_slipped_inside;
-		return;
-	}
-	if(ModuleInModule(targetModule, thisModule))
-	{
-		#if logFarLocData
-		fprintf(logfile, "Against module %d: containment failure \n",targetModule->m_index);
-		#endif
-		thisModule->m_flags |= m_flag_slipped_inside;
-		return;
-	}
-	
-	/* check if entry point already exists... */
-	if(GetModuleEP(thisModule, targetModule) != (FARENTRYPOINT *)0)
-	{
-		#if logFarLocData
-		fprintf(logfile, "Against module %d: ep already exists \n",targetModule->m_index);
-		#endif
-		return;	
-	}
-
-	/* at this stage we know that thisModule is physical....
-	but it's a good idea to check the target module */
-	if (!(ModuleIsPhysical(targetModule)))
-	{
-		#if logFarLocData
-		fprintf(logfile, "Against module %d: target is not physical \n",targetModule->m_index);
-		#endif
-		return;	
-	}
-			
-	/* so go ahead and find the entry point pair... */
-	#if logFarLocData
-	fprintf(logfile, "Calculating ep against module %d %s\n", targetModule->m_index,targetModule->name);
-	#endif
-				
-	/* compute the bounding box intersection between the modules */
-	if(GetModulesIntersection(thisModule, targetModule) == 0)
-	{	
-		#if logFarLocData
-		fprintf(logfile, "Against module %d: BBOX failure \n",targetModule->m_index);
-		#endif
-		return;		
-	}
-
-	/* get the bounding boxes defined by each module's points inside the intersection volume */
-	
-	numpts1 = GetModulePointBox(thisModule, &MI_Volume2);
-	numpts2 = GetModulePointBox(targetModule, &MI_Volume3);
-	
-	if(numpts1<2 || numpts2<2)
-	{
-		int extentCentre;
-
-		#if logFarLocData
-		fprintf(logfile, "Against module %d: not enough points in intersection \n",targetModule->m_index);
-		#endif
-
-		/* Create one anyways. */
-
-		extentCentre=MI_Volume1.maxX + MI_Volume1.minX;
-		extentCentre>>=1;
-		thisModuleEP.vx = extentCentre; 
-		targetModuleEP.vx = extentCentre;
-
-		extentCentre=MI_Volume1.maxY + MI_Volume1.minY;
-		extentCentre>>=1;
-		thisModuleEP.vy = extentCentre; 
-		targetModuleEP.vy = extentCentre;
-
-		extentCentre=MI_Volume1.maxZ + MI_Volume1.minZ;
-		extentCentre>>=1;
-		thisModuleEP.vz = extentCentre; 
-		targetModuleEP.vz = extentCentre;
-
-		if( ((MI_Volume1.maxX - MI_Volume1.minX) < (MI_Volume1.maxY - MI_Volume1.minY))&&
-			((MI_Volume1.maxX - MI_Volume1.minX) < (MI_Volume1.maxZ - MI_Volume1.minZ)))
-		{
-			/* x is smallest */
-			if(thisModule->m_world.vx > targetModule->m_world.vx)
-			{
-				thisModuleEP.vx = MI_Volume2.maxX + EP_POSNDISP;
-				targetModuleEP.vx = MI_Volume3.minX - EP_POSNDISP;
-			}
-			else
-			{
-				thisModuleEP.vx = MI_Volume2.minX - EP_POSNDISP;
-				targetModuleEP.vx = MI_Volume3.maxX + EP_POSNDISP;
-			}
-		}
-		else if((MI_Volume1.maxZ - MI_Volume1.minZ) < (MI_Volume1.maxY - MI_Volume1.minY))
-		{
-			/* z is smallest */
-
-			if(thisModule->m_world.vz > targetModule->m_world.vz)
-			{
-				thisModuleEP.vz = MI_Volume2.maxZ + EP_POSNDISP;
-				targetModuleEP.vz = MI_Volume3.minZ - EP_POSNDISP;
-			}
-			else
-			{
-				thisModuleEP.vz = MI_Volume2.minZ - EP_POSNDISP;
-				targetModuleEP.vz = MI_Volume3.maxZ + EP_POSNDISP;
-			}
-		}
-		else
-		{
-			/* y is smallest */
-			if(thisModule->m_world.vy > targetModule->m_world.vy)
-			{
-				thisModuleEP.vy = MI_Volume2.maxY + EP_POSNDISP;
-				targetModuleEP.vy = MI_Volume3.minY - EP_POSNDISP;
-			}
-			else
-			{
-				thisModuleEP.vy = MI_Volume2.minY - EP_POSNDISP;
-				targetModuleEP.vy = MI_Volume3.maxY + EP_POSNDISP;
-			}
-		}
-		#if logFarLocData
-		fprintf(logfile, "Made one anyway.\n");
-		#endif
-	
-	} else {
-
-		/* Test the point bounding boxes, just to make sure */
-		LOCALASSERT(MI_Volume2.maxX >= MI_Volume2.minX);
-		LOCALASSERT(MI_Volume2.maxY >= MI_Volume2.minY);
-		LOCALASSERT(MI_Volume2.maxZ >= MI_Volume2.minZ);
-		LOCALASSERT(MI_Volume3.maxX >= MI_Volume3.minX);
-		LOCALASSERT(MI_Volume3.maxY >= MI_Volume3.minY);
-		LOCALASSERT(MI_Volume3.maxZ >= MI_Volume3.minZ);
-		
-		/* calculate ep's */
-		if( ((MI_Volume1.maxX - MI_Volume1.minX) < (MI_Volume1.maxY - MI_Volume1.minY))&&
-			((MI_Volume1.maxX - MI_Volume1.minX) < (MI_Volume1.maxZ - MI_Volume1.minZ)))
-		{
-			/* x is smallest */
-			int extentCentre;
-		
-			if(MI_Volume2.maxY < MI_Volume3.maxY) extentCentre = MI_Volume2.maxY;
-			else extentCentre = MI_Volume3.maxY;
-			if(MI_Volume2.minY > MI_Volume3.minY) extentCentre += MI_Volume2.minY;
-			else extentCentre += MI_Volume3.minY;
-			extentCentre /=	2;
-			thisModuleEP.vy = extentCentre; 
-			targetModuleEP.vy = extentCentre;
-			 
-			if(MI_Volume2.maxZ < MI_Volume3.maxZ) extentCentre = MI_Volume2.maxZ;
-			else extentCentre = MI_Volume3.maxZ;
-			if(MI_Volume2.minZ > MI_Volume3.minZ) extentCentre += MI_Volume2.minZ;
-			else extentCentre += MI_Volume3.minZ;
-			extentCentre /=	2;
-			thisModuleEP.vz = extentCentre; 
-			targetModuleEP.vz = extentCentre;
-		
-			if(thisModule->m_world.vx > targetModule->m_world.vx)
-			{
-				thisModuleEP.vx = MI_Volume2.maxX + EP_POSNDISP;
-				targetModuleEP.vx = MI_Volume3.minX - EP_POSNDISP;
-			}
-			else
-			{
-				thisModuleEP.vx = MI_Volume2.minX - EP_POSNDISP;
-				targetModuleEP.vx = MI_Volume3.maxX + EP_POSNDISP;
-			}
-		}
-		else if((MI_Volume1.maxZ - MI_Volume1.minZ) < (MI_Volume1.maxY - MI_Volume1.minY))
-		{
-			/* z is smallest */
-			int extentCentre;
-					 
-			if(MI_Volume2.maxX < MI_Volume3.maxX) extentCentre = MI_Volume2.maxX;
-			else extentCentre = MI_Volume3.maxX;
-			if(MI_Volume2.minX > MI_Volume3.minX) extentCentre += MI_Volume2.minX;
-			else extentCentre += MI_Volume3.minX;
-			extentCentre /=	2;
-			thisModuleEP.vx = extentCentre; 
-			targetModuleEP.vx = extentCentre;
-		
-			if(MI_Volume2.maxY < MI_Volume3.maxY) extentCentre = MI_Volume2.maxY;
-			else extentCentre = MI_Volume3.maxY;
-			if(MI_Volume2.minY > MI_Volume3.minY) extentCentre += MI_Volume2.minY;
-			else extentCentre += MI_Volume3.minY;
-			extentCentre /=	2;
-			thisModuleEP.vy = extentCentre; 
-			targetModuleEP.vy = extentCentre;
-		
-			if(thisModule->m_world.vz > targetModule->m_world.vz)
-			{
-				thisModuleEP.vz = MI_Volume2.maxZ + EP_POSNDISP;
-				targetModuleEP.vz = MI_Volume3.minZ - EP_POSNDISP;
-			}
-			else
-			{
-				thisModuleEP.vz = MI_Volume2.minZ - EP_POSNDISP;
-				targetModuleEP.vz = MI_Volume3.maxZ + EP_POSNDISP;
-			}
-		}
-		else
-		{
-			/* y is smallest */
-			int extentCentre;
-		
-			if(MI_Volume2.maxX < MI_Volume3.maxX) extentCentre = MI_Volume2.maxX;
-			else extentCentre = MI_Volume3.maxX;
-			if(MI_Volume2.minX > MI_Volume3.minX) extentCentre += MI_Volume2.minX;
-			else extentCentre += MI_Volume3.minX;
-			extentCentre /=	2;
-			thisModuleEP.vx = extentCentre; 
-			targetModuleEP.vx = extentCentre;
-			 
-			if(MI_Volume2.maxZ < MI_Volume3.maxZ) extentCentre = MI_Volume2.maxZ;
-			else extentCentre = MI_Volume3.maxZ;
-			if(MI_Volume2.minZ > MI_Volume3.minZ) extentCentre += MI_Volume2.minZ;
-			else extentCentre += MI_Volume3.minZ;
-			extentCentre /=	2;
-			thisModuleEP.vz = extentCentre; 
-			targetModuleEP.vz = extentCentre;
-		
-			if(thisModule->m_world.vy > targetModule->m_world.vy)
-			{
-				thisModuleEP.vy = MI_Volume2.maxY + EP_POSNDISP;
-				targetModuleEP.vy = MI_Volume3.minY - EP_POSNDISP;
-			}
-			else
-			{
-				thisModuleEP.vy = MI_Volume2.minY - EP_POSNDISP;
-				targetModuleEP.vy = MI_Volume3.maxY + EP_POSNDISP;
-			}
-		}
-	}
-
-	/* convert back into local space */
-	thisModuleEP.vx -= thisModule->m_world.vx;
-	thisModuleEP.vy -= thisModule->m_world.vy;
-	thisModuleEP.vz -= thisModule->m_world.vz;
-	targetModuleEP.vx -= targetModule->m_world.vx;
-	targetModuleEP.vy -= targetModule->m_world.vy;
-	targetModuleEP.vz -= targetModule->m_world.vz;
-		
-	/* now test to make sure the entry points are inside their respective modules.
-	   (If not, don't add either) */
-	{
-		int inModule;
-		inModule = PointIsInModule(thisModule, &thisModuleEP);
-		if(!inModule)
-		{
-			#if logFarLocData
-			fprintf(logfile, "....can't add eps: MODULE %d, EP NOT IN MODULE SPACE \n", thisModule->m_index);
-			#endif
-			return;
-		}
-		inModule = PointIsInModule(targetModule, &targetModuleEP);
-		if(!inModule)
-		{
-			#if logFarLocData
-			fprintf(logfile, "....can't add eps: MODULE %d, EP NOT IN MODULE SPACE \n", targetModule->m_index);
-			#endif
-			return;
-		}
-	}
-	
-	/* Finally, set up the entry points for this and target module */
-	AddModuleEP(thisModule, targetModule, &thisModuleEP);
-	AddModuleEP(targetModule, thisModule, &targetModuleEP);	
-	#if logFarLocData
-	fprintf(logfile, "... entry points added \n");
-	#endif
-	
-}
-#endif
 
 /*-----------------------Patrick 28/2/96---------------------------
   This function calculates the bounding box intersection volume
@@ -1005,13 +532,8 @@ static int GetModulePointBox(MODULE *thisModule, EPBBEXTENTS *extents)
 	pointCounter = SetupPointAccessFromShapeIndex(thisModule->m_mapptr->MapShape);
 	while(pointCounter>0)
 	{
-		#if PSX
-			SVECTOR* thisPt = AccessNextPoint();
-			VECTORCH thisWorldPoint;
-		#else
 			VECTORCH* thisPt = AccessNextPoint();
 			VECTORCH thisWorldPoint;
-		#endif
 
 		thisWorldPoint.vx = thisPt->vx + thisModule->m_world.vx;
 		thisWorldPoint.vy = thisPt->vy + thisModule->m_world.vy;
@@ -1060,9 +582,6 @@ static void AddModuleEP(MODULE* thisModule, MODULE*fromModule, VECTORCH *posn)
 		The effective result is that the linked module will get an ep from the 
 		unlinked module, but not the other way round....
 		*/
-		#if logFarLocData
-		fprintf(logfile, "....CAN'T ADD EP TO MODULE %d : NO EP SLOTS \n", thisModule->m_index);
-		#endif
 		return;
 	}
 
@@ -1150,11 +669,6 @@ static void BuildFM_AuxilaryLocs(MODULE *thisModule)
 	}
 					
 	
-	#if logFarLocData
-	fprintf(logfile, "Num valid locs: %d \n", NumLocsValid);
-	fprintf(logfile, "Num Height failed: %d \n", NumLocsHeightFailed);
-	fprintf(logfile, "Num Vol failed: %d \n \n", NumLocsVolFailed);
-	#endif
 	
 	/* now have a full list of locations.... 
 	Those that are zero are invalid: hopefully some have survived */
@@ -1234,37 +748,10 @@ static void BuildFM_AuxilaryLocs(MODULE *thisModule)
 			LOCALASSERT(checkCount == NumLocsValid);
 		
 		}
-		#if logFarLocData
-		{
-			/* log the final list */
-			VECTORCH *tmpPtr;
-			int tmpCounter;
-			fprintf(logfile, "Locations list: \n");
-
-			tmpCounter = FALLP_AuxLocs[ThisModuleIndex].numLocations;
-			tmpPtr = FALLP_AuxLocs[ThisModuleIndex].locationsList;
-
-			while(tmpCounter > 0)
-			{
-				fprintf(logfile, "%d %d %d \n", tmpPtr->vx, tmpPtr->vz, tmpPtr->vy);
-				tmpPtr++;
-				tmpCounter--;	
-			}
-
-			fprintf(logfile,"\n");
-				
-		}
-		#endif
 	}
 	else
 	{
 		/* No valid locations */
-		#if logFarLocData
-		{
-			/* log an error */
-			fprintf(logfile,"All auxilary locations FAILED \n");
-		}
-		#endif	
 	}									
 }
 

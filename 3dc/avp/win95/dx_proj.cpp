@@ -76,17 +76,7 @@ extern "C++"
 // is, ahem, less than totally perfect...
 #define PreferPalettisedTextures Yes
 
-// Test hack to force driver zero (mono
-// rather than RGB), plus others.  Should
-// all be No in theory.  Turn on only one
-// at a time!!!
-#define ForceRampDriver No
-#define ForceRGBDriver No
-#define ForceHardwareDriver No
-#define ForceDirectDraw No
-
 // Externs
-
 extern int VideoMode;
 extern int VideoModeColourDepth;
 extern int WindowMode;
@@ -314,7 +304,6 @@ void SelectD3DDriverAndDrawMode(void)
 	   exit(0xdeaf);
 	  }
 
-    #if SupportZBuffering
     if (ZBufferRequestMode == RequestZBufferAlways)
 	  {
 	   if (d3d.Driver[d3d.CurrentDriver].ZBuffer)
@@ -332,47 +321,11 @@ void SelectD3DDriverAndDrawMode(void)
 	  }
 	else
 	  ZBufferMode = ZBufferOff;
-    #endif
-
+ 
 	
-    // Overrides for test purposes only
-
-    #if ForceRampDriver
-    d3d.CurrentDriver = 0;
-	D3DDriverMode = D3DSoftwareRampDriver;
-	ScanDrawMode = ScanDrawD3DRamp;
-    #endif
-
-    #if ForceRGBDriver
-    d3d.CurrentDriver = 1;
-	D3DDriverMode = D3DSoftwareRGBDriver;
-	ScanDrawMode = ScanDrawD3DSoftwareRGB;
-    #endif
-
-    #if ForceHardwareDriver
-    d3d.CurrentDriver = 2;
-	D3DDriverMode = D3DHardwareRGBDriver;
-	ScanDrawMode = ScanDrawD3DHardwareRGB;
-    #endif
-
-    #if ForceDirectDraw
-    d3d.CurrentDriver = 0;
-	D3DDriverMode = D3DSoftwareRampDriver;
-	ScanDrawMode = ScanDrawDirectDraw;
-    #endif
 
 }
 
-#if SUPPORT_MMX
-int use_mmx_math;
-void SelectMMXOptions(void)
-{
-	if (MMXAvailable)
-		use_mmx_math = 1;
-	else
-		use_mmx_math = 0;
-}
-#endif
 
 // Initialise temporary D3D object and then destroy
 // it again, SOLELY for the purpose of determining
@@ -428,38 +381,6 @@ BOOL TestInitD3DObject(void)
 // STRUCTURE AS DOES THE DRIVER DO TEXTURES
 // OR Z-BUFFERING.  FIXME!!!
 
-   #if 0
-   if ((D3DHardwareAvailable) && 
-     (RasterisationRequestMode == RequestDefaultRasterisation))
-     {
-	  if ((VideoMode == VideoMode_DX_320x200x8) ||
-	     (VideoMode == VideoMode_DX_320x240x8))
-		{
-		 if (CheckForVideoModes(VideoMode_DX_320x200x15))
-		   {
-		    VideoMode = VideoMode_DX_320x200x15;
-			return TRUE;
-		   }
-		 else if (CheckForVideoModes(VideoMode_DX_640x480x15))
-		   {
-		    VideoMode = VideoMode_DX_640x480x15;
-			return TRUE;
-		   }
-         else
-		   return FALSE;
-		}
-	  else if (VideoMode == VideoMode_DX_640x480x8)
-	    {
-		 if (CheckForVideoModes(VideoMode_DX_640x480x15))
-		   {
-		    VideoMode = VideoMode_DX_640x480x15;
-			return TRUE;
-		   }
-		 else
-		   return FALSE;
-		}
-	 }
-   #else
    // test only!!!
      {
 	  if (D3DHardwareAvailable)
@@ -467,7 +388,6 @@ BOOL TestInitD3DObject(void)
 	  else
 	    TestHw = No;
 	 }
-   #endif
 
    return TRUE;
 }
@@ -571,16 +491,10 @@ BOOL TestMemoryAccess(void)
 			LOGDXERR(ddrval);
 
   			if (ddrval != DD_OK)
-  			#if debug
      		   {
                 ReleaseDirect3D();
                 exit(ddrval);
      		   }
-  			#else
-			   {
-     		    return FALSE;
-			   }
-  			#endif
 
             if (ddcaps.dwCaps & DDCAPS_BLT)
 			  BlitVidMem = TRUE;
@@ -612,82 +526,7 @@ BOOL TestMemoryAccess(void)
 			else
 			  Flip = FALSE;
      
-	        // Creating surfaces like this before setting exclusive mode
-			// und so weiter seems to REALLY UPSET IT.  So for now, we
-			// shall say sod it and decide purely on the basis of the caps.
-	        #if 0
-	        // Create a DD surface in Vram
-            memset(&ddsd,0,sizeof(DDSURFACEDESC));
-            ddsd.dwSize = sizeof(DDSURFACEDESC);
-            ddsd.dwFlags = DDSD_WIDTH | DDSD_HEIGHT | DDSD_CAPS;
-			// 640 x 480 would be a typical screen
-            ddsd.dwHeight = TestSurfHeight;
-            ddsd.dwWidth = TestSurfWidth;
-            ddsd.ddsCaps.dwCaps= (DDSCAPS_OFFSCREENPLAIN);
 
-            ddrval = lpDD->CreateSurface(&ddsd, &lpTestSurf, NULL);
-			LOGDXERR(ddrval);
-            if (ddrval != DD_OK)
-	        #if debug
-		      {
-		       ReleaseDirect3D();
-	           exit(ddrval);
-	          }
-	        #else
-	        return FALSE;
-	        #endif
-
-            SurfacePtr = (unsigned char*) ddsd.lpSurface;
-
-            // Time write
-			TimeForVramWrite = timeGetTime();
-			for (i=0; i<TestSurfHeight; i++)
-			  {
-			   memset(SurfacePtr, 0, TestSurfWidth);
-			   SurfacePtr += ddsd.lPitch;
-			  }
-			TimeForVramWrite = (timeGetTime() - TimeForVramWrite);
-
-            // Kill the surface
-            ReleaseDDSurface((void*) lpTestSurf);
-            
-	        // Create a DD surface in System Memory
-            memset(&ddsd,0,sizeof(DDSURFACEDESC));
-            ddsd.dwSize = sizeof(DDSURFACEDESC);
-            ddsd.dwFlags = DDSD_WIDTH | DDSD_HEIGHT | DDSD_CAPS;
-			// 640 x 480 would be a typical screen
-            ddsd.dwHeight = TestSurfHeight;
-            ddsd.dwWidth = TestSurfWidth;
-            ddsd.ddsCaps.dwCaps= (DDSCAPS_OFFSCREENPLAIN 
-                                 | DDSCAPS_SYSTEMMEMORY);
-
-            ddrval = lpDD->CreateSurface(&ddsd, &lpTestSurf, NULL);
-			LOGDXERR(ddrval);
-            if (ddrval != DD_OK)
-	        #if debug
-		      {
-		       ReleaseDirect3D();
-	           exit(ddrval);
-	          }
-	        #else
-	        return FALSE;
-	        #endif
-
-            SurfacePtr = (unsigned char*) ddsd.lpSurface;
-
-            // Time write
-			TimeForSysMemWrite = timeGetTime();
-			for (i=0; i<TestSurfHeight; i++)
-			  {
-			   memset(SurfacePtr, 0, TestSurfWidth);
-			   SurfacePtr += ddsd.lPitch;
-			  }
-			TimeForSysMemWrite = (timeGetTime() - TimeForSysMemWrite);
-
-            ReleaseDDSurface((void*) lpTestSurf);
-            #endif
-
-			// Now decide!!!!
 			// Benchmarking memory speed at this point in the initialisation
 			// sequence seems tricky, so for now we shall simply try deciding on
 			// the basis of the caps, seeing as video memory always seems faster

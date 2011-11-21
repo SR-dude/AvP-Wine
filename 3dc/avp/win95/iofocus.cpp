@@ -14,34 +14,17 @@
 #include "gadget.h"
 #include "avp_menus.h"
 #include "psnd.h"
+/* adj moved this */
+#define UseLocalAssert Yes
+#include "ourasert.h"
+
 extern "C"
 {
 	
-	#define UseLocalAssert Yes
-	#include "ourasert.h"
-
-/* Version settings ************************************************/
-
-/* Constants *******************************************************/
-
-/* Macros **********************************************************/
-
-/* Imported function prototypes ************************************/
 extern int InGameMenusAreRunning(void);
+static OurBool iofocus_AcceptTyping = No;
 
-/* Imported data ***************************************************/
 
-
-/* Exported globals ************************************************/
-
-/* Internal type definitions ***************************************/
-
-/* Internal function prototypes ************************************/
-
-/* Internal globals ************************************************/
-	static OurBool iofocus_AcceptTyping = No;
-
-/* Exported function definitions ***********************************/
 OurBool IOFOCUS_AcceptControls(void)
 {
 	return !iofocus_AcceptTyping;
@@ -54,7 +37,6 @@ OurBool IOFOCUS_AcceptTyping(void)
 
 void IOFOCUS_Toggle(void)
 {
-	#if CONSOLE_DEBUGGING_COMMANDS_ACTIVATED||!(PREDATOR_DEMO||MARINE_DEMO||ALIEN_DEMO)
 	if(InGameMenusAreRunning()) return;;
 
 	iofocus_AcceptTyping = !iofocus_AcceptTyping;
@@ -67,10 +49,8 @@ void IOFOCUS_Toggle(void)
 		Sound_Play(SID_CONSOLE_DEACTIVATES,NULL);
 		RemoveTheConsolePlease();
 	}
-	#endif
 }
 
 
-/* Internal function definitions ***********************************/
 
 };

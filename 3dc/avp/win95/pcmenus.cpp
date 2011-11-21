@@ -9,13 +9,10 @@
 #include <math.h> // for sqrt
 #include <windows.h> // for SetCursor
 #include <string.h> // strcat, strcpy, etc
-
 #include "3dc.h" // for directdraw stuff
 #include "chnktexi.h" // for requesting textures on powers of two
 #include "d3_func.h"
 
-//#include "menudefs.h" // general menu stuff
-//#include "menugfx.h" // menu graphics stuff
 #include "module.h" // required by gamedef
 #include "gamedef.h" // for IDemand...
 #include "pcmenus.h" // enums and functions for these menus
@@ -24,7 +21,6 @@
 #include "list_tem.hpp" // for linked lists as and when required
 
 #include "dxlog.h"
-
 #include "scstring.hpp"
 
 
@@ -70,15 +66,13 @@ extern "C"
 	extern int VideoModeType;
 	extern int VideoModeTypeScreen;
 	extern int ScanDrawMode;
-    extern unsigned char AttemptVideoModeRestart;
+	extern unsigned char AttemptVideoModeRestart;
 	extern unsigned char TestPalette[];
 	extern unsigned char LPTestPalette[]; /* to cast to lp*/
 	extern int **ShadingTableArray;
 	extern unsigned char **PaletteShadingTableArray;
-   
+ 
 
-	extern void SaveKeyConfiguration();
-	
 	extern BOOL g_bMustRedrawScreen;
 
 	#define D3TF_FIRST D3TF_4BIT
@@ -260,7 +254,6 @@ private:
 		SCString* pSCString_H = new SCString(Height);
 		SCString* pSCString_CD = new SCString(ColourDepth);
 		SCString* pSCString_X = new SCString("X");
-			// LOCALISEME
 
 		// Construct string of the form "<width>X<height>X<bitdepth>" with a possible
 		// trailing " ?" for more dubious modes:
@@ -273,30 +266,7 @@ private:
 			pSCString_CD
 		);
 
-		#if 1
 		pSCString_Description = pSCString_Temp;
-		#else
-		if (notreporting_vga && *vmi==vga_mode)
-		{
-			SCString* pSCString_Questionable = new SCString
-			(
-				" ?"
-			);	// LOCALISEME
-
-			pSCString_Description = new SCString
-			(
-				pSCString_Temp,
-				pSCString_Questionable
-			);
-
-			pSCString_Questionable -> R_Release();
-			pSCString_Temp -> R_Release();
-		}
-		else
-		{
-			pSCString_Description = pSCString_Temp;
-		}
-		#endif
 	
 
 		pSCString_X -> R_Release();
@@ -480,232 +450,12 @@ static void LoadVideoModeSettings(void)
 static size_t IsNotEnoughVidMemForBytes(size_t required)
 {
 	return 0;
-	
-	// Won't be using this. I don't think
-	#if 0
-	
-	char buff[128];
-	sprintf(buff,"Want: %d Have: %d",(int)required,GetAvailableVideoMemory());
-	LOGDXSTR(buff);
-	
-	if (required > GetAvailableVideoMemory()) return GetAvailableVideoMemory();
-	
-	LOGDXSTR("Maybe enough");
-	
-	#if DISABLE_VIDEOCARD_ANALYSIS
-	return 0;
-	#endif
-	
-	static size_t what_we_know_we_can_have = 0;
-	
-	if (required <= what_we_know_we_can_have) return 0;
-
-	// deal with cards whose video memory is fragmented
-	// such that textures may not be able to use all the
-	// available video memory
-
-	// we don't know we can use all the available video memory
-	// for textures - so try and find out what we can use
-	// with the current options - and in future, as long as
-	// available video memory exceeds this amount, we'll know
-	// at least a minimum amount that we can have without having
-	// to run this test again
-	
-	List<IMAGEHEADER *> imgs;
-	size_t vidmem_before = GetAvailableVideoMemory();
-	CL_Image random_tx;
-	
-	CL_Select_Mode(CLL_D3DTEXTURE);
-	random_tx.MakeRandom(512,512,RND_SEED1);
-	
-	// throw d3d textures at the system until we can no more
-	do
-	{
-		CL_Error copyerr;
-		do
-		{
-			IMAGEHEADER * new_ih = new IMAGEHEADER;
-			memset(new_ih,0,sizeof(IMAGEHEADER));
-			size_t vidmem_before_create = GetAvailableVideoMemory();
-			copyerr = random_tx.CopyToD3DTexture((LPDIRECTDRAWSURFACE *)&new_ih->DDPtr,(LPVOID *)&new_ih->DDSurface,DDSCAPS_SYSTEMMEMORY);
-			if (CLE_OK == copyerr)
-			{
-				copyerr = CLE_DXERROR;
-				if (CopyD3DTexture(new_ih))
-				{
-					if (LoadD3DTextureIntoD3DMaterial(new_ih))
-						copyerr = CLE_OK;
-				}
-			}
-			size_t vidmem_after_create = GetAvailableVideoMemory();
-			imgs.add_entry(new_ih);
-			if (vidmem_after_create >= vidmem_before_create) copyerr = CLE_DXERROR;
-			LOGDXFMT(("VidMem: %d",vidmem_after_create));
-		}
-		while (CLE_OK==copyerr);
-		random_tx.MakeRandom(random_tx.width>>1,random_tx.height>>1);
-	}
-	while (random_tx.width>=32 && random_tx.height>=32);
-		
-	size_t vidmem_after = GetAvailableVideoMemory();
-	
-	what_we_know_we_can_have = vidmem_before - vidmem_after;
-	
-	char buf[128];
-	sprintf(buf,"Can have %d\n",what_we_know_we_can_have);
-	LOGDXSTR(buf);	
-	
-	// release all dummy textures we threw at the system
-	while (imgs.size())
-	{
-		if (imgs.first_entry()->DDSurface)
-			ReleaseDDSurface(imgs.first_entry()->DDSurface);
-		if (imgs.first_entry()->D3DTexture)
-			ReleaseD3DTexture(imgs.first_entry()->D3DTexture);
-		delete imgs.first_entry();
-		imgs.delete_first_entry();
-	}
-
-	
-	if (required <= what_we_know_we_can_have)
-		return 0;
-	else
-		return what_we_know_we_can_have;
-	#endif
+// adj stub
 }
 
 static BOOL IsNotEnoughVidMemForScreenDepth(int s_depth)
 {
-	// bollocks - this is all obsolete - FIXME
-	return FALSE;
-	
-	#if 0
-	
-	LOGDXSTR("Testing Vid Mem");
-
-	CL_Init_All(); - not required any more
-
-	// determine if d3d textures need to be a power of two in width and height
-	// try 48x48
-	IMAGEHEADER tmp_iheader;
-	memset(&tmp_iheader,0,sizeof(IMAGEHEADER));
-	CL_Image random_tx;
-	CL_Error copyerr;
-	
-	// do we need texture powers of two or square
-	need_textures_powers_of_two = d3d.ThisDriver.dpcTriCaps.dwTextureCaps & D3DPTEXTURECAPS_POW2 ? 1 : 0;
-	need_textures_square = d3d.ThisDriver.dpcTriCaps.dwTextureCaps & D3DPTEXTURECAPS_SQUAREONLY ? 1 : 0;
-	
-	LOGDXFMT(("Need POW_2 : %d",need_textures_powers_of_two));
-	LOGDXFMT(("Need SQUARE : %d",need_textures_square));
-	
-	// determine how much texture memory is used by a typical 64x64 hud graphic
-	
-	#if DISABLE_VIDEOCARD_ANALYSIS
-	size_t vidmem_before, vidmem_after;
-	copyerr = CLE_DXERROR;
-	#else
-	
-	CL_Select_Mode(CLL_DDSURFACE);
-	random_tx.MakeRandom(64,64,RND_SEED4);
-	size_t vidmem_before = GetAvailableVideoMemory();
-	copyerr = random_tx.CopyToDirectDrawSurface((LPDIRECTDRAWSURFACE *)&tmp_iheader.DDSurface,(LPVOID *)&tmp_iheader.DDPtr,DDSCAPS_SYSTEMMEMORY);
-	size_t vidmem_after = GetAvailableVideoMemory();
-	if (tmp_iheader.DDSurface)
-	{
-		ReleaseDDSurface(tmp_iheader.DDSurface);
-		tmp_iheader.DDSurface = (void*) 0;
-		tmp_iheader.DDPtr = (void*) 0;
-	}
-	if (tmp_iheader.D3DTexture)
-	{
-		ReleaseD3DTexture(tmp_iheader.D3DTexture);
-		tmp_iheader.D3DTexture = (void*) 0;
-		tmp_iheader.D3DMaterial = (void*) 0;
-		tmp_iheader.D3DHandle = (void*) 0;
-	}
-	
-	#endif
-	
-	float hud_bytespertexel =
-		CLE_OK == copyerr
-			? (float)(vidmem_before-vidmem_after)/(random_tx.width*random_tx.height)
-			: (float)s_depth/8
-		;
-	
-	char buf[128];
-	sprintf(buf,"HUD BPP: %f",hud_bytespertexel);
-	LOGDXSTR(buf);
-	
-	// determine how much texture memory is used by a typical 128x128 texture
-	
-	#if DISABLE_VIDEOCARD_ANALYSIS
-	#else
-	
-	CL_Select_Mode(CLL_D3DTEXTURE);
-	random_tx.MakeRandom(128,128,RND_SEED2);
-	LOGDXSTR("Trying D3D");
-	
-	//size_t
-	vidmem_before = GetAvailableVideoMemory();
-	copyerr = random_tx.CopyToD3DTexture((LPDIRECTDRAWSURFACE *)&tmp_iheader.DDPtr,(LPVOID *)&tmp_iheader.DDSurface,DDSCAPS_SYSTEMMEMORY);
-	if (CLE_OK == copyerr)
-	{
-		copyerr = CLE_DXERROR;
-		if (CopyD3DTexture(&tmp_iheader))
-			if (LoadD3DTextureIntoD3DMaterial(&tmp_iheader))
-				copyerr = CLE_OK;
-	}
-	//size_t
-	vidmem_after = GetAvailableVideoMemory();
-	if (tmp_iheader.DDSurface)
-	{
-		ReleaseDDSurface(tmp_iheader.DDSurface);
-		tmp_iheader.DDSurface = (void*) 0;
-		tmp_iheader.DDPtr = (void*) 0;
-	}
-	if (tmp_iheader.D3DTexture)
-	{
-		ReleaseD3DTexture(tmp_iheader.D3DTexture);
-		tmp_iheader.D3DTexture = (void*) 0;
-		tmp_iheader.D3DMaterial = (void*) 0;
-		tmp_iheader.D3DHandle = (void*) 0;
-	}
-	#endif
-	
-	float textures_bytespertexel =
-		CLE_OK == copyerr
-			? (float)(vidmem_before-vidmem_after)/(random_tx.width*random_tx.height)
-			: (float)BitsPerPixel(&d3d.TextureFormat[d3d.CurrentTextureFormat])/8
-		;
-		
-	//char buf[128];
-	sprintf(buf,"Textures BPP: %f",textures_bytespertexel);
-	LOGDXSTR(buf);
-
-	ImageSizeRestrictionIdx isri = need_textures_square ? need_textures_powers_of_two ? ISRI_SQUAREANDPOWER2 : ISRI_SQUARE : need_textures_powers_of_two ? ISRI_POWER2 : ISRI_UNIT4;
-	
-	size_t vram_rq;
-	size_t vram_avail;
-	for (int i=0; hw_try_desc[i]; ++i)
-	{
-		desc_textures_to_load = hw_try_desc[i];
-		vram_rq = (size_t)(
-			hw_max_num_texels[isri][ITI_HUD][desc_textures_to_load[ITI_HUD]] * hud_bytespertexel +
-			hw_max_num_texels[isri][ITI_TEXTURE][desc_textures_to_load[ITI_TEXTURE]] * textures_bytespertexel +
-			hw_max_num_texels[isri][ITI_SPRITE][desc_textures_to_load[ITI_SPRITE]] * textures_bytespertexel
-		);
-		vram_avail = IsNotEnoughVidMemForBytes(vram_rq);
-		if (!vram_avail) return FALSE;
-	}
-	// bollocks - return FALSE anayway, since the following doesn't actually work anymore anyway
-	return FALSE;
-	
-	char errstring[512];
-	sprintf(errstring,"THIS SET OF OPTIONS REQUIRES AT LEAST %d BYTES OF VIDEO MEMORY FREE. THERE ARE ONLY %d BYTES FREE. THE TEXTURE FORMAT WAS %d-BIT",(int)vram_rq,(int)vram_avail,BitsPerPixel(&d3d.TextureFormat[d3d.CurrentTextureFormat]));
-	EmergencyPcOptionsMenu(errstring);
-	return TRUE;
-	#endif
+// adj stub
 }
 	 
 
@@ -732,14 +482,13 @@ BOOL PreferTextureFormat(D3DTEXTUREFORMAT const * oldfmt,D3DTEXTUREFORMAT const 
 	if (newfmt->Palette) return TRUE;
 	else return FALSE;
 }
-#if 1
+
 void InitOptionsMenu(void)
 {
-	#if debug // Check that this function is only called once
+	// Check that this function is only called once
 	static int already_called = 0;
 	GLOBALASSERT(!already_called);
 	already_called=1;
-	#endif
 	
 	// hardware and direct 3d, zbuffering?
 	int hw_now_avail = D3DHardwareAvailable ? 1 : 0; // 4Mb cards only?
@@ -787,10 +536,8 @@ void InitOptionsMenu(void)
 	
 	LoadVideoModeSettings();
 	
-	#if !ENABLE_MIPMAP_OPTION
 	mipmap_opt[VM3_SCANDRAW] = mipmap_avail[VM3_SCANDRAW];
 	mipmap_opt[VM3_D3D] = FALSE;
-	#endif
 	
 	if (hw_now_avail != hw_avail) // card removed/added so set default
 	{
@@ -822,46 +569,9 @@ void InitOptionsMenu(void)
 	}
 	
 	RasterisationRequestMode = RequestSoftwareRasterisation;
-#if 0
-	ChangeDirectDrawObject();
-	
-	notreporting_vga = 1;
-	// possible software video modes
-	for (i=0; i<NumAvailableVideoModes; ++i)
-	{
-		VidModeInfo vmi(AvailableVideoModes[i]);
-		
-		if (vmi==vga_mode) notreporting_vga = 0;
-		
-		if (vmi.IsForScanDraw())
-			avail_vidmodes[VM3_SCANDRAW].add_entry(vmi);
-	}
-	
-	if (notreporting_vga)
-	{
-		if (vga_mode.IsForScanDraw())
-			avail_vidmodes[VM3_SCANDRAW].add_entry(vga_mode);
-	}
-	
-	// get the indexes of the video modes
-	idx = 0;
-	for (OHIF<VidModeInfo> i_vidmode_sd(&avail_vidmodes[VM3_SCANDRAW]); !i_vidmode_sd.done(); i_vidmode_sd.next(), ++idx)
-	{
-		if (i_vidmode_sd()==vidmode[VM3_SCANDRAW])
-		{
-			sel_vidmode_index[VM3_SCANDRAW] = idx;
-			break;
-		}
-	}
-	
-	vidmode[VM3_SCANDRAW] = avail_vidmodes[VM3_SCANDRAW][sel_vidmode_index[VM3_SCANDRAW]];
-	vidmode[VM3_D3D] = avail_vidmodes[VM3_D3D][sel_vidmode_index[VM3_D3D]];
-	#if ENABLE_SHADING_OPTION
-	desired_shading = sel_shading[d3d_opt];
-	#endif
-#endif
+
 }
-#endif
+
 
 extern int SetGameVideoMode(void)
 {
@@ -871,7 +581,6 @@ extern int SetGameVideoMode(void)
 	unsigned int s_width;
 	unsigned int s_height;
 	unsigned int s_depth;
-//	do
 	{
 		finiObjectsExceptDD();
 		WindowMode = WindowRequestMode;
@@ -907,20 +616,11 @@ extern int SetGameVideoMode(void)
 		// deal with hw dd objects required?
 		ChangeDirectDrawObject();
 		
-		#if SupportZBuffering
 		if (zbuf_avail[d3d_opt])
 			ZBufferRequestMode = zbufopt[d3d_opt];
 		else
 			ZBufferRequestMode = RequestZBufferNever;
-		#else
-		ZBufferRequestMode = RequestZBufferNever;
-		#endif
 		
-		#if 0
-		s_width  = vidmode[d3d_opt].Width;
-		s_height = vidmode[d3d_opt].Height;
-		s_depth  = vidmode[d3d_opt].ColourDepth;
-		#else
 		{
 			DEVICEANDVIDEOMODESDESC *dPtr = &DeviceDescriptions[CurrentlySelectedDevice];
 			VIDEOMODEDESC *vmPtr = &(dPtr->VideoModes[CurrentlySelectedVideoMode]);
@@ -928,15 +628,10 @@ extern int SetGameVideoMode(void)
 			s_height = vmPtr->Height;
 			s_depth  = vmPtr->ColourDepth;
 		}
-		#endif
 		if (s_depth<=8)
 		{
 			/* temp hack to test super TLTs */
 			ScreenDescriptorBlock.SDB_Flags &= ~SDB_Flag_TLTPalette;
-			#if 0 && SupportZBuffering
-			if (RequestZBufferAlways==ZBufferRequestMode)
-				ScreenDescriptorBlock.SDB_Flags |= SDB_Flag_TLTPalette;
-			#endif
 			
 			GLOBALASSERT(ScreenDescriptorBlock.SDB_Flags & SDB_Flag_Raw256);
 			ConvertToDDPalette(TestPalette, LPTestPalette, 256, 0);
@@ -968,13 +663,8 @@ extern int SetGameVideoMode(void)
 		ScreenDescriptorBlock.SDB_CentreY   = s_height/2;
 
 		/* KJL 12:00:54 07/04/97 - new projection angles */
-		#if USE_FOV_53
-		ScreenDescriptorBlock.SDB_ProjX     = s_width;
-		ScreenDescriptorBlock.SDB_ProjY     = s_height*4/3;
-		#else
 		ScreenDescriptorBlock.SDB_ProjX     = s_width/2;
 		ScreenDescriptorBlock.SDB_ProjY     = s_height/2;
-		#endif
 
 		ScreenDescriptorBlock.SDB_ClipLeft  = 0;
 		ScreenDescriptorBlock.SDB_ClipRight = s_width;
@@ -990,16 +680,6 @@ extern int SetGameVideoMode(void)
 		LOGDXSTR("Testing");
 			
 	}
-	#if 0
-	while
-	(
-		InitialiseDirect3DImmediateMode() || VM3_SCANDRAW==d3d_opt
-			? VideoMemoryPreferred == DXMemoryMode
-				? IsNotEnoughVidMemForScreenDepth(s_depth)
-				: 0
-			: (GLOBALASSERT(0=="CANNOT INITIALIZE DIRECT 3D FOR THIS VIDEO MODE"),1)//(EmergencyPcOptionsMenu("CANNOT INITIALIZE DIRECT 3D FOR THIS VIDEO MODE"), 1)
-	);
-	#endif
 	if (IsNotEnoughVidMemForScreenDepth(s_depth))
 	{
 		// erm, something
@@ -1011,7 +691,6 @@ extern int SetGameVideoMode(void)
 		return 0;
 	}
 	
-	// CL_Init_All(); // set up shifts for display pixel format - not required
 	
 	if (ScanDrawMode == ScanDrawDirectDraw)
 	{
@@ -1189,6 +868,7 @@ extern void SaveVideoModeSettings(void)
 	vidmode[VM3_SCANDRAW] = avail_vidmodes[VM3_SCANDRAW][sel_vidmode_index[VM3_SCANDRAW]];
 	vidmode[VM3_D3D] = avail_vidmodes[VM3_D3D][sel_vidmode_index[VM3_D3D]];
 
+// adj
 	FILE * fp = fopen("AVPVMOPT.BIN","wb");
 	if (!fp) return;
 	fwrite("VMOP",4,1,fp);

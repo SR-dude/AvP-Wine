@@ -385,7 +385,6 @@ extern DAMAGE_PROFILE firedamage;
 extern DAMAGE_PROFILE SmallExplosionDamage;
 extern DAMAGE_PROFILE BigExplosionDamage;
 
-extern void InitialiseEquipment(void);
 
 /*compare two damage profiles to see if they are the same*/
 extern BOOL AreDamageProfilesEqual(DAMAGE_PROFILE* profile1,DAMAGE_PROFILE* profile2);

@@ -1,15 +1,11 @@
 #include "3dc.h"
 #include "inline.h"
-
 #include "tallfont.hpp"
 #include "strtab.hpp"
-
 #include "awtexld.h"
 #include "alt_tab.h"
-
 #include "chnktexi.h"
 #include "hud_layout.h"
-
 #define UseLocalAssert Yes
 #include "ourasert.h"
 #include "ffstdio.h"
@@ -90,28 +86,13 @@ AVPMENUGFX AvPMenuGfxStorage[MAX_NO_OF_AVPMENUGFXS] =
 	{"Menus\\bonus.rim"},
 
 	// Splash screens
-	#if MARINE_DEMO
-	{"MarineSplash\\splash00.rim"},
-	{"MarineSplash\\splash01.rim"},
-	{"MarineSplash\\splash02.rim"},
-	{"MarineSplash\\splash03.rim"},
-	{"MarineSplash\\splash04.rim"},
-	{"MarineSplash\\splash05.rim"},
-	#elif ALIEN_DEMO
-	{"AlienSplash\\splash00.rim"},
-	{"AlienSplash\\splash01.rim"},
-	{"AlienSplash\\splash02.rim"},
-	{"AlienSplash\\splash03.rim"},
-	{"AlienSplash\\splash04.rim"},
-	{"AlienSplash\\splash05.rim"},
-	#else
+
 	{"PredatorSplash\\splash00.rim"},
 	{"PredatorSplash\\splash01.rim"},
 	{"PredatorSplash\\splash02.rim"},
 	{"PredatorSplash\\splash03.rim"},
 	{"PredatorSplash\\splash04.rim"},
 	{"PredatorSplash\\splash05.rim"},
-	#endif
 };
 
 static void LoadMenuFont(void);
@@ -177,8 +158,6 @@ extern int RenderMenuText(char *textPtr, int x, int y, int alpha, enum AVPMENUFO
 		if (size<18) size = 18;
 		DrawAvPMenuGfx(AVPMENUGFX_GLOWY_LEFT,x+18,y-8,alpha,AVPMENUFORMAT_RIGHTJUSTIFIED);
 		DrawAvPMenuGlowyBar(x+18,y-8,alpha,size-18);
-//		for (int i=18; i<size; i++)
-//		DrawAvPMenuGfx(AVPMENUGFX_GLOWY_MIDDLE,x+i,y-8,alpha,AVPMENUFORMAT_LEFTJUSTIFIED);
 		DrawAvPMenuGfx(AVPMENUGFX_GLOWY_RIGHT,x+size,y-8,alpha,AVPMENUFORMAT_LEFTJUSTIFIED);
 	}
 	R2Pos_StartOfRow = r2pos(x,y);
@@ -618,17 +597,6 @@ static int RenderSmallFontString(char *textPtr,int sx,int sy,int alpha, int red,
 				srcPtr += (ddsdimage.lPitch/2) - HUD_FONT_WIDTH; 
 			}
 			sx += AAFontWidths[c];
-			#if 0
-			if(c!=32)
-			{
-				extra += 8-AAFontWidths[c];
-			}
-			else
-			{
-				sx+=extra+8-AAFontWidths[c];
-				extra=0;
-			}
-			#endif
 		}
 	}
    	
@@ -882,17 +850,6 @@ extern void RenderSmallFontString_Wrapped(char *textPtr,RECT* area,int alpha,int
 					srcPtr += (ddsdimage.lPitch/2) - HUD_FONT_WIDTH; 
 				}
 				sx += AAFontWidths[c];
-				#if 0
-				if(c!=32)
-				{
-					extra += 8-AAFontWidths[c];
-				}
-				else
-				{
-					sx+=extra+8-AAFontWidths[c];
-					extra=0;
-				}
-				#endif
 			}
 		}
 	}
@@ -923,18 +880,6 @@ extern void LoadAvPMenuGfx(enum AVPMENUGFX_ID menuGfxID)
 	if(pFastFileData)
 	{
 		//load from fast file
-		#if 0
-		gfxPtr->ImagePtr = AwCreateSurface
-							(
-								"pxfXYB",
-								pFastFileData,
-								fastFileLength,
-								AW_TLF_TRANSP|AW_TLF_CHROMAKEY,
-								&(gfxPtr->Width),
-								&(gfxPtr->Height),
-								&(gfxPtr->hBackup)
-							);
-		#else
 		gfxPtr->ImagePtr = AwCreateSurface
 							(
 								"pxfXY",
@@ -944,7 +889,7 @@ extern void LoadAvPMenuGfx(enum AVPMENUGFX_ID menuGfxID)
 								&(gfxPtr->Width),
 								&(gfxPtr->Height)
 							);
-		#endif
+		
 	}
 	else
 	{
@@ -960,11 +905,9 @@ extern void LoadAvPMenuGfx(enum AVPMENUGFX_ID menuGfxID)
 							);
 	}
 	GLOBALASSERT(gfxPtr->ImagePtr);
-//	GLOBALASSERT(gfxPtr->hBackup);
 	GLOBALASSERT(gfxPtr->Width>0);
 	GLOBALASSERT(gfxPtr->Height>0);
 	gfxPtr->hBackup=0;
-//	ATIncludeSurface(gfxPtr->ImagePtr,gfxPtr->hBackup);
 }
 
 static void ReleaseAvPMenuGfx(enum AVPMENUGFX_ID menuGfxID)
@@ -978,17 +921,9 @@ static void ReleaseAvPMenuGfx(enum AVPMENUGFX_ID menuGfxID)
 	GLOBALASSERT(gfxPtr);
 	GLOBALASSERT(gfxPtr->ImagePtr);
 
-  //	ATRemoveSurface(gfxPtr->ImagePtr);
 	ReleaseDDSurface(gfxPtr->ImagePtr);
 	
 	gfxPtr->ImagePtr = NULL;
-	#if 0
-	if (gfxPtr->hBackup)
-	{
-		AwDestroyBackupTexture(gfxPtr->hBackup);
-		gfxPtr->hBackup = NULL;
-	}
-	#endif
 }
 
 extern void LoadAllAvPMenuGfx(void)
@@ -1026,14 +961,8 @@ extern void LoadAllAvPMenuGfx(void)
 				{
 					extern int CloudTable[128][128];
 					int r = (int)(*srcPtr) & DisplayPixelFormat.dwRBitMask;
-//					int g = (int)(*srcPtr) & DisplayPixelFormat.dwGBitMask;
-//					int b = (int)(*srcPtr) & DisplayPixelFormat.dwBBitMask;
 					r = DIV_FIXED(r,DisplayPixelFormat.dwRBitMask);
-//					g = DIV_FIXED(g,DisplayPixelFormat.dwGBitMask);
-//					b = DIV_FIXED(b,DisplayPixelFormat.dwBBitMask);
 					CloudTable[x][y]=r;
-//					CloudTable[x][y]=g;
-//					CloudTable[x][y]=b;
 					srcPtr++;
 				}
 				srcPtr += (ddsdimage.lPitch/2) - gfxPtr->Width; 

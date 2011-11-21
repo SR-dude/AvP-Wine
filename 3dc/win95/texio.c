@@ -1,60 +1,15 @@
-#if 1
-
-
 #include "3dc.h"
-
 #include <conio.h>
 #include <sys/stat.h>
-
 #include "inline.h"
-
-#ifdef RIFF_SYSTEM
 #include "chnktexi.h"
-#endif
 
 #define UseLocalAssert 0
 #include "ourasert.h"
 
-#else
-
-#include <stdio.h>
-#include <conio.h>
-#include <sys/stat.h>
-
-#include "system.h"
-#include "equates.h"
-#include "platform.h"
-#include "shape.h"
-#include "prototyp.h"
-#include "inline.h"
-
-#ifdef RIFF_SYSTEM
-#include "chnktexi.h"
-#endif
-
-
-#endif
-
-
 #include "awtexld.h"
 #include "alt_tab.h"
 
-/*
-	#define for experimental purposes 
-	ONLY!!!
-*/
-
-#define DefinedTextureType TextureTypePPM
-
-
-#if 0
-#if debug
-int tripa = 100;
-int tripb = 100;
-int tripc = 0;
-#define trip_up tripa = tripb / tripc;
-#endif
-#endif
 
 
 /*
@@ -68,7 +23,7 @@ int tripc = 0;
 	extern SCREENDESCRIPTORBLOCK ScreenDescriptorBlock;
 	extern unsigned char *ScreenBuffer;
 	extern char projectsubdirectory[];
-    extern int ScanDrawMode;
+	extern int ScanDrawMode;
 	extern int VideoModeType;
 
 /*
@@ -79,42 +34,7 @@ int tripc = 0;
 
 	TEXTURE *ImageBuffer;							/* Memory Resident Image Data */
 
-	#ifdef MaxImageGroups
-	#if MaxImageGroups < 2 /* optimize if this multiple groups are not required */
-	#undef MaxImageGroups
-	#endif /* MaxImageGroups < 2 */
-	#endif /* MaxImageGroups */
 
-	#ifdef MaxImageGroups
-
-	#include "txioctrl.h"
-	
-	/*
-	basically, I want there to be more than one image header array
-	so that I can load some images once only, then load shapes, call
-	InitializeTextures, DeallocateAllImages, etc. and only the images associated
-	with the shapes load are deallocated.
-	I might want to load shapes in two blocks, calling InitializeTextures
-	for each load.
-
-	There will need to be as many slots for ImageHeaderArrays as MaxImageGroups
-
-	I want this to be completely invisible to anyone except programmers on
-	PC projects that require this feature
-
-	Jake.
-	*/
-
-	/* these three globals must behave the same */
-	int NumImages = 0;								/* # current images */
-	IMAGEHEADER *ImageHeaderPtrs[MaxImageGroups*MaxImages];	/* Ptrs to Image Header Blocks */
-	IMAGEHEADER ImageHeaderArray[MaxImageGroups*MaxImages];	/* Array of Image Headers */
-	
-	int NumImagesArray[MaxImageGroups]; /* must be static to ensure initialization to zero */
-	static int CurrentImageGroup = 0;
-	static IMAGEHEADER *NextFreeImageHeaderPtr[MaxImageGroups];
-	
-	#else /* ! MaxImageGroups */
 	
 	int NumImages = 0;								/* # current images */
 	IMAGEHEADER *ImageHeaderPtrs[MaxImages];	/* Ptrs to Image Header Blocks */
@@ -122,7 +42,6 @@ int tripc = 0;
 	
 	static IMAGEHEADER *NextFreeImageHeaderPtr;
 
-	#endif /* ! MaxImageGroups */
 
 
 /*
@@ -131,208 +50,6 @@ int tripc = 0;
 
 */
 
-
-#if LoadingMapsShapesAndTexturesEtc
-
-
-void InitialiseImageHeaders(void)
-
-{
-	#ifdef MaxImageGroups
-
-	NumImages = CurrentImageGroup * MaxImages;
-	NextFreeImageHeaderPtr[CurrentImageGroup] = &ImageHeaderArray[CurrentImageGroup*MaxImages];
-
-	#else
-
-	NumImages = 0;
-	NextFreeImageHeaderPtr = ImageHeaderArray;
-
-	#endif
-}
-
-
-int LoadImageCHsForShapes(SHAPEHEADER **shapelist)
-
-{
-
-	SHAPEHEADER **shlistptr;
-	SHAPEHEADER *shptr;
-	char **txfiles;
-	int TxIndex;
-	int LTxIndex;
-
-
-/*
-
- Build the Texture List
-
-*/
-
-	shlistptr = shapelist;
-
-	while(*shlistptr) {
-
-		shptr = *shlistptr++;
-
-		/* If the shape has textures */
-
-		if(shptr->sh_localtextures) {
-
-			txfiles = shptr->sh_localtextures;
-
-			LTxIndex = 0;
-
-			while(*txfiles) {
-
-				/* The RIFF Image loaders have changed to support not loading the same image twice - JH 17-2-96 */
-				
-				char *src;
-				char *dst;
-				char fname[ImageNameSize];
-				char *texfilesptr;
-				#ifndef RIFF_SYSTEM
-				int i, j, NewImage;
-				char *iname;
-				IMAGEHEADER *ihptr;
-				IMAGEHEADER *new_ihptr;
-				void* im;
-				#endif
-				
-				txfilesptr = *txfiles++;
-				
-				/*
-
-				"txfilesptr" is in the form "textures\<fname>". We need to
-				prefix that text with the name of the current textures path.
-
-				Soon this path may be varied but for now it is just the name of
-				the current project subdirectory.
-
-				*/
-
-				src = projectsubdirectory;
-				dst = fname;
-
-				while(*src)
-					*dst++ = *src++;
-
-				src = txfilesptr;
-
-				while(*src)
-					*dst++ = *src++;
-
-				*dst = 0;
-
-				#ifdef RIFF_SYSTEM
-
-				/* This function calls GetExistingImageHeader to figure out if the image is already loaded */
-				TxIndex = CL_LoadImageOnce(fname,(ScanDrawDirectDraw == ScanDrawMode ? LIO_CHIMAGE : LIO_D3DTEXTURE)|LIO_TRANSPARENT|LIO_RELATIVEPATH|LIO_RESTORABLE);
-				GLOBALASSERT(GEI_NOTLOADED != TxIndex);
-				
-				#else
-				
-				/* If there are already images, try and find this one */
-
-				NewImage = Yes;
-
-				#ifdef MaxImageGroups
-
-				TxIndex = CurrentImageGroup * MaxImages;			/* Assume image 0 */
-				
-				if(NumImagesArray[CurrentImageGroup]) {
-
-					for(i=NumImagesArray[CurrentImageGroup]; i!=0 && NewImage!=No; i--) {
-
-				#else
-
-				TxIndex = 0;			/* Assume image 0 */
-				
-				if(NumImages) {
-
-					for(i=NumImages; i!=0 && NewImage!=No; i--) {
-
-				#endif
-
-						ihptr = ImageHeaderPtrs[TxIndex];
-
-						iname = &ihptr->ImageName[0];
-
-						j = CompareFilenameCH(txfilesptr, iname);
-
-						if(j) NewImage = No;
-
-						else TxIndex++;
-
-					}
-
-				}
-
-
-				/* If this is a new image, add it */
-
-				if(NewImage) {
-
-					/* Get an Image Header */
-
-					new_ihptr = GetImageHeader();
-
-					if(new_ihptr) {
-
-			            if (ScanDrawMode == ScanDrawDirectDraw)
-						  im = (void*) LoadImageCH(&fname[0], new_ihptr);
-						else
-						  im = LoadImageIntoD3DImmediateSurface
-						     (&fname[0], new_ihptr, DefinedTextureType);
-
-					}
-
-				}
-
-				#endif
-
-				/*
-
-					The local index for this image in this shape is
-					"LTxIndex".
-
-					The global index for the image is "TxIndex".
-
-					We must go through the shape's items and change all the
-					local references to global.
-
-				*/
-
-				MakeShapeTexturesGlobal(shptr, TxIndex, LTxIndex);
-
-				LTxIndex++;			/* Next Local Texture */
-
-			}
-
-			/* Is this shape a sprite that requires resizing? */
-
-			if((shptr->shapeflags & ShapeFlag_Sprite) &&
-				(shptr->shapeflags & ShapeFlag_SpriteResizing)) {
-
-				SpriteResizing(shptr);
-
-			}
-
-		}
-
-	}
-
-
-	return Yes;
-
-
-}
-
-
-#else
-
-
-#define InitTexPrnt No
 
 int InitialiseTextures(void)
 
@@ -353,14 +70,6 @@ int InitialiseTextures(void)
 
 	*/
 
-	#ifdef MaxImageGroups
-
-    DeallocateCurrentImages();
-
-	NumImages = CurrentImageGroup * MaxImages;
-	NextFreeImageHeaderPtr[CurrentImageGroup] = &ImageHeaderArray[CurrentImageGroup*MaxImages];
-
-	#else
 
     DeallocateAllImages();
 
@@ -369,7 +78,7 @@ int InitialiseTextures(void)
 	NumImages = 0;
 	NextFreeImageHeaderPtr = ImageHeaderArray;
 
-	#endif
+
 
 	/* Added 23/3/98 by DHM so that this can be called without loading any
 	shapes (to get textprint working in the menus):
@@ -392,9 +101,6 @@ int InitialiseTextures(void)
 
 		if(shptr->sh_localtextures) {
 
-			#if InitTexPrnt
-			textprint("This shape has textures\n");
-			#endif
 
 			txfiles = shptr->sh_localtextures;
 
@@ -408,13 +114,6 @@ int InitialiseTextures(void)
 				char *dst;
 				char fname[ImageNameSize];
 				char *txfilesptr;
-				#ifndef RIFF_SYSTEM
-				int i, j, NewImage;
-				char *iname;
-				IMAGEHEADER *ihptr;
-				IMAGEHEADER *new_ihptr;
-				void* im;
-				#endif
 				
 				txfilesptr = *txfiles++;
 				
@@ -442,98 +141,14 @@ int InitialiseTextures(void)
 				*dst = 0;
 
 
-				#if InitTexPrnt
-				textprint(" A Texture\n");
-				#endif
 
 				
-				#ifdef RIFF_SYSTEM
 
 				/* This function calls GetExistingImageHeader to figure out if the image is already loaded */
 				TxIndex = CL_LoadImageOnce(fname,(ScanDrawDirectDraw == ScanDrawMode ? LIO_CHIMAGE : LIO_D3DTEXTURE)|LIO_TRANSPARENT|LIO_RELATIVEPATH|LIO_RESTORABLE);
 				GLOBALASSERT(GEI_NOTLOADED != TxIndex);
 				
-				#else
-				
-				/* If there are already images, try and find this one */
 
-				NewImage = Yes;
-
-				#ifdef MaxImageGroups
-
-				TxIndex = CurrentImageGroup * MaxImages;			/* Assume image 0 */
-				
-				if(NumImagesArray[CurrentImageGroup]) {
-
-					for(i=NumImagesArray[CurrentImageGroup]; i!=0 && NewImage!=No; i--) {
-
-				#else
-
-				TxIndex = 0;			/* Assume image 0 */
-				
-				if(NumImages) {
-
-					for(i=NumImages; i!=0 && NewImage!=No; i--) {
-
-				#endif
-
-						ihptr = ImageHeaderPtrs[TxIndex];
-
-						iname = &ihptr->ImageName[0];
-
-						j = CompareFilenameCH(txfilesptr, iname);
-
-						if(j) NewImage = No;
-
-						else TxIndex++;
-
-					}
-
-				}
-
-
-				/* If this is a new image, add it */
-
-				if(NewImage) {
-
-					#if InitTexPrnt
-					textprint("New Image\n");
-					WaitForReturn();
-					#endif
-
-					/* Get an Image Header */
-
-					new_ihptr = GetImageHeader();
-
-					if(new_ihptr) {
-
-			            if (ScanDrawMode == ScanDrawDirectDraw)
-						  im = (void*) LoadImageCH(&fname[0], new_ihptr);
-						else
-						  im = LoadImageIntoD3DImmediateSurface
-						     (&fname[0], new_ihptr, DefinedTextureType);
-
-						if(im) {
-
-							#if InitTexPrnt
-							textprint("Load OK, NumImages = %d\n", NumImages);
-							WaitForReturn();
-							#endif
-
-						}
-
-					}
-
-				}
-
-
-				/* test */
-
-				#if InitTexPrnt
-				else textprint("Image Already Exists\n");
-				#endif
-
-				#endif
 
 				/*
 
@@ -547,9 +162,6 @@ int InitialiseTextures(void)
 
 				*/
 
-				#if InitTexPrnt
-				textprint("\nLocal to Global for Shape\n");
-				#endif
 
 				MakeShapeTexturesGlobal(shptr, TxIndex, LTxIndex);
 
@@ -570,12 +182,6 @@ int InitialiseTextures(void)
 
 	}
 
-	#if InitTexPrnt
-	textprint("\nFinished PP for textures\n");
-
-	WaitForReturn();
-
-	#endif
 
 
 	return Yes;
@@ -584,7 +190,7 @@ int InitialiseTextures(void)
 }
 
 
-#endif
+
 
 
 /*
@@ -639,11 +245,6 @@ void MakeShapeTexturesGlobal(SHAPEHEADER *shptr, int TxIndex, int LTxIndex)
 	int **ShapeItemArrayPtr;
 	POLYHEADER *ShapeItemPtr;
 
-	#if SupportBSP
-	SHAPEDATA_BSP_BLOCK *ShapeBSPPtr;
-	int num_bsp_blocks;
-	int j, k;
-	#endif
 
 	int i, txi;
 
@@ -652,9 +253,6 @@ void MakeShapeTexturesGlobal(SHAPEHEADER *shptr, int TxIndex, int LTxIndex)
 
 	if(shptr->items) {
 
-		#if InitTexPrnt
-		textprint("Item Array\n");
-		#endif
 
 		ShapeItemArrayPtr = shptr->items;
 
@@ -662,8 +260,6 @@ void MakeShapeTexturesGlobal(SHAPEHEADER *shptr, int TxIndex, int LTxIndex)
 
 			ShapeItemPtr = (POLYHEADER *) *ShapeItemArrayPtr++;
 			
-			#if SupportZBuffering
-
 			if(ShapeItemPtr->PolyItemType == I_2dTexturedPolygon
 				|| ShapeItemPtr->PolyItemType == I_ZB_2dTexturedPolygon
 				|| ShapeItemPtr->PolyItemType == I_Gouraud2dTexturedPolygon
@@ -673,13 +269,6 @@ void MakeShapeTexturesGlobal(SHAPEHEADER *shptr, int TxIndex, int LTxIndex)
 				|| ShapeItemPtr->PolyItemType == I_ScaledSprite
 				|| ShapeItemPtr->PolyItemType == I_3dTexturedPolygon
 				|| ShapeItemPtr->PolyItemType == I_ZB_3dTexturedPolygon) {
-			#else
-			if(ShapeItemPtr->PolyItemType == I_2dTexturedPolygon
-				|| ShapeItemPtr->PolyItemType == I_Gouraud2dTexturedPolygon
-				|| ShapeItemPtr->PolyItemType == I_Gouraud3dTexturedPolygon
-				|| ShapeItemPtr->PolyItemType == I_ScaledSprite
-				|| ShapeItemPtr->PolyItemType == I_3dTexturedPolygon){
-			#endif /* SupportZBuffering */
 
 				if(ShapeItemPtr->PolyFlags & iflag_txanim) {
 
@@ -713,119 +302,8 @@ void MakeShapeTexturesGlobal(SHAPEHEADER *shptr, int TxIndex, int LTxIndex)
 
 	}
 
-	#if SupportBSP
 
-	/* Or are they in a BSP block array? */
-
-	else if(shptr->sh_bsp_blocks) {
-
-		#if InitTexPrnt
-		textprint("BSP Block Array\n");
-		#endif
-
-		#if 0
-		/* Find the BSP Instruction */
-		ShInstrPtr = shptr->sh_instruction;
-		num_bsp_blocks = 0;
-		while(ShInstrPtr->sh_instr != I_ShapeEnd) {
-			if(ShInstrPtr->sh_instr == I_ShapeBSPTree) {
-				num_bsp_blocks = ShInstrPtr->sh_numitems;
-			}
-			ShInstrPtr++;
-		}
-		#endif
-
-		num_bsp_blocks = FindNumBSPNodes(shptr);
-
-
-		#if InitTexPrnt
-		textprint("Number of BSP blocks = %d\n", num_bsp_blocks);
-		#endif
-
-		if(num_bsp_blocks) {
-
-			ShapeBSPPtr = shptr->sh_bsp_blocks;
-
-			for(k=num_bsp_blocks; k!=0; k--) {
-
-				ShapeItemArrayPtr = ShapeBSPPtr->bsp_block_data;
-
-				for(j=ShapeBSPPtr->bsp_numitems; j!=0; j--) {
-
-					ShapeItemPtr = (POLYHEADER *) *ShapeItemArrayPtr++;
-
-					#if InitTexPrnt
-					textprint("shape item\n");
-					#endif
-
-					if(ShapeItemPtr->PolyItemType == I_2dTexturedPolygon
-						|| ShapeItemPtr->PolyItemType == I_ZB_2dTexturedPolygon
-						|| ShapeItemPtr->PolyItemType == I_Gouraud2dTexturedPolygon
-						|| ShapeItemPtr->PolyItemType == I_ZB_Gouraud2dTexturedPolygon
-						|| ShapeItemPtr->PolyItemType == I_Gouraud3dTexturedPolygon
-						|| ShapeItemPtr->PolyItemType == I_ZB_Gouraud3dTexturedPolygon
-						|| ShapeItemPtr->PolyItemType == I_ScaledSprite
-						|| ShapeItemPtr->PolyItemType == I_3dTexturedPolygon
-						|| ShapeItemPtr->PolyItemType == I_ZB_3dTexturedPolygon) {
-
-						if(ShapeItemPtr->PolyFlags & iflag_txanim) {
-
-							MakeTxAnimFrameTexturesGlobal(shptr, ShapeItemPtr,
-																	LTxIndex, TxIndex);
-
-						}
-
-						#if InitTexPrnt
-						textprint(" - textured\n");
-						#endif
-
-						if(ShapeItemPtr->PolyColour & TxLocal) {
-
-							#if InitTexPrnt
-							textprint("  - local index\n");
-							#endif
-
-							txi = ShapeItemPtr->PolyColour;
-							txi &= ~(TxLocal);					/* Clear Flag */
-							txi &= ClrTxDefn;						/* Clear Defn */
-
-							#if InitTexPrnt
-							textprint("  - is %d\n", txi);
-							textprint("  - LTxIndex is %d\n", LTxIndex);
-							#endif
-
-							/* Is this the local index? */
-
-							if(txi == LTxIndex) {
-
-								/* Clear low word, OR in global index */
-
-								ShapeItemPtr->PolyColour &= ClrTxIndex;
-								ShapeItemPtr->PolyColour |= TxIndex;
-
-								#if InitTexPrnt
-								textprint("Local %d, Global %d\n", LTxIndex, TxIndex);
-								#endif
-
-							}
-
-						}
-
-					}
-
-				}
-
-				ShapeBSPPtr++;
-
-			}
-
-		}
-
-	}
-
-	#endif	/* SupportBSP */
-
-	/* Otherwise the shape has no item data */
+	
 
 
 }
@@ -854,10 +332,6 @@ void MakeTxAnimFrameTexturesGlobal(SHAPEHEADER *sptr,
 	int i, txi, image;
 
 
-	#if 0
-	textprint("LTxIndex = %d, TxIndex = %d\n", LTxIndex, TxIndex);
-	WaitForReturn();
-	#endif
 
 
 	/* Get the animation sequence header */
@@ -960,8 +434,6 @@ void MakeTxAnimFrameTexturesGlobal(SHAPEHEADER *sptr,
 
 */
 
-#define sr_print No
-
 void SpriteResizing(SHAPEHEADER *sptr)
 
 {
@@ -999,9 +471,6 @@ void SpriteResizing(SHAPEHEADER *sptr)
 	int num_images;
 
 
-	#if sr_print
-	textprint("\nSprite Resize Shape\n\n");
-	#endif
 
 
 	/* Get the animation sequence header */
@@ -1097,9 +566,6 @@ void SpriteResizing(SHAPEHEADER *sptr)
 				for(image = 0; image < num_images; image++) {
 
 
-					#if sr_print
-					textprint("image %d of %d   \n", (image + 1), num_images);
-					#endif
 
 
 					/* Get the image */
@@ -1112,19 +578,10 @@ void SpriteResizing(SHAPEHEADER *sptr)
 
 					/* Find the extents of the image, assuming transparency */
 
-					#if 0
-					FindImageExtents(ihdr, txaf->txf_numuvs, txaf->txf_uvdata, &e, &e_curr);
-					#else
 					FindImageExtents(ihdr, txaf->txf_numuvs, txf_uvarray, &e, &e_curr);
-					#endif
 
 					/* Convert the image extents to fixed point */
 
-					#if sr_print
-					textprint("extents = %d, %d\n", e.u_low, e.v_low);
-					textprint("          %d, %d\n", e.u_high, e.v_high);
-					WaitForReturn();
-					#endif
 
 					e.u_low  <<= 16;
 					e.v_low  <<= 16;
@@ -1173,11 +630,7 @@ void SpriteResizing(SHAPEHEADER *sptr)
 
 					/* Write out the new UV data */
 
-					#if 0
-					uvptr = txaf->txf_uvdata;
-					#else
 					uvptr = txf_uvarray;
-					#endif
 
 
 					/*
@@ -1265,17 +718,11 @@ void SpriteResizing(SHAPEHEADER *sptr)
 					}
 
 
-					#if sr_print
-					textprint(" (image done)\n");
-					#endif
 
 
 				}
 
 
-				#if sr_print
-				textprint("\n");
-				#endif
 
 
 				/* Next Texture Animation Frame */
@@ -1289,9 +736,6 @@ void SpriteResizing(SHAPEHEADER *sptr)
 	}
 
 
-	#if sr_print
-	textprint("\nResize done\n\n");
-	#endif
 
 }
 
@@ -1446,23 +890,10 @@ IMAGEHEADER* GetImageHeader(void)
 
 	IMAGEHEADER *iheader;
 
-	#ifdef MaxImageGroups
-
-	/* NumImages always points to the correct point in the array */
-	do
-	{
-		iheader = NextFreeImageHeaderPtr[CurrentImageGroup]++;
-	}
-	while (IsImageInUse(CurrentImageGroup,NumImagesArray[CurrentImageGroup]++) ? ++NumImages : 0);
-	
-	GLOBALASSERT(NumImagesArray[CurrentImageGroup] < MaxImages);
-
-	#else
 
 	iheader = NextFreeImageHeaderPtr++;
 	GLOBALASSERT(NumImages < MaxImages);
 
-	#endif
 	
 	/* ensure flags are zero */
 	memset(iheader,0,sizeof(IMAGEHEADER));
@@ -1475,54 +906,7 @@ IMAGEHEADER* GetImageHeader(void)
 }
 
 
-/*
 
- Return the address of a texture image in memory, else null
-
-*/
-
-#if 0
-void* GetTexture(int texindex)
-
-{
-
-    /* Ahem... */
-
-	return No;
-
-}
-#endif
-
-/*
-
- Allocate memory for a Texture Image
-
-*/
-
-#if 0
-TEXTURE* GetTextureMemory(int txsize)
-
-{
-
-    /* Err... */
-	return No;
-
-}
-#endif
-
-/*
-
- Deallocate memory for a Texture Image
-
-*/
-
-#if 0
-void ReturnTextureMemory(TEXTURE *txptr)
-
-{
-
-}
-#endif
 
 static void DeallocateImageHeader(IMAGEHEADER * ihptr)
 {
@@ -1585,188 +969,7 @@ static void RestoreImageHeader(IMAGEHEADER * ihptr)
 		ReloadImageIntoD3DImmediateSurface(ihptr);
 }
 
-#ifdef MaxImageGroups
 
-void SetCurrentImageGroup(unsigned int group)
-{
-	GLOBALASSERT(group < MaxImageGroups);
-	CurrentImageGroup = group;
-	NumImages = group*MaxImages + NumImagesArray[group];
-}
-
-int DeallocateCurrentImages(void)
-{
-	int i;
-	IMAGEHEADER *ihptr;
-
-	if (NumImagesArray[CurrentImageGroup])
-	{
-		ihptr = &ImageHeaderArray[CurrentImageGroup*MaxImages];
-		for (i = 0; i < NumImagesArray[CurrentImageGroup]; ++i)
-		{
-			if (CanDeleteImage(CurrentImageGroup,i))
-				DeallocateImageHeader(ihptr);
-			++ihptr;
-		}		
-		NumImagesArray[CurrentImageGroup] = 0;
-		NumImages = CurrentImageGroup * MaxImages;
-		NextFreeImageHeaderPtr[CurrentImageGroup] = &ImageHeaderArray[CurrentImageGroup*MaxImages];
-		ImageGroupFreed(CurrentImageGroup);
-	}
-
-	return Yes; /* ok for the moment */
-}
-
-void NowDeleteImage(int img_group, int img_num_offset)
-{
-	DeallocateImageHeader(&ImageHeaderArray[img_group*MaxImages+img_num_offset]);
-}
-
-int DeallocateAllImages(void)
-{
-	int i, j;
-	IMAGEHEADER *ihptr;
-
-	for (j=0; j<MaxImageGroups; ++j)
-	{
-		if (NumImagesArray[j])
-		{
-			ihptr = &ImageHeaderArray[j*MaxImages];
-			for (i = 0; i<NumImagesArray[j]; ++i)
-			{
-				if (CanDeleteImage(j,i))
-					DeallocateImageHeader(ihptr);
-				++ihptr;
-			}		
-			NumImagesArray[j] = 0;
-		}
-		ImageGroupFreed(j);
-	}
-	NumImages = CurrentImageGroup * MaxImages;
-	NextFreeImageHeaderPtr[CurrentImageGroup] = &ImageHeaderArray[CurrentImageGroup*MaxImages];
-
-	return Yes; /* ok for the moment */
-}
-
-static void MinimizeImageCallback(int i, void * gP)
-{
-	int g = *(int *)gP;
-	MinimizeImageHeader(ImageHeaderPtrs[g*MaxImages+i]);
-}
-
-int MinimizeAllImages(void)
-{
-	int i, j;
-	IMAGEHEADER *ihptr;
-
-	for (j=0; j<MaxImageGroups; ++j)
-	{
-		if (NumImagesArray[j])
-		{
-			ihptr = &ImageHeaderArray[j*MaxImages];
-			for (i = 0; i<NumImagesArray[j]; ++i)
-			{
-				MinimizeImageHeader(ihptr);
-				++ihptr;
-			}		
-		}
-		EnumLeftoverImages(j,NumImagesArray[j],MinimizeImageCallback,&j);
-	}
-
-	return Yes; /* ok for the moment */
-}
-
-static void RestoreImageCallback(int i, void * gP)
-{
-	int g = *(int *)gP;
-	RestoreImageHeader(ImageHeaderPtrs[g*MaxImages+i]);
-}
-
-int RestoreAllImages(void)
-{
-	int i, j;
-	IMAGEHEADER *ihptr;
-
-	for (j=0; j<MaxImageGroups; ++j)
-	{
-		if (NumImagesArray[j])
-		{
-			ihptr = &ImageHeaderArray[j*MaxImages];
-			for (i = 0; i<NumImagesArray[j]; ++i)
-			{
-				RestoreImageHeader(ihptr);
-				++ihptr;
-			}		
-		}
-		EnumLeftoverImages(j,NumImagesArray[j],RestoreImageCallback,&j);
-	}
-
-	return Yes; /* ok for the moment */
-}
-
-#if debug
-
-struct ImageGroupDebugInfo
-{
-	int num_texels;
-	int num_images;
-	int num_shared;
-	int num_leftover;
-};
-
-static struct ImageGroupDebugInfo db_gp_info[MaxImageGroups];
-
-static void DbShareImgCallback(int imgnum, void * user)
-{
-	int g = *(int *)user;
-	
-	++db_gp_info[g].num_shared;
-}
-
-static void DbLeftoverImgCallback(int i, void * user)
-{
-	int g = *(int *)user;
-	
-	++db_gp_info[g].num_leftover;
-
-	db_gp_info[g].num_texels += ImageHeaderPtrs[g*MaxImages+i]->ImageWidth * ImageHeaderPtrs[g*MaxImages+i]->ImageHeight;
-}
-
-void ImageGroupsDebugPrintInit(void)
-{
-	int g;
-	for (g=0; g<MaxImageGroups; g++)
-	{
-		int i;
-		
-		db_gp_info[g].num_texels = 0;
-		db_gp_info[g].num_images = NumImagesArray[g];
-		db_gp_info[g].num_shared = 0;
-		db_gp_info[g].num_leftover = 0;
-
-		EnumSharedImages(g,NumImagesArray[g],DbShareImgCallback,&g);
-		EnumLeftoverImages(g,NumImagesArray[g],DbLeftoverImgCallback,&g);
-
-		for (i=0; i<NumImagesArray[g]; ++i)
-		{
-			db_gp_info[g].num_texels += ImageHeaderPtrs[g*MaxImages+i]->ImageWidth * ImageHeaderPtrs[g*MaxImages+i]->ImageHeight;
-		}
-	}
-}
-
-void ImageGroupsDebugPrint(void)
-{
-	int g;
-	textprint("IMAGE GROUP DEBUG INFO\nGP  N_IMG  N_SHR  N_LFT  N_TEXELS\n");
-	for (g=0; g<MaxImageGroups; ++g)
-	{
-		textprint("%2d  %5d  %5d  %5d  %8d\n",g,db_gp_info[g].num_images,db_gp_info[g].num_shared,db_gp_info[g].num_leftover,db_gp_info[g].num_texels);
-	}
-}
-
-#endif
-	
-#else
 
 int DeallocateAllImages(void)
 {
@@ -1821,10 +1024,9 @@ int RestoreAllImages(void)
 	return Yes; /* ok for the moment */
 }
 
-#endif
 
 
-#ifdef RIFF_SYSTEM
+
 
 /*
 The RIFF_SYSTEM uses this function to return an image number
@@ -1850,34 +1052,15 @@ int GetExistingImageNum(char const * fname)
 	int i;
 	IMAGEHEADER * iharrayptr;
 	
-	#ifdef MaxImageGroups
-
-	int g;
-
-	for (g=0; g<MaxImageGroups; ++g)
-	{
-		for (i=0, iharrayptr = &ImageHeaderArray[g*MaxImages]; i<NumImagesArray[g]; ++i, ++iharrayptr)
-		{
-			if (!stricmp(iharrayptr->ImageName,fname))
-			{
-				if (g!=CurrentImageGroup)
-					MarkImageInUseByGroup(g,i,CurrentImageGroup);
-				return i+g*MaxImages;
-			}
-		}
-	}
-
-	#else
 	
 	for (i=0, iharrayptr = ImageHeaderArray; i<NumImages; ++i, ++iharrayptr)
 	{
 		if (!stricmp(iharrayptr->ImageName,fname)) return i;
 	}
 
-	#endif
-
+	
 	return GEI_NOTLOADED;
 }
 
-#endif
+
 

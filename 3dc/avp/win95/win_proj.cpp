@@ -37,8 +37,6 @@ extern LPDIRECTDRAWSURFACE lpDDBackdrop;
 unsigned char ksarray[256];
 unsigned char ToAsciiTable[256][256];
 
-// Dubious
-#define grabmousecapture No
 
 /*
 	Name of project window etc for Win95 interface
@@ -146,26 +144,13 @@ long FAR PASCAL WindowProc(HWND hWnd, UINT message,
 			unsigned char vkcode = (wParam&255);
 		
 			// ignore the status of caps lock
-			//ksarray[VK_CAPITAL] = 0;	
-		 	//ksarray[VK_CAPITAL] = GetKeyState(VK_CAPITAL);	
 			if (vkcode!=VK_CAPITAL && vkcode!=VK_SCROLL)
 			{
-			 	#if 0
-				WORD output;
-			 	if (ToAscii(vkcode,scancode,&ksarray[0],&output,0))
-				{
-					IngameKeyboardInput_KeyDown((unsigned char)(output));
-				}
-				#else
 				if (ToAsciiTable[vkcode][scancode])
 				{
 					IngameKeyboardInput_KeyDown(ToAsciiTable[vkcode][scancode]);
 				}
-				#endif
 			}
-			// reset caps lock status
-			//ksarray[VK_CAPITAL] = GetKeyState(VK_CAPITAL);	
-			//ToAscii(wParam&255,scancode,&ksarray[0],&output,0);
 		}
 		return 0;
 
@@ -177,33 +162,13 @@ long FAR PASCAL WindowProc(HWND hWnd, UINT message,
 
 			
 			// ignore the status of caps lock
-			//ksarray[VK_CAPITAL] = 0;	
-//MakeToAsciiTable();			
-		  	//ksarray[VK_CAPITAL] = GetKeyState(VK_CAPITAL);	
 			if (vkcode!=VK_CAPITAL && vkcode!=VK_SCROLL)
 			{
-				#if 0
-			 	WORD output;
-			 	unsigned char z = ToAscii(vkcode,scancode,&ksarray[0],&output,0);
-				unsigned char a = (unsigned char)output;
-				unsigned char b = ToAsciiTable[vkcode][scancode];
-				#endif
-				#if 0
-				WORD output;
-			 	if (ToAscii(vkcode,scancode,&ksarray[0],&output,0))
-				{
-					IngameKeyboardInput_KeyUp((unsigned char)(output));
-				}
-				#else
 				if (ToAsciiTable[vkcode][scancode])
 				{
 					IngameKeyboardInput_KeyUp(ToAsciiTable[vkcode][scancode]);
 				}
-				#endif
 			}
-			// reset caps lock status
-			//ksarray[VK_CAPITAL] = GetKeyState(VK_CAPITAL);	
-			//ToAscii(wParam&255,scancode,&ksarray[0],&output,0);
 		}
 		return 0;
 		 
@@ -236,13 +201,6 @@ long FAR PASCAL WindowProc(HWND hWnd, UINT message,
 
 	 case WM_ACTIVATE:
 	    return 0;
-#if 0
-     case WM_SYSKEYUP:
-	    return 0;
-
-	case WM_SYSKEYDOWN:
-	    return 0;
-#endif
      case WM_CREATE:
         break;
 
@@ -363,29 +321,8 @@ BOOL InitialiseWindowsSystem(HANDLE hInstance, int nCmdShow,
      }
    else if (WindowMode == WindowModeFullScreen)
      {
-      #if 1
       WinWidth = GetSystemMetrics(SM_CXSCREEN);
       WinHeight = GetSystemMetrics(SM_CYSCREEN);
-      #else
-      // This version of the code MUST be
-      // kept up to date with new video modes!!!
-      if ((VideoMode == VideoMode_DX_320x200x8) ||
-        (VideoMode == VideoMode_DX_320x200x8T))
-	     {
-	      WinWidth = 320;
-	      WinHeight = 200;
-	     }
-      else if (VideoMode == VideoMode_DX_320x240x8)
-         {
-	      WinWidth = 320;
-	      WinHeight = 240;
-	     }
-      else // Default to 640x480
-         {
-	      WinWidth = 640;
-	      WinHeight = 480;
-	     }
-      #endif
 
       // Set up globals for window corners
       WinLeftX = 0;
@@ -421,17 +358,9 @@ BOOL InitialiseWindowsSystem(HANDLE hInstance, int nCmdShow,
 	System icon resource.  This one is generic.  For an actual
 	game this icon will be project specific.
 */
-      #if 1
       wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-	  #else
-      wc.hIcon = NULL;
-	  #endif
 // System cursor resource.  This one is generic.
-      #if 1
       wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-	  #else
-      wc.hCursor = NULL;
-	  #endif
 /*
 	NULL background forces application to redraw
 	the background ITSELF when it receives a WM_ERASEBKGND
@@ -462,7 +391,6 @@ BOOL InitialiseWindowsSystem(HANDLE hInstance, int nCmdShow,
   topmost full screen window.
 */
 
-#if debug
     if (WindowMode == WindowModeSubWindow)
 	  {
        hWndMain = CreateWindowEx(
@@ -533,78 +461,7 @@ BOOL InitialiseWindowsSystem(HANDLE hInstance, int nCmdShow,
 	else
 	  return FALSE;
 
-#else
-    if (WindowMode == WindowModeSubWindow)
-	  {
-       hWndMain = CreateWindowEx(
-          0, // WS_EX_TOPMOST
-          NAME, //  Name of class (registered by RegisterClass call above) 
-          TITLE, // Name of window
-		  WS_OVERLAPPED |
-		  WS_CAPTION |
-		  WS_THICKFRAME,
-/*
-	Initial horizontal and  vertical position.  For a pop-up window,
-	these are the coordinates of the upper left corner.
-*/
-          WinLeftX,
-          WinTopY,
-/*
-	Width and height of window. These are set to the current full
-	screen widths as determined by a Win32 GetSystemMetrics call
-	(GetSystemMetrics(SM_CXSCREEN) and 
-	GetSystemMetrics(SM_CYSCREEN)).
-*/
-          WinWidth,
-		  WinHeight,
-// Parent window (could be set in tools system?) 
-          NULL,
-// Child/menu window (could be set in tools system?) 
-          NULL,
-// Handle for module associated with window 
-          hInstance,
-// Parameter for associated structure (null in this case) 
-          NULL);
-	  }
-	else if (WindowMode == WindowModeFullScreen)
-	  {
-       hWndMain = CreateWindowEx(
-/*
-	WS_EX_TOPMOST forces this window to be topmost except
-	for other topmost	windows, even when deactivated.
-*/
-          WS_EX_TOPMOST,
-          NAME, //  Name of class (registered by RegisterClass call above) 
-          TITLE, // Name of window
-		  WS_VISIBLE | // kills Alt-Space and strews its entrails for fifteen miles.  Heh heh heh.
-          WS_POPUP, // Specify window is style pop up, i.e. non-application 
-/*
-	Initial horizontal and  vertical position.  For a pop-up window,
-	these are the coordinates of the upper left corner.
-*/
-          WinLeftX,
-          WinTopY,
-/*
-	Width and height of window. These are set to the current full
-	screen widths as determined by a Win32 GetSystemMetrics call
-	(GetSystemMetrics(SM_CXSCREEN) and 
-	GetSystemMetrics(SM_CYSCREEN)).
-*/
-          WinWidth,
-		  WinHeight,
-// Parent window (null for a full screen game) 
-          NULL,
-// Child/menu window (null for a full screen game) 
-          NULL,
-// Handle for module associated with window 
-          hInstance,
-// Parameter for associated structure (null in this case) 
-          NULL);
-	  }
-	else
-	  return FALSE;
 
-#endif
 
     if (!hWndMain)
       return FALSE;
@@ -622,11 +479,6 @@ BOOL InitialiseWindowsSystem(HANDLE hInstance, int nCmdShow,
 // we will still get MOUSEMOVE etc messages even
 // if the mouse is out of the defined window area.
 
-    #if grabmousecapture
-    SetCapture(hWndMain);
-// Load null cursor shape
-	SetCursor(NULL);
-	#endif
 	MakeToAsciiTable();
 
     return TRUE;
@@ -640,10 +492,6 @@ BOOL ExitWindowsSystem(void)
 {
    BOOL rc = TRUE;
 
-   // Release dedicated mouse capture
-   #if grabmousecapture
-   ReleaseCapture();
-   #endif
 
    rc = DestroyWindow(hWndMain);
 

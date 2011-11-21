@@ -71,6 +71,8 @@ static void Process_Sprite_MapType(DISPLAYBLOCK *dblockptr)
 {
 }
 
+/* adj */
+
 
 static void Process_Term_MapType(DISPLAYBLOCK *dptr)
 {}

@@ -397,24 +397,6 @@ void AllocateModuleObject(MODULE *mptr);
 void DeallocateModuleObject(MODULE *mptr);
 
 
-/*
-
- A project supplied function. The display block has been successfuly
- allocated and has been fully initialised.
-
-*/
-
-void ModuleObjectJustAllocated(MODULE *mptr);
-
-
-/*
-
- A project supplied function. The display block is about to be deallocated.
-
-*/
-
-void ModuleObjectAboutToBeDeallocated(MODULE *mptr);
-
 
 /*
 

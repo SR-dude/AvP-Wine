@@ -42,9 +42,6 @@ Source file for predator AI
 #include "ourasert.h"
 #include "extents.h"
 
-#define ALL_NEW_AVOIDANCE_PRED  1
-#define PREDATOR_HIT_DELTAS     1
-
 /* external global variables used in this file */
 extern int ModuleArraySize;
 extern char *ModuleCurrVisArray;
@@ -364,38 +361,7 @@ static void PredatorNearDamageShell(STRATEGYBLOCK *sbPtr)
                 
                 /* Do the alien attack sound */
         
-                    #if 0
-        	        	unsigned int rand=FastRandom();
-                        switch (rand % 4)
-                        {
-                                case 0:
-                                {
-                                Sound_Play(SID_SWIPE,"dp",&dynPtr->Position,(rand&255)-128);                                    
-                                break;
-                        }
-                        case 1:
-                        {
-                                Sound_Play(SID_SWIPE2,"dp",&dynPtr->Position,(rand&255)-128);                                   
-                                break;
-                        }
-                        case 2:
-                        {
-                                Sound_Play(SID_SWIPE3,"dp",&dynPtr->Position,(rand&255)-128);                                   
-                                break;
-                        }
-                                case 3:
-                        {
-                                Sound_Play(SID_SWIPE4,"dp",&dynPtr->Position,(rand&255)-128);                                   
-                                break;
-                        }
-                                default:
-                                {
-                                        break;
-                                }
-                        }
-					#else
 					DoPredatorAISwipeSound(sbPtr);
-					#endif
                         /* Oops, check range first. */
                         if (dodamage) {
         
@@ -661,14 +627,12 @@ void CreatePredoBot(VECTORCH *position, int weapon)
                 predatorStatus->My_Gun_Section=GetThisSectionData(predatorStatus->HModelController.section_data,predatorStatus->Selected_Weapon->GunName);
                 predatorStatus->My_Elevation_Section=GetThisSectionData(predatorStatus->HModelController.section_data,predatorStatus->Selected_Weapon->ElevationName);
 
-                #if PREDATOR_HIT_DELTAS
                 if (HModelSequence_Exists(&predatorStatus->HModelController,(int)HMSQT_PredatorStand,(int)PSSS_HitChestFront)) {
                         DELTA_CONTROLLER *delta;
                         delta=Add_Delta_Sequence(&predatorStatus->HModelController,"HitDelta",(int)HMSQT_PredatorStand,(int)PSSS_HitChestFront,-1);
                         GLOBALASSERT(delta);
                         delta->Playing=0;
                 }
-                #endif
 
                 ProveHModel_Far(&predatorStatus->HModelController,sbPtr);
 
@@ -798,13 +762,8 @@ void InitPredatorBehaviour(void* bhdata, STRATEGYBLOCK *sbPtr)
                 predatorStatus->enableTaunt=0;
                 predatorStatus->Explode=0;
 
-                #if 0
-                predatorStatus->PrimaryWeapon=PNPCW_Pistol;
-                predatorStatus->SecondaryWeapon=PNPCW_Wristblade;
-                #else
                 predatorStatus->PrimaryWeapon=toolsData->primary;
                 predatorStatus->SecondaryWeapon=toolsData->secondary;
-                #endif
                 predatorStatus->ChangeToWeapon=PNPCW_End;
                 predatorStatus->Selected_Weapon=GetThisNPCPredatorWeapon(predatorStatus->PrimaryWeapon);
 
@@ -851,14 +810,12 @@ void InitPredatorBehaviour(void* bhdata, STRATEGYBLOCK *sbPtr)
                 predatorStatus->My_Gun_Section=GetThisSectionData(predatorStatus->HModelController.section_data,predatorStatus->Selected_Weapon->GunName);
                 predatorStatus->My_Elevation_Section=GetThisSectionData(predatorStatus->HModelController.section_data,predatorStatus->Selected_Weapon->ElevationName);
 
-                #if PREDATOR_HIT_DELTAS
                 if (HModelSequence_Exists(&predatorStatus->HModelController,(int)HMSQT_PredatorStand,(int)PSSS_HitChestFront)) {
                         DELTA_CONTROLLER *delta;
                         delta=Add_Delta_Sequence(&predatorStatus->HModelController,"HitDelta",(int)HMSQT_PredatorStand,(int)PSSS_HitChestFront,-1);
                         GLOBALASSERT(delta);
                         delta->Playing=0;
                 }
-                #endif
 
                 ProveHModel_Far(&predatorStatus->HModelController,sbPtr);
 
@@ -1051,9 +1008,6 @@ void PredatorBehaviour(STRATEGYBLOCK *sbPtr)
                         SlackTotal+=slack;
                         SlackSize++;
                 }
-                #if 0
-                PrintDebuggingText("MaxSpeed = %d, SynthSpeed = %d, SetSpeed = %d, Slack %d\n",alienStatusPointer->MaxSpeed,synthSpeed,setSpeed,slack);
-                #endif
         }
 
         InitWaypointSystem(0);
@@ -1078,15 +1032,7 @@ void PredatorBehaviour(STRATEGYBLOCK *sbPtr)
                 predatorStatusPointer->Target=Predator_GetNewTarget(sbPtr);
 
                 if (predatorStatusPointer->Target) {
-                        #if 0
-                        textprint("Predator gets new target.\n");
-                        #endif
                         COPY_NAME(predatorStatusPointer->Target_SBname,predatorStatusPointer->Target->SBname);
-        
-                } else {
-                        #if 0
-                                PrintDebuggingText("Predator found no target!\n");
-                        #endif
                 }
 			}
         }
@@ -1347,10 +1293,8 @@ void PredatorBehaviour(STRATEGYBLOCK *sbPtr)
                         
                         if(PointIsInModule(thisModule, &localCoords)==0)
                         {
-                                #if (!PSX)
                                 textprint("FAR PREDATOR MODULE CONTAINMENT FAILURE \n");
                                 LOCALASSERT(1==0);
-                                #endif
                         }  
                 }
                 #endif
@@ -1362,28 +1306,6 @@ void PredatorBehaviour(STRATEGYBLOCK *sbPtr)
                 DestroyAnyStrategyBlock(sbPtr);
         }
         
-        #if 0
-        /* Now, right at the end, fix animation speed. */
-        if ((predatorStatusPointer->HModelController.Sub_Sequence==PRSS_Standard)
-                ||(predatorStatusPointer->HModelController.Sub_Sequence==PCSS_Standard)) {
-
-                int speed,animfactor;
-                /* ...compute speed factor... */
-                speed=Approximate3dMagnitude(&sbPtr->DynPtr->LinVelocity);
-                if (speed==0) {
-                        animfactor=ONE_FIXED;
-                } else {
-                        animfactor=DIV_FIXED(625,speed); // Was 512!  Difference to correct for rounding down...
-                }
-                GLOBALASSERT(animfactor>0);
-                if (ShowPredoStats) {
-                        PrintDebuggingText("Anim Factor %d, Tweening %d\n",animfactor,predatorStatusPointer->HModelController.Tweening);
-                }
-                if (predatorStatusPointer->HModelController.Tweening==0) {
-                        HModel_SetToolsRelativeSpeed(&predatorStatusPointer->HModelController,animfactor);
-                }
-        }
-        #endif
 
         /* Update delta playing flag. */
         {
@@ -1667,16 +1589,6 @@ void MakePredatorFar(STRATEGYBLOCK *sbPtr)
                 return;
         }
         
-        #if 0
-        if(PredatorShouldAttackPlayer(sbPtr))
-        {
-                predatorStatusPointer->behaviourState = PBS_Hunting;
-        }
-        else
-        {
-                predatorStatusPointer->behaviourState = PBS_Withdrawing;        
-        }
-        #endif
 }
 
 void PredatorIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple,SECTION_DATA *Section, VECTORCH *incoming)
@@ -1720,32 +1632,6 @@ void PredatorIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multipl
                 }
         }
 		
-		#if 0
-		{
-			int tkd;
-			VECTORCH origin,blast;
-			/* Make a blood splat? */
-			tkd=TotalKineticDamage(damage);
-			tkd=MUL_FIXED(tkd,multiple);
-
-			if (tkd) {
-				if (Section) {
-					origin=Section->World_Offset;
-				} else {
-					GetTargetingPointOfObject_Far(sbPtr,&origin);
-				}
-				if (incoming) {
-					blast=origin;
-					blast.vx+=incoming->vx;
-					blast.vy+=incoming->vy;
-					blast.vz+=incoming->vz;
-				} else {
-					blast=origin;
-				}
-				MakeBloodExplosion(&origin, 100, &blast, (tkd>>2), PARTICLE_PREDATOR_BLOOD);
-			}
-		}
-		#endif
 
 		/* Do we really want to die? */
         if(sbPtr->SBDamageBlock.Health <= 0) {
@@ -1779,12 +1665,6 @@ void PredatorIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multipl
                         RequestState(predatorStatusPointer->death_target_sbptr,predatorStatusPointer->death_target_request, 0);
                 } 
         
-                #if 0
-                /* switch to dying-suicide state? */
-                predatorStatusPointer->behaviourState = PBS_Dying;
-                predatorStatusPointer->stateTimer = PRED_DIETIME;
-                /* No longer need with corpses, and allows us to reference behaviourState later. */
-                #endif
 
                 /* Set deathtype */
                 
@@ -1901,12 +1781,8 @@ void PredatorIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multipl
                                 wounds=0;
                         }
                         
-                        //if (predatorStatusPointer->behaviourState==PBS_SelfDestruct) {
-                        //      this_death=&Predator_Special_SelfDestruct_Death;
-                        //} else {
                                 this_death=GetPredatorDeathSequence(&predatorStatusPointer->HModelController,root,wounds,
                                         wounds,deathtype,&facing,burning,predatorStatusPointer->IAmCrouched,0);
-                        //}
                         
                         GLOBALASSERT(this_death);
                         
@@ -2230,9 +2106,7 @@ static PRED_RETURN_CONDITION Execute_PFS_Avoidance(STRATEGYBLOCK *sbPtr) {
 
         /* High on the list of Things Not To Be Doing. */
 
-        #if ALL_NEW_AVOIDANCE_PRED
         Initialise_AvoidanceManager(sbPtr,&predatorStatusPointer->avoidanceManager);
-        #endif
 
         switch (predatorStatusPointer->lastState) {
                 case PBS_Recovering:
@@ -2423,9 +2297,6 @@ static PRED_RETURN_CONDITION Execute_PNS_DischargePistol(STRATEGYBLOCK *sbPtr)
                 /* Only terminate if you haven't fired yet... */
                 if(!PredatorCanSeeTarget(sbPtr))
                 {
-                        #if 1
-                        /* ... and remove the gunflash */
-                        #endif
         
                         return(PRC_Request_Engage);
                 }
@@ -2434,9 +2305,7 @@ static PRED_RETURN_CONDITION Execute_PNS_DischargePistol(STRATEGYBLOCK *sbPtr)
                 just entered this state, or the target has moved during firing*/
                 if((!correctlyOrientated)||(predatorStatusPointer->CloakStatus!=PCLOAK_Off))
                 {
-                        #if 1
                         /* stop visual and audio cues: technically, we're not firing at this moment */
-                        #endif
                         return(PRC_No_Change);
                 }
                 
@@ -2455,10 +2324,7 @@ static PRED_RETURN_CONDITION Execute_PNS_DischargePistol(STRATEGYBLOCK *sbPtr)
                 
                 range=VectorDistance((&predatorStatusPointer->Target->DynPtr->Position),(&sbPtr->DynPtr->Position));
         
-                #if 1
-                /* look after the gun flash */
-                #endif
-                
+                 
                 /* look after the sound */
                 Sound_Play(SID_PRED_PISTOL,"d",&(sbPtr->DynPtr->Position));
         
@@ -2589,10 +2455,6 @@ static PRED_RETURN_CONDITION Execute_PNS_AttackWithPlasmaCaster(STRATEGYBLOCK *s
         /* Only terminate if you haven't fired yet... */
         if(!PredatorCanSeeTarget(sbPtr))
         {
-                #if 1
-                /* ... and remove the gunflash */
-                #endif
-        
                 return(PRC_Request_Engage);
         }
 
@@ -2608,9 +2470,6 @@ static PRED_RETURN_CONDITION Execute_PNS_AttackWithPlasmaCaster(STRATEGYBLOCK *s
         just entered this state, or the target has moved during firing*/
         if((!correctlyOrientated)||(predatorStatusPointer->CloakStatus!=PCLOAK_Off))
         {
-                #if 1
-                /* stop visual and audio cues: technically, we're not firing at this moment */
-                #endif
                 return(PRC_No_Change);
         }
 
@@ -2650,9 +2509,6 @@ static PRED_RETURN_CONDITION Execute_PNS_AttackWithPlasmaCaster(STRATEGYBLOCK *s
                         relPos2.vy=(predatorStatusPointer->Target->DynPtr->Position.vy)-(predatorStatusPointer->Target->DynPtr->PrevPosition.vy);
                         relPos2.vz=(predatorStatusPointer->Target->DynPtr->Position.vz)-(predatorStatusPointer->Target->DynPtr->PrevPosition.vz);
                         
-                        #if 1
-                        /* look after the gun flash */
-                        #endif
                         
                         /* look after the sound */
                         Sound_Play(SID_PRED_LAUNCHER,"d",&(sbPtr->DynPtr->Position));
@@ -2832,38 +2688,7 @@ static PRED_RETURN_CONDITION Execute_PNS_Approach(STRATEGYBLOCK *sbPtr)
         /* Make some noise if not cloaked */
         if (predatorStatusPointer->CloakStatus == PCLOAK_Off)
         {
-			#if 0
-          unsigned int random=FastRandom() & 127;
-          switch (random)
-          {
-            case 0:
-            {
-              Sound_Play(SID_PRED_SNARL,"d",&sbPtr->DynPtr->Position);
-                break;
-            }
-            case 1:
-            {
-              Sound_Play(SID_PRED_SCREAM1,"d",&sbPtr->DynPtr->Position);
-              break;
-            }
-            case 2:
-            {
-              Sound_Play(SID_PRED_LOUDROAR,"d",&sbPtr->DynPtr->Position);
-              break;
-            }
-                        case 3:
-            {
-              Sound_Play(SID_PRED_SHORTROAR,"d",&sbPtr->DynPtr->Position);
-              break;
-                  }
-      default:
-      {
-        break;
-      }
-        }
-			#else
 			DoPredatorRandomSound(sbPtr);
-			#endif
         }
 
         PredatorHandleMovingAnimation(sbPtr);
@@ -3036,41 +2861,12 @@ static PRED_RETURN_CONDITION Execute_PNS_EngageWithPistol(STRATEGYBLOCK *sbPtr)
         NPCSetVelocity(sbPtr, &velocityDirection, predatorStatusPointer->nearSpeed);    
 
         /* test here for impeding collisions, and not being able to reach target... */
-        #if ALL_NEW_AVOIDANCE_PRED
         {
                 if (New_NPC_IsObstructed(sbPtr,&predatorStatusPointer->avoidanceManager)) {
                         /* Go to all new avoidance. */
                         return(PRC_Request_Avoidance);
                 }
         }
-        #else
-        {
-                STRATEGYBLOCK *destructableObject = NULL;
-
-                NPC_IsObstructed(sbPtr,&(predatorStatusPointer->moveData),&predatorStatusPointer->obstruction,&destructableObject);
-                if(predatorStatusPointer->obstruction.environment)
-                {
-                        /* go to avoidance */
-                        return(PRC_Request_Avoidance);
-                }
-                if(predatorStatusPointer->obstruction.destructableObject)
-                {
-                        LOCALASSERT(destructableObject);
-                        CauseDamageToObject(destructableObject,&TemplateAmmo[AMMO_NPC_OBSTACLE_CLEAR].MaxDamage[AvP.Difficulty], ONE_FIXED,NULL);
-                }
-        }
-
-        if(NPC_CannotReachTarget(&(predatorStatusPointer->moveData), &targetPosition, &velocityDirection))
-        {
-
-                predatorStatusPointer->obstruction.environment=1;
-                predatorStatusPointer->obstruction.destructableObject=0;
-                predatorStatusPointer->obstruction.otherCharacter=0;
-                predatorStatusPointer->obstruction.anySingleObstruction=0;
-        
-                return(PRC_Request_Avoidance);
-        }
-        #endif
         return(PRC_No_Change);
 }
 
@@ -3204,41 +3000,12 @@ static PRED_RETURN_CONDITION Execute_PNS_EngageWithPlasmaCaster(STRATEGYBLOCK *s
         NPCSetVelocity(sbPtr, &velocityDirection, predatorStatusPointer->nearSpeed);    
 
         /* test here for impeding collisions, and not being able to reach target... */
-        #if ALL_NEW_AVOIDANCE_PRED
         {
                 if (New_NPC_IsObstructed(sbPtr,&predatorStatusPointer->avoidanceManager)) {
                         /* Go to all new avoidance. */
                         return(PRC_Request_Avoidance);
                 }
         }
-        #else
-        {
-                STRATEGYBLOCK *destructableObject = NULL;
-
-                NPC_IsObstructed(sbPtr,&(predatorStatusPointer->moveData),&predatorStatusPointer->obstruction,&destructableObject);
-                if(predatorStatusPointer->obstruction.environment)
-                {
-                        /* go to avoidance */
-                        return(PRC_Request_Avoidance);
-                }
-                if(predatorStatusPointer->obstruction.destructableObject)
-                {
-                        LOCALASSERT(destructableObject);
-                        CauseDamageToObject(destructableObject,&TemplateAmmo[AMMO_NPC_OBSTACLE_CLEAR].MaxDamage[AvP.Difficulty], ONE_FIXED,NULL);
-                }
-        }
-
-        if(NPC_CannotReachTarget(&(predatorStatusPointer->moveData), &targetPosition, &velocityDirection))
-        {
-
-                predatorStatusPointer->obstruction.environment=1;
-                predatorStatusPointer->obstruction.destructableObject=0;
-                predatorStatusPointer->obstruction.otherCharacter=0;
-                predatorStatusPointer->obstruction.anySingleObstruction=0;
-        
-                return(PRC_Request_Avoidance);
-        }
-        #endif
         return(PRC_No_Change);
 }
 
@@ -3375,43 +3142,12 @@ static PRED_RETURN_CONDITION Execute_PNS_EngageWithWristblade(STRATEGYBLOCK *sbP
         NPCSetVelocity(sbPtr, &velocityDirection, predatorStatusPointer->nearSpeed);    
 
         /* test here for impeding collisions, and not being able to reach target... */
-        #if ALL_NEW_AVOIDANCE_PRED
         {
                 if (New_NPC_IsObstructed(sbPtr,&predatorStatusPointer->avoidanceManager)) {
                         /* Go to all new avoidance. */
                         return(PRC_Request_Avoidance);
                 }
         }
-        #else
-        {
-                STRATEGYBLOCK *destructableObject = NULL;
-
-                NPC_IsObstructed(sbPtr,&(predatorStatusPointer->moveData),&predatorStatusPointer->obstruction,&destructableObject);
-                if(predatorStatusPointer->obstruction.environment)
-                {
-                        /* go to avoidance */
-                        return(PRC_Request_Avoidance);
-                }
-                if(predatorStatusPointer->obstruction.destructableObject)
-                {
-                        LOCALASSERT(destructableObject);
-                        CauseDamageToObject(destructableObject,&TemplateAmmo[AMMO_NPC_OBSTACLE_CLEAR].MaxDamage[AvP.Difficulty], ONE_FIXED,NULL);
-                }
-        }
-
-        if(NPC_CannotReachTarget(&(predatorStatusPointer->moveData), &targetPosition, &velocityDirection))
-        {
-
-                predatorStatusPointer->obstruction.environment=1;
-                predatorStatusPointer->obstruction.destructableObject=0;
-                predatorStatusPointer->obstruction.otherCharacter=0;
-                predatorStatusPointer->obstruction.anySingleObstruction=0;
-
-                predatorStatusPointer->patience-=ONE_FIXED;
-        
-                return(PRC_Request_Avoidance);
-        }
-        #endif
         return(PRC_No_Change);
 }
 
@@ -3660,7 +3396,6 @@ static PRED_RETURN_CONDITION Execute_PNS_SwapWeapon(STRATEGYBLOCK *sbPtr) {
 
                 Transmogrify_HModels(sbPtr,&predatorStatusPointer->HModelController,root_section,0,1,0);
                 
-                #if PREDATOR_HIT_DELTAS
                 if (HModelSequence_Exists(&predatorStatusPointer->HModelController,(int)HMSQT_PredatorStand,(int)PSSS_HitChestFront)) {
                         /* This ritual in case _one_ of the hierarchies doesn't have hitdeltas. */
                         DELTA_CONTROLLER *delta;
@@ -3668,7 +3403,6 @@ static PRED_RETURN_CONDITION Execute_PNS_SwapWeapon(STRATEGYBLOCK *sbPtr) {
                         GLOBALASSERT(delta);
                         delta->Playing=0;
                 }
-                #endif
 
                 /* Replace elevation. */
                 if (predatorStatusPointer->Selected_Weapon->UseElevation) {
@@ -3897,7 +3631,6 @@ static PRED_RETURN_CONDITION Execute_PNS_Hunt(STRATEGYBLOCK *sbPtr)
                 return(PRC_Request_Engage);
         } else if(!(PredatorIsAwareOfTarget(sbPtr))) {
                 /* I have a bad feeling about this, too. */
-                //return(PRC_No_Change);
 				/* Might just be in a non-vis module now... */
         }
 
@@ -3927,15 +3660,8 @@ static PRED_RETURN_CONDITION Execute_PNS_Hunt(STRATEGYBLOCK *sbPtr)
                 }
 
                 if (!targetModule) {
-                        #if 1
                         /* Must be sealed off. */
                         return(PRC_Request_Recover);
-                        #else
-                        extern MODULE *playerPherModule;
-                        
-                        LOGDXFMT(("Jules's bug: predator is in %s, player is in %s",sbPtr->containingModule->name,playerPherModule->name));
-                        GLOBALASSERT(targetModule);
-                        #endif
                 }                               
 
                 thisEp=GetAIModuleEP(targetModule,sbPtr->containingModule->m_aimodule);
@@ -3957,42 +3683,13 @@ static PRED_RETURN_CONDITION Execute_PNS_Hunt(STRATEGYBLOCK *sbPtr)
         NPCSetVelocity(sbPtr, &velocityDirection, predatorStatusPointer->nearSpeed);    
 
         /* test here for impeding collisions, and not being able to reach target... */
-        #if ALL_NEW_AVOIDANCE_PRED
         {
                 if (New_NPC_IsObstructed(sbPtr,&predatorStatusPointer->avoidanceManager)) {
                         /* Go to all new avoidance. */
                         return(PRC_Request_Avoidance);
                 }
         }
-        #else
-        {
-                STRATEGYBLOCK *destructableObject = NULL;
 
-                NPC_IsObstructed(sbPtr,&(predatorStatusPointer->moveData),&predatorStatusPointer->obstruction,&destructableObject);
-                if((predatorStatusPointer->obstruction.environment)||(predatorStatusPointer->obstruction.otherCharacter))
-                {
-                        return(PRC_Request_Avoidance);
-                }
-                if(predatorStatusPointer->obstruction.destructableObject)
-                {
-                        LOCALASSERT(destructableObject);
-                        CauseDamageToObject(destructableObject,&TemplateAmmo[AMMO_NPC_OBSTACLE_CLEAR].MaxDamage[AvP.Difficulty], ONE_FIXED,NULL);
-                }
-        }
-
-        if(NPC_CannotReachTarget(&(predatorStatusPointer->moveData), &(predatorStatusPointer->wanderData.worldPosition), &velocityDirection))
-        {
-                /* go to avoidance */
-                /* no sequence change required */
-                
-                predatorStatusPointer->obstruction.environment=1;
-                predatorStatusPointer->obstruction.destructableObject=0;
-                predatorStatusPointer->obstruction.otherCharacter=0;
-                predatorStatusPointer->obstruction.anySingleObstruction=0;
-
-                return(PRC_Request_Avoidance);
-        }
-        #endif
         return(PRC_No_Change);
 }
 
@@ -4020,14 +3717,6 @@ static PRED_RETURN_CONDITION Execute_PNS_Retreat(STRATEGYBLOCK *sbPtr)
                 return(PRC_Request_Recover);
         }
 
-        #if 0
-        if (predatorStatusPointer->incidentFlag) {
-                /* Need a better test here. */
-                if (!(PredatorCanSeeTarget(sbPtr))) {
-                        return(PRC_Request_Recover);
-                }
-        }
-        #endif
 
         /* Yeah, from where _am_ I running? */
         if(PredatorIsAwareOfTarget(sbPtr)) {
@@ -4099,44 +3788,12 @@ static PRED_RETURN_CONDITION Execute_PNS_Retreat(STRATEGYBLOCK *sbPtr)
         NPCSetVelocity(sbPtr, &velocityDirection, predatorStatusPointer->nearSpeed);    
 
         /* test here for impeding collisions, and not being able to reach target... */
-        #if ALL_NEW_AVOIDANCE_PRED
         {
                 if (New_NPC_IsObstructed(sbPtr,&predatorStatusPointer->avoidanceManager)) {
                         /* Go to all new avoidance. */
                         return(PRC_Request_Avoidance);
                 }
         }
-        #else
-        {
-                STRATEGYBLOCK *destructableObject = NULL;
-
-                NPC_IsObstructed(sbPtr,&(predatorStatusPointer->moveData),&predatorStatusPointer->obstruction,&destructableObject);
-                if((predatorStatusPointer->obstruction.environment)||(predatorStatusPointer->obstruction.otherCharacter))
-                {
-                        return(PRC_Request_Avoidance);
-                }
-                if(predatorStatusPointer->obstruction.destructableObject)
-                {
-                        LOCALASSERT(destructableObject);
-                        CauseDamageToObject(destructableObject,&TemplateAmmo[AMMO_NPC_OBSTACLE_CLEAR].MaxDamage[AvP.Difficulty], ONE_FIXED,NULL);
-                }
-        }
-
-        #if 1
-        if(NPC_CannotReachTarget(&(predatorStatusPointer->moveData), &(predatorStatusPointer->wanderData.worldPosition), &velocityDirection))
-        {
-                /* go to avoidance */
-                /* no sequence change required */
-                
-                predatorStatusPointer->obstruction.environment=1;
-                predatorStatusPointer->obstruction.destructableObject=0;
-                predatorStatusPointer->obstruction.otherCharacter=0;
-                predatorStatusPointer->obstruction.anySingleObstruction=0;
-
-                return(PRC_Request_Avoidance);
-        }
-        #endif
-        #endif
         return(PRC_No_Change);
 }
 
@@ -4310,10 +3967,6 @@ static void PredatorCloakOn(PREDATOR_STATUS_BLOCK *predStatus)
 {
         LOCALASSERT(predStatus);
         
-        #if 0
-        /* Temp! */
-        return;
-        #else
         if (predStatus->CloakStatus==PCLOAK_On) {
                 return;
         } else if (predStatus->CloakStatus==PCLOAK_Deactivating) {
@@ -4328,7 +3981,6 @@ static void PredatorCloakOn(PREDATOR_STATUS_BLOCK *predStatus)
                 predStatus->CloakStatus = PCLOAK_Activating;            
                 predStatus->CloakTimer = ONE_FIXED-1;
         }
-        #endif
 }
 
 static void PredatorCloakOff(PREDATOR_STATUS_BLOCK *predStatus)
@@ -4421,7 +4073,6 @@ static void DoPredatorCloak(PREDATOR_STATUS_BLOCK *predStatus,DYNAMICSBLOCK *dyn
 			predStatus->CloakingEffectiveness=0;
 		}
 	}
-//	PrintDebuggingText("cloaking effectiveness %d\n",predStatus->CloakingEffectiveness);
 
 }
 
@@ -4574,14 +4225,6 @@ void Predator_Enter_Wander_State(STRATEGYBLOCK *sbPtr) {
         predatorStatusPointer->stateTimer = PRED_NEAR_CLOSEATTACK_TIME;                                                         
         predatorStatusPointer->Pred_Laser_On=0;
 
-        #if 0
-        if(predatorStatusPointer->IAmCrouched) {
-                SetPredatorAnimationSequence(sbPtr,HMSQT_PredatorCrawl,PCrSS_Standard,ONE_FIXED,(ONE_FIXED>>3));                
-        } else {
-                SetPredatorAnimationSequence(sbPtr,HMSQT_PredatorRun,PRSS_Standard,ONE_FIXED,(ONE_FIXED>>3));
-        }
-        #endif
-
 }
 
 void Predator_Enter_Hunt_State(STRATEGYBLOCK *sbPtr) {
@@ -4601,13 +4244,6 @@ void Predator_Enter_Hunt_State(STRATEGYBLOCK *sbPtr) {
         predatorStatusPointer->stateTimer = PRED_NEAR_CLOSEATTACK_TIME;                                                         
         predatorStatusPointer->Pred_Laser_On=0;
 
-        #if 0
-        if(predatorStatusPointer->IAmCrouched) {
-                SetPredatorAnimationSequence(sbPtr,HMSQT_PredatorCrawl,PCrSS_Standard,ONE_FIXED,(ONE_FIXED>>3));                
-        } else {
-                SetPredatorAnimationSequence(sbPtr,HMSQT_PredatorRun,PRSS_Standard,ONE_FIXED,(ONE_FIXED>>3));
-        }
-        #endif
 
 }
 
@@ -4674,14 +4310,6 @@ void Predator_Enter_Withdrawal_State(STRATEGYBLOCK *sbPtr) {
         predatorStatusPointer->missionmodule=NULL;
         predatorStatusPointer->fearmodule=NULL;
 
-        #if 0
-        if(predatorStatusPointer->IAmCrouched) {
-                SetPredatorAnimationSequence(sbPtr,HMSQT_PredatorCrawl,PCrSS_Standard,ONE_FIXED,(ONE_FIXED>>3));                
-        } else {
-                SetPredatorAnimationSequence(sbPtr,HMSQT_PredatorRun,PRSS_Standard,ONE_FIXED,(ONE_FIXED>>3));
-        }
-        #endif
-
 }
 
 void Predator_Enter_Engaged_State(STRATEGYBLOCK *sbPtr) {
@@ -4700,14 +4328,6 @@ void Predator_Enter_Engaged_State(STRATEGYBLOCK *sbPtr) {
         predatorStatusPointer->behaviourState = PBS_Engaging;
         predatorStatusPointer->stateTimer = PRED_NEAR_CLOSEATTACK_TIME;                                                         
         predatorStatusPointer->Pred_Laser_On=0;
-
-        #if 0
-        if(predatorStatusPointer->IAmCrouched) {
-                SetPredatorAnimationSequence(sbPtr,HMSQT_PredatorCrawl,PCrSS_Standard,ONE_FIXED,(ONE_FIXED>>3));                
-        } else {
-                SetPredatorAnimationSequence(sbPtr,HMSQT_PredatorRun,PRSS_Standard,ONE_FIXED,(ONE_FIXED>>3));
-        }
-        #endif
 
 }
 
@@ -4765,14 +4385,6 @@ void Predator_Enter_Avoidance_State(STRATEGYBLOCK *sbPtr) {
         sbPtr->DynPtr->LinVelocity.vx = 0;
         sbPtr->DynPtr->LinVelocity.vy = 0;
         sbPtr->DynPtr->LinVelocity.vz = 0;
-
-        #if 0
-        if(predatorStatusPointer->IAmCrouched) {
-                SetPredatorAnimationSequence(sbPtr,HMSQT_PredatorCrawl,PCrSS_Standard,ONE_FIXED,(ONE_FIXED>>3));                
-        } else {
-                SetPredatorAnimationSequence(sbPtr,HMSQT_PredatorRun,PRSS_Standard,ONE_FIXED,(ONE_FIXED>>3));
-        }
-        #endif
 
 }
 
@@ -4832,13 +4444,6 @@ void Predator_Enter_Return_State(STRATEGYBLOCK *sbPtr) {
         predatorStatusPointer->stateTimer = PRED_NEAR_CLOSEATTACK_TIME;                                                         
         predatorStatusPointer->Pred_Laser_On=0;
 
-        #if 0
-        if(predatorStatusPointer->IAmCrouched) {
-                SetPredatorAnimationSequence(sbPtr,HMSQT_PredatorCrawl,PCrSS_Standard,ONE_FIXED,(ONE_FIXED>>3));                
-        } else {
-                SetPredatorAnimationSequence(sbPtr,HMSQT_PredatorRun,PRSS_Standard,ONE_FIXED,(ONE_FIXED>>3));
-        }
-        #endif
 
 }
 
@@ -4861,14 +4466,6 @@ void Predator_Enter_Pathfinder_State(STRATEGYBLOCK *sbPtr) {
         predatorStatusPointer->behaviourState = PBS_Pathfinding;
         predatorStatusPointer->stateTimer = PRED_NEAR_CLOSEATTACK_TIME;                                                         
         predatorStatusPointer->Pred_Laser_On=0;
-
-        #if 0
-        if(predatorStatusPointer->IAmCrouched) {
-                SetPredatorAnimationSequence(sbPtr,HMSQT_PredatorCrawl,PCrSS_Standard,ONE_FIXED,(ONE_FIXED>>3));                
-        } else {
-                SetPredatorAnimationSequence(sbPtr,HMSQT_PredatorRun,PRSS_Standard,ONE_FIXED,(ONE_FIXED>>3));
-        }
-        #endif
 
 }
 
@@ -4897,11 +4494,7 @@ void Predator_Enter_Taunt_State(STRATEGYBLOCK *sbPtr) {
                 SetPredatorAnimationSequence(sbPtr,HMSQT_PredatorStand,PSSS_Taunt_One,-1,(ONE_FIXED>>3));               
                 predatorStatusPointer->HModelController.LoopAfterTweening=0;
 				
-				#if 0
-                Sound_Play(SID_PRED_NEWROAR,"d",&sbPtr->DynPtr->Position);
-				#else
 				DoPredatorTauntSound(sbPtr);
-				#endif
 
         } else {
                 /* Yuck. */
@@ -5126,13 +4719,8 @@ int Predator_TargetFilter(STRATEGYBLOCK *candidate) {
                         return(1);
                         break;
                 case I_BehaviourPredator:
-                        #if ANARCHY
-                        return(1);
-                        #else
                         return(0);
-                        #endif
                         break;
-        #if SupportWindows95
                 case I_BehaviourNetGhost:
                         {
                                 NETGHOSTDATABLOCK *dataptr;
@@ -5141,8 +4729,7 @@ int Predator_TargetFilter(STRATEGYBLOCK *candidate) {
                                         case I_BehaviourMarinePlayer:
                                         case I_BehaviourAlienPlayer:
                                         case I_BehaviourPredatorPlayer:
-                                                //return(1);
-                                                return(0);
+                                                 return(0);
                                                 break;
                                         default:
                                                 return(0);
@@ -5150,7 +4737,6 @@ int Predator_TargetFilter(STRATEGYBLOCK *candidate) {
                                 }
                         }
                         break;
-        #endif
                 default:
                         return(0);
                         break;
@@ -5160,11 +4746,6 @@ int Predator_TargetFilter(STRATEGYBLOCK *candidate) {
 
 
 STRATEGYBLOCK *Predator_GetNewTarget(STRATEGYBLOCK *sbPtr) {
-
-        #if 0
-        /* Here's the simple one, for testing purposes. */
-        return(Player->ObStrategyBlock);
-        #else
 
         int neardist, newblip;
         STRATEGYBLOCK *nearest;
@@ -5235,7 +4816,6 @@ STRATEGYBLOCK *Predator_GetNewTarget(STRATEGYBLOCK *sbPtr) {
         }
 
         return(nearest);
-        #endif
         
 }
 
@@ -5568,27 +5148,9 @@ static PRED_RETURN_CONDITION Execute_PNS_AttackWithStaff(STRATEGYBLOCK *sbPtr)
 
         PredatorNearDamageShell(sbPtr);
 
-        #if 0
-        /* Staff damage. */
-        {
-                SECTION_DATA *tip1,*mid,*tip2;
-
-                tip1=GetThisSectionData(predatorStatusPointer->HModelController.section_data,"staff a blade");
-                mid=GetThisSectionData(predatorStatusPointer->HModelController.section_data,"staff center");
-                tip2=GetThisSectionData(predatorStatusPointer->HModelController.section_data,"staff b blade");
-        
-                GLOBALASSERT(tip1);
-                GLOBALASSERT(mid);
-                GLOBALASSERT(tip2);
-
-                Staff_Manager(&TemplateAmmo[AMMO_NPC_PRED_STAFF].MaxDamage[AvP.Difficulty],tip1,mid,tip2,sbPtr);
-
-        }
-        #endif
 
         if (predatorStatusPointer->HModelController.keyframe_flags&1) {
 
-                //predatorStatusPointer->enableSwap=1;
                 StartPredStaffAttackSequence(sbPtr);
                 predatorStatusPointer->stateTimer = PRED_NEAR_CLOSEATTACK_TIME;
                 /* Shrug. */
@@ -5769,42 +5331,12 @@ static PRED_RETURN_CONDITION Execute_PNS_Pathfinder(STRATEGYBLOCK *sbPtr)
         NPCSetVelocity(sbPtr, &velocityDirection, predatorStatusPointer->nearSpeed);    
 
         /* test here for impeding collisions, and not being able to reach target... */
-        #if ALL_NEW_AVOIDANCE_PRED
         {
                 if (New_NPC_IsObstructed(sbPtr,&predatorStatusPointer->avoidanceManager)) {
                         /* Go to all new avoidance. */
                         return(PRC_Request_Avoidance);
                 }
         }
-        #else
-        {
-                STRATEGYBLOCK *destructableObject = NULL;
-                NPC_IsObstructed(sbPtr,&(predatorStatusPointer->moveData),&predatorStatusPointer->obstruction,&destructableObject);
-                if((predatorStatusPointer->obstruction.environment)||(predatorStatusPointer->obstruction.otherCharacter))
-                {
-                        /* go to avoidance */
-                        return(PRC_Request_Avoidance);
-                }
-                if(predatorStatusPointer->obstruction.destructableObject)
-                {
-                        LOCALASSERT(destructableObject);
-                        CauseDamageToObject(destructableObject,&TemplateAmmo[AMMO_NPC_OBSTACLE_CLEAR].MaxDamage[AvP.Difficulty], ONE_FIXED,NULL);
-                }
-        }
-
-        if(NPC_CannotReachTarget(&(predatorStatusPointer->moveData), &(predatorStatusPointer->wanderData.worldPosition), &velocityDirection))
-        {
-                /* go to avoidance */
-                /* no sequence change required */
-                
-                predatorStatusPointer->obstruction.environment=1;
-                predatorStatusPointer->obstruction.destructableObject=0;
-                predatorStatusPointer->obstruction.otherCharacter=0;
-                predatorStatusPointer->obstruction.anySingleObstruction=0;
-
-                return(PRC_Request_Avoidance);
-        }
-        #endif
         return(PRC_No_Change);
 }
 
@@ -5935,42 +5467,12 @@ static PRED_RETURN_CONDITION Execute_PNS_Return(STRATEGYBLOCK *sbPtr)
         NPCSetVelocity(sbPtr, &velocityDirection, predatorStatusPointer->nearSpeed);    
 
         /* test here for impeding collisions, and not being able to reach target... */
-        #if ALL_NEW_AVOIDANCE_PRED
         {
                 if (New_NPC_IsObstructed(sbPtr,&predatorStatusPointer->avoidanceManager)) {
                         /* Go to all new avoidance. */
                         return(PRC_Request_Avoidance);
                 }
         }
-        #else
-        {
-                STRATEGYBLOCK *destructableObject = NULL;
-                NPC_IsObstructed(sbPtr,&(predatorStatusPointer->moveData),&predatorStatusPointer->obstruction,&destructableObject);
-                if((predatorStatusPointer->obstruction.environment)||(predatorStatusPointer->obstruction.otherCharacter))
-                {
-                        /* go to avoidance */
-                        return(PRC_Request_Avoidance);
-                }
-                if(predatorStatusPointer->obstruction.destructableObject)
-                {
-                        LOCALASSERT(destructableObject);
-                        CauseDamageToObject(destructableObject,&TemplateAmmo[AMMO_NPC_OBSTACLE_CLEAR].MaxDamage[AvP.Difficulty], ONE_FIXED,NULL);
-                }
-        }
-
-        if(NPC_CannotReachTarget(&(predatorStatusPointer->moveData), &(predatorStatusPointer->wanderData.worldPosition), &velocityDirection))
-        {
-                /* go to avoidance */
-                /* no sequence change required */
-                
-                predatorStatusPointer->obstruction.environment=1;
-                predatorStatusPointer->obstruction.destructableObject=0;
-                predatorStatusPointer->obstruction.otherCharacter=0;
-                predatorStatusPointer->obstruction.anySingleObstruction=0;
-
-                return(PRC_Request_Avoidance);
-        }
-        #endif
         return(PRC_No_Change);
 }
 
@@ -6041,15 +5543,6 @@ static PRED_RETURN_CONDITION Execute_PNS_Taunting(STRATEGYBLOCK *sbPtr)
         sbPtr->DynPtr->LinVelocity.vy = 0;
         sbPtr->DynPtr->LinVelocity.vz = 0;
 
-        #if 0
-        if (predatorStatusPointer->HModelController.keyframe_flags) {
-			#if 0
-      		Sound_Play(SID_PRED_NEWROAR,"d",&sbPtr->DynPtr->Position);
-			#else
-			DoPredatorTauntSound(sbPtr);
-			#endif
-        }
-        #endif
 
         if (!sbPtr->SBdptr) {
                 /* We're far... do the timer! */
@@ -6130,9 +5623,7 @@ static PRED_RETURN_CONDITION Execute_PNS_DischargeSpeargun(STRATEGYBLOCK *sbPtr)
                 /* Only terminate if you haven't fired yet... */
                 if(!PredatorCanSeeTarget(sbPtr))
                 {
-                        #if 1
                         /* ... and remove the gunflash */
-                        #endif
         
                         return(PRC_Request_Engage);
                 }
@@ -6141,9 +5632,7 @@ static PRED_RETURN_CONDITION Execute_PNS_DischargeSpeargun(STRATEGYBLOCK *sbPtr)
                 just entered this state, or the target has moved during firing*/
                 if((!correctlyOrientated)||(predatorStatusPointer->CloakStatus!=PCLOAK_Off))
                 {
-                        #if 1
                         /* stop visual and audio cues: technically, we're not firing at this moment */
-                        #endif
                         return(PRC_No_Change);
                 }
                 
@@ -6162,9 +5651,7 @@ static PRED_RETURN_CONDITION Execute_PNS_DischargeSpeargun(STRATEGYBLOCK *sbPtr)
                 
                 range=VectorDistance((&predatorStatusPointer->Target->DynPtr->Position),(&sbPtr->DynPtr->Position));
         
-                #if 1
                 /* look after the gun flash */
-                #endif
                 
                 /* look after the sound */
                 Sound_Play(SID_PRED_LASER,"d",&(sbPtr->DynPtr->Position));
@@ -6313,9 +5800,7 @@ static PRED_RETURN_CONDITION Execute_PNS_AttackBrutallyWithPlasmaCaster(STRATEGY
         /* Only terminate if you haven't fired yet... */
         if(!PredatorCanSeeTarget(sbPtr))
         {
-                #if 1
                 /* ... and remove the gunflash */
-                #endif
         
                 return(PRC_Request_Engage);
         }
@@ -6332,9 +5817,7 @@ static PRED_RETURN_CONDITION Execute_PNS_AttackBrutallyWithPlasmaCaster(STRATEGY
         just entered this state, or the target has moved during firing*/
         if (!correctlyOrientated)
         {
-                #if 1
                 /* stop visual and audio cues: technically, we're not firing at this moment */
-                #endif
                 return(PRC_No_Change);
         }
 
@@ -6371,9 +5854,7 @@ static PRED_RETURN_CONDITION Execute_PNS_AttackBrutallyWithPlasmaCaster(STRATEGY
                         relPos2.vy=(predatorStatusPointer->Target->DynPtr->Position.vy)-(predatorStatusPointer->Target->DynPtr->PrevPosition.vy);
                         relPos2.vz=(predatorStatusPointer->Target->DynPtr->Position.vz)-(predatorStatusPointer->Target->DynPtr->PrevPosition.vz);
                         
-                        #if 1
                         /* look after the gun flash */
-                        #endif
                         
                         /* look after the sound */
                         Sound_Play(SID_PRED_LAUNCHER,"d",&(sbPtr->DynPtr->Position));
@@ -6418,14 +5899,7 @@ static PRED_RETURN_CONDITION Execute_PNS_AttackBrutallyWithPlasmaCaster(STRATEGY
         if (predatorStatusPointer->internalState==2) {
 
                 /* After shot. */
-                
-                #if 0
-                if (!(HModelAnimation_IsFinished(&predatorStatusPointer->HModelController))) {
-                        /* Still playing. */
-                        return(PRC_No_Change);
-                }
-                #endif
-
+ 
                 if(range < predatorStatusPointer->Selected_Weapon->MinRange)
                 {
                         /* renew firing, as we are still too close to approach */ 
@@ -6458,14 +5932,10 @@ static PRED_RETURN_CONDITION Execute_PNS_AttackBrutallyWithPlasmaCaster(STRATEGY
                                         /* Change weapon?  No random chance... */
                                         return(PRC_Request_Swap);
                                 } else {
-                                        #if 0
-                                        return(PRC_Request_Engage);
-                                        #else
                                         /* Heck, if we can still see them... */
                                         predatorStatusPointer->stateTimer = predatorStatusPointer->Selected_Weapon->FiringRate;
                                         predatorStatusPointer->internalState=0;
                                         return(PRC_No_Change);
-                                        #endif
                                 }
                         } else {
                                 /* And another! */
@@ -6572,17 +6042,13 @@ static PRED_RETURN_CONDITION Execute_PNS_NewDischargePistol(STRATEGYBLOCK *sbPtr
                 return(PRC_No_Change);
         }
         
-        //if (predatorStatusPointer->stateTimer==predatorStatusPointer->Selected_Weapon->FiringRate) 
         {
                 
-                //predatorStatusPointer->HModelController.Playing=0;
 
                 /* Only terminate if you haven't fired yet... */
                 if(!PredatorCanSeeTarget(sbPtr))
                 {
-                        #if 1
                         /* ... and remove the gunflash */
-                        #endif
         
                         return(PRC_Request_Engage);
                 }
@@ -6591,16 +6057,12 @@ static PRED_RETURN_CONDITION Execute_PNS_NewDischargePistol(STRATEGYBLOCK *sbPtr
                 just entered this state, or the target has moved during firing*/
                 if((!correctlyOrientated)||(predatorStatusPointer->CloakStatus!=PCLOAK_Off))
                 {
-                        #if 1
                         /* stop visual and audio cues: technically, we're not firing at this moment */
-                        #endif
                         return(PRC_No_Change);
                 }
                 
                 /* If you are correctly oriented, you can now fire! */
 
-                //predatorStatusPointer->HModelController.Playing=1;
-                //predatorStatusPointer->HModelController.sequence_timer=0;
 
                 relPos.vx=(predatorStatusPointer->Target->DynPtr->Position.vx)-(sbPtr->DynPtr->Position.vx);
                 relPos.vy=(predatorStatusPointer->Target->DynPtr->Position.vy)-(sbPtr->DynPtr->Position.vy);
@@ -6612,9 +6074,7 @@ static PRED_RETURN_CONDITION Execute_PNS_NewDischargePistol(STRATEGYBLOCK *sbPtr
                 
                 range=VectorDistance((&predatorStatusPointer->Target->DynPtr->Position),(&sbPtr->DynPtr->Position));
         
-                #if 1
                 /* look after the gun flash */
-                #endif
                 
                 /* look after the sound */
                 Sound_Play(SID_PRED_PISTOL,"d",&(sbPtr->DynPtr->Position));
@@ -6637,9 +6097,6 @@ static PRED_RETURN_CONDITION Execute_PNS_NewDischargePistol(STRATEGYBLOCK *sbPtr
 
                 }
 
-                //if (predatorStatusPointer->volleySize>3) {
-                //      predatorStatusPointer->enableSwap=1;
-                //}
         }       
 
         predatorStatusPointer->stateTimer -= NormalFrameTime;
@@ -6659,47 +6116,7 @@ static PRED_RETURN_CONDITION Execute_PNS_NewDischargePistol(STRATEGYBLOCK *sbPtr
         }
         
         /* Enable swap after a full burst. */
-//        predatorStatusPointer->enableSwap=1;
 
-        #if 0
-        {
-                /* renew firing, as we are still too close to approach */ 
-                predatorStatusPointer->stateTimer = predatorStatusPointer->Selected_Weapon->FiringRate;                                 
-                predatorStatusPointer->volleySize = 0;
-                return(PRC_No_Change);
-        }
-        else
-        {
-                NPC_DATA *NpcData;
-                /* we are far enough away, so return to approach? */
-
-                NpcData=GetThisNpcData(I_NPC_Predator);
-                
-                if ((sbPtr->SBDamageBlock.Health<(NpcData->StartingStats.Health<<(ONE_FIXED_SHIFT-1)))
-                        &&(sbPtr->SBDamageBlock.Health>0)) {
-                        /* 50% health? */
-                        if (General_GetAIModuleForRetreat(sbPtr,predatorStatusPointer->Target->containingModule->m_aimodule,5)) {
-                                return(PRC_Request_Withdraw);
-                        } else {
-                                predatorStatusPointer->stateTimer = predatorStatusPointer->Selected_Weapon->FiringRate;                                 
-                                return(PRC_No_Change);
-                        }
-                }
-
-                if (predatorStatusPointer->volleySize>=predatorStatusPointer->Selected_Weapon->VolleySize) {
-                        if (((FastRandom()&65535)>32767)&&(predatorStatusPointer->enableSwap)) {
-                                /* Change weapon! */
-                                return(PRC_Request_Swap);
-                        } else {
-                                return(PRC_Request_Engage);
-                        }
-                } else {
-                        /* And another! */
-                        predatorStatusPointer->stateTimer = predatorStatusPointer->Selected_Weapon->FiringRate;                                 
-                        return(PRC_No_Change);
-                }
-        }
-        #endif
         return(PRC_No_Change);
 }
 
@@ -6744,15 +6161,9 @@ static PRED_RETURN_CONDITION Execute_PNS_SelfDestruct(STRATEGYBLOCK *sbPtr)
                         /* Kaboom. */
                         predatorStatusPointer->internalState=2;
                         /* And kill the pred, for good measure? */
-                        #if 0
-                        predatorStatusPointer->GibbFactor=ONE_FIXED;
-                        CauseDamageToObject(sbPtr,&certainDeath,ONE_FIXED,NULL);
-                        StartPredatorSelfDestructExplosion(sbPtr);
                         /* So as not to confuse the corpse. */
-						#else
                         predatorStatusPointer->GibbFactor=ONE_FIXED;
 						predatorStatusPointer->Explode=1;
-						#endif
                 }
         }
                 
@@ -6764,17 +6175,6 @@ static PRED_RETURN_CONDITION Execute_PNS_SelfDestruct(STRATEGYBLOCK *sbPtr)
 void StartPredatorSelfDestructExplosion(STRATEGYBLOCK *sbPtr) {
 
         /* So it can be easily altered.  Also referenced by bh_corpse.c. */
-	#if 0
-        HandleEffectsOfExplosion
-        (
-                sbPtr,
-                &(sbPtr->DynPtr->Position),
-                TemplateAmmo[AMMO_SADAR_BLAST].MaxRange,
-                &TemplateAmmo[AMMO_SADAR_BLAST].MaxDamage[AvP.Difficulty],
-                TemplateAmmo[AMMO_SADAR_BLAST].ExplosionIsFlat
-        );
-        Sound_Play(SID_NICE_EXPLOSION,"d",&(sbPtr->DynPtr->Position));
-	#else
 	/* Copied from SelfDestructBehavFun. */
 	int i;
 
@@ -6808,7 +6208,6 @@ void StartPredatorSelfDestructExplosion(STRATEGYBLOCK *sbPtr) {
 			}
 		}
 	}
-	#endif
 }
 
 void DoPredatorHitSound(STRATEGYBLOCK *sbPtr) {

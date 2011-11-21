@@ -75,10 +75,6 @@ DISPLAYBLOCK* ReadMap(MAPHEADER *mapheader)
 
 				dblockptr->ObLightType = mapblock8ptr->MapLightType;
 
-/* KJL 15:23:52 06/07/97 - removed */
-//				CopyVector(&mapblock8ptr->MapOrigin, &dblockptr->ObOrigin);
-//				dblockptr->ObSimShapes = mapblock8ptr->MapSimShapes;
-//				dblockptr->ObViewType = mapblock8ptr->MapViewType;
 
 				MapBlockInit(dblockptr);
 
@@ -180,9 +176,6 @@ void MapSetVDB(DISPLAYBLOCK *dptr, MAPSETVDB *mapvdbdata)
 
 		PlatformSpecificVDBInit(vdb);
 
-		#if ProjectSpecificVDBs
-		ProjectSpecificVDBInit(vdb);
-		#endif
 
 
 	}

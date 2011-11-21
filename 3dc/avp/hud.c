@@ -52,10 +52,7 @@
 
 extern int ScanDrawMode;
 
-#define DO_PREDATOR_OVERLAY No
-#define DO_ALIEN_OVERLAY No
 
-#define DRAW_HUD Yes
 /*KJL****************************************************************************************
 *  										G L O B A L S 	            					    *
 ****************************************************************************************KJL*/
@@ -131,7 +128,6 @@ static float ScanlineLevel;
 /*KJL****************************************************************************************
 *                                    P R O T O T Y P E S	                                *
 ****************************************************************************************KJL*/
-//extern void SmartTarget(int speed);
 extern void SmartTarget(int speed,int projectile_speed);
 
 extern void PlatformSpecificKillMarineHUD(void);
@@ -144,8 +140,6 @@ void DisplayPredatorHealthAndEnergy(void);
 void InitHUD();
 static void InitMarineHUD();
 static void InitAlienHUD();
-//static void CalcCoordsAndBLTWeapon(WEAPON_DATA* wptr);
-
 
 void MaintainHUD(void);
 
@@ -169,15 +163,9 @@ void CentreGunSight(void);
 
 static void InitPredatorHUD();
 static int FindPredatorThreats(void);
-#if DO_PREDATOR_OVERLAY
-static void UpdatePredatorStatusValues(void);
-#endif
 static void HandlePredatorWeapon(void);
 
 static void HandleAlienWeapon(void);
-#if DO_ALIEN_OVERLAY
-static void UpdateAlienStatusValues(void);
-#endif
 
 int Fast2dMagnitude(int dx, int dy);
 
@@ -210,7 +198,6 @@ void InitHUD(void)
 	RequestFadeToBlackLevel = 0;
 
 	/* KJL 11:18:36 04/25/97 - initialise HUD map code */
-	//InitHUDMap();
 }
 void KillHUD(void)
 {
@@ -302,7 +289,6 @@ void MaintainHUD(void)
 	PLAYER_STATUS *playerStatusPtr= (PLAYER_STATUS *) (Player->ObStrategyBlock->SBdataptr);
 	GLOBALASSERT(playerStatusPtr);
 
-//	RenderSmokeTest();
 	PlatformSpecificEnteringHUD();
 	
 	if (ScanDrawMode != ScanDrawDirectDraw)
@@ -311,12 +297,8 @@ void MaintainHUD(void)
 	}
 	RenderGrapplingHook();
 	
-	#if SOFTWARE_RENDERER
-	FlushSoftwareZBuffer();
-	#else
 	SecondFlushD3DZBuffer();
-	#endif
-	//DrawFontTest();
+
 	if (Observer)
 	{
 		switch(AvP.PlayerType)
@@ -340,17 +322,13 @@ void MaintainHUD(void)
 				break;
 		}
 		CheckWireFrameMode(0);
-		#if 1||!PREDATOR_DEMO
 		GADGET_Render();
-		#endif
 		return;
 	}
 	
-//	GlobalAmbience=16384;
 
 	/* KJL 18:46:04 03/10/97 - for now I've completely turned off the HUD if you die; this
 	can easily be changed */    	
-	#if DRAW_HUD
 	if (playerStatusPtr->MyFaceHugger!=NULL)
 	{
 		/* YUCK! */
@@ -366,9 +344,7 @@ void MaintainHUD(void)
 			case I_Marine:
 			{
 				HandleMarineWeapon();
-//	   			UpdateHUDMap();
 	  	 	 	if (CurrentVisionMode==VISION_MODE_NORMAL) DoMotionTracker();
-//	            UpdateMarineStatusValues();
 				CheckWireFrameMode(0);
 				//flash health if invulnerable
 				if((playerStatusPtr->invulnerabilityTimer/12000 %2)==0)
@@ -388,8 +364,6 @@ void MaintainHUD(void)
 			{
 				HandlePredatorWeapon();
 				CheckWireFrameMode(0);
-				//DrawPredatorEnergyBar();						
-	  			//DisplayHealthAndArmour();
 			   	DrawWristDisplay();
   				
   				HandlePredOVision();
@@ -466,7 +440,6 @@ void MaintainHUD(void)
 		}
 	}
 
-	#endif
 
 	CheckWireFrameMode(0);
 
@@ -474,9 +447,7 @@ void MaintainHUD(void)
 		extern int HeadUpDisplayZOffset;
 		HeadUpDisplayZOffset = 0;
 
-		#if 1||!PREDATOR_DEMO
 		GADGET_Render();
-		#endif
 		
 		switch(AvP.PlayerType)
 		{
@@ -487,7 +458,6 @@ void MaintainHUD(void)
 			}
 	       	case I_Predator:
 			{
-  	//			HandlePredOVision();
 				break;
 			}
 			default:
@@ -519,7 +489,6 @@ void MaintainHUD(void)
 		
 		extern int PlayerDamagedOverlayIntensity;
 		int intensity = PlayerDamagedOverlayIntensity>>12;
-//		if (intensity>255) intensity = 255;
 		if (intensity>128) intensity = 128;
 		
 		if (intensity)
@@ -531,24 +500,6 @@ void MaintainHUD(void)
 		if (PlayerDamagedOverlayIntensity<0) PlayerDamagedOverlayIntensity=0;
 	}
 	{
-		#if 0
-		if(DrawCompanyLogos && LogosAlphaLevel)
-		{
-			extern void D3D_DrawRebellionLogo(unsigned int alpha);
-			
-			if (LogosAlphaLevel<ONE_FIXED)
-			{
-				D3D_DrawRebellionLogo(LogosAlphaLevel);
-			}
-			else
-			{
-				D3D_DrawRebellionLogo(0xff00);
-			}
-			
-			LogosAlphaLevel-=NormalFrameTime;
-			if (LogosAlphaLevel<0) LogosAlphaLevel=0;
-		}
-		#endif
 		if(FadingGameInAfterLoading)
 		{
 			extern void D3D_FadeDownScreen(int brightness, int colour);
@@ -633,19 +584,6 @@ static void DoMotionTracker(void)
 				}
 			}
 
-			// Do motion tracker pitch change?
-
-			#if 0 // no - it sounds fucking awful
-			if (MTSoundHandle!=SOUND_NOACTIVEINDEX)			
-			{
-				int panicFactor = 65536 - MUL_FIXED(nearestDistance,MOTIONTRACKER_SCALE);
-				LOCALASSERT(panicFactor>=0);
-				panicFactor>>=8;              // Scale to 0-256
-				 
-				PlatChangeSoundPitch(MTSoundHandle,panicFactor);
-
-			}
-			#endif
 				
 		}
 		else if (NoOfMTBlips==0) /* if the MT is blank, cycle the distance digits */
@@ -860,7 +798,6 @@ static int DoMotionTrackerBlips(void)
 				/* ignore objects 'behind' MT */
 				if (y>=0)
 				{
-//				  	int x = MUL_FIXED(dx,cosPhi) - MUL_FIXED(dz,sinPhi);
 					int dist = Fast2dMagnitude(dx,dz);
 					int radius = MUL_FIXED(dist,MOTIONTRACKER_SCALE);
 					
@@ -880,8 +817,6 @@ static int DoMotionTrackerBlips(void)
 							if (nearestDistance>dist) nearestDistance=dist;
 
 							/* create new blip */
-				//			MotionTrackerBlips[NoOfMTBlips].X = x;
-				//			MotionTrackerBlips[NoOfMTBlips].Y = y;
 							MotionTrackerBlips[NoOfMTBlips].X = objectDynPtr->Position.vx;
 							MotionTrackerBlips[NoOfMTBlips].Y = objectDynPtr->Position.vz;
 							MotionTrackerBlips[NoOfMTBlips].Brightness = 65536;
@@ -897,7 +832,6 @@ static int DoMotionTrackerBlips(void)
 
 static void DisplayHealthAndArmour(void)
 {
-//	extern void D3D_RenderHUDString(char *stringPtr,int x,int y,int colour);
 	int health,armour;
     /* access the extra data hanging off the strategy block */
 	PLAYER_STATUS *playerStatusPtr= (PLAYER_STATUS *) (Player->ObStrategyBlock->SBdataptr);
@@ -1048,135 +982,8 @@ static void DisplayMarinesAmmo(void)
 	}
 
 }				   
-#if 0
-static void UpdateMarineStatusValues(void)
-{
-	PLAYER_WEAPON_DATA *weaponPtr;
 
-    /* access the extra data hanging off the strategy block */
-	PLAYER_STATUS *playerStatusPtr= (PLAYER_STATUS *) (Player->ObStrategyBlock->SBdataptr);
-    GLOBALASSERT(playerStatusPtr);
-    	
-	{
-		/* player's current weapon */
-    	GLOBALASSERT(playerStatusPtr->SelectedWeaponSlot<MAX_NO_OF_WEAPON_SLOTS);
-        
-        /* init a pointer to the weapon's data */
-        weaponPtr = &(playerStatusPtr->WeaponSlot[playerStatusPtr->SelectedWeaponSlot]);
-    }
-    
 
-	{
-    	int value=playerStatusPtr->Health>>16;	/* stored in 16.16 so shift down */
-        ValueOfHUDDigit[MARINE_HUD_HEALTH_UNITS]=value%10;
-		value/=10;
-        ValueOfHUDDigit[MARINE_HUD_HEALTH_TENS]=value%10;
-        value/=10;
-		ValueOfHUDDigit[MARINE_HUD_HEALTH_HUNDREDS]=value%10;
-	}
-	{
-    	#if PC_E3DEMO
-    	int value=playerStatusPtr->Energy>>16;	/* stored in 16.16 so shift down */
-        #else
-		extern int FrameRate;
-		int value=FrameRate;
-		#endif
-        ValueOfHUDDigit[MARINE_HUD_ENERGY_UNITS]=value%10;
-		value/=10;
-        ValueOfHUDDigit[MARINE_HUD_ENERGY_TENS]=value%10;
-        value/=10;
-		ValueOfHUDDigit[MARINE_HUD_ENERGY_HUNDREDS]=value%10;
-	}
-	{
-    	int value=playerStatusPtr->Armour>>16;	/* stored in 16.16 so shift down */
-        ValueOfHUDDigit[MARINE_HUD_ARMOUR_UNITS]=value%10;
-		value/=10;
-        ValueOfHUDDigit[MARINE_HUD_ARMOUR_TENS]=value%10;
-        value/=10;
-		ValueOfHUDDigit[MARINE_HUD_ARMOUR_HUNDREDS]=value%10;
-	}
-	
-	{
-    	int value=weaponPtr->PrimaryRoundsRemaining>>16;
-        /* ammo is in 16.16. we want the integer part, rounded up */
-        if ( (weaponPtr->PrimaryRoundsRemaining&0xffff) ) value+=1;
-        
-        ValueOfHUDDigit[MARINE_HUD_PRIMARY_AMMO_ROUNDS_UNITS]=value%10;
-		value/=10;
-        ValueOfHUDDigit[MARINE_HUD_PRIMARY_AMMO_ROUNDS_TENS]=value%10;
-        value/=10;
-		ValueOfHUDDigit[MARINE_HUD_PRIMARY_AMMO_ROUNDS_HUNDREDS]=value%10;
-	}
-	{
-    	int value=weaponPtr->PrimaryMagazinesRemaining;
-        ValueOfHUDDigit[MARINE_HUD_PRIMARY_AMMO_MAGAZINES_UNITS]=value%10;
-		value/=10;
-        ValueOfHUDDigit[MARINE_HUD_PRIMARY_AMMO_MAGAZINES_TENS]=value%10;
-    }	
-	
-	/* KJL 14:54:39 03/26/97 - secondary ammo */
-	if ( (weaponPtr->WeaponIDNumber == WEAPON_PULSERIFLE)
-	   ||(weaponPtr->WeaponIDNumber == WEAPON_MYSTERYGUN) )
-	{
-    	int value=weaponPtr->SecondaryRoundsRemaining>>16;
-        /* ammo is in 16.16. we want the integer part, rounded up */
-        if ( (weaponPtr->SecondaryRoundsRemaining&0xffff) ) value+=1;
-        
-        ValueOfHUDDigit[MARINE_HUD_SECONDARY_AMMO_ROUNDS_UNITS]=value%10;
-		value/=10;
-        ValueOfHUDDigit[MARINE_HUD_SECONDARY_AMMO_ROUNDS_TENS]=value%10;
-        value/=10;
-		ValueOfHUDDigit[MARINE_HUD_SECONDARY_AMMO_ROUNDS_HUNDREDS]=value%10;
-
-    	value=weaponPtr->SecondaryMagazinesRemaining;
-        ValueOfHUDDigit[MARINE_HUD_SECONDARY_AMMO_MAGAZINES_UNITS]=value%10;
-		value/=10;
-        ValueOfHUDDigit[MARINE_HUD_SECONDARY_AMMO_MAGAZINES_TENS]=value%10;
-		
-		BLTMarineNumericsToHUD(MARINE_HUD_SECONDARY_AMMO_MAGAZINES_TENS);
-    }	
-	else if (weaponPtr->WeaponIDNumber == WEAPON_GRENADELAUNCHER)
- 	{
-		/* KJL 11:46:57 04/09/97 - use to display your ammo type */
-		int value;
-		switch(GrenadeLauncherData.SelectedAmmo)
-		{
-			case AMMO_GRENADE:
-			{
-				value=1;
-				break;
-			}
-			case AMMO_FLARE_GRENADE:
-			{
-				value=2;
-				break;
-			}
-			case AMMO_FRAGMENTATION_GRENADE:
-			{
-				value=3;
-				break;
-			}
-			case AMMO_PROXIMITY_GRENADE:
-			{
-				value=4;
-				break;
-			}
-			default:
-			{
-				LOCALASSERT(0);
-				break;
-			}
-		}
-        ValueOfHUDDigit[MARINE_HUD_SECONDARY_AMMO_ROUNDS_UNITS]=value;
-		BLTMarineNumericsToHUD(MARINE_HUD_SECONDARY_AMMO_ROUNDS_UNITS);
-	}
-	else
-	{
-		BLTMarineNumericsToHUD(MARINE_HUD_PRIMARY_AMMO_MAGAZINES_TENS);
-	}
-
-}
-#endif
 static void HandleMarineWeapon(void)
 {
 	PLAYER_WEAPON_DATA *weaponPtr;
@@ -1239,28 +1046,9 @@ static void HandleMarineWeapon(void)
 				else
 				{
 					DrawMuzzleFlash(&PlayersWeaponMuzzleFlash.ObWorld,&direction,MUZZLE_FLASH_AMORPHOUS);
-					#if 0
-					{
-						int i = 5;
-						VECTORCH velocity = direction;
-						velocity.vx >>= 9;
-						velocity.vy >>= 9;
-						velocity.vz >>= 9;
-						do
-						{
-							VECTORCH position = PlayersWeaponMuzzleFlash.ObWorld;
-							position.vx += (FastRandom()&15)-8;
-							position.vy += (FastRandom()&15)-8;
-							position.vz += (FastRandom()&15)-8;
-							MakeParticle(&position,&velocity,PARTICLE_GUNMUZZLE_SMOKE);
-						}
-						while(--i);
-					}
-					#endif
 				}
 			}
 			onThisFrame=!onThisFrame;
-		//	RenderThisDisplayblock(&PlayersWeaponMuzzleFlash);
 		}
 		
 	}
@@ -1336,145 +1124,7 @@ static void InitPredatorHUD(void)
 	InitialiseGrapplingHook();
 }
 
-#if DO_PREDATOR_OVERLAY
 
-static void UpdatePredatorStatusValues(void)
-{
-	PLAYER_WEAPON_DATA *weaponPtr;
-
-    /* access the extra data hanging off the strategy block */
-	PLAYER_STATUS *playerStatusPtr= (PLAYER_STATUS *) (Player->ObStrategyBlock->SBdataptr);
-    GLOBALASSERT(playerStatusPtr);
-    	
-	{
-		/* player's current weapon */
-    	GLOBALASSERT(playerStatusPtr->SelectedWeaponSlot<MAX_NO_OF_WEAPON_SLOTS);
-        
-        /* init a pointer to the weapon's data */
-        weaponPtr = &(playerStatusPtr->WeaponSlot[playerStatusPtr->SelectedWeaponSlot]);
-    }
-    
-
-	{
-    	int value=WideMulNarrowDiv(playerStatusPtr->Health,45,6553600);
-
-        if (value>=37)
-        {
-        	ValueOfHUDDigit[PREDATOR_HUD_HEALTH_5]= value-36;
-			ValueOfHUDDigit[PREDATOR_HUD_HEALTH_4]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_HEALTH_3]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_HEALTH_2]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_HEALTH_1]= 9;
-		}
-		else if (value>=28)
-        {
-        	ValueOfHUDDigit[PREDATOR_HUD_HEALTH_5]=	0;
-			ValueOfHUDDigit[PREDATOR_HUD_HEALTH_4]= value-27;
-			ValueOfHUDDigit[PREDATOR_HUD_HEALTH_3]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_HEALTH_2]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_HEALTH_1]= 9;
-		}
-		else if (value>=19)
-        {
-        	ValueOfHUDDigit[PREDATOR_HUD_HEALTH_5]= 0;
-			ValueOfHUDDigit[PREDATOR_HUD_HEALTH_4]= 0;
-			ValueOfHUDDigit[PREDATOR_HUD_HEALTH_3]= value-18;
-			ValueOfHUDDigit[PREDATOR_HUD_HEALTH_2]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_HEALTH_1]= 9;
-		}
-		else if (value>=10)
-        {
-        	ValueOfHUDDigit[PREDATOR_HUD_HEALTH_5]= 0;
-			ValueOfHUDDigit[PREDATOR_HUD_HEALTH_4]= 0;
-			ValueOfHUDDigit[PREDATOR_HUD_HEALTH_3]= 0;
-			ValueOfHUDDigit[PREDATOR_HUD_HEALTH_2]= value-9;
-			ValueOfHUDDigit[PREDATOR_HUD_HEALTH_1]= 9;
-		}
-		else
-		{
-        	ValueOfHUDDigit[PREDATOR_HUD_HEALTH_5]= 0;
-			ValueOfHUDDigit[PREDATOR_HUD_HEALTH_4]= 0;
-			ValueOfHUDDigit[PREDATOR_HUD_HEALTH_3]= 0;
-			ValueOfHUDDigit[PREDATOR_HUD_HEALTH_2]= 0;
-			ValueOfHUDDigit[PREDATOR_HUD_HEALTH_1]= value;
-		}
-	}
-	{
-    	int value=WideMulNarrowDiv(playerStatusPtr->Armour,45,6553600);
-
-        if (value>=37)
-        {
-        	ValueOfHUDDigit[PREDATOR_HUD_ARMOUR_5]= value-36;
-			ValueOfHUDDigit[PREDATOR_HUD_ARMOUR_4]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_ARMOUR_3]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_ARMOUR_2]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_ARMOUR_1]= 9;
-		}
-		else if (value>=28)
-        {
-        	ValueOfHUDDigit[PREDATOR_HUD_ARMOUR_5]=	0;
-			ValueOfHUDDigit[PREDATOR_HUD_ARMOUR_4]= value-27;
-			ValueOfHUDDigit[PREDATOR_HUD_ARMOUR_3]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_ARMOUR_2]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_ARMOUR_1]= 9;
-		}
-		else if (value>=19)
-        {
-        	ValueOfHUDDigit[PREDATOR_HUD_ARMOUR_5]= 0;
-			ValueOfHUDDigit[PREDATOR_HUD_ARMOUR_4]= 0;
-			ValueOfHUDDigit[PREDATOR_HUD_ARMOUR_3]= value-18;
-			ValueOfHUDDigit[PREDATOR_HUD_ARMOUR_2]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_ARMOUR_1]= 9;
-		}
-		else if (value>=10)
-        {
-        	ValueOfHUDDigit[PREDATOR_HUD_ARMOUR_5]= 0;
-			ValueOfHUDDigit[PREDATOR_HUD_ARMOUR_4]= 0;
-			ValueOfHUDDigit[PREDATOR_HUD_ARMOUR_3]= 0;
-			ValueOfHUDDigit[PREDATOR_HUD_ARMOUR_2]= value-9;
-			ValueOfHUDDigit[PREDATOR_HUD_ARMOUR_1]= 9;
-		}
-		else
-		{
-        	ValueOfHUDDigit[PREDATOR_HUD_ARMOUR_5]= 0;
-			ValueOfHUDDigit[PREDATOR_HUD_ARMOUR_4]= 0;
-			ValueOfHUDDigit[PREDATOR_HUD_ARMOUR_3]= 0;
-			ValueOfHUDDigit[PREDATOR_HUD_ARMOUR_2]= 0;
-			ValueOfHUDDigit[PREDATOR_HUD_ARMOUR_1]= value;
-		}
-	}
-	
-#if 0
-	{
-    	int value=playerStatusPtr->Energy>>16;	/* stored in 16.16 so shift down */
-        ValueOfHUDDigit[MARINE_HUD_ENERGY_UNITS]=value%10;
-		value/=10;
-        ValueOfHUDDigit[MARINE_HUD_ENERGY_TENS]=value%10;
-        value/=10;
-		ValueOfHUDDigit[MARINE_HUD_ENERGY_HUNDREDS]=value%10;
-	}
-	{
-    	int value=weaponPtr->RoundsRemaining>>16;
-        /* ammo is in 16.16. we want the integer part, rounded up */
-        if ( (weaponPtr->RoundsRemaining&0xffff) ) value+=1;
-        
-        ValueOfHUDDigit[MARINE_HUD_AMMO_ROUNDS_UNITS]=value%10;
-		value/=10;
-        ValueOfHUDDigit[MARINE_HUD_AMMO_ROUNDS_TENS]=value%10;
-        value/=10;
-		ValueOfHUDDigit[MARINE_HUD_AMMO_ROUNDS_HUNDREDS]=value%10;
-	}
-	{
-    	int value=weaponPtr->MagazinesRemaining;
-        ValueOfHUDDigit[MARINE_HUD_AMMO_MAGAZINES_UNITS]=value%10;
-		value/=10;
-        ValueOfHUDDigit[MARINE_HUD_AMMO_MAGAZINES_TENS]=value%10;
-    }
-#endif	
-	
-}
-
-#endif
 
 void DisplayPredatorHealthAndEnergy(void)
 {
@@ -1570,140 +1220,7 @@ void DisplayPredatorHealthAndEnergy(void)
 	}
 
 }
-#if 0
-static void DoPredatorThreatDisplay(void)
-{
-	/* evaluate the distance digits */
-	{
-    	int value=WideMulNarrowDiv(FindPredatorThreats(),72,MOTIONTRACKER_RANGE);
 
-        if (value>=64)
-        {
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_8]= value-63;
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_7]= 9;
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_6]= 9;
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_5]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_4]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_3]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_2]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_1]= 9;
-		}
-        else if (value>=55)
-        {
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_8]= 0;
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_7]= value-54;
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_6]= 9;
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_5]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_4]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_3]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_2]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_1]= 9;
-		}
-        else if (value>=46)
-        {
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_8]= 0;
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_7]= 0;
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_6]= value-45;
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_5]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_4]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_3]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_2]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_1]= 9;
-		}
-        else if (value>=37)
-        {
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_8]= 0;
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_7]= 0;
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_6]= 0;
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_5]= value-36;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_4]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_3]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_2]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_1]= 9;
-		}
-		else if (value>=28)
-        {
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_8]= 0;
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_7]= 0;
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_6]= 0;
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_5]=	0;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_4]= value-27;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_3]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_2]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_1]= 9;
-		}
-		else if (value>=19)
-        {
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_8]= 0;
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_7]= 0;
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_6]= 0;
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_5]= 0;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_4]= 0;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_3]= value-18;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_2]= 9;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_1]= 9;
-		}
-		else if (value>=10)
-        {
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_8]= 0;
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_7]= 0;
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_6]= 0;
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_5]= 0;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_4]= 0;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_3]= 0;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_2]= value-9;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_1]= 9;
-		}
-		else
-		{
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_8]= 0;
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_7]= 0;
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_6]= 0;
-        	ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_5]= 0;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_4]= 0;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_3]= 0;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_2]= 0;
-			ValueOfHUDDigit[PREDATOR_HUD_THREATDISPLAY_1]= value;
-		}
-	}
-   
-	
-	return;
-}
-
-
-static int FindPredatorThreats(void)
-{
-	DYNAMICSBLOCK *playerDynPtr = Player->ObStrategyBlock->DynPtr;
-	int numberOfObjects = NumActiveStBlocks;
-	int nearestDistance=MOTIONTRACKER_RANGE;
-	
-	while (numberOfObjects--)
-	{
-		STRATEGYBLOCK *objectPtr = ActiveStBlockList[numberOfObjects];
-		DYNAMICSBLOCK *objectDynPtr = objectPtr->DynPtr;
-		
-		if (objectPtr == Player->ObStrategyBlock) continue;
-
-  		if (objectDynPtr)
-		{
-		    /* 2d vector from player to object */
-			int dx = objectDynPtr->Position.vx-playerDynPtr->Position.vx;
-			int dz = objectDynPtr->Position.vz-playerDynPtr->Position.vz;
-			int dy = objectDynPtr->Position.vy-playerDynPtr->Position.vy;
-			
-			if (dy > -2000 || dy <2000)
-			{
-				int dist = Fast2dMagnitude(dx,dz);
-				/* remember distance for possible display on HUD */
-				if (nearestDistance>dist) nearestDistance=dist;
-  		   		
-			}
-		}
-	}
-	return nearestDistance;
-}
-#endif
 static void HandlePredatorWeapon(void)
 {
 	PLAYER_WEAPON_DATA *weaponPtr;
@@ -1722,8 +1239,6 @@ static void HandlePredatorWeapon(void)
         twPtr = &TemplateWeapon[weaponPtr->WeaponIDNumber];
     }
 	
-	//PositionPlayersWeapon();
-
 	{
 		extern void RenderThisDisplayblock(DISPLAYBLOCK *dbPtr);
 		
@@ -1896,59 +1411,7 @@ void DrawWristDisplay(void)
 	if (!sectionPtr) return;
 	
 	RenderPredatorPlasmaCasterCharge(PlayerStatusPtr->PlasmaCasterCharge, &sectionPtr->World_Offset, &sectionPtr->SecMat);
-	#if 0
-   	for (i=0; i<5; i++)
-   	{
-   		DECAL CurrentDecal;	
-		extern MODULE *playerPherModule;
-		int z= 0,halfWidth=50,halfHeight=50;
 
-
- 		sectionPtr=GetThisSectionData(PlayersWeaponHModelController.section_data,sectionName[i]);
-		if (!sectionPtr) return;
-	
-		CurrentDecal.DecalID = DECAL_PREDATOR_BLOOD;
-
- 		CurrentDecal.Vertices[0].vx = -halfWidth;
-		CurrentDecal.Vertices[0].vz = -halfHeight;
-		CurrentDecal.Vertices[0].vy = z;
-		RotateVector(&(CurrentDecal.Vertices[0]),&sectionPtr->SecMat);
-		CurrentDecal.Vertices[0].vx += sectionPtr->World_Offset.vx;
-		CurrentDecal.Vertices[0].vy += sectionPtr->World_Offset.vy;
-		CurrentDecal.Vertices[0].vz += sectionPtr->World_Offset.vz;
-
-
-		CurrentDecal.Vertices[1].vx = halfWidth;
-		CurrentDecal.Vertices[1].vz = -halfHeight;
-		CurrentDecal.Vertices[1].vy = z;
-		RotateVector(&(CurrentDecal.Vertices[1]),&sectionPtr->SecMat);
-		CurrentDecal.Vertices[1].vx += sectionPtr->World_Offset.vx;
-		CurrentDecal.Vertices[1].vy += sectionPtr->World_Offset.vy;
-		CurrentDecal.Vertices[1].vz += sectionPtr->World_Offset.vz;
-
-		CurrentDecal.Vertices[2].vx = halfWidth;
-		CurrentDecal.Vertices[2].vz = halfHeight;
-		CurrentDecal.Vertices[2].vy = z;
-		RotateVector(&(CurrentDecal.Vertices[2]),&sectionPtr->SecMat);
-		CurrentDecal.Vertices[2].vx += sectionPtr->World_Offset.vx;
-		CurrentDecal.Vertices[2].vy += sectionPtr->World_Offset.vy;
-		CurrentDecal.Vertices[2].vz += sectionPtr->World_Offset.vz;
-
-		CurrentDecal.Vertices[3].vx = -halfWidth;
-		CurrentDecal.Vertices[3].vz = halfHeight;
-		CurrentDecal.Vertices[3].vy = z;
-		RotateVector(&(CurrentDecal.Vertices[3]),&sectionPtr->SecMat);
-		CurrentDecal.Vertices[3].vx += sectionPtr->World_Offset.vx;
-		CurrentDecal.Vertices[3].vy += sectionPtr->World_Offset.vy;
-		CurrentDecal.Vertices[3].vz += sectionPtr->World_Offset.vz;
-
-		CurrentDecal.ModuleIndex = playerPherModule->m_index;
-
-		CurrentDecal.UOffset = 0;
-		
-		RenderDecal(&CurrentDecal);
-	}
-	#endif
 }
 void RotateVertex(VECTOR2D *vertexPtr, int theta)
 {
@@ -1989,8 +1452,6 @@ static void HandleAlienWeapon(void)
         twPtr = &TemplateWeapon[weaponPtr->WeaponIDNumber];
     }
 	
-	//PositionPlayersWeapon();
-
 	{
 		extern void RenderThisDisplayblock(DISPLAYBLOCK *dbPtr);
 		
@@ -2006,7 +1467,6 @@ static void HandleAlienWeapon(void)
 			RenderThisDisplayblock(&PlayersWeapon);
 		
 	}
-	//if ((twPtr->PrimaryIsMeleeWeapon)&&
 	if ((weaponPtr->WeaponIDNumber == WEAPON_ALIEN_CLAW)&&(Alien_Visible_Weapon==0))
 	{
 		GunMuzzleSightX = (ScreenDescriptorBlock.SDB_Width<<15);
@@ -2024,24 +1484,7 @@ static void HandleAlienWeapon(void)
 
 }
 
-#if DO_ALIEN_OVERLAY
 
-static void UpdateAlienStatusValues(void)
-{
-    /* access the extra data hanging off the strategy block */
-	PLAYER_STATUS *playerStatusPtr= (PLAYER_STATUS *) (Player->ObStrategyBlock->SBdataptr);
-    GLOBALASSERT(playerStatusPtr);
-	{
-    	int value=playerStatusPtr->Health>>16;	/* stored in 16.16 so shift down */
-        ValueOfHUDDigit[ALIEN_HUD_HEALTH_UNITS]=value%10;
-		value/=10;
-        ValueOfHUDDigit[ALIEN_HUD_HEALTH_TENS]=value%10;
-        value/=10;
-		ValueOfHUDDigit[ALIEN_HUD_HEALTH_HUNDREDS]=value%10;
-	}
-}
-
-#endif
 
 static void DrawAlienTeeth(void)
 {
@@ -2172,9 +1615,7 @@ int Fast2dMagnitude(int dx, int dy)
 
 extern void NewOnScreenMessage(unsigned char *messagePtr)
 {
-	#if SupportWindows95
 	GADGET_NewOnScreenMessage( messagePtr );	
-	#endif
 }
 
 static void AimGunSight(int aimingSpeed, TEMPLATE_WEAPON_DATA *twPtr)
@@ -2285,7 +1726,6 @@ void MaintainZoomingLevel(void)
 
 
 	deltaZoom = (ZoomLevels[i-1] - ZoomLevels[i])*(float)NormalFrameTime/32768.0f;
-//	textprint("deltaZoom %f, zone %d\n",deltaZoom,i);
 
    	requestedZoomScale = ZoomLevels[CameraZoomLevel];
 
@@ -2301,10 +1741,6 @@ void MaintainZoomingLevel(void)
 	}
 	else if (requestedZoomScale>CameraZoomScale)
 	{
-		#if 0
-		CameraZoomScale += deltaZoom;
-		if (requestedZoomScale<CameraZoomScale) 
-		#endif
 		CameraZoomScale = requestedZoomScale;
 		DrawScanlineOverlay = 1;
 		ScanlineLevel=1.0f;
@@ -2314,9 +1750,6 @@ void MaintainZoomingLevel(void)
 	{
 		DrawScanlineOverlay = 0;
 	}
-
-//	textprint("ScanlineLevel %f\n",ScanlineLevel);
-
 
 }
 

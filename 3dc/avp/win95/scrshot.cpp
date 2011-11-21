@@ -66,7 +66,6 @@ static BOOL ModuleLinkAssist=FALSE;
 
 void HandleScreenShot()
 {
-	#ifdef AVP_DEBUG_VERSION
 
 	if (DebouncedKeyboardInput[KEY_F8])
 		ScreenShot();
@@ -92,7 +91,6 @@ void HandleScreenShot()
 	
 	if(AvP.MainLoopRunning && ModuleLinkAssist)LoadModuleData();
 
-	#endif
 }
 					 
 void ScreenShot()

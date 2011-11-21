@@ -337,9 +337,7 @@ void MakePlacedLightNear(STRATEGYBLOCK *sbPtr)
 	tempModule.m_lightarray = pl_bhv->light;
 	tempModule.m_extraitemdata = (struct extraitemdata *)0;
 	tempModule.m_dptr = NULL; /* this is important */
-	#if SupportWIndows95
 	tempModule.name = NULL; /* this is important */
-	#endif
 	AllocateModuleObject(&tempModule); 
 	dPtr = tempModule.m_dptr;		
 	if(dPtr==NULL) return; /* cannot create displayblock, so leave object "far" */
@@ -392,7 +390,6 @@ void RespawnLight(STRATEGYBLOCK *sbPtr)
 	{
  
 		sbPtr->maintainVisibility = 1;
-		//MakeObjectNear(sbPtr);
 	
 		/* must respawn health too... */	
 		sbPtr->SBDamageBlock.Health = pl_bhv->startingHealth;
@@ -438,7 +435,6 @@ void PlacedLightIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int mult
 	LOCALASSERT(pl_bhv);
 
 	if(pl_bhv->state==Light_State_Broken) return;
-	#if 1
 	
 	if((AvP.Network==I_Peer)&&(!InanimateDamageFromNetHost))
 	{
@@ -451,7 +447,6 @@ void PlacedLightIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int mult
 		//add light damaged net message
 		if(sbPtr->SBDamageBlock.Health <= 0) AddNetMsg_InanimateObjectDestroyed(sbPtr);
 	}
-	#endif
 		
 	if (!pl_bhv->Indestructable)
 	{
@@ -523,7 +518,6 @@ void SendRequestToPlacedLight(STRATEGYBLOCK* sbptr,BOOL state,int extended_data)
 				if(sbptr->integrity==0)
 				{
 					//destroy the light by applying some damage to it
-					//DAMAGE_PROFILE certainDeath = {0,0,10000,0,0,0};
 					PlacedLightIsDamaged(sbptr, &certainDeath, ONE_FIXED);
 				}
 				

@@ -45,11 +45,8 @@ extern int ZBufferMode;
 
 extern DPID MultiplayerObservedPlayer;
 
-#if SupportMorphing
 MORPHDISPLAY MorphDisplay;
-#endif
 
-#if SupportModules
 SCENEMODULE **Global_ModulePtr = 0;
 MODULE *Global_MotherModule;
 char *ModuleCurrVisArray = 0;
@@ -57,7 +54,6 @@ char *ModulePrevVisArray = 0;
 char *ModuleTempArray = 0;
 char *ModuleLocalVisArray = 0;
 int ModuleArraySize = 0;
-#endif
 
 /* KJL 11:12:10 06/06/97 - orientation */
 MATRIXCH LToVMat;
@@ -165,7 +161,6 @@ void LightSourcesInRangeOfObject(DISPLAYBLOCK *dptr)
 
 				if ((CurrentVisionMode == VISION_MODE_IMAGEINTENSIFIER) && (lptr->LightFlags & LFlag_PreLitSource))
 					 continue;
-//				lptr->LightFlags |= LFlag_NoSpecular;
 
 		   		if(!(dptr->ObFlags3 & ObFlag3_PreLit &&
 					lptr->LightFlags & LFlag_PreLitSource))
@@ -187,10 +182,6 @@ void LightSourcesInRangeOfObject(DISPLAYBLOCK *dptr)
 
 						distanceToLight = Approximate3dMagnitude(&vertexToLight);
 
-						#if 0
-						if (CurrentVisionMode == VISION_MODE_IMAGEINTENSIFIER)
-							distanceToLight /= 2;
-						#endif
 
 						if(distanceToLight < (lptr->LightRange + dptr->ObRadius) )
 						{
@@ -233,11 +224,6 @@ void LightSourcesInRangeOfObject(DISPLAYBLOCK *dptr)
 			vertexToLight.vz = lptr->LightWorld.vz - dptr->ObWorld.vz;
 
 			distanceToLight = Approximate3dMagnitude(&vertexToLight);
-
-			#if 0
-			if (CurrentVisionMode == VISION_MODE_IMAGEINTENSIFIER)
-				distanceToLight /= 2;
-			#endif
 
 			if(distanceToLight < (lptr->LightRange + dptr->ObRadius) )
 			{
@@ -407,26 +393,12 @@ void InteriorType_Body()
 
 				
 		ioff.vx = 0;
-		ioff.vz = 0;//-extentsPtr->CollisionRadius*2;
+		ioff.vz = 0;
 		ioff.vy += verticalSpeed/16+200;
 
 		RotateVector(&ioff, &subjectPtr->ObMat);
 		AddVector(&ioff, &Global_VDB_Ptr->VDB_World);
 		
-		#if 0
-		{
-			static int i=-10;
-			i=-i;
-			ioff.vx = MUL_FIXED(GetSin((CloakingPhase/5)&4095),i);
-			ioff.vy = MUL_FIXED(GetCos((CloakingPhase/3)&4095),i);
-			ioff.vz = 0;
-
-			RotateVector(&ioff, &subjectPtr->ObMat);
-			AddVector(&ioff, &Global_VDB_Ptr->VDB_World);
-
-
-		}
-		#endif
 	}
 	{
 		EULER orientation;
@@ -548,9 +520,7 @@ void AVPGetInViewVolumeList(VIEWDESCRIPTORBLOCK *VDB_Ptr)
 {
 	DISPLAYBLOCK **activeblocksptr;
 	int t;
-	#if (SupportModules && SupportMultiCamModules)
 	int MVis;
-	#endif
 
 	/* Initialisation */
 	NumOnScreenBlocks = 0;
@@ -582,7 +552,6 @@ void AVPGetInViewVolumeList(VIEWDESCRIPTORBLOCK *VDB_Ptr)
 			RotateVector(&dptr->ObView, &VDB_Ptr->VDB_Mat);
 
 			/* Screen Test */
-			#if MIRRORING_ON
 			if (MirroringActive || dptr->HModelControlBlock || dptr->SfxPtr)
 			{
 				OnScreenBlockList[NumOnScreenBlocks++] = dptr;
@@ -591,19 +560,6 @@ void AVPGetInViewVolumeList(VIEWDESCRIPTORBLOCK *VDB_Ptr)
 			{
 				OnScreenBlockList[NumOnScreenBlocks++] = dptr;
 			}
-			#else
-			if(dptr->SfxPtr || dptr->HModelControlBlock || ObjectWithinFrustrum(dptr))
-			{
-				OnScreenBlockList[NumOnScreenBlocks++] = dptr;
-			}
-			else
-			{
-				if(dptr->HModelControlBlock)
-				{
-					DoHModelTimer(dptr->HModelControlBlock);
-				}
-			}
-			#endif
 		}
 		
 	}
@@ -620,11 +576,7 @@ void ReflectObject(DISPLAYBLOCK *dPtr)
 void CheckIfMirroringIsRequired(void);
 void AvpShowViews(void)
 {
-	#if SOFTWARE_RENDERER
-	FlushSoftwareZBuffer();
-	#else
 	FlushD3DZBuffer();
-	#endif
 
 	UpdateAllFMVTextures();	
 
@@ -633,13 +585,7 @@ void AvpShowViews(void)
 	UpdateCamera();
 
 	/* Initialise the global VMA */
-//	GlobalAmbience=655;
-//	textprint("Global Ambience: %d\n",GlobalAmbience);
 
-	#if PSX
-	// For PSX, GlobalAmbience is used in the render files
-	GlobalAmbience = Global_VDB_Ptr->VDB_Ambience >> 8;
-	#endif
 	
 	/* Prepare the View Descriptor Block for use in ShowView() */
 
@@ -655,14 +601,9 @@ void AvpShowViews(void)
 
 	/* Now we know where the camera is, update the modules */
 
-	#if SupportModules
 	AllNewModuleHandler();
-//	ModuleHandler(Global_VDB_Ptr);
-	#endif
 
-	#if MIRRORING_ON
 	CheckIfMirroringIsRequired();
-	#endif
 
 	/* Do lights */
 	UpdateRunTimeLights();
@@ -672,7 +613,6 @@ void AvpShowViews(void)
 		MakeLightElement(&Player->ObWorld,LIGHTELEMENT_ALIEN_TEETH2);
 	}
 
-//	GlobalAmbience=ONE_FIXED/4;
 	/* Find out which objects are in the View Volume */
 	AVPGetInViewVolumeList(Global_VDB_Ptr);
 
@@ -697,20 +637,15 @@ void AvpShowViews(void)
 	 	/* KJL 12:13:26 02/05/97 - divert rendering for AvP */
 		KRenderItems(Global_VDB_Ptr);
 	}
-	#if 0 
-	RenderDungeon();
-	#endif
 
 	PlatformSpecificShowViewExit(Global_VDB_Ptr, &ScreenDescriptorBlock);
 
-	#if (SupportWindows95 && SupportZBuffering)
 	if ((ScanDrawMode != ScanDrawDirectDraw) &&	(ZBufferMode != ZBufferOff))
 	{
 		/* KJL 10:25:44 7/23/97 - this offset is used to push back the normal game gfx,
 		so that the HUD can be drawn over the top without sinking into walls, etc. */
 		HeadUpDisplayZOffset = 0;
 	}
-	#endif
 }
 
 
@@ -890,54 +825,12 @@ int AVPViewVolumePlaneTest(CLIPPLANEBLOCK *cpb, DISPLAYBLOCK *dblockptr, int or)
 }
 
 
-#if MIRRORING_ON
 void CheckIfMirroringIsRequired(void)
 {
 	extern char LevelName[];
 	extern MODULE * playerPherModule;
 
 	MirroringActive = 0;
-	#if 0
-	if ( (!stricmp(LevelName,"e3demo")) || (!stricmp(LevelName,"e3demosp")) )
-	{
-		int numOfObjects = NumActiveBlocks;
-
-		while(numOfObjects)
-		{
-			DISPLAYBLOCK *objectPtr = ActiveBlockList[--numOfObjects];
-			MODULE *modulePtr = objectPtr->ObMyModule;
-
-			/* if it's a module, which isn't inside another module */
-			if (modulePtr && modulePtr->name)
-			{
-				if(!stricmp(modulePtr->name,"marine01b"))
-				{
-					if(ModuleCurrVisArray[modulePtr->m_index] == 2)
-					{
-						MirroringActive = 1;
-						MirroringAxis = -149*2;
-						break;
-					}
-				}
-			}
-		}
-	
-		if (playerPherModule && playerPherModule->name)
-		{
-			textprint("<%s>\n",playerPherModule->name);
-			if((!stricmp(playerPherModule->name,"predator"))
-			 ||(!stricmp(playerPherModule->name,"predator01"))
-			 ||(!stricmp(playerPherModule->name,"predator03"))
-			 ||(!stricmp(playerPherModule->name,"predator02")) )
-			{
-				MirroringActive = 1;
-				MirroringAxis = -7164*2;
-			}
-		}
-	}
-	else
-	#endif 
-	#if 1
 	if (!stricmp(LevelName,"derelict"))
 	{
 		if (playerPherModule && playerPherModule->name)
@@ -950,9 +843,7 @@ void CheckIfMirroringIsRequired(void)
 			}
 		}
 	}
-	#endif
 }
-#endif
 
 #define MinChangeInXSize 8
 void MakeViewingWindowSmaller(void)
@@ -977,7 +868,6 @@ void MakeViewingWindowSmaller(void)
 		Global_VDB_Ptr->VDB_ProjX = (Global_VDB_Ptr->VDB_ClipRight - Global_VDB_Ptr->VDB_ClipLeft)/2;
 		Global_VDB_Ptr->VDB_ProjY = (Global_VDB_Ptr->VDB_ClipDown - Global_VDB_Ptr->VDB_ClipUp)/2;
 	}
-	//BlankScreen(); 
 }
 
 void MakeViewingWindowLarger(void)

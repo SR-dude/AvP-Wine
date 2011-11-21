@@ -95,14 +95,6 @@ void DeathVolumeBehaveFun(STRATEGYBLOCK* vol_sbptr)
 			maxy=dptr->ObWorld.vy+dptr->ObMaxY;
 			if(max(miny,dv_bhv->volume_min.vy) > min(maxy,dv_bhv->volume_max.vy)) continue;
 
-			/*
-			if(dynPtr->Position.vx > dv_bhv->volume_min.vx &&
-			   dynPtr->Position.vx < dv_bhv->volume_max.vx &&
-			   dynPtr->Position.vz > dv_bhv->volume_min.vz &&
-			   dynPtr->Position.vz < dv_bhv->volume_max.vz &&
-			   dynPtr->Position.vy > dv_bhv->volume_min.vy &&
-			   dynPtr->Position.vy < dv_bhv->volume_max.vy)
-			*/
 			{
 				//finally see if the object is one of the types that can be harmed by the death volume
 				if(sbPtr->I_SBtype==I_BehaviourAlien ||

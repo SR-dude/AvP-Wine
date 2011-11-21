@@ -19,11 +19,9 @@ rounds fired etc etc etc*/
 #include "weapons.h"
 #include "inventry.h"
 
-#if SupportWindows95
 /* for win95 net game support */
 #include "pldnet.h"
 #include "pldghost.h"
-#endif
 
 #include "avp_userprofile.h"
 
@@ -81,7 +79,6 @@ void MaintainPlayersInventory(void)
 						if (AbleToPickupWeapon(objStatPtr->subType)) {
 							RemovePickedUpObject(collidedWith);	
 						 	/*Message now done in able to pickup function*/
-						 //	NewOnScreenMessage(GetTextString(TemplateWeapon[objStatPtr->subType].Name));
 						}
 						break;
 					}
@@ -111,7 +108,6 @@ void MaintainPlayersInventory(void)
 					}
 					case(IOT_Key):
 					{
-//						SetPlayerSecurityClearance(Player->ObStrategyBlock,objStatPtr->subType);						
 						RemovePickedUpObject(collidedWith);
 						break;
 					}
@@ -177,7 +173,6 @@ void MaintainPlayersInventory(void)
 							ghostData->IOType=IOT_Non;
 							/* So it's not picked up again... */
 						 	/*Message now done in able to pickup function*/
-						   //	NewOnScreenMessage(GetTextString(TemplateWeapon[ghostData->subtype].Name));
 						}
 					}
 				}
@@ -251,7 +246,6 @@ void InitialisePlayersInventory(PLAYER_STATUS *playerStatusPtr)
         {
     		PLAYER_WEAPON_DATA *wdPtr = &playerStatusPtr->WeaponSlot[--slot];
 
-   			//wdPtr->WeaponIDNumber = NULL_WEAPON;
    			wdPtr->WeaponIDNumber = PlayerWeaponKey[slot];
 
  		   	wdPtr->PrimaryRoundsRemaining=0;
@@ -511,7 +505,6 @@ void InitialisePlayersInventory(PLAYER_STATUS *playerStatusPtr)
 				}
     			
     			//make sure the player starts with his appropriate weapon selected
-//    			playerStatusPtr->SelectedWeaponSlot = a;
 				playerStatusPtr->PreviouslySelectedWeaponSlot = a;
     			playerStatusPtr->SwapToWeaponSlot = a;
 				
@@ -535,16 +528,6 @@ void InitialisePlayersInventory(PLAYER_STATUS *playerStatusPtr)
            			playerStatusPtr->WeaponSlot[a].Possessed=1;
 				}
 			}
-			#if 0
-			/* Keep smartgun and flamer... for demo, lose SADAR, grenadelauncher and minigun. */
-			a=SlotForThisWeapon(WEAPON_SADAR);
-            playerStatusPtr->WeaponSlot[a].Possessed=-1;
-			/* KJL 15:47:30 26/11/98 - grenade launched back in for multiplayer demo */
-//			a=SlotForThisWeapon(WEAPON_GRENADELAUNCHER);
-//          playerStatusPtr->WeaponSlot[a].Possessed=-1;
-			a=SlotForThisWeapon(WEAPON_MINIGUN);
-            playerStatusPtr->WeaponSlot[a].Possessed=-1;
-			#endif
 
 			a=SlotForThisWeapon(WEAPON_BEAMCANNON);
             playerStatusPtr->WeaponSlot[a].Possessed=0;
@@ -601,9 +584,6 @@ void InitialisePlayersInventory(PLAYER_STATUS *playerStatusPtr)
 			playerStatusPtr->WeaponSlot[a].Possessed=1;
 			a=SlotForThisWeapon(WEAPON_ALIEN_GRAB);
 			playerStatusPtr->WeaponSlot[a].Possessed=0;
-			//a=SlotForThisWeapon(WEAPON_ALIEN_SPIT);
-            //playerStatusPtr->WeaponSlot[a].PrimaryRoundsRemaining=100*65536;
-			//playerStatusPtr->WeaponSlot[a].Possessed=1;
 			break;
 		}
 		default:
@@ -808,20 +788,6 @@ static int AbleToPickupAmmo(enum AMMO_ID ammoID)
 				    	/* init a pointer to the weapon's data */
 				    	weaponPtr = &(playerStatusPtr->WeaponSlot[weaponSlot]);
 						
-						#if 0
-						if(weaponPtr->SecondaryMagazinesRemaining == 99)
-						{
-							/* no room! */
-							return 0;
-						}
-						else
-						{
-							weaponPtr->SecondaryMagazinesRemaining+=1; /* KJL 12:54:37 03/10/97 - need extra data field in ammo templates */
-						
-							if(weaponPtr->SecondaryMagazinesRemaining > 99)
-								weaponPtr->SecondaryMagazinesRemaining = 99;
-						}
-						#else
 						if(weaponPtr->SecondaryRoundsRemaining == 99)
 						{
 							/* no room! */
@@ -832,7 +798,6 @@ static int AbleToPickupAmmo(enum AMMO_ID ammoID)
 						if (weaponPtr->SecondaryRoundsRemaining>(99*ONE_FIXED)) {
 							weaponPtr->SecondaryRoundsRemaining=(99*ONE_FIXED);
 						}
-						#endif
 					}		
 					/* successful */
 					return 1;
@@ -1153,13 +1118,6 @@ static int AbleToPickupWeapon(enum WEAPON_ID weaponID)
 	    /* init a pointer to the weapon's data */
 	    weaponPtr = &(playerStatusPtr->WeaponSlot[weaponSlot]);
 		
-		#if 0
-		/* if weapon slot isn't empty, unable to pickup weapon */
-		if (weaponPtr->Possessed!=0) return 0;
-
-		/* add weapon to inventory */
-		weaponPtr->Possessed = 1;
-		#else
 
 		/* Select new weapons. */
 		if (weaponPtr->Possessed==0) {
@@ -1176,17 +1134,6 @@ static int AbleToPickupWeapon(enum WEAPON_ID weaponID)
 		{
 			if (AbleToPickupAmmo(twPtr->SecondaryAmmoID)) {
 				/* AbleToPickupAmmo should load some grenades... */
-				#if 0
-				TEMPLATE_AMMO_DATA *templateAmmoPtr;
-
-				/* Load weapon. */
-				templateAmmoPtr = &TemplateAmmo[twPtr->SecondaryAmmoID];
-
-				if ((weaponPtr->SecondaryRoundsRemaining==0)&&(weaponPtr->SecondaryMagazinesRemaining>0)) {
-					weaponPtr->SecondaryRoundsRemaining = templateAmmoPtr->AmmoPerMagazine;
-					weaponPtr->SecondaryMagazinesRemaining--;
-				}
-				#endif
 			} 
 		}
 
@@ -1245,7 +1192,6 @@ static int AbleToPickupWeapon(enum WEAPON_ID weaponID)
 			/* No ammo to load. */
 		}
 		
-		#endif
 
 	}
 
@@ -1298,16 +1244,12 @@ static int AbleToPickupHealth(int healthID)
 			{
 				/* KJL 17:25:18 28/11/98 - no medipacks for Predator! */
 				return 0;
-
-//				PlayerType=I_PC_Predator;
 				break;
 			}
 			case(I_Alien):
 			{
 				/* CDF 24/2/99 No medipacks for aliens, either! */
 				return 0;
-
-//				PlayerType=I_PC_Alien;
 				break;
 			}
 			default:
@@ -1368,7 +1310,6 @@ static int AbleToPickupArmour(int armourID)
 			case(I_Predator):
 			{
 				/* KJL 17:25:38 28/11/98 - no armour pickups for Predator! */
-		 //		PlayerType=I_PC_Predator;
 				return 0;
 				break;
 			}
@@ -1376,7 +1317,6 @@ static int AbleToPickupArmour(int armourID)
 			{
 				/* CDF 24/2/99 ...or for the alien. */
 				return(0);
-//				PlayerType=I_PC_Alien;
 				break;
 			}
 			default:
@@ -1493,9 +1433,7 @@ extern void RemovePickedUpObject(STRATEGYBLOCK *objectPtr)
 
 	if (objStatPtr->ghosted_object) {
 		/* Must be a runtime pickup... */
-		#if SupportWindows95
 		AddNetMsg_LocalObjectDestroyed(objectPtr);
-		#endif
 		DestroyAnyStrategyBlock(objectPtr);
 		return;
 	}
@@ -1512,9 +1450,7 @@ extern void RemovePickedUpObject(STRATEGYBLOCK *objectPtr)
 	if(AvP.Network==I_No_Network) DestroyAnyStrategyBlock(objectPtr);
 	else
 	{
-		#if SupportWindows95
 		AddNetMsg_ObjectPickedUp(&objectPtr->SBname[0]);
-		#endif
 		KillInanimateObjectForRespawn(objectPtr);
 	}
 
@@ -1777,9 +1713,6 @@ void Recall_Disc(void) {
 					RemovePickedUpObject(nearest);
 					playerStatusPtr->FieldCharge-=RecallDisc_Charge;
 					CurrentGameStats_ChargeUsed(RecallDisc_Charge);
-					#if 0
-					NewOnScreenMessage("RECALLED DISC");
-					#endif
 					Sound_Play(SID_PREDATOR_DISK_RECOVERED,"h");
 					AutoSwapToDisc_OutOfSequence();
 				}
@@ -1798,9 +1731,6 @@ void Recall_Disc(void) {
 					/* So it's not picked up again... */
 					playerStatusPtr->FieldCharge-=RecallDisc_Charge;
 					CurrentGameStats_ChargeUsed(RecallDisc_Charge);
-					#if 0
-					NewOnScreenMessage("RECALLED DISC");
-					#endif
 					Sound_Play(SID_PREDATOR_DISK_RECOVERED,"h");
 					AutoSwapToDisc_OutOfSequence();
 				}
@@ -1817,9 +1747,7 @@ void Recall_Disc(void) {
 					Sound_Stop(bbPtr->soundHandle);
 					Sound_Play(SID_PREDATOR_DISK_RECOVERED,"h");
 
-					#if SupportWindows95
 					if(AvP.Network != I_No_Network)	AddNetMsg_LocalObjectDestroyed(nearest);
-					#endif
 				    DestroyAnyStrategyBlock(nearest);	
 				
 				}
@@ -1828,9 +1756,6 @@ void Recall_Disc(void) {
 				GLOBALASSERT(0);
 			}
 		} else {
-			#if 0
-			NewOnScreenMessage("FOUND NO DISCS");
-			#endif
 		}
 	}
 }
@@ -1872,9 +1797,7 @@ void RemoveAllThisPlayersDiscs(void) {
 
 			/* Are we the right type? */
 			if (ObjectIsPlayersDisc(candidate)) {
-				#if SupportWindows95
 				AddNetMsg_LocalObjectDestroyed(candidate);
-				#endif
 				DestroyAnyStrategyBlock(candidate);
 			}
 		}

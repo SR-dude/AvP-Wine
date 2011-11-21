@@ -4,7 +4,6 @@
 extern "C" {
 #endif
 
-#define CORPSE_SIGHTINGS 1
 
 typedef struct netcorpsedatablock {
 	int timer;

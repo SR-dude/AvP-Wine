@@ -1,7 +1,3 @@
-/*KJL****************************************************************************************
-*                                         	hud.c                                           *
-****************************************************************************************KJL*/
-
 #include "3dc.h"
 #include "module.h"
 #include "inline.h"
@@ -9,26 +5,19 @@
 #include "gamedef.h"
 #include "bh_types.h"
 #include "huddefs.h"
-
 /* patrick's sound include */
 #include "psnd.h"
 #include "psndplat.h"
-
 #define UseLocalAssert Yes
 #include "ourasert.h"
 
-/*KJL****************************************************************************************
-*                                    P R O T O T Y P E S	                                *
-****************************************************************************************KJL*/
 #include "vision.h"
 #include "krender.h"
 #include "frustrum.h"
 #include "avpview.h"
 #include "game_statistics.h"
 
-/*KJL****************************************************************************************
-*  										G L O B A L S 	            					    *
-****************************************************************************************KJL*/
+
 enum VISION_MODE_ID CurrentVisionMode;
 
 static visionModeDebounced=0;
@@ -57,7 +46,7 @@ extern void DrawNoiseOverlay(int t);
 
 void SetupVision(void)
 {
-	/* KJL 16:33:47 01/10/97 - change view for alien;
+	/* change view for alien;
 	this must be called after ProcessSystemObjects() */
 	if(AvP.PlayerType == I_Alien)
    	{
@@ -69,11 +58,11 @@ void SetupVision(void)
 		LOCALASSERT(VDBPtr);
 
 		/* change clipping planes for new field of view */
-		/* KJL 12:00:54 07/04/97 - new projection angles */
+		/* new projection angles */
 		VDBPtr->VDB_ProjX = ScreenDescriptorBlock.SDB_Width/4;
 		VDBPtr->VDB_ProjY = (ScreenDescriptorBlock.SDB_Height)/4;
 
-		/* KJL 17:37:51 7/17/97 - frustrum setup */
+		/* frustrum setup */
 		SetFrustrumType(FRUSTRUM_TYPE_WIDE);
 	}
 	else if (AvP.PlayerType == I_Predator)
@@ -90,7 +79,7 @@ void SetupVision(void)
 		VDBPtr->VDB_ProjY = (ScreenDescriptorBlock.SDB_Height)/2;
 		
 		SetupPredOVision();
-		/* KJL 17:37:51 7/17/97 - frustrum setup */
+		/* frustrum setup */
 		SetFrustrumType(FRUSTRUM_TYPE_NORMAL);
 	}
 	else
@@ -107,13 +96,13 @@ void SetupVision(void)
 		VDBPtr->VDB_ProjY = (ScreenDescriptorBlock.SDB_Height)/2;
 		
 		SetupMarineOVision();
-		/* KJL 17:37:51 7/17/97 - frustrum setup */
+		/* frustrum setup */
 		SetFrustrumType(FRUSTRUM_TYPE_NORMAL);
 	}
 
 	InitCameraValues();
 
-	/* KJL 12:01:09 16/02/98 - init visionmode */
+	/* init visionmode */
 	CurrentVisionMode = VISION_MODE_NORMAL;
 
 	predOVision_SoundHandle=SOUND_NOACTIVEINDEX;
@@ -139,7 +128,7 @@ void SetupPredOVision(void)
 	/* setup in-game data */
 	PredOVision.VisionMode = PREDOVISION_NORMAL;
 	PredOVision.VisionIsChanging=0;
-	/* JH - 29/5/97 for d3d */
+	/* for d3d */
 	d3d_light_ctrl.ctrl = LCCM_NORMAL;
 }
 
@@ -233,7 +222,7 @@ void SetupMarineOVision(void)
 	/* setup in-game data */
 	MarineOVision.VisionMode = MARINEOVISION_NORMAL;
 	MarineOVision.VisionIsChanging=0;
-	/* JH - 29/5/97 for d3d */
+	/* for d3d */
 	d3d_light_ctrl.ctrl = LCCM_NORMAL;
 }
 

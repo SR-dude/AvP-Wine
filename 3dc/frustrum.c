@@ -33,8 +33,6 @@ extern int *Global_ShapeNormals;
 
 extern VECTORCH LocalView;
 
-#define FAR_Z_CLIP 0
-#define FAR_Z_CLIP_RANGE 49000
 /*KJL****************************************************************************************
 *                                    P R O T O T Y P E S	                                *
 ****************************************************************************************KJL*/
@@ -170,7 +168,6 @@ void SetFrustrumType(enum FrustrumType frustrumType)
 /* clipping code macros - these are used as building blocks to assemble
 clipping fns for different polygon types with the minimum of fuss */
 #define ZCLIPPINGVALUE 4
-//64
 #define Clip_Z_Test(v) (ZCLIPPINGVALUE <= (v)->Z) 
 #define Clip_NX_Test(v) (-(v)->X <= (v)->Z)
 #define Clip_PX_Test(v) ((v)->X <= (v)->Z)
@@ -886,7 +883,6 @@ int PolygonWithinFrustrum(POLYHEADER *polyPtr)
 		VECTORCH pop;
 		VECTORCH *normalPtr = (VECTORCH*)(Global_ShapeNormals + polyPtr->PolyNormalIndex);
 		
-		#if 1
 		if(Global_ODB_Ptr->ObMorphCtrl)
 		{
 			extern MORPHDISPLAY MorphDisplay;
@@ -939,7 +935,6 @@ int PolygonWithinFrustrum(POLYHEADER *polyPtr)
 			}
  		}
 		else
-		#endif
 		{
 			/* Get the 1st polygon point as the POP */
 			VECTORCH *pointsArray = (VECTORCH*)(Global_ShapePoints);
@@ -964,7 +959,6 @@ int PolygonShouldBeDrawn(POLYHEADER *polyPtr)
 	/* at this point we know that the poly is inside the view frustrum */
 	if (polyPtr->PolyFlags & iflag_notvis) return 0;
 
-	#if 1	
 	/* if not a sprite, test direction of poly */
 	if (!( (Global_ShapeHeaderPtr->shapeflags&ShapeFlag_Sprite) || (polyPtr->PolyFlags & iflag_no_bfc) ))
 	{
@@ -984,20 +978,6 @@ int PolygonShouldBeDrawn(POLYHEADER *polyPtr)
 	
 		if (Dot(&pop, normalPtr)>0) return 0;
 	}
-	#endif
-	#if 0
-	{
-		int *vertexNumberPtr = &polyPtr->Poly1stPt;
-		RenderPolygon.NumberOfVertices=0; 
-		while(*vertexNumberPtr++ != Term)
-		{
-			/* count the number of points in the polygon; this is used for all the loops that follow */
-		   	RenderPolygon.NumberOfVertices++; 
-		}
-	}
-	#elif 0
-	RenderPolygon.NumberOfVertices = 3;
-	#else
 	{
 		int *vertexNumberPtr = &polyPtr->Poly1stPt;
 		if (vertexNumberPtr[3] == Term)
@@ -1009,7 +989,6 @@ int PolygonShouldBeDrawn(POLYHEADER *polyPtr)
 			RenderPolygon.NumberOfVertices = 4;
 		}
 	}
-	#endif
 
 	return 2;
 }	
@@ -1046,11 +1025,7 @@ static int VertexWithin_Wide_Frustrum(RENDERVERTEX *vertexPtr)
 /* KJL 15:32:52 7/17/97 - Test to see if an object is in the view frustrum */
 static int ObjectWithin_Norm_Frustrum(DISPLAYBLOCK *dbPtr)
 {
- //	LOCALASSERT(dbPtr->ObShapeData->shaperadius);
 
-#if FAR_Z_CLIP
-	if(dbPtr->ObView.vz-dbPtr->ObShapeData->shaperadius<=FAR_Z_CLIP_RANGE)
-#endif
 	if (dbPtr->ObView.vz+dbPtr->ObShapeData->shaperadius>=ZCLIPPINGVALUE)
 	{
 		/* scale radius by square root of 2 */
@@ -1066,7 +1041,6 @@ static int ObjectWithin_Norm_Frustrum(DISPLAYBLOCK *dbPtr)
 }
 static int ObjectCompletelyWithin_Norm_Frustrum(DISPLAYBLOCK *dbPtr)
 {
- //	LOCALASSERT(dbPtr->ObShapeData->shaperadius);
 	if (dbPtr->ObView.vz-dbPtr->ObShapeData->shaperadius>=ZCLIPPINGVALUE)
 	{
 		/* scale radius by square root of 2 */
@@ -1114,11 +1088,7 @@ void TestVerticesWith_Norm_Frustrum(void)
 	{
 		char vertexFlag = 0;
 		
-#if FAR_Z_CLIP
-		if(ZCLIPPINGVALUE <= RotatedPts[v].vz && RotatedPts[v].vz<=FAR_Z_CLIP_RANGE)
-#else
 		if(ZCLIPPINGVALUE <= RotatedPts[v].vz)
-#endif
 			vertexFlag |= INSIDE_FRUSTRUM_Z_PLANE;
 		
 		if(-RotatedPts[v].vx <= RotatedPts[v].vz)

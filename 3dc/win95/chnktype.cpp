@@ -2,25 +2,9 @@
 #include <math.h>
 #include "chnktype.hpp"
 
-#if engine
-
 #define UseLocalAssert No
 #include "ourasert.h"
-#define assert(x) GLOBALASSERT(x)
 
-#else
-
-#if cencon
-#include "ccassert.h"
-#else
-#include <assert.h>
-#endif
-
-#endif
-
-#ifdef cencon
-#define new my_new
-#endif
 
 // misc data structures functions
 BOOL operator==(const obinfile &o1, const obinfile &o2)
@@ -101,7 +85,7 @@ unsigned int ChunkPoly::GetTextureIndex()
 
 void ChunkPoly::SetUVIndex(unsigned int uv_index)
 {
-	assert(uv_index<=CHUNK_MAX_UVINDEX);
+	GLOBALASSERT(uv_index<=CHUNK_MAX_UVINDEX);
 	//clear the old uvindex
 	colour &=~CHUNK_UVINDEX_MASK;
 	
@@ -124,7 +108,7 @@ void ChunkPoly::SetUVIndex(unsigned int uv_index)
 
 void ChunkPoly::SetTextureIndex(unsigned int texture_index)
 {
-	assert(texture_index<=CHUNK_MAX_TEXTUREINDEX);
+	GLOBALASSERT(texture_index<=CHUNK_MAX_TEXTUREINDEX);
 
 	colour &=~ CHUNK_TEXTUREINDEX_MASK;
 	colour |= texture_index;
@@ -174,8 +158,6 @@ ChunkVector& ChunkVector::operator-=(const ChunkVector& a)
 }
 
 
-
-#if engine
 ChunkVector::operator VECTORCH () const
 {
 	VECTORCH v;
@@ -185,7 +167,7 @@ ChunkVector::operator VECTORCH () const
 
 	return(v);
 }
-#endif
+
 ChunkVector::operator ChunkVectorInt () const
 {
 	ChunkVectorInt v;
@@ -298,8 +280,6 @@ ChunkVectorInt& ChunkVectorInt::operator-=(const ChunkVectorInt& a)
 }
 
 
-
-#if engine
 ChunkVectorInt::operator VECTORCH () const
 {
 	VECTORCH v;
@@ -309,7 +289,7 @@ ChunkVectorInt::operator VECTORCH () const
 
 	return(v);
 }
-#endif
+
 
 ChunkVectorInt operator*(const ChunkVectorInt & a, const double s)
 {
@@ -407,7 +387,7 @@ ChunkVectorFloat operator/(const ChunkVectorFloat & a, const double s)
 	return(v);
 }
 
-#if engine
+
 ChunkVectorFloat::operator VECTORCH () const
 {
 	VECTORCH v;
@@ -417,7 +397,7 @@ ChunkVectorFloat::operator VECTORCH () const
 
 	return(v);
 }
-#endif
+
 int ChunkVectorFloat::norm()
 {
   float modulos =(float) mod(*this);
@@ -447,9 +427,6 @@ ChunkShape::~ChunkShape()
 		for (int i = 0; i<num_texfiles; i++)
 			if (texture_fns[i]) delete texture_fns[i];
 
-	#if UseOldChunkLoader
-	if(float_v_list) delete float_v_list;
-	#endif
 }
 
 ChunkShape::ChunkShape()
@@ -468,9 +445,6 @@ ChunkShape::ChunkShape()
 
 	radius_about_centre=0;
 
-	#if UseOldChunkLoader
-	float_v_list=0;
-	#endif
 }
 
 
@@ -533,9 +507,6 @@ ChunkShape::ChunkShape(const ChunkShape &shp)
 	centre=shp.centre;
 	radius_about_centre=shp.radius_about_centre;
 
-	#if UseOldChunkLoader
-	float_v_list=0;
-	#endif
 }
 
 ChunkShape& ChunkShape::operator=(const ChunkShape &shp)
@@ -608,10 +579,6 @@ ChunkShape& ChunkShape::operator=(const ChunkShape &shp)
 	centre=shp.centre;
 	radius_about_centre=shp.radius_about_centre;
 
-	#if UseOldChunkLoader
-	if(float_v_list) delete float_v_list;
-	float_v_list=0;
-	#endif
 
 	return *this;
 
@@ -647,33 +614,15 @@ void ChunkShape::rescale (double scale)
 
 
 VMod_Arr_Item::VMod_Arr_Item()
-{
-	#if UseOldChunkLoader
-	o_name = 0;
-	#endif
+{ // adj stubs
 }
 
 VMod_Arr_Item::~VMod_Arr_Item()
 {
-	#if UseOldChunkLoader
-	if (o_name)
-		delete o_name;
-	#endif
 }
 
 VMod_Arr_Item::VMod_Arr_Item(const VMod_Arr_Item & vma)
 {
-	#if UseOldChunkLoader
-	if (vma.o_name)
-	{
-		o_name = new char [strlen(vma.o_name)+1];
-		strcpy (o_name, vma.o_name);
-	}
-	else
-	{
-		o_name = 0;
-	}
-	#endif
 
 	branch_no = vma.branch_no;
 	flags = vma.flags;
@@ -685,20 +634,6 @@ VMod_Arr_Item& VMod_Arr_Item::operator=(const VMod_Arr_Item & vma)
 {
 	if (&vma == this) return(*this);
 
-	#if UseOldChunkLoader
-	if (o_name)
-		delete o_name;
-
-	if (vma.o_name)
-	{
-		o_name = new char [strlen(vma.o_name)+1];
-		strcpy (o_name, vma.o_name);
-	}
-	else
-	{
-		o_name = 0;
-	}
-	#endif
 
 	branch_no = vma.branch_no;
 	flags = vma.flags;
@@ -726,35 +661,17 @@ BOOL operator!=(const VMod_Arr_Item & vm1, const VMod_Arr_Item & vm2)
 Adjacent_Module::Adjacent_Module()
 {
 	flags = 0;
-	#if UseOldChunkLoader
-	o_name = 0;
-	#endif
 	entry_point.x=0;
 	entry_point.y=0;
 	entry_point.z=0;
 }
 
 Adjacent_Module::~Adjacent_Module()
-{
-	#if UseOldChunkLoader
-	if (o_name)
-		delete o_name;
-	#endif
+{ // adj stubs
 }
 
 Adjacent_Module::Adjacent_Module(const Adjacent_Module & am)
 {
-	#if UseOldChunkLoader
-	if (am.o_name)
-	{
-		o_name = new char [strlen(am.o_name)+1];
-		strcpy (o_name, am.o_name);
-	}
-	else
-	{
-		o_name = 0;
-	}
-	#endif
 	object_index=am.object_index;
 	flags = am.flags;
 	entry_point = am.entry_point;
@@ -764,20 +681,6 @@ Adjacent_Module& Adjacent_Module::operator=(const Adjacent_Module & am)
 {
 	if (&am == this) return(*this);
 
-	#if UseOldChunkLoader
-	if (o_name)
-		delete o_name;
-
-	if (am.o_name)
-	{
-		o_name = new char [strlen(am.o_name)+1];
-		strcpy (o_name, am.o_name);
-	}
-	else
-	{
-		o_name = 0;
-	}
-	#endif
 
 	object_index=am.object_index;
 	flags = am.flags;
@@ -870,44 +773,7 @@ ChunkAnimFrame::ChunkAnimFrame(const ChunkAnimFrame & frm)
 	pad3=frm.pad3;
 	pad4=frm.pad4;
 }		 
-/*
-ChunkAnimFrame::ChunkAnimFrame(ChunkAnimFrame* startframe,ChunkAnimFrame* endframe,int startwt,int endwt,ChunkShape const *cs)
-{
-	name=0;
-	num_polys=startframe->num_polys;
-	num_verts=startframe->num_verts;
-	flags=startframe->flags|animframeflag_interpolated_frame;
-	num_interp_frames=0;
-	pad3=0;
-	pad4=0;
 
-	v_list=new ChunkVector[num_verts];
-	p_normal_list=new ChunkVector[num_polys];
-
-	double start_mult=startwt/(double)(startwt+endwt);
-	double end_mult=endwt/(double)(startwt+endwt);
-
-	for(int i=0;i<num_verts;i++)
-	{
-		v_list[i].x=startframe->v_list[i].x*start_mult+endframe->v_list[i].x*end_mult;
-		v_list[i].y=startframe->v_list[i].y*start_mult+endframe->v_list[i].y*end_mult;
-		v_list[i].z=startframe->v_list[i].z*start_mult+endframe->v_list[i].z*end_mult;
-	}
-
-	for(i=0;i<num_polys;i++)
-	{
-		ChunkVector v1=cs->v_list[cs->poly_list[i].vert_ind[1]]-cs->v_list[cs->poly_list[i].vert_ind[0]];	
-		ChunkVector v2=cs->v_list[cs->poly_list[i].vert_ind[2]]-cs->v_list[cs->poly_list[i].vert_ind[0]];
-		ChunkVector norm;
-		norm.x=v1.y*v2.z-v1.z*v2.y;	
-		norm.y=v1.z*v2.x-v1.x*v2.z;	
-		norm.z=v1.x*v2.y-v1.y*v2.x;
-		double length=sqrt(norm.x*norm.x+norm.y*norm.y+norm.z*norm.z);	
-		cs->p_normal_list[i]=norm*(1/length);
-	}
-
-}
-*/
 ChunkAnimFrame& ChunkAnimFrame::operator=(const ChunkAnimFrame &frm)
 {
 	
@@ -1190,32 +1056,5 @@ void ChunkAnimSequence::DeleteInterpolatedFrames()
 void ChunkAnimSequence::GenerateInterpolatedFrames(ChunkShape const *cs)
 {
 	DeleteInterpolatedFrames();
-	/*
-	int NewNumFrames=NumFrames;
-	for(int i=0;i<NumFrames;i++)
-	{
-		NewNumFrames+=Frames[i]->num_interp_frames;	
-	}
-	if(NewNumFrames==NumFrames) return;
 
-	ChunkAnimFrame** NewFrames=new ChunkAnimFrame*[NewNumFrames];
-	
-	int framepos=0;
-	for( i=0;i<NumFrames;i++ )
-	{
-		NewFrames[framepos++]=Frames[i];	
-		if(Frames[i]->num_interp_frames==0)continue;
-
-		ChunkAnimFrame* startframe=Frames[i];
-		ChunkAnimFrame*	endframe=Frames[(i+1)%NumFrames];
-		
-		for(int j=0;j<startframe->num_interp_frames;j++)
-		{
-			NewFrames[framepos++]=new ChunkAnimFrame(startframe,endframe,startframe->num_interp_frames-j,j+1,cs);
-		}
-	}
-	delete [] Frames;
-	Frames=NewFrames;
-	NumFrames=NewNumFrames;
-	*/
 }

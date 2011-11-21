@@ -57,7 +57,6 @@ SFXBLOCK* AllocateSfxBlock(void)
 	{
 		/* unable to allocate a sfxamics block I'm afraid; 
 		   MAX_NO_OF_SFX_BLOCKS is too low */
-   	  //LOCALASSERT(NumFreeSfxBlocks);
 		textprint("No Free SFX blocks!\n");
 	}
 
@@ -241,7 +240,6 @@ void HandleObjectOnFire(DISPLAYBLOCK *dispPtr)
 
 	if (dispPtr->ObShapeData->shaperadius<=LocalDetailLevels.AlienEnergyViewThreshold) return;
 
-	#if 1
 	{
 		DYNAMICSBLOCK *dynPtr;
 		STRATEGYBLOCK *sbPtr;
@@ -259,11 +257,6 @@ void HandleObjectOnFire(DISPLAYBLOCK *dispPtr)
 		if (dispPtr==sbPtr->SBdptr)	noRequired = 5;
 
 	}
-	#else
-	velocity.vx = 0;
-	velocity.vy = 0;
-	velocity.vz = 0;
-	#endif
 	
 	objectIsDisappearing = ( (dispPtr->SpecialFXFlags & SFXFLAG_MELTINGINTOGROUND) &&(dispPtr->ObFlags2 <= ONE_FIXED) )	;
 
@@ -273,9 +266,6 @@ void HandleObjectOnFire(DISPLAYBLOCK *dispPtr)
 		position.vx = dispPtr->ObWorld.vx+(FastRandom()&255)-128;
 		position.vy = dispPtr->ObWorld.vy+(FastRandom()&255)-128;
 		position.vz = dispPtr->ObWorld.vz+(FastRandom()&255)-128;
-		#if 0
-		MakeParticle(&(position), &velocity, PARTICLE_NONCOLLIDINGFLAME);
-		#else
 		if (objectIsDisappearing)
 		{
 			if ((FastRandom()&65535) < dispPtr->ObFlags2)
@@ -290,7 +280,6 @@ void HandleObjectOnFire(DISPLAYBLOCK *dispPtr)
 		{
 			MakeParticle(&(position), &velocity, PARTICLE_IMPACTSMOKE);
 		}
-		#endif
 	}
 
 }

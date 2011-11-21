@@ -3,54 +3,26 @@
 #define DB_LEVEL 4
 #endif
 #include "db.h"
-
-#ifndef NDEBUG
-	#define HT_FAIL db_log1
-	#include "hash_tem.hpp" // for the backup surfaces memory leak checking
-#endif
-
-#ifdef _MSC_VER
-	#include "iff.hpp"
-#endif
-
+#define HT_FAIL db_log1
+#include "hash_tem.hpp" // for the backup surfaces memory leak checking
+#include "iff.hpp"
 #include "list_tem.hpp"
-
 #include <stdlib.h>
 #include <stdarg.h>
 #include <limits.h>
-
 #include "awtexld.h"
-#pragma warning(disable: 4701)
 #include "awtexld.hpp"
-#pragma warning(default: 4701)
+#include <typeinfo>
 
-#ifdef _CPPRTTI
-	#include <typeinfo.h>
-#endif
 
 /* awTexLd.cpp - Author: Jake Hotson */
 
-/*****************************************/
-/* Preprocessor switches for experiments */
-/*****************************************/
 
-#define MIPMAPTEST 0 // experiment to create mip map surfaces for textures, but doesn't bother putting any data into them
-
-/*****************************/
-/* DB_LEVEL dependent macros */
-/*****************************/
-
-#if DB_LEVEL >= 5
-#define inline // prevent function inlining at level 5 debugging
-#endif
 
 /*****************************************************/
 /* ZEROFILL and SETDWSIZE macros ensure that I won't */
 /* accidentally get the parameters wrong             */
 /*****************************************************/
-
-#if 1 // which do you prefer?
-
 // zero mem
 template <class X>
 static inline void ZEROFILL(X & x)
@@ -72,13 +44,6 @@ static inline void INITDXSTRUCT(X & x)
 	SETDWSIZE(x);
 }
 
-#else
-
-#define ZEROFILL(x) (memset(&x,0,sizeof x))
-#define SETDWSIZE(x) (x.dwSize = sizeof x)
-#define INITDXSTRUCT(x) (ZEROFILL(x),SETDWSIZE(x))
-
-#endif
 
 /*****************************************************************/
 /* Put everything I can in a namespace to avoid naming conflicts */
@@ -94,14 +59,6 @@ namespace AwTl
 	db_code5(void BrkPt(){})
 	#define BREAKPOINT db_code5(::AwTl::BrkPt();)
 	
-	#if DB_LEVEL > 4
-	static unsigned GetRefCount(IUnknown * pUnknown)
-	{
-		if (!pUnknown) return 0;
-		pUnknown->AddRef();
-		return static_cast<unsigned>(pUnknown->Release());
-	}
-	#endif
 	
 	/*********************************/
 	/* Pixel format global structure */
@@ -212,7 +169,6 @@ namespace AwTl
 	/* Reference Count Object Debug Support */
 	/****************************************/
 	
-	#ifndef NDEBUG
 	
 		static bool g_bAllocListActive = false;
 		
@@ -229,8 +185,6 @@ namespace AwTl
 					{
 						db_log1(("AW: Potential Memory Leaks Detected!!!"));
 					}
-					#ifdef _CPPRTTI
-						#pragma message("Run-Time Type Identification (RTTI) is enabled")
 						for (Iterator itLeak(*this) ; !itLeak.Done() ; itLeak.Next())
 						{
 							db_logf1(("\tAW Object not deallocated: Type: %s RefCnt: %u",typeid(*itLeak.Get()).name(),itLeak.Get()->m_nRefCnt));
@@ -239,18 +193,6 @@ namespace AwTl
 						{
 							db_log1(("AW: Object dump complete"));
 						}
-					#else // ! _CPPRTTI
-						#pragma message("Run-Time Type Identification (RTTI) is not enabled - memory leak checking will not report types")
-						unsigned nRefs(0);
-						for (Iterator itLeak(*this) ; !itLeak.Done() ; itLeak.Next())
-						{
-							nRefs += itLeak.Get()->m_nRefCnt;
-						}
-						if (Size())
-						{
-							db_logf1(("AW: Objects not deallocated: Number of Objects: %u Number of References: %u",Size(),nRefs));
-						}
-					#endif // ! _CPPRTTI
 					g_bAllocListActive = false;
 				}
 		};
@@ -268,7 +210,6 @@ namespace AwTl
 				g_listAllocated.RemoveAsserted(pObj);
 		}
 		
-	#endif // ! NDEBUG
 	
 	/********************************************/
 	/* structure to contain loading information */
@@ -432,17 +373,6 @@ void AwBackupTexture::ChoosePixelFormat(AwTl::CreateTextureParms const & _parmsR
 	// transparency?
 	m_bTranspMask = HasTransparentMask(fMyFlags & AW_TLF_TRANSP ? true : false);
 		
-	#if 0
-	if (_parmsR.prevTexP.voidP)
-	{
-		// use the previous format
-	}
-	else if (_parmsR.prevTexB)
-	{
-		// use the previous format from one of the regiouns
-	}
-	else
-	#endif
 	
 	if (_parmsR.loadTextureB || fMyFlags & AW_TLF_TEXTURE)
 	{
@@ -470,7 +400,6 @@ void AwBackupTexture::ChoosePixelFormat(AwTl::CreateTextureParms const & _parmsR
 		
 		pixelFormat = *pFormat;
 		
-		#if DB_LEVEL >= 4
 		if (pixelFormat.palettizedB)
 		{
 			db_logf4(("\tchosen %u-bit palettized texture format",pixelFormat.bitsPerPixel));
@@ -498,7 +427,6 @@ void AwBackupTexture::ChoosePixelFormat(AwTl::CreateTextureParms const & _parmsR
 					8U-pixelFormat.blueRightShift));
 			}
 		}
-		#endif
 	}
 	else
 	{
@@ -642,12 +570,10 @@ AwTl::SurfUnion AwBackupTexture::CreateTexture(AwTl::CreateTextureParms const & 
 			{
 				pLoadInfo->surface_width = fMyFlags & AW_TLF_MINSIZE && pLoadInfo->rectP ? pLoadInfo->rectP->right - pLoadInfo->rectP->left : pLoadInfo->width;
 				pLoadInfo->surface_height = fMyFlags & AW_TLF_MINSIZE && pLoadInfo->rectP ? pLoadInfo->rectP->bottom - pLoadInfo->rectP->top : pLoadInfo->height;
-				#if 1 // not sure if this is required...
 				pLoadInfo->surface_width += 3;
 				pLoadInfo->surface_width &= ~3;
 				pLoadInfo->surface_height += 3;
 				pLoadInfo->surface_height &= ~3;
-				#endif
 			}
 		
 			if (pLoadInfo->widthP) *pLoadInfo->widthP = pLoadInfo->surface_width;
@@ -667,7 +593,6 @@ AwTl::SurfUnion AwBackupTexture::CreateTexture(AwTl::CreateTextureParms const & 
 			ddsd.dwHeight = pLoadInfo->surface_height;
 			ddsd.dwWidth = pLoadInfo->surface_width;
 		
-			#if MIPMAPTEST
 			/*
 			D3DPTEXTURECAPS_POW2 
 			All nonmipmapped textures must have widths and heights specified as powers of two if this flag is set.
@@ -679,7 +604,6 @@ AwTl::SurfUnion AwBackupTexture::CreateTexture(AwTl::CreateTextureParms const & 
 				ddsd.dwFlags |= DDSD_MIPMAPCOUNT;
 				ddsd.dwMipMapCount = 3;
 			}
-			#endif
 		
 			if (pLoadInfo->prevTexP.voidP && (!_parmsR.loadTextureB || !(fMyFlags & AW_TLF_COMPRESS)))
 			{
@@ -688,12 +612,6 @@ AwTl::SurfUnion AwBackupTexture::CreateTexture(AwTl::CreateTextureParms const & 
 				else
 					awTlLastDxErr = pLoadInfo->prevTexP.surfaceP->QueryInterface(GUID_DD_SURFACE,(LPVOID *)&pLoadInfo->surfaceP);
 				HANDLE_DXERROR("getting direct draw surface interface")
-				#if DB_LEVEL >= 5
-				if (_parmsR.loadTextureB)
-					db_logf5(("\t\tnow prev tex ref %u new surface i/f ref %u",GetRefCount(pLoadInfo->prevTexP.textureP),GetRefCount(pLoadInfo->surfaceP)));
-				else
-					db_logf5(("\t\tnow prev surf ref %u new surface i/f ref %u",GetRefCount(pLoadInfo->prevTexP.surfaceP),GetRefCount(pLoadInfo->surfaceP)));
-				#endif
 				
 				// check for lost surfaces
 				if (fMyFlags & AW_TLF_CHECKLOST)
@@ -822,29 +740,6 @@ AwTl::SurfUnion AwBackupTexture::CreateTexture(AwTl::CreateTextureParms const & 
 					pLoadInfo->prevTexP.surfaceP->AddRef();
 			}
 		
-			#if MIPMAPTEST
-			if (128==surface_width && 128==surface_height)
-			{
-				// test if we can get attached surfaces...
-				DDSCAPS ddscaps;
-				ZEROFILL(ddscaps);
-				ddscaps.dwCaps = DDSCAPS_TEXTURE | DDSCAPS_MIPMAP;
-				DDSurface * mip2P;
-				awTlLastDxErr = pLoadInfo->surfaceP->GetAttachedSurface(&ddscaps,&mip2P);
-				HANDLE_DXERROR("getting first mipmap")
-				DDSurface * mip3P;
-				awTlLastDxErr = mip2P->GetAttachedSurface(&ddscaps,&mip3P);
-				HANDLE_DXERROR("getting second mipmap")
-				db_logf5(("\tabout to release 2nd mip with ref %u",GetRefCount(mip2P)));
-				db_code1(refcnt =)
-				mip2P->Release();
-				db_onlyassert1(1==refcnt);
-				db_logf5(("\tabout to release 3nd mip with ref %u",GetRefCount(mip3P)));
-				db_code1(refcnt =)
-				mip3P->Release();
-				db_onlyassert1(1==refcnt);
-			}
-			#endif
 			
 			bSkipAll = bSkipAll && pLoadInfo->skipB;
 		}}
@@ -941,25 +836,6 @@ AwTl::SurfUnion AwBackupTexture::CreateTexture(AwTl::CreateTextureParms const & 
 					db_log3("AwCreateGraphic(): WARNING: setting a palette on a DD surface may have no effect");
 				}
 				
-				#if 0
-				if (m_bTranspMask)
-				{
-					colour_tableA[0].peRed = 0;
-					colour_tableA[0].peGreen = 0;
-					colour_tableA[0].peBlue = 0;
-					colour_tableA[0].peFlags = 0;
-					for (unsigned i=1; i<m_nPaletteSize; ++i)
-					{
-						colour_tableA[i].peRed = paletteP[i].r;
-						colour_tableA[i].peGreen = paletteP[i].g;
-						colour_tableA[i].peBlue = paletteP[i].b;
-						if (!(paletteP[i].r + paletteP[i].g + paletteP[i].b))
-							colour_tableA[i].peRed = 1;
-						colour_tableA[i].peFlags = 0;
-					}
-				}
-				else
-				#endif
 				{
 					for (unsigned i=0; i<m_nPaletteSize; ++i)
 					{
@@ -1271,12 +1147,6 @@ AwTl::SurfUnion AwBackupTexture::CreateTexture(AwTl::CreateTextureParms const & 
 		}
 		delete[] arrLoadInfo;
 		
-		#if DB_LEVEL >= 5
-		if (_parmsR.loadTextureB)
-			db_logf5(("AwCreateGraphic(): returning texture with ref cnt %u",GetRefCount(pRet.textureP)));
-		else
-			db_logf5(("AwCreateGraphic(): returning surface with ref cnt %u",GetRefCount(pRet.surfaceP)));
-		#endif
 		
 		return pRet;
 	}
@@ -1602,9 +1472,6 @@ namespace AwTl {
 		public:
 			MagicFileIdTree()
 				: m_pfnCreate(NULL)
-				#ifdef _MSC_VER
-				, hack(0)
-				#endif
 			{
 				for (unsigned i=0; i<256; ++i)
 					m_arrNextLayer[i]=NULL;
@@ -1620,9 +1487,6 @@ namespace AwTl {
 			
 			TexFileLoader * (* m_pfnCreate) ();
 			
-		#ifdef _MSC_VER
-			unsigned hack;
-		#endif
 	}
 		* g_pMagicFileIdTree = NULL;
 	
@@ -1630,25 +1494,7 @@ namespace AwTl {
 	{
 		static MagicFileIdTree mfidt;
 
-#ifdef _MSC_VER
-		// Touch the loaders.
-		{
-			mfidt.hack += reinterpret_cast<unsigned>(&rlcAwBmpLoader_187);
-			
-			mfidt.hack += reinterpret_cast<unsigned>(&rlcAwIffLoader_428);
-			mfidt.hack += reinterpret_cast<unsigned>(&rlcAwIffLoader_429);
-			mfidt.hack += reinterpret_cast<unsigned>(&rlcAwIffLoader_430);
-			
-			mfidt.hack += reinterpret_cast<unsigned>(&rlcAwPpmLoader_229);
-			mfidt.hack += reinterpret_cast<unsigned>(&rlcAwPgmLoader_230);
-			mfidt.hack += reinterpret_cast<unsigned>(&rlcAwPbmLoader_231);
-
-			mfidt.hack += reinterpret_cast<unsigned>(&rccIlbmBmhdChunk_4);
-			mfidt.hack += reinterpret_cast<unsigned>(&rccIlbmCmapChunk_5);
-			mfidt.hack += reinterpret_cast<unsigned>(&rccIlbmBodyChunk_6);
-			mfidt.hack += reinterpret_cast<unsigned>(&rccIlbmGrabChunk_7);
-		}
-#endif
+	// adj I am concerned about some missing code here in original
 		g_pMagicFileIdTree = &mfidt;
 		
 		MagicFileIdTree * pLayer = g_pMagicFileIdTree;
@@ -1766,7 +1612,6 @@ namespace AwTl {
 		}
 	}
 	
-	#if DB_LEVEL >= 4
 	static void LogPrimCaps(LPD3DPRIMCAPS _pcP, bool _triB)
 	{
 		#define DEVCAP(mask,can_or_does,explanation) \
@@ -2036,7 +1881,6 @@ namespace AwTl {
 		db_logf4(("\tMinimum stipple size is %u x %u",_descP->dwMinStippleWidth,_descP->dwMinStippleHeight));
 		db_logf4(("\tMaximum stipple size is %u x %u",max_sw,max_sh));
 	}
-	#endif
 
 	// Parse the format string and get the parameters
 	
@@ -2257,11 +2101,9 @@ namespace AwTl {
 
 #define IS_VALID_MEMBER(sP,mem) (reinterpret_cast<unsigned>(&(sP)->mem) - reinterpret_cast<unsigned>(sP) < static_cast<unsigned>((sP)->dwSize))
 
-#if defined(__WATCOMC__) && (__WATCOMC__ <= 1100) // currently Watcom compiler crashes when the macro is expanded with the db_logf code in it
-#define GET_VALID_MEMBER(sP,mem,deflt) (IS_VALID_MEMBER(sP,mem) ? (sP)->mem : (deflt))
-#else
+
 #define GET_VALID_MEMBER(sP,mem,deflt) (IS_VALID_MEMBER(sP,mem) ? (sP)->mem : (db_logf4((FUNCTION_NAME ": WARNING: %s->%s is not valid",#sP ,#mem )),(deflt)))
-#endif
+
 
 #define HANDLE_INITERROR(test,s) \
 	if (!(test)) { \
@@ -2340,11 +2182,7 @@ AW_TL_ERC AwSetDDObject(DDObject * _ddP)
 	using AwTl::driverDesc;
 	
 	db_logf4(("AwSetDDObject(%p) called.",_ddP));
-	#ifdef DIRECTDRAW_VERSION
-		db_logf4(("\tCompiled with DirectDraw Version %u.%u",DIRECTDRAW_VERSION/0x100U,DIRECTDRAW_VERSION%0x100U));
-	#else
-		db_log4("\tCompiled with unknown DirectDraw version");
-	#endif
+	db_logf4(("\tCompiled with DirectDraw Version %u.%u",DIRECTDRAW_VERSION/0x100U,DIRECTDRAW_VERSION%0x100U));
 	
 	
 	HANDLE_INITERROR(_ddP,"DDObject * is NULL")
@@ -2411,7 +2249,6 @@ static AW_TL_ERC AwSetPixelFormat(AwTl::PixelFormat * _pfP, LPDDPIXELFORMAT _ddp
 	if (_pfP->palettizedB)
 	{
 		HANDLE_INITERROR(!_pfP->alphaB,"alpha channel info is on a palettized format. This is not yet supported")
-		#if DB_LEVEL >= 4
 		if (_ddpfP->dwFlags & DDPF_RGB)
 		{
 			db_log4(FUNCTION_NAME ": WARNING: RGB data supplied for a palettized format is ignored");
@@ -2420,7 +2257,6 @@ static AW_TL_ERC AwSetPixelFormat(AwTl::PixelFormat * _pfP, LPDDPIXELFORMAT _ddp
 			db_logf4(("\tGreen Mask is 0x%08x",GET_VALID_MEMBER(_ddpfP,dwGBitMask,0)));
 			db_logf4(("\tBlue Mask is 0x%08x",GET_VALID_MEMBER(_ddpfP,dwBBitMask,0)));
 		}
-		#endif
 	}
 	else
 	{
@@ -2455,7 +2291,6 @@ static AW_TL_ERC AwSetPixelFormat(AwTl::PixelFormat * _pfP, LPDDPIXELFORMAT _ddp
 		
 	db_log4("AwSetPixelFormat() OK");
 	
-	#if DB_LEVEL >= 4
 	db_logf4(("Pixel Format is %u-bit %s",_pfP->bitsPerPixel,_pfP->palettizedB ? "palettized" : _pfP->alphaB ? "RGBA" : "RGB"));
 	if (!_pfP->palettizedB)
 	{
@@ -2474,7 +2309,6 @@ static AW_TL_ERC AwSetPixelFormat(AwTl::PixelFormat * _pfP, LPDDPIXELFORMAT _ddp
 		db_logf4(("\tGreen->[%u..%u]",_pfP->greenLeftShift+7-_pfP->greenRightShift,_pfP->greenLeftShift));
 		db_logf4(("\tBlue->[%u..%u]",_pfP->blueLeftShift+7-_pfP->blueRightShift,_pfP->blueLeftShift));
 	}
-	#endif
 	
 	_pfP->validB = true;
 	return AW_TLE_OK;
@@ -2561,12 +2395,10 @@ AW_TL_ERC AwGetTextureSize(register unsigned * _widthP, register unsigned * _hei
 		else *_heightP = *_widthP;
 	}
 	
-	#if 1 // not sure if this is required...
 	*_widthP += 3;
 	*_widthP &= ~3;
 	*_heightP += 3;
 	*_heightP &= ~3;
-	#endif
 	
 	db_logf4(("\tAwGetTextureSize(): d3d texture will be %ux%u",*_widthP,*_heightP));
 	
@@ -2640,7 +2472,6 @@ DWORD awTlLastWinErr;
 /* PUBLIC DEBUG: AwErrorToString functions */
 /*******************************************/
 
-#ifndef NDEBUG
 char const * AwWinErrorToString(DWORD error)
 {
 	if (NO_ERROR==error) return "No error";
@@ -2939,36 +2770,8 @@ char const * AwDxErrorToString(HRESULT error)
             return "D3DERR_MATERIAL_SETDATA_FAILED\0";
         case D3DERR_LIGHT_SET_FAILED:
             return "D3DERR_LIGHT_SET_FAILED\0";
-        #if 0 // retained mode error codes
-        case D3DRMERR_BADOBJECT:
-            return "D3DRMERR_BADOBJECT\0";
-        case D3DRMERR_BADTYPE:
-            return "D3DRMERR_BADTYPE\0";
-        case D3DRMERR_BADALLOC:
-            return "D3DRMERR_BADALLOC\0";
-        case D3DRMERR_FACEUSED:
-            return "D3DRMERR_FACEUSED\0";
-        case D3DRMERR_NOTFOUND:
-            return "D3DRMERR_NOTFOUND\0";
-        case D3DRMERR_NOTDONEYET:
-            return "D3DRMERR_NOTDONEYET\0";
-        case D3DRMERR_FILENOTFOUND:
-            return "The file was not found.\0";
-        case D3DRMERR_BADFILE:
-            return "D3DRMERR_BADFILE\0";
-        case D3DRMERR_BADDEVICE:
-            return "D3DRMERR_BADDEVICE\0";
-        case D3DRMERR_BADVALUE:
-            return "D3DRMERR_BADVALUE\0";
-        case D3DRMERR_BADMAJORVERSION:
-            return "D3DRMERR_BADMAJORVERSION\0";
-        case D3DRMERR_BADMINORVERSION:
-            return "D3DRMERR_BADMINORVERSION\0";
-        case D3DRMERR_UNABLETOEXECUTE:
-            return "D3DRMERR_UNABLETOEXECUTE\0";
-        #endif
         default:
             return "Unrecognized error value.\0";
     }
 }
-#endif
+

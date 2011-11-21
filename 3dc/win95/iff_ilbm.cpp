@@ -68,7 +68,6 @@ namespace IFF
 		return true;
 	}
 	
-	#ifndef IFF_READ_ONLY
 		bool IlbmBodyChunk::BeginEncode()
 		{
 			if (!GetHeaderInfo())
@@ -85,10 +84,7 @@ namespace IFF
 			return true;
 		}
 
-// The uninitialised part of byte is shifted out.
-#ifdef _MSC_VER
-#pragma warning(disable: 4701)
-#endif
+
 		bool IlbmBodyChunk::EncodeNextRow(unsigned const * pRow)
 		{
 			if (!pEncodeDst) return false;
@@ -165,9 +161,6 @@ namespace IFF
 			
 			return true;
 		}
-#ifdef _MSC_VER
-#pragma warning(default: 4701)
-#endif
 		
 		bool IlbmBodyChunk::EndEncode()
 		{
@@ -187,7 +180,6 @@ namespace IFF
 			
 			return true;
 		}
-	#endif
 	
 	bool IlbmBodyChunk::BeginDecode() const
 	{
@@ -207,10 +199,6 @@ namespace IFF
 		return pData != NULL;
 	}
 
-// The uninitialised part of pDecodeDst is shifted out.
-#ifdef _MSC_VER
-#pragma warning(disable: 4701)
-#endif
 	unsigned const * IlbmBodyChunk::DecodeNextRow() const
 	{
 		if (!pDecodeSrc || !pDecodeDst) return NULL;
@@ -305,18 +293,13 @@ namespace IFF
 		
 		return pDecodeDst;
 	}
-#ifdef _MSC_VER
-#pragma warning(default: 4701)
-#endif
 	
 	IlbmBodyChunk::~IlbmBodyChunk()
 	{
 		if (pData) delete[] pData;
 		if (pDecodeDst) delete[] pDecodeDst;
-		#ifndef IFF_READ_ONLY
 			if (pEncodeDst) delete pEncodeDst;
 			if (pEncodeSrc) delete[] pEncodeSrc;
-		#endif
 	}
 	
 	void IlbmGrabChunk::Serialize(Archive * pArchv)

@@ -14,58 +14,31 @@
 #include "teletype.hpp"
 #include "coordstr.hpp"
 #include "trig666.hpp"
-
 #include "indexfnt.hpp"
-
 #include "wrapstr.hpp"
-
 #include "inline.h"
-
 #include "iofocus.h"
-
 #include "consolelog.hpp"
+#include "rootgadg.hpp"
+#include "hudgadg.hpp"
+	// for ClearTheQueue()
+#include "font.h"
+	// for the font tests
+#define UseLocalAssert Yes
+#include "ourasert.h"
 
-	#include "rootgadg.hpp"
-	#include "hudgadg.hpp"
-		// for ClearTheQueue()
-
-	#include "font.h"
-		// for the font tests
-
-	#define UseLocalAssert Yes
-	#include "ourasert.h"
-
-/* Version settings ************************************************/
 
 /* Constants *******************************************************/
-	#define MAX_MESSAGES_TO_DISPLAY		(20)
-	#define PARTIAL_MESSAGES_TO_DISPLAY	(5)
+#define MAX_MESSAGES_TO_DISPLAY		(20)
+#define FIXP_SECONDS_UNTIL_TEXT_REPORTS_DISAPPEAR (ONE_FIXED * 5)
+#define INT_CHEESY_FLASH_DURATION	(1)
 
-	#define FIXP_SECONDS_UNTIL_TEXT_REPORTS_DISAPPEAR (ONE_FIXED * 5)
-	#define FIXP_CHEESY_FLASH_RATE		(ONE_FIXED * 6)
-	#define INT_CHEESY_FLASH_DURATION	(1)
-
-/* Macros **********************************************************/
-
-/* Imported function prototypes ************************************/
 
 /* Imported data ***************************************************/
 #ifdef __cplusplus
 	extern "C"
 	{
 #endif
-		#if 0
-		extern OurBool			DaveDebugOn;
-		extern FDIEXTENSIONTAG	FDIET_Dummy;
-		extern IFEXTENSIONTAG	IFET_Dummy;
-		extern FDIQUAD			FDIQuad_WholeScreen;
-		extern FDIPOS			FDIPos_Origin;
-		extern FDIPOS			FDIPos_ScreenCentre;
-		extern IFOBJECTLOCATION IFObjLoc_Origin;
-		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
-		extern IFCOLOUR			IFColour_Dummy;
- 		extern IFVECTOR			IFVec_Zero;
-		#endif
 		extern int RealFrameTime;
 #ifdef __cplusplus
 	};
@@ -74,10 +47,9 @@
 
 static int NumberOfLinesToDisplay=0;
 
-/* Exported globals ************************************************/
+
 
 /* Internal type definitions ***************************************/
-	#if UseGadgets
 	class TextReportDaemon_Scroll : public AcyclicHomingCoordinate
 	{
 	public:
@@ -118,10 +90,9 @@ static int NumberOfLinesToDisplay=0;
 		void Reset(void);
 	};
 
-	#endif // UseGadgets
+
 
 /* Internal function prototypes ************************************/
-#if UseGadgets
 void TestStringRender_Unclipped
 (
 	r2pos& R2Pos_Cursor,
@@ -132,12 +103,10 @@ void TestStringRender_Unclipped
 		// the physical screen (i.e. already clipped)
 	const SCString& SCStr
 );
-#endif
 
-/* Internal globals ************************************************/
+
 
 /* Exported function definitions ***********************************/
-#if UseGadgets
 // class TextReportGadget : public Gadget
 // public:
 void TextReportGadget :: Render
@@ -147,45 +116,10 @@ void TextReportGadget :: Render
 	int FixP_Alpha
 )
 {
-	/* PRECONDITION */
-	{
-	}
 
 	/* CODE */
 	{
-		#if 0
-		BLTFontOffsetToHUD
-		(
-			// PFFONT* font , 
-			400, // int xdest, 
-			100, // int ydest, 
-			0 // int offset
-		);
-		#endif
 
-		#if 0
-		BLTWholeFont
-		(
-			3, // int fontnum,
-			30, // int x ,
-			130, // int y,
-			100 // int win_width
-		);
-		#endif
-
-		#if 0
-		textprint
-		(
-			"TextReportGadget :: Render at (%i,%i) clipped (%i,%i,%i,%i) alpha=%i\n",
-			R2Pos . x,
-			R2Pos . y,
-			R2Rect_Clip . x0,
-			R2Rect_Clip . y0,
-			R2Rect_Clip . x1,
-			R2Rect_Clip . y1,
-			FixP_Alpha
-		);
-		#endif
 
 		IndexedFont* pLetterFont = IndexedFont :: GetFont( I_Font_TeletypeLettering );
 		GLOBALASSERT( pLetterFont );
@@ -214,25 +148,6 @@ void TextReportGadget :: Render
 			);
 		}
 
-		#if 0
-		{
-			SCString* pSCStr_Temp = new SCString("PLACEHOLDER STRING");
-			r2pos R2Pos_Cursor = R2Rect_ClipForText . GetPos();
-
-			TestStringRender_Unclipped
-			(
-				R2Pos_Cursor, // r2pos& R2Pos_Cursor,
-					// start position for string;
-					// gets written back to with final position
-
-					// Renders as a single line; it is asserted that the result is fully within
-					// the physical screen (i.e. already clipped)
-				*pSCStr_Temp // const SCString& SCStr
-			);
-
-			pSCStr_Temp -> R_Release();
-		}
-		#endif
 
 		// Calculate y-displacement based upon number of lines:
 		int HeightOfLines = (List_pTeletypeGadg_Displaying . size() * FontHeight);
@@ -251,7 +166,6 @@ void TextReportGadget :: Render
 				oi.next()
 			)
 			{
-				#if 1
 				oi() -> Render
 				(
 					R2Pos_Teletype, // const struct r2pos& R2Pos,
@@ -259,13 +173,6 @@ void TextReportGadget :: Render
 					FixP_Alpha // int FixP_Alpha
 				);
 				R2Pos_Teletype . y += FontHeight;
-				#else
-				textprint
-				(
-					"Textline:\"%s\"\n",
-					oi() -> pProjCh()
-				);
-				#endif
 			}
 		}
 
@@ -292,27 +199,6 @@ void TextReportGadget :: Render
 		}
 
 
-		#if 0
-		// Diagnostic on queuing messages:
-		{
-			textprint("Text report queue:\n");
-			for
-			(
-				List_Iterator_Forward<SCString*> oi(&(List_pSCString_ToAppear));
-					// a _pointer_ 
-					// to the list.
-				!oi.done();
-				oi.next()
-			)
-			{
-				textprint
-				(
-					"Queuing:\"%s\"\n",
-					oi() -> pProjCh()
-				);
-			}
-		}
-		#endif
 
 	}
 }
@@ -349,22 +235,14 @@ TextReportGadget :: TextReportGadget
 (
 ) : Gadget
 	(
-		#if debug
 		"TextReportGadget"
-		#endif
 	),
 	RefList_SCString_ToAppear(),
 	List_pTeletypeGadg_Displaying()
 {
-	/* PRECONDITION */
-	{
-	}
 
 	/* CODE */
 	{
-		#if 0
-		pSCString_Current = NULL;
-		#endif
 
 		p666_Scroll = new TextReportDaemon_Scroll
 		(
@@ -382,13 +260,9 @@ TextReportGadget :: TextReportGadget
 
 TextReportGadget :: ~TextReportGadget()
 {
-	/* PRECONDITION */
-	{
-	}
 
 	/* CODE */
 	{
-		#if 1
 		{
 			for
 			(
@@ -401,12 +275,6 @@ TextReportGadget :: ~TextReportGadget()
 				delete( oi() );
 			}
 		}
-		#else
-		if ( pSCString_Current )
-		{
-			pSCString_Current -> R_Release();
-		}
-		#endif
 
 		delete p666_Scroll;
 		delete p666_Disappear;
@@ -429,7 +297,6 @@ void TextReportGadget :: AddTextReport
 
 	/* CODE */
 	{
-		#if 1
 		IndexedFont* pLetterFont = IndexedFont :: GetFont( I_Font_TeletypeLettering );
 		GLOBALASSERT( pLetterFont );
 
@@ -445,7 +312,6 @@ void TextReportGadget :: AddTextReport
 
 		// Iterate through list of strings, adding each as teletype gadgets to the report,
 		// then releasing the strings:
-//		NumberOfLinesToDisplay=0;
 		for
 		(
 			LIF<SCString*> oi( pList_pSCString_Wrapped );
@@ -472,12 +338,6 @@ void TextReportGadget :: AddTextReport
 
 
 		delete pList_pSCString_Wrapped;
-		#else
-		AddTeletypeLine
-		(
-			pSCString_ToAdd
-		);
-		#endif
 	}
 }
 
@@ -490,29 +350,10 @@ void TextReportGadget :: ClearQueue(void)
 
 	RefList_SCString_ToAppear . EmptyYourself();
 
-	#if 0
-	{
-		SCString* pSCString_Temp1 = new SCString("CLEARED MESSAGE DISPLAY QUEUE; NUM LINES=");
-			// LOCALISEME()
-		SCString* pSCString_Temp2 = new SCString(NumKilled);
 
-		SCString* pSCString_Feedback = new SCString
-		(
-			pSCString_Temp1,
-			pSCString_Temp2
-		);
-
-		pSCString_Temp2	-> R_Release();
-		pSCString_Temp1	-> R_Release();
-
-		pSCString_Feedback -> SendToScreen();
-
-		pSCString_Feedback -> R_Release();
-	}	
-	#endif
 }
 
-/*static*/ void TextReportGadget :: ClearTheQueue(void)
+void TextReportGadget :: ClearTheQueue(void)
 {
 	// tries to find the (singleton) queue and clears it
 
@@ -595,7 +436,6 @@ void TextReportGadget :: Disappear(void)
 	p666_Scroll -> SetTarget_Int
 	(
 		GetOffScreenScrollCoord()
-			// int Int_TargetCoord
 	);
 	p666_Disappear -> Stop();
 }
@@ -607,7 +447,6 @@ void TextReportGadget :: ForceOnScreen(void)
 	p666_Scroll -> SetTarget_Int
 	(
 		GetFullyOnScreenScrollCoord()
-			// int Int_TargetCoord
 	);
 	p666_Disappear -> Stop();	
 }
@@ -676,46 +515,6 @@ void TextReportGadget :: DirectAddTeletypeLine
 	/* CODE */
 	{
 		// You no longer own a reference to this string
-		#if 0
-		{
-			IndexedFont* pLetterFont = IndexedFont :: GetFont( I_Font_TeletypeLettering );
-			GLOBALASSERT( pLetterFont );
-
-			List<SCString*>* pList_pSCString_Wrapped = WordWrap :: Make
-			(
-				*pSCString_ToAdd, // const SCString& SCString_In,
-
-				*pLetterFont, // const IndexedFont& IndexedFnt_In,
-
-				TEXT_REPORT_MAX_W, // int W_FirstLine_In,
-				TEXT_REPORT_MAX_W // int W_Subsequently_In
-			);
-
-			pSCString_ToAdd -> R_Release();
-
-			// Iterate through list of strings, adding each as teletype gadgets to the report,
-			// then releasing the strings:
-			for
-			(
-				LIF<SCString*> oi( pList_pSCString_Wrapped );
-				!oi.done();
-				oi.next()
-			)
-			{
-			    List_pTeletypeGadg_Displaying . add_entry_end
-			    (
-					new TeletypeGadget
-					(
-						this, // TextReportGadget* pTextReportGadg,
-						oi() // SCString* pSCString
-					)
-				);
-				oi() -> R_Release();
-			}
-
-			delete pList_pSCString_Wrapped;
-		}
-		#else
 		{
 		    List_pTeletypeGadg_Displaying . add_entry_end
 		    (
@@ -726,7 +525,7 @@ void TextReportGadget :: DirectAddTeletypeLine
 				)
 			);
 		}
-		#endif
+
 
 		PostprocessForAddingTeletypeLine();
 	}
@@ -823,10 +622,9 @@ void TextReportGadget :: UpdateLineTimes()
 	}
 }
 
-#endif //UseGadgets
+
 
 /* Internal function definitions ***********************************/
-#if UseGadgets
 // class TextReportDaemon_Scroll : public AcyclicHomingCoordinate
 // public:
 TextReportDaemon_Scroll :: TextReportDaemon_Scroll
@@ -914,82 +712,3 @@ void CheesyDaemon_Lifetime :: Reset(void)
 
 
 
-#endif // UseGadgets
-
-
-
-
-
-
-
-
-#if UseGadgets && 0
-	// test code
-	#define FONT_INDEX (3)
-
-void TestStringRender_Unclipped
-(
-	r2pos& R2Pos_Cursor,
-		// start position for string;
-		// gets written back to with final position
-
-		// Renders as a single line; it is asserted that the result is fully within
-		// the physical screen (i.e. already clipped)
-	const SCString& SCStr
-)
-{
-	/* PRECONDITION */
-	{
-	}
-
-	/* CODE */
-	{
-		// GetOffset:
-		const pffont& PFFont = AvpFonts[FONT_INDEX];
-
-		ProjChar* pProjChar_I = SCStr . pProjCh();
-
-		while ( *pProjChar_I )
-		{
-			const ProjChar ProjCh = *pProjChar_I;
-
-			if
-			(
-				PFFont . bPrintable( ProjCh )
-			)
-			{
-				#if 0
-				textprint("printable \'%c\'\n",ProjCh);
-				#endif
-
-				R2Pos_Cursor . x += 1+BLTFontOffsetToHUD
-				(
-					(PFFONT*)&PFFont, // PFFONT* font,
-						// "cast away the const-ness" for the moment
-					R2Pos_Cursor . x, // int xdest,
-					R2Pos_Cursor . y, // int ydest,
-					PFFont . ProjCharToOffset( ProjCh ) // int offset
-				);
-				// appears to return the width of the character...
-			}
-			else
-			{
-				#if 0
-				textprint("unprintable \'%c\'\n",ProjCh);
-				#endif
-			}
-
-			pProjChar_I++;
-		}
-	}
-}
-
-void TestStringRender_Clipped
-(
-	r2pos& R2Pos_Cursor,
-	const r2rect& R2Rect_Clip,
-	const SCString& SCStr
-)
-{
-}
-#endif // test code

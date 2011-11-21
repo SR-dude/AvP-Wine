@@ -16,17 +16,11 @@
 
 extern "C"
 {
-	#include "d3d_hud.h"
+#include "d3d_hud.h"
 };
-	#define UseLocalAssert Yes
-	#include "ourasert.h"
+#define UseLocalAssert Yes
+#include "ourasert.h"
 
-/* Version settings ************************************************/
-	#define Use_BLT	No	
-
-/* Constants *******************************************************/
-
-/* Macros **********************************************************/
 
 /* Imported function prototypes ************************************/
 extern void D3D_RenderHUDString(char *stringPtr,int x,int y,int colour);
@@ -43,54 +37,25 @@ extern void D3D_RenderHUDString_Clipped(char *stringPtr,int x,int y,int colour);
 		extern DDPIXELFORMAT DisplayPixelFormat;
 		extern int CloudTable[128][128];
 		extern int CloakingPhase;
-		#if 0
-		extern OurBool			DaveDebugOn;
-		extern FDIEXTENSIONTAG	FDIET_Dummy;
-		extern IFEXTENSIONTAG	IFET_Dummy;
-		extern FDIQUAD			FDIQuad_WholeScreen;
-		extern FDIPOS			FDIPos_Origin;
-		extern FDIPOS			FDIPos_ScreenCentre;
-		extern IFOBJECTLOCATION IFObjLoc_Origin;
-		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
-		extern IFCOLOUR			IFColour_Dummy;
- 		extern IFVECTOR			IFVec_Zero;
-		#endif
 #ifdef __cplusplus
 	};
 #endif
 
-
-
 /* Exported globals ************************************************/
-	/*static*/ IndexedFont* IndexedFont :: pIndexedFont[ IndexedFonts_MAX_NUMBER_OF_FONTS ];
+IndexedFont* IndexedFont :: pIndexedFont[ IndexedFonts_MAX_NUMBER_OF_FONTS ];
 
-/* Internal type definitions ***************************************/
-
-/* Internal function prototypes ************************************/
-
-/* Internal globals ************************************************/
 
 /* Exported function definitions ***********************************/
 // class IndexedFont
 // public:
-/*static*/ void IndexedFont :: UnloadFont( FontIndex I_Font_ToGet )
+ void IndexedFont :: UnloadFont( FontIndex I_Font_ToGet )
 {
 
-	// there must be a font loaded in that slot
+	GLOBALASSERT( pIndexedFont[I_Font_ToGet ] );
 
-	/* PRECONDITION */
-	{
-		GLOBALASSERT( pIndexedFont[I_Font_ToGet ] );
-	}
-
-	/* CODE */
-	{
-		IndexedFont* pDelete = pIndexedFont[I_Font_ToGet ];
-
-		pIndexedFont[ I_Font_ToGet ] = NULL;
-
-		delete pDelete;
-	}
+	IndexedFont* pDelete = pIndexedFont[I_Font_ToGet ];
+	pIndexedFont[ I_Font_ToGet ] = NULL;
+	delete pDelete;
 }
 
 /*virtual*/ IndexedFont :: ~IndexedFont()
@@ -109,13 +74,8 @@ OurBool IndexedFont :: bCanRenderFully( ProjChar* pProjCh )
 	// Assumes one byte-per-character:
 	while ( *pProjCh )
 	{
-		if
-		(
-			!bCanRender( *pProjCh )
-		)
-		{
+		if ( !bCanRender( *pProjCh ) )
 			return No;
-		}
 		
 		pProjCh++;
 	}
@@ -123,7 +83,7 @@ OurBool IndexedFont :: bCanRenderFully( ProjChar* pProjCh )
 	return Yes;
 }
 
-#if debug
+//  :: Render_Clipped_Report ()
 void IndexedFont :: Render_Clipped_Report
 (
 	const struct r2pos& R2Pos_Cursor,
@@ -145,35 +105,23 @@ void IndexedFont :: Render_Clipped_Report
 		SCStr . pProjCh()
 	);
 }
-#endif
 
 
 // protected:
 // Protected constructor since abstract class
-IndexedFont :: IndexedFont
-(
-	FontIndex I_Font_New
-)
+IndexedFont :: IndexedFont ( FontIndex I_Font_New )
 {
-	/* PRECONDITION */
-	{
-		GLOBALASSERT( I_Font_New < IndexedFonts_MAX_NUMBER_OF_FONTS );
-	}
-
-	/* CODE */
-	{
-		I_Font_Val = I_Font_New;
-
-		pIndexedFont[ I_Font_New ] = this;
-	}
+	GLOBALASSERT( I_Font_New < IndexedFonts_MAX_NUMBER_OF_FONTS );
+	I_Font_Val = I_Font_New;
+	pIndexedFont[ I_Font_New ] = this;
+	
 }
 
 
-// private:
 
-#if 1
 // class IndexedFont_Proportional : public IndexedFont
 // public:
+// :: RenderString_Clipped ()
 void IndexedFont_Proportional :: RenderString_Clipped
 (
 	struct r2pos& R2Pos_Cursor,
@@ -182,173 +130,57 @@ void IndexedFont_Proportional :: RenderString_Clipped
 	const SCString& SCStr
 ) const
 {
-	/* PRECONDITION */
+
+
+	ProjChar* pProjChar_I = SCStr . pProjCh();
+
+	while ( *pProjChar_I )
 	{
-	}
+		const ProjChar ProjCh = *pProjChar_I;
 
-	/* CODE */
-	{
-		#if 0
-		Render_Clipped_Report
-		(
-			R2Pos_Cursor,
-			R2Rect_Clip,
-			FixP_Alpha,
-			SCStr
-		);
-		#endif
-
-		ProjChar* pProjChar_I = SCStr . pProjCh();
-
-		while ( *pProjChar_I )
+		if ( bCanRender( ProjCh ) )
 		{
-			const ProjChar ProjCh = *pProjChar_I;
-
-			if
-			(
-				bCanRender( ProjCh )
-			)
-			{
-				#if 0
-				textprint("printable \'%c\'\n",ProjCh);
-				#endif
-
-				#if 1
-				// Rewritten by DHM 18/3/98 to use the single character renderer:
-				RenderChar_Clipped
-				(
-					R2Pos_Cursor,
-					R2Rect_Clip,
-					FixP_Alpha,
-					ProjCh
-				);
-				#else
-				// For the moment, only render characters that are fully on-screen:
-				if
-				(
-					r2rect
-					(
-						R2Pos_Cursor,
-						GetWidth(ProjCh),
-						GetHeight()
-					) . bFitsIn( R2Rect_Clip )
-				) 
-				{
-					#if Use_BLT
-					R2Pos_Cursor . x += 1+BLTFontOffsetToHUD
-					(
-						pffont_Val, // PFFONT* font,
-						R2Pos_Cursor . x, // int xdest,
-						R2Pos_Cursor . y, // int ydest,
-						pffont_Val -> ProjCharToOffset( ProjCh ) // int offset
-					);
-					#else
-					textprintXY
-					(
-						R2Pos_Cursor . x,
-						R2Pos_Cursor . y,
-						"%c", ProjCh
-					);
-					R2Pos_Cursor . x += 1+GetWidth(ProjCh);
-					#endif
-					// appears to return the width of the character...
-				}
-				else
-				{
-					R2Pos_Cursor . x += GetWidth( ProjCh );
-				}
-				#endif
-			}
-			else
-			{
-				#if 0
-				textprint("unprintable \'%c\'\n",ProjCh);
-				#endif
-			}
-
-			pProjChar_I++;
+			// Rewritten by DHM 18/3/98 to use the single character renderer:
+			RenderChar_Clipped ( R2Pos_Cursor, R2Rect_Clip,	FixP_Alpha, ProjCh );
 		}
+
+		pProjChar_I++;
 	}
+	
 }
 
+// :: RenderString_Unclipped ()
 void IndexedFont_Proportional :: RenderString_Unclipped
 (
 	struct r2pos& R2Pos_Cursor,
-	int FixP_Alpha, //  FixP_Alpha,
+	int FixP_Alpha, 
 	const SCString& SCStr
 ) const
+
 {
+	ProjChar* pProjChar_I = SCStr . pProjCh();
+
+	while ( *pProjChar_I )
 	{
-		ProjChar* pProjChar_I = SCStr . pProjCh();
+		const ProjChar ProjCh = *pProjChar_I;
 
-		while ( *pProjChar_I )
-		{
-			const ProjChar ProjCh = *pProjChar_I;
-
-			if
-			(
-				bCanRender( ProjCh )
-			)
+		if ( bCanRender( ProjCh ) )
 			{
-				#if 0
-				textprint("printable \'%c\'\n",ProjCh);
-				#endif
-
-				#if 1
-				// Rewritten by DHM 18/3/98 to use the single character renderer:
-				RenderChar_Unclipped
-				(
-					R2Pos_Cursor,
-					FixP_Alpha,
-					ProjCh
-				);
-				#else
-					#if Use_BLT
-					R2Pos_Cursor . x += 1+BLTFontOffsetToHUD
-					(
-						pffont_Val, // PFFONT* font,
-						R2Pos_Cursor . x, // int xdest,
-						R2Pos_Cursor . y, // int ydest,
-						pffont_Val -> ProjCharToOffset( ProjCh ) // int offset
-					);
-					// appears to return the width of the character...
-					#else
-					textprintXY
-					(
-						R2Pos_Cursor . x,
-						R2Pos_Cursor . y,
-						"%c", ProjCh
-					);
-					R2Pos_Cursor . x += 1+GetWidth(ProjCh);
-					#endif
-				#endif
-
-			}
-			else
-			{
-				#if 0
-				textprint("unprintable \'%c\'\n",ProjCh);
-				#endif
+ 				// Rewritten by DHM 18/3/98 to use the single character renderer:
+				RenderChar_Unclipped (R2Pos_Cursor,FixP_Alpha,ProjCh );
 			}
 
-			pProjChar_I++;
-		}
+		pProjChar_I++;
 	}
+	
 }
 
-
-r2size IndexedFont_Proportional :: CalcSize
-(
-	ProjChar* pProjCh
-) const
+// :: CalcSize ()
+r2size IndexedFont_Proportional :: CalcSize (	ProjChar* pProjCh ) const
 {
 	GLOBALASSERT( pProjCh );
 
-	r2size R2Size_Return
-	(
-		0,
-		GetHeight()
-	);
+	r2size R2Size_Return ( 0, GetHeight() );
 
 	if (*pProjCh)
 	{
@@ -367,41 +199,24 @@ r2size IndexedFont_Proportional :: CalcSize
 	return R2Size_Return;
 }
 
-r2size IndexedFont_Proportional :: CalcSize
-(
-	ProjChar* pProjCh,
-	int MaxChars
-) const
+// :: CalcSize ()
+r2size IndexedFont_Proportional :: CalcSize ( 	ProjChar* pProjCh, int MaxChars ) const
 {
 	GLOBALASSERT( pProjCh );
 	GLOBALASSERT( MaxChars >= 0 );
 
-	r2size R2Size_Return
-	(
-		0,
-		GetHeight()
-	);
+	r2size R2Size_Return ( 0, GetHeight() );
 
-	if
-	(
-		(*pProjCh)
-		&&
-		(MaxChars>0)
-	)
+	if ( (*pProjCh)	&& (MaxChars>0)	)
 	{
 		// non-empty strings have one pixel space between characters; the if/do/while
 		// construction is to take one off the final result for a non-empty string
 		do
 		{
 			R2Size_Return . w += GetWidth( *pProjCh ) + 1;
-
 			pProjCh++;
 		} while
-		(
-			(*pProjCh)
-			&&
-			(--MaxChars>0)
-		);
+		( (*pProjCh) &&	(--MaxChars>0) );
 
 		R2Size_Return . w --;
 	}
@@ -409,12 +224,11 @@ r2size IndexedFont_Proportional :: CalcSize
 	return R2Size_Return;	
 }
 
-#endif
 
 // class IndexedFont_Kerned : public IndexedFont
 // public:
-void
-IndexedFont_Kerned :: RenderString_Clipped
+// :: RenderString_Clipped ()
+void IndexedFont_Kerned :: RenderString_Clipped
 (
 	struct r2pos& R2Pos_Cursor,
 	const struct r2rect& R2Rect_Clip,
@@ -438,44 +252,16 @@ IndexedFont_Kerned :: RenderString_Clipped
 	{
 		const ProjChar ProjCh = *pProjChar_I;
 
-		if
-		(
-			bCanRender( ProjCh )
-		)
+		if ( bCanRender( ProjCh ) )
 		{
-			#if 0
-			textprint("printable \'%c\'\n",ProjCh);
-			#endif
 
-			#if 0
-			RenderChar_Clipped
-			(
-				R2Pos_Cursor,
-				R2Rect_Clip,
-				FixP_Alpha,
-				ProjCh
-			);
-			#else
 			if (ProjCh != ' ')
 			{
 				unsigned int theOffset=ProjCh - 32;
 				int width = GetWidth(ProjCh);
 
-				/*
-				if
-				(
-					GetOffset
-					(
-						theOffset,
-						ProjCh
-					)
-				)
-				*/
 				{
-					if
-					(
-						width>0
-					)
+					if ( width>0 )
 					{
 						{
 							// This code adapted from DrawGraphicWithAlphaChannel();
@@ -513,9 +299,6 @@ IndexedFont_Kerned :: RenderString_Clipped
 									for (int xCount=width; xCount>0;xCount--)
 									{
 										int r = CloudTable[(xCount+R2Pos_Cursor.x+CloakingPhase/64)&127][(screenY+CloakingPhase/128)&127];
-			//							b += CloudTable[((xCount+R2Pos_Cursor.x)/2-CloakingPhase/96)&127][((yCount+R2Pos_Cursor.y)/4+CloakingPhase/64)&127]/4;
-			//							b += CloudTable[((xCount+R2Pos_Cursor.x+10)/4-CloakingPhase/64)&127][((yCount+R2Pos_Cursor.y-50)/8+CloakingPhase/32)&127]/8;
-			//							if (b>ONE_FIXED) b = ONE_FIXED;
 										r = MUL_FIXED(FixP_Alpha,r);
 										if (*fontimagePtr)
 										{
@@ -555,20 +338,9 @@ IndexedFont_Kerned :: RenderString_Clipped
 				}
 			}
 
-			#endif
-		}
-		else
-		{
-			#if 0
-			textprint("unprintable \'%c\'\n",ProjCh);
-			#endif
 		}
 
-		R2Pos_Cursor . x += 1+GetXInc
-		(
-            ProjCh,
-            *(pProjChar_I+1)
-		);
+		R2Pos_Cursor . x += 1+GetXInc ( ProjCh,  *(pProjChar_I+1) );
             // this takes responsibility for updating cursor pos,
             // rather than the RenderChar function
 
@@ -577,14 +349,15 @@ IndexedFont_Kerned :: RenderString_Clipped
 	image_ptr->Unlock((LPVOID)ddsdimage.lpSurface);
 }
 
-void
-IndexedFont_Kerned :: RenderString_Unclipped
+
+// :: RenderString_Unclipped ()
+void IndexedFont_Kerned :: RenderString_Unclipped
 (
 	struct r2pos& R2Pos_Cursor,
 	int FixP_Alpha,
 	const SCString& SCStr
 ) const
-#if 1
+
 {
 	ProjChar* pProjChar_I = SCStr . pProjCh();
 
@@ -602,44 +375,16 @@ IndexedFont_Kerned :: RenderString_Unclipped
 	{
 		const ProjChar ProjCh = *pProjChar_I;
 
-		if
-		(
-			bCanRender( ProjCh )
-		)
+		if ( bCanRender( ProjCh ) )
 		{
-			#if 0
-			textprint("printable \'%c\'\n",ProjCh);
-			#endif
 
-			#if 0
-			RenderChar_Clipped
-			(
-				R2Pos_Cursor,
-				R2Rect_Clip,
-				FixP_Alpha,
-				ProjCh
-			);
-			#else
 			if (ProjCh != ' ')
 			{
 				unsigned int theOffset=ProjCh - 32;
 				int width = GetWidth(ProjCh);
 
-				/*
-				if
-				(
-					GetOffset
-					(
-						theOffset,
-						ProjCh
-					)
-				)
-				*/
 				{
-					if
-					(
-						width>0
-					)
+					if ( width>0 )
 					{
 						{
 							// This code adapted from DrawGraphicWithAlphaChannel();
@@ -676,15 +421,10 @@ IndexedFont_Kerned :: RenderString_Unclipped
 									int xIndex = R2Pos_Cursor.x+CloakingPhase/64;
 									int yIndex = (screenY+CloakingPhase/128)&127;
 
-//									if (screenY >= R2Rect_Clip.y0 && screenY <= R2Rect_Clip.y1)
 									for (int xCount=width; xCount>0;xCount--)
 									{
 										int r = CloudTable[(xCount+xIndex)&127][yIndex];
-			//							b += CloudTable[((xCount+R2Pos_Cursor.x)/2-CloakingPhase/96)&127][((yCount+R2Pos_Cursor.y)/4+CloakingPhase/64)&127]/4;
-			//							b += CloudTable[((xCount+R2Pos_Cursor.x+10)/4-CloakingPhase/64)&127][((yCount+R2Pos_Cursor.y-50)/8+CloakingPhase/32)&127]/8;
-			//							if (b>ONE_FIXED) b = ONE_FIXED;
 										r = MUL_FIXED(FixP_Alpha,r);
-										//int r = FixP_Alpha;
 										if (*fontimagePtr)
 										{
 											unsigned int backR = (int)(*backbufferPtr) & DisplayPixelFormat.dwRBitMask;
@@ -723,20 +463,9 @@ IndexedFont_Kerned :: RenderString_Unclipped
 				}
 			}
 
-			#endif
-		}
-		else
-		{
-			#if 0
-			textprint("unprintable \'%c\'\n",ProjCh);
-			#endif
 		}
 
-		R2Pos_Cursor . x += 1+GetXInc
-		(
-            ProjCh,
-            *(pProjChar_I+1)
-		);
+		R2Pos_Cursor.x  += 1+GetXInc ( ProjCh, *(pProjChar_I+1) );
             // this takes responsibility for updating cursor pos,
             // rather than the RenderChar function
 
@@ -744,93 +473,21 @@ IndexedFont_Kerned :: RenderString_Unclipped
 	}
 	image_ptr->Unlock((LPVOID)ddsdimage.lpSurface);
 }
-#else
-{
-	/* PRECONDITION */
-	#if 0
-	{
-		// Check it's already been properly clipped:
-		// (using direct calculation of string sizes)
-		GLOBALASSERT
-		(
-			r2rect
-			(
-				R2Pos_Cursor,
-				CalcSize( SCStr . pProjCh() ) 
-			) . bValidPhys()
-		);
-	}
-	#endif
-	/* CODE */
-	{
-		ProjChar* pProjChar_I = SCStr . pProjCh();
 
-		while ( *pProjChar_I )
-		{
-			const ProjChar ProjCh = *pProjChar_I;
-
-			if
-			(
-				bCanRender( ProjCh )
-			)
-			{
-				#if 0
-				textprint("printable \'%c\'\n",ProjCh);
-				#endif
-#if 1
-				RenderChar_Unclipped
-				(
-					R2Pos_Cursor,
-					FixP_Alpha,
-					ProjCh
-				);
-#endif
-			}
-			else
-			{
-				#if 0
-				textprint("unprintable \'%c\'\n",ProjCh);
-				#endif
-			}
-
-    		R2Pos_Cursor . x += 1+GetXInc
-    		(
-                ProjCh,
-                *(pProjChar_I+1)
-    		);
-                // this takes responsibility for updating cursor pos,
-                // rather than the RenderChar function
-
-			pProjChar_I++;
-		}
-	}
-}
-#endif
 
 // The string CalcSize() functions are implemented at this level
 // For this class, it's not just done by adding together the sizes for
 // the characters:
-r2size
-IndexedFont_Kerned :: CalcSize
-(
-	ProjChar* pProjCh
-) const
+// :: CalcSize ()
+r2size IndexedFont_Kerned :: CalcSize (	ProjChar* pProjCh ) const
 {
 	GLOBALASSERT(pProjCh);
 
-	r2size R2Size_Return
-	(
-		0,
-		GetHeight()
-	);
+	r2size R2Size_Return	( 0, GetHeight() );
 
 	while (*pProjCh)
 	{
-		R2Size_Return . w += 1+GetXInc
-		(
-			*(pProjCh),
-			*(pProjCh+1)
-		);
+		R2Size_Return.w  += 1+GetXInc ( *(pProjCh), *(pProjCh+1) );
 			// note how the final non-null character has a call to GetXInc
 			// with the null character as its successor
 
@@ -840,34 +497,17 @@ IndexedFont_Kerned :: CalcSize
 	return R2Size_Return;
 }
 
-r2size
-IndexedFont_Kerned :: CalcSize
-(
-	ProjChar* pProjCh,
-	int MaxChars
-) const
+// :: CalcSize ()
+r2size IndexedFont_Kerned :: CalcSize (	ProjChar* pProjCh, int MaxChars ) const
 {
 	GLOBALASSERT(pProjCh);
 	GLOBALASSERT( MaxChars >=0 );
 
-	r2size R2Size_Return
-	(
-		0,
-		GetHeight()
-	);
+	r2size R2Size_Return ( 0, GetHeight() );
 
-	while
-	(
-		(*pProjCh)
-		&&
-		((MaxChars--)>0)
-	)
+	while	( (*pProjCh) && ((MaxChars--)>0) )
 	{
-		R2Size_Return . w += 1+GetXInc
-		(
-			*(pProjCh),
-			*(pProjCh+1)
-		);
+		R2Size_Return.w += 1+GetXInc ( *(pProjCh), *(pProjCh+1) );
 			// note how the final non-null character has a call to GetXInc
 			// with the null character as its successor
 
@@ -877,7 +517,7 @@ IndexedFont_Kerned :: CalcSize
 	return R2Size_Return;
 }
 
-
+// :: RenderChar_Clipped ()
 void IndexedFont_Proportional_PF :: RenderChar_Clipped
 (
 	struct r2pos& R2Pos_Cursor,
@@ -886,227 +526,100 @@ void IndexedFont_Proportional_PF :: RenderChar_Clipped
 	ProjChar ProjCh
 ) const
 {
-	/* PRECONDITION */
-	{
-	}
 
-	/* CODE */
+	if (bCanRender( ProjCh ) )
 	{
-		if
-		(
-			bCanRender( ProjCh )
-		)
+		// For the moment, only render characters that are fully on-screen:
+		if ( r2rect (R2Pos_Cursor, GetWidth(ProjCh), GetHeight() ).bFitsIn( R2Rect_Clip ) ) 
 		{
-			#if 0
-			textprint("printable \'%c\'\n",ProjCh);
-			#endif
-			// For the moment, only render characters that are fully on-screen:
-			if
-			(
-				r2rect
-				(
-					R2Pos_Cursor,
-					GetWidth(ProjCh),
-					GetHeight()
-				) . bFitsIn( R2Rect_Clip )
-			) 
-			{
-				#if Use_BLT
-				R2Pos_Cursor . x += 1+BLTFontOffsetToHUD
-				(
-					pffont_Val, // PFFONT* font,
-					R2Pos_Cursor . x, // int xdest,
-					R2Pos_Cursor . y, // int ydest,
-					pffont_Val -> ProjCharToOffset( ProjCh ) // int offset
-				);
-				// appears to return the width of the character...
-				#else
-				textprintXY
-				(
-					R2Pos_Cursor . x,
-					R2Pos_Cursor . y,
-					"%c", ProjCh
-				);
-				R2Pos_Cursor . x += 1+GetWidth(ProjCh);
-				#endif				
-			}
-			else
-			{
-				R2Pos_Cursor . x += GetWidth( ProjCh );
-			}
+			textprintXY (R2Pos_Cursor.x, R2Pos_Cursor.y, "%c", ProjCh );
+			R2Pos_Cursor . x += 1+GetWidth(ProjCh);
+							
 		}
 		else
 		{
-			#if 0
-			textprint("unprintable \'%c\'\n",ProjCh);
-			#endif
+			R2Pos_Cursor.x += GetWidth( ProjCh );
 		}
 	}
 }
 
+
+
+// :: RenderChar_Unclipped ()
 void IndexedFont_Proportional_PF :: RenderChar_Unclipped
 (
 	struct r2pos& R2Pos_Cursor,
+/* adj Do you see the comma after int ? */
 	int, // FixP_Alpha,
 	ProjChar ProjCh
 ) const
 {
-	/* PRECONDITION */
-	#if 1
+	// Check it's already been properly clipped:
+	// (using direct calculation of char size)
+	GLOBALASSERT ( r2rect (R2Pos_Cursor, CalcSize( ProjCh ) ).bValidPhys() );
+	if (bCanRender( ProjCh ) )
 	{
-		// Check it's already been properly clipped:
-		// (using direct calculation of char size)
-		GLOBALASSERT
-		(
-			r2rect
-			(
-				R2Pos_Cursor,
-				CalcSize( ProjCh ) 
-			) . bValidPhys()
-		);
+		textprintXY ( R2Pos_Cursor.x, R2Pos_Cursor.y, "%c", ProjCh );
+		R2Pos_Cursor . x += 1+GetWidth(ProjCh);
 	}
-	#endif
-	/* CODE */
-	{
-		if
-		(
-			bCanRender( ProjCh )
-		)
-		{
-			#if 0
-			textprint("printable \'%c\'\n",ProjCh);
-			#endif
-
-			#if Use_BLT
-			R2Pos_Cursor . x += 1+BLTFontOffsetToHUD
-			(
-				pffont_Val, // PFFONT* font,
-				R2Pos_Cursor . x, // int xdest,
-				R2Pos_Cursor . y, // int ydest,
-				pffont_Val -> ProjCharToOffset( ProjCh ) // int offset
-			);
-			// appears to return the width of the character...
-			#else
-			textprintXY
-			(
-				R2Pos_Cursor . x,
-				R2Pos_Cursor . y,
-				"%c", ProjCh
-			);
-			R2Pos_Cursor . x += 1+GetWidth(ProjCh);
-			#endif
-		}
-		else
-		{
-			#if 0
-			textprint("unprintable \'%c\'\n",ProjCh);
-			#endif
-		}
-	}
+	
 }
 
 
-/*static*/ void IndexedFont_Proportional_PF :: PFLoadHook
-(
-	FontIndex I_Font_New,
-	PFFONT *pffont_New
-)
+
+// :: PFLoadHook () 
+void IndexedFont_Proportional_PF :: PFLoadHook ( FontIndex I_Font_New, PFFONT *pffont_New )
 {
-	/* PRECONDITION */
-	{
-	}
-
-	/* CODE */
-	{
-		new IndexedFont_Proportional_PF
-		(
-			I_Font_New,
-			pffont_New
-		);
-
-		SCString :: UpdateAfterFontChange( I_Font_New );
-	}
+	new IndexedFont_Proportional_PF	( I_Font_New, pffont_New );
+	SCString :: UpdateAfterFontChange( I_Font_New );
 }
 
-/*static*/ void IndexedFont_Proportional_PF :: PFUnLoadHook
-(
-	FontIndex // I_Font_Old
-)
-{
-	#if 0
-	delete 
-	SCString :: UpdateAfterFontChange( I_Font_Old );
-	#endif
+
+
+// :: PFUnLoadHook ()
+void IndexedFont_Proportional_PF :: PFUnLoadHook ( FontIndex )
+{ /* adj stub */
 }
+
+
 
 // private:
-IndexedFont_Proportional_PF :: IndexedFont_Proportional_PF
-(
-	FontIndex I_Font_New,
-	PFFONT *pffont_New
-) : IndexedFont_Proportional
-	(
-		I_Font_New
-	),
-	MaxWidth_Val(0)
+// :: IndexedFont_Proportional_PF ()
+IndexedFont_Proportional_PF :: IndexedFont_Proportional_PF ( FontIndex I_Font_New, PFFONT *pffont_New ) : IndexedFont_Proportional (I_Font_New), MaxWidth_Val(0)
 {
-	/* PRECONDITION */
-	{
-		GLOBALASSERT( pffont_New );
-	}
+	GLOBALASSERT( pffont_New );
 
-	/* CODE */
-	{
-		pffont_Val = pffont_New;
+	pffont_Val = pffont_New;
 
-		// Calculate MaxWidth_Val:
-		int i=(pffont_New -> num_chars_in_font);
-		int Offset = pffont_New -> GetOffset();
+	// Calculate MaxWidth_Val:
+	int i=(pffont_New -> num_chars_in_font);
+	int Offset = pffont_New -> GetOffset();
 		
-		while (i>0)
+	while (i>0)
 		{
 			i--;
-
-			int ThisWidth = pffont_Val -> GetWidth
-			(
-				(ProjChar) (i + Offset )
-			);
+			int ThisWidth = pffont_Val->GetWidth ( (ProjChar) (i + Offset ) );
 			if ( MaxWidth_Val < ThisWidth)
 			{
 				MaxWidth_Val = ThisWidth;
 			}
 		}
-
-	}
+	
 }
 
 
 
 
-void INDEXFNT_PFLoadHook
-(
-	FontIndex I_Font_New,
-	PFFONT *pffont_New
-)
+void INDEXFNT_PFLoadHook ( FontIndex I_Font_New, PFFONT *pffont_New)
 {
-	/* PRECONDITION */
-	{
-		GLOBALASSERT( I_Font_New < IndexedFonts_MAX_NUMBER_OF_FONTS );
-		GLOBALASSERT( pffont_New );
-	}
+	GLOBALASSERT( I_Font_New < IndexedFonts_MAX_NUMBER_OF_FONTS );
+	GLOBALASSERT( pffont_New );
 
-	/* CODE */
-	{
-		IndexedFont_Proportional_PF :: PFLoadHook
-		(
-			I_Font_New,
-			pffont_New // PFFONT *pffont_New
-		);
+	IndexedFont_Proportional_PF :: PFLoadHook ( I_Font_New,	pffont_New );
 
-	}
 }
 
-
+// :: RenderString_Clipped ()
 void IndexedFont_HUD :: RenderString_Clipped
 (
 	struct r2pos& R2Pos_Cursor,
@@ -1126,34 +639,12 @@ void IndexedFont_HUD :: RenderString_Clipped
 			D3D_RenderHUDString_Clipped(pProjChar_I,R2Pos_Cursor.x,R2Pos_Cursor.y,(255<<24)+(192<<16)+(192<<8)+(192));
 		}
 		else
-		#if 0
-		{
-	  		HUDCharDesc charDesc;
-			charDesc.Y = R2Pos_Cursor . y;
-
-			charDesc.Red = 192;
-			charDesc.Green = 192;
-			charDesc.Blue = 192;
-			charDesc.Alpha= 255;
-
-			while ( *pProjChar_I )
-			{
-				const ProjChar ProjCh = *pProjChar_I;
-
-				charDesc.Character=ProjCh;
-				charDesc.X = R2Pos_Cursor . x;			
-				D3D_DrawHUDFontCharacter(&charDesc);
-		
-				R2Pos_Cursor . x += 1+GetWidth(ProjCh);
-				pProjChar_I++;
-			}
-		}
-		#else
 		D3D_RenderHUDString(pProjChar_I,R2Pos_Cursor.x,R2Pos_Cursor.y,(255<<24)+(192<<16)+(192<<8)+(192));
-		#endif
 	}
 }
 
+
+// :: RenderString_Unclipped ()
 void IndexedFont_HUD :: RenderString_Unclipped
 (
 	struct r2pos& R2Pos_Cursor,
@@ -1161,22 +652,18 @@ void IndexedFont_HUD :: RenderString_Unclipped
 	const SCString& SCStr
 ) const
 {
+/* adj * stub */
 	LOCALASSERT(0);
 }
 
 
-r2size IndexedFont_HUD :: CalcSize
-(
-	ProjChar* pProjCh
-) const
+
+// :: CalcSize ()
+r2size IndexedFont_HUD :: CalcSize ( ProjChar* pProjCh ) const
 {
 	GLOBALASSERT( pProjCh );
 
-	r2size R2Size_Return
-	(
-		0,
-		GetHeight()
-	);
+	r2size R2Size_Return ( 0, GetHeight() );
 
 	if (*pProjCh)
 	{
@@ -1184,7 +671,7 @@ r2size IndexedFont_HUD :: CalcSize
 		// construction is to take one off the final result for a non-empty string
 		do
 		{
-			R2Size_Return . w += GetWidth( *pProjCh ) + 1;
+			R2Size_Return.w += GetWidth( *pProjCh ) + 1;
 
 			pProjCh++;
 		} while (*pProjCh);
@@ -1194,49 +681,7 @@ r2size IndexedFont_HUD :: CalcSize
 
 	return R2Size_Return;
 }
-#if 0
-r2size IndexedFont_HUD :: CalcSize
-(
-	ProjChar* pProjCh,
-	int MaxChars
-) const
-{
-	GLOBALASSERT( pProjCh );
-	GLOBALASSERT( MaxChars >= 0 );
-
-	r2size R2Size_Return
-	(
-		0,
-		GetHeight()
-	);
-
-	if
-	(
-		(*pProjCh)
-		&&
-		(MaxChars>0)
-	)
-	{
-		// non-empty strings have one pixel space between characters; the if/do/while
-		// construction is to take one off the final result for a non-empty string
-		do
-		{
-			R2Size_Return . w += GetWidth( *pProjCh ) + 1;
-
-			pProjCh++;
-		} while
-		(
-			(*pProjCh)
-			&&
-			(--MaxChars>0)
-		);
-
-		R2Size_Return . w --;
-	}
-
-	return R2Size_Return;	
-}
-#endif
+// :: RenderChar_Clipped ()
 void IndexedFont_HUD :: RenderChar_Clipped
 (
 	struct r2pos& R2Pos_Cursor,
@@ -1258,7 +703,7 @@ void IndexedFont_HUD :: RenderChar_Clipped
 	D3D_DrawHUDFontCharacter(&charDesc);
 	R2Pos_Cursor . x += GetWidth(ProjCh);
 }
-
+// ::RenderChar_Unclipped ()
 void IndexedFont_HUD :: RenderChar_Unclipped
 (
 	struct r2pos& R2Pos_Cursor,
@@ -1266,71 +711,23 @@ void IndexedFont_HUD :: RenderChar_Unclipped
 	ProjChar ProjCh
 ) const
 {
-	/* PRECONDITION */
-	{
-		// Check it's already been properly clipped:
-		// (using direct calculation of char size)
-		GLOBALASSERT
-		(
-			r2rect
-			(
-				R2Pos_Cursor,
-				CalcSize( ProjCh ) 
-			) . bValidPhys()
-		);
-	}
+	// Check it's already been properly clipped:
+	// (using direct calculation of char size)
+	GLOBALASSERT ( r2rect (	R2Pos_Cursor,	CalcSize( ProjCh )  ).bValidPhys() );
 
-	/* CODE */
-	{
-			{
+	HUDCharDesc charDesc;
+	charDesc.Character=ProjCh;
+	charDesc.X = R2Pos_Cursor . x;			
+	charDesc.Y = R2Pos_Cursor . y;
 
-				HUDCharDesc charDesc;
-				charDesc.Character=ProjCh;
-				charDesc.X = R2Pos_Cursor . x;			
-				charDesc.Y = R2Pos_Cursor . y;
+	charDesc.Red = FastRandom()&255;
+	charDesc.Green = FastRandom()&255;
+	charDesc.Blue = FastRandom()&255;
+	charDesc.Alpha=255;
 
-				charDesc.Red = FastRandom()&255;
-				charDesc.Green = FastRandom()&255;
-				charDesc.Blue = FastRandom()&255;
-				charDesc.Alpha=255;
-
-				D3D_DrawHUDFontCharacter(&charDesc);
-
-				R2Pos_Cursor . x += 1+GetWidth(ProjCh);
-			}
-			#if 0
-			else
-			{
-				R2Pos_Cursor . x += GetWidth( ProjCh );
-			}
-			#endif
-	}
+	D3D_DrawHUDFontCharacter(&charDesc);
+	R2Pos_Cursor . x += 1+GetWidth(ProjCh);
+	
 }
-
-/* Internal function definitions ***********************************/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

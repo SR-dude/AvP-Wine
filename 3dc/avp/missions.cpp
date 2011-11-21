@@ -27,31 +27,11 @@ extern "C"
 	extern void MessageHistory_Add(enum TEXTSTRING_ID stringID);
 };
 
-/* Version settings ************************************************/
-
-/* Constants *******************************************************/
-
-/* Macros **********************************************************/
-
-/* Imported function prototypes ************************************/
-
-/* Imported data ***************************************************/
 #ifdef __cplusplus
 	extern "C"
 	{
 #endif
-		#if 0
-		extern OurBool			DaveDebugOn;
-		extern FDIEXTENSIONTAG	FDIET_Dummy;
-		extern IFEXTENSIONTAG	IFET_Dummy;
-		extern FDIQUAD			FDIQuad_WholeScreen;
-		extern FDIPOS			FDIPos_Origin;
-		extern FDIPOS			FDIPos_ScreenCentre;
-		extern IFOBJECTLOCATION IFObjLoc_Origin;
-		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
-		extern IFCOLOUR			IFColour_Dummy;
- 		extern IFVECTOR			IFVec_Zero;
-		#endif
+
 #ifdef __cplusplus
 	};
 #endif
@@ -59,20 +39,11 @@ extern "C"
 
 
 /* Exported globals ************************************************/
-	/*static*/ List<MissionHint*> MissionHint :: List_pMissionHint;
-	/*static*/ List<MissionObjective*> MissionObjective :: List_pMissionObjective;
+	List<MissionHint*> MissionHint :: List_pMissionHint;
+	 List<MissionObjective*> MissionObjective :: List_pMissionObjective;
 
-/* Internal type definitions ***************************************/
 
-/* Internal function prototypes ************************************/
 
-/* Internal globals ************************************************/
-
-/* Exported function definitions ***********************************/
-
-// class MissionHint
-// Friends
-// Public methods:
 MissionHint :: MissionHint
 (
 	enum TEXTSTRING_ID I_TextString_Description,
@@ -92,38 +63,7 @@ MissionHint :: ~MissionHint()
 }
 
 
-// Protected methods:
 
-// Private methods:
-
-#if 0
-// class MissionEvent
-// public:
-// protected:
-MissionEvent :: MissionEvent
-(
-	enum TEXTSTRING_ID I_TextString_TriggeringFeedback,
-	enum MissionEffects MissionFX
-) : I_TextString_TriggeringFeedback_Val
-	(
-		I_TextString_TriggeringFeedback
-	),
-	MissionFX_Val( MissionFX )
-{
-	List_pMissionEvent . add_entry(this);
-}
-
-MissionEvent :: ~MissionEvent()
-{
-	List_pMissionEvent . delete_entry(this);	
-}
-
-// private:
-#endif
-
-
-// class MissionObjective
-// public:
 extern "C"
 {
 //function for triggering mission objective that can be called from a c file
@@ -164,14 +104,12 @@ void SetMissionStateFromLoad(void* mission_objective,int state)
 
 void PrintStringTableEntryInConsole(enum TEXTSTRING_ID string_id)
 {
-	#if UseGadgets
 	SCString* pSCString = &StringTable :: GetSCString
 	(
 		string_id
 	);
 	pSCString -> SendToScreen();
 	pSCString -> R_Release();
-	#endif // UseGadgets
 	/* KJL 99/2/5 - play 'incoming message' sound */
 	switch(AvP.PlayerType)
 	{
@@ -217,14 +155,12 @@ void MissionObjective :: OnTriggering(void)
 		// Send triggering message to the screen:
 		if (I_TextString_TriggeringFeedback_Val)
 		{
-			#if UseGadgets
 			SCString* pSCString_Feedback = &StringTable :: GetSCString
 			(
 				I_TextString_TriggeringFeedback_Val
 			);
 			pSCString_Feedback -> SendToScreen();
 			pSCString_Feedback -> R_Release();
-			#endif // UseGadgets
 		}
 
 		// Any further effects? e.g. next objective appears?
@@ -257,7 +193,6 @@ void MissionObjective :: OnTriggering(void)
 					if(!PaintBallMode.IsOn)
 					{
 						AvP.LevelCompleted = 1;
-			  //		AvP.MainLoopRunning = 0;
 					}
 					break;
 				}
@@ -320,7 +255,6 @@ void MissionObjective :: MakeVisible()
 	if(has_become_visible)//send objective text to console
 	{
 		{
-			#if UseGadgets
 			SCString* pSCString_Description = &StringTable :: GetSCString
 			(
 				 I_TextString_Description_Val
@@ -329,7 +263,6 @@ void MissionObjective :: MakeVisible()
 			pSCString_Description -> SendToScreen();
 
 			pSCString_Description -> R_Release();
-			#endif // UseGadgets
 		}
 	}
 }
@@ -369,21 +302,21 @@ MissionObjective :: MissionObjective
 
 ) : aMissionHint_Incomplete
 	(
-		I_TextString_Description, // enum TEXTSTRING_ID I_TextString_Description,
+		I_TextString_Description, 
 		(
 			bVisible( MOS_New )
 			&&
 			!bComplete( MOS_New )
-		) // OurBool bVisible_New
+		) 
 	),
 	aMissionHint_Complete
 	(
-		I_TextString_TriggeringFeedback, // enum TEXTSTRING_ID I_TextString_Description,
+		I_TextString_TriggeringFeedback, 
 		(
 			bVisible( MOS_New )
 			&&
 			bComplete( MOS_New )
-		) // OurBool bVisible_New
+		) 
 	),
 	I_TextString_Description_Val( I_TextString_Description ),
 	I_TextString_TriggeringFeedback_Val( I_TextString_TriggeringFeedback ),
@@ -405,7 +338,6 @@ MissionObjective :: ~MissionObjective()
 	}
 }
 
-// private:
 void MissionObjective :: SetMOS( MissionObjectiveState MOS_New  )
 {
 	if ( MOS_Val != MOS_New )
@@ -445,60 +377,7 @@ void MissionObjective::ResetMission()
 // Suggested mission objectives for GENSHD1:
 void MissionHacks :: TestInit(void)
 {
-	#if 0
-	#if 1
-	new MissionHint
-	(
-		TEXTSTRING_LEVELMSG_001, // ProjChar* pProjCh_Description,
-		Yes // OurBool bVisible
-	);
-	#endif
-
-	new MissionObjective
-	(
-		TEXTSTRING_LEVELMSG_002,  // ProjChar* pProjCh_Description,
-		MOS_VisibleUnachieved, // enum MissionObjectiveState MOS_New,
-	
-		TEXTSTRING_LEVELMSG_003, // ProjChar* pProjCh_TriggeringFeedback,
-		MissionFX_UncoversNext // enum MissionEffects MissionFX,
-	);
-
-	new MissionObjective
-	(
-		TEXTSTRING_LEVELMSG_004, // ProjChar* pProjCh_Description,
-		MOS_HiddenUnachieved, // enum MissionObjectiveState MOS_New,
-
-		TEXTSTRING_LEVELMSG_005, // ProjChar* pProjCh_TriggeringFeedback,
-		MissionFX_UncoversNext // enum MissionEffects MissionFX,
-	);
-
-	new MissionObjective
-	(
-		TEXTSTRING_LEVELMSG_006,  // ProjChar* pProjCh_Description,
-		MOS_HiddenUnachieved, // enum MissionObjectiveState MOS_New,
-
-		TEXTSTRING_LEVELMSG_007, // ProjChar* pProjCh_TriggeringFeedback,
-		MissionFX_UncoversNext // enum MissionEffects MissionFX,
-	);
-
-	new MissionObjective
-	(
-		TEXTSTRING_LEVELMSG_008,  // ProjChar* pProjCh_Description,
-		MOS_HiddenUnachieved, // enum MissionObjectiveState MOS_New,
-
-		TEXTSTRING_LEVELMSG_009, // ProjChar* pProjCh_TriggeringFeedback,
-		MissionFX_UncoversNext // enum MissionEffects MissionFX,
-	);
-
-	new MissionObjective
-	(
-		TEXTSTRING_LEVELMSG_010,  // ProjChar* pProjCh_Description,
-		MOS_HiddenUnachieved, // enum MissionObjectiveState MOS_New,
-
-		TEXTSTRING_LEVELMSG_011, // ProjChar* pProjCh_TriggeringFeedback,
-		MissionFX_CompletesLevel // enum MissionEffects MissionFX,
-	);
-	#endif
+/*adj*/
 }
 
 void MissionObjective :: TestCompleteNext(void)
@@ -530,14 +409,12 @@ void MissionObjective :: TestCompleteNext(void)
 
 			// Feedback:
 			{
-				#if UseGadgets
 
 				SCString* pSCString_Temp = new SCString("TESTING MISSION COMPLETION HOOK:");
 
 				pSCString_Temp -> SendToScreen();
 
 				pSCString_Temp -> R_Release();
-				#endif // UseGadgets
 
 			}
 
@@ -547,14 +424,12 @@ void MissionObjective :: TestCompleteNext(void)
 		{
 			// Feedback:
 			{
-				#if UseGadgets
 
 				SCString* pSCString_Temp = new SCString("NO INCOMPLETE OBJECTIVES");
 
 				pSCString_Temp -> SendToScreen();
 
 				pSCString_Temp -> R_Release();
-				#endif // UseGadgets
 			}
 		}
 	}
@@ -563,62 +438,3 @@ void MissionObjective :: TestCompleteNext(void)
 
 
 
-/* Internal function definitions ***********************************/
-
-
-
-
-
-
-
-#if 0
-		"BACKUP POWER SYSTEM ACTIVATED", // ProjChar* pProjCh_TriggeringFeedback,
-		MissionFX_None // enum MissionEffects MissionFX,
-	);
-
-	new MissionObjective
-	(
-		"SECURITY DOORS RESTRICT ACCESS WITHIN THE COLONY.  FIND THE OPERATIONS ROOM IN THE MAIN BUILDING.  "
-		"INSIDE ARE FIVE SWITCHES.  TRIGGER ALL OF THEM TO OPEN THE SECURITY DOORS REMOTELY.  "
-			, // ProjChar* pProjCh_Description,
-		Yes, // OurBool bHidden
-
-		"SECURITY DOOR EMERGENCY OVERRIDE TRIGGERED:  DOORS HAVE BEEN OPENED.  ", // ProjChar* pProjCh_TriggeringFeedback,
-		MissionFX_None // enum MissionEffects MissionFX,
-	);
-
-	new MissionObjective
-	(
-		"MAKE YOUR WAY TO MEDLAB.  COLLECT COMPUTER ARCHIVES "
-		"DOCUMENTING THE COLONISTS WORK ON THE FACEHUGGERS.  "
-			,  // ProjChar* pProjCh_Description,
-		Yes, // OurBool bHidden
-
-		"PARTIAL MEDLAB ARCHIVE COLLECTED", // ProjChar* pProjCh_TriggeringFeedback,
-		MissionFX_None // enum MissionEffects MissionFX,
-	);
-
-	new MissionObjective
-	(
-		"THE MEDLAB ARCHIVE YOU HAVE COLLECTED IS ONLY ONE OF THREE FILES.  "
-		"WE'VE GOT A PDT READING ON THE MEDLAB OFFICER WHO WAS RESEARCHING THE FACEHUGGERS.  "
-		"IT'S COMING FROM THE BASEMENT OF THE PROCESSOR PLANT.  "
-		"SHE MIGHT BE ALIVE, BUT IT'S PROBABLY JUST HER REMAINS.  "
-		"MAKE YOUR WAY THERE AND TRY TO FIND MORE ARCHIVES.  "
-			,  // ProjChar* pProjCh_Description,
-		Yes, // OurBool bHidden
-
-		"MEDLAB ARCHIVE COLLECTED", // ProjChar* pProjCh_TriggeringFeedback,
-		MissionFX_None // enum MissionEffects MissionFX,
-	);
-
-	new MissionObjective
-	(
-		"THAT LOOKS LIKE ALL THE FILES.  "
-		"GET BACK TO THE YARD.  THE LANDING BEACON CONTROLS ARE IN A RECESS TO THE LEFT OF THE "
-		"ATMOSPHERE PROCESSOR.  ACTIVATE THE BEACON AND PREPARE FOR EVAC."
-			,  // ProjChar* pProjCh_Description,
-		Yes, // OurBool bHidden
-
-		"LANDING BEACON ACTIVATED.  STAND CLEAR AND PREPARE FOR EVAC.  ", // ProjChar* pProjCh_TriggeringFeedback,
-#endif

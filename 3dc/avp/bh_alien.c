@@ -94,12 +94,6 @@ void CastAlienBot(void) {
 	#define BOTRANGE 2000
 
 	VECTORCH position;
-	#if 0
-	if (AvP.Network!=I_No_Network) {
-		NewOnScreenMessage("NO ALIENBOTS IN MULTIPLAYER MODE");
-		return;
-	}
-	#endif
 	position=Player->ObStrategyBlock->DynPtr->Position;
 	position.vx+=MUL_FIXED(Player->ObStrategyBlock->DynPtr->OrientMat.mat31,BOTRANGE);		
 	position.vy+=MUL_FIXED(Player->ObStrategyBlock->DynPtr->OrientMat.mat32,BOTRANGE);		
@@ -114,12 +108,6 @@ void CastPredAlienBot(void) {
 	#define BOTRANGE 2000
 
 	VECTORCH position;
-	#if 0
-	if (AvP.Network!=I_No_Network) {
-		NewOnScreenMessage("NO ALIENBOTS IN MULTIPLAYER MODE");
-		return;
-	}
-	#endif
 	position=Player->ObStrategyBlock->DynPtr->Position;
 	position.vx+=MUL_FIXED(Player->ObStrategyBlock->DynPtr->OrientMat.mat31,BOTRANGE);		
 	position.vy+=MUL_FIXED(Player->ObStrategyBlock->DynPtr->OrientMat.mat32,BOTRANGE);		
@@ -134,12 +122,6 @@ void CastPraetorianBot(void) {
 	#define BOTRANGE 2000
 
 	VECTORCH position;
-	#if 0
-	if (AvP.Network!=I_No_Network) {
-		NewOnScreenMessage("NO ALIENBOTS IN MULTIPLAYER MODE");
-		return;
-	}
-	#endif
 	position=Player->ObStrategyBlock->DynPtr->Position;
 	position.vx+=MUL_FIXED(Player->ObStrategyBlock->DynPtr->OrientMat.mat31,BOTRANGE);		
 	position.vy+=MUL_FIXED(Player->ObStrategyBlock->DynPtr->OrientMat.mat32,BOTRANGE);		
@@ -394,7 +376,6 @@ NB the strategyblock passed here is a reference to the generator sb
 void CreateAlienDynamic(STRATEGYBLOCK *Generator, ALIEN_TYPE type_of_alien)
 {
 	STRATEGYBLOCK* sbPtr;
-	//int i;
 
 
 	/* create and initialise a strategy block */
@@ -1010,9 +991,6 @@ void AlienBehaviour(STRATEGYBLOCK *sbPtr)
 	if(sbPtr->SBdptr) 
 	{
 		LOCALASSERT(ModuleCurrVisArray[(sbPtr->containingModule->m_index)]);
-		#if 0/*SupportWindows95 */
-		textprint("Near Alien in module %s \n",sbPtr->containingModule->name);
-		#endif
 		NearAlienBehaviour(sbPtr);
 		Alt_NearAliens++;
 	}
@@ -1020,9 +998,6 @@ void AlienBehaviour(STRATEGYBLOCK *sbPtr)
 	{
 		/* NB if this assert fires, we may just have run out of displayblocks */
 		LOCALASSERT(ModuleCurrVisArray[(sbPtr->containingModule->m_index)] == 0);
-		#if 0/*SupportWindows95 */
-		textprint("Far Alien in module %s \n",sbPtr->containingModule->name);
-		#endif
 		FarAlienBehaviour(sbPtr);	
 		Alt_FarAliens++;
 	}
@@ -1127,7 +1102,6 @@ void MakeAlienNear(STRATEGYBLOCK *sbPtr)
 	dynPtr->LinVelocity.vz = 0;
 
 	/* initialise our sequence data */
-	//dPtr->ShapeAnimControlBlock = &alienStatusPointer->ShpAnimCtrl;
 	dPtr->HModelControlBlock=&alienStatusPointer->HModelController;
 	
 	ProveHModel(dPtr->HModelControlBlock,dPtr);
@@ -1298,15 +1272,6 @@ static void DoAlienDeathSound(STRATEGYBLOCK *sbPtr) {
 	PlayAlienSound((int)alienStatusPointer->Type,ASC_Death,0,
 		NULL,&sbPtr->DynPtr->Position);
 
-	#if 0	
-	if (AvP.Network != I_No_Network)
-	{
-		soundIndex=ActiveSounds[alienStatusPointer->soundHandle2].soundIndex;
-		if (soundIndex!=SID_NOSOUND) {
-			AddNetMsg_SpotAlienSound(soundIndex,pitch,&dynPtr->Position);
-		}
-	}
-	#endif
 
 }
 
@@ -1321,15 +1286,6 @@ extern void DoAlienLimbLossSound(VECTORCH *position) {
 /*----------------------Patrick 7/11/96-----------------------------
 Handle weapon impact on an alien
 --------------------------------------------------------------------*/
-/* KJL 11:46:43 12/17/96 - rewritten */
-
-// JB 16/6/97 rewritten
-// Patrick 29/7/97 rewritten again. again.
-// ChrisF 16/9/97 rewritten again again, again.
-// ChrisF 26/11/97 rewritten again, again, again, again.
-// ChrisF 1/4/98 rewritten again again again again again.  Okay, 'modified' then. Added directional parameter.
-// ChrisF 20/11/98 rewritten again again again again again again, added hit delta support.
-// ChrisF 15/2/99 rewritten again again again again again again again, added fragging noise.
 
 void AlienIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple, int wounds,SECTION_DATA *Section,VECTORCH *incoming, DISPLAYBLOCK *frag)
 {
@@ -1354,15 +1310,6 @@ void AlienIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple, 
 		DoAlienLimbLossSound(&sbPtr->DynPtr->Position);
 	}
 
-#if 0
-	ALIEN_STATUS_BLOCK *alienStatusPointer;
-	GLOBALASSERT(sbPtr);
-					
-	/* reduce alien health */
-	alienStatusPointer = (ALIEN_STATUS_BLOCK *)(sbPtr->SBdataptr);    
-	LOCALASSERT(alienStatusPointer);
-	if(alienStatusPointer->Health>0) (alienStatusPointer->Health) -= damage; 	
-#endif
 	/* Perhaps I'd better explain... I now handle damage
 	for you.  These functions now are only for special effects,
 	and if you need to do anything when damage happens. */
@@ -1388,7 +1335,6 @@ void AlienIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple, 
 			}
 
 		} else {
-			#if WOUNDING_SPEED_EFFECTS
 			/* Alien wounding effects? */
 			int factor;
 			int changespeed;
@@ -1427,7 +1373,6 @@ void AlienIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple, 
 
 				HModel_ChangeSpeed(&alienStatusPointer->HModelController,newspeed);
 			}
-			#endif
 			
 			/* If you got here, you should still be alive. */
 
@@ -1682,36 +1627,7 @@ void KillAlien(STRATEGYBLOCK *sbPtr,int wounds,DAMAGE_PROFILE *damage, int multi
 		this_death=GetAlienDeathSequence(&alienStatusPointer->HModelController,NULL,alienStatusPointer->Wounds,alienStatusPointer->Wounds,
 			deathtype,&facing,0,alienStatusPointer->IAmCrouched,electrical);
 
-		#if 0
-		GLOBALASSERT(this_death);
-		
-		SetAlienShapeAnimSequence_Core(sbPtr,this_death->Sequence_Type,this_death->Sub_Sequence,
-			this_death->Sequence_Length,this_death->TweeningTime);
- 
-		alienStatusPointer->NearStateTimer=ALIEN_DYINGTIME;
-		alienStatusPointer->HModelController.Looped=0;
-		alienStatusPointer->HModelController.LoopAfterTweening=0;
-		/* switch state */
-		alienStatusPointer->BehaviourState=ABS_Dying;
-
-		/* stop sound, if we have one */
-		if(alienStatusPointer->soundHandle!=SOUND_NOACTIVEINDEX) Sound_Stop(alienStatusPointer->soundHandle);				
-
-		/* stop motion */
-		LOCALASSERT(sbPtr->DynPtr);
-		sbPtr->DynPtr->Friction	= 400000;
-		sbPtr->DynPtr->LinImpulse.vx+=sbPtr->DynPtr->LinVelocity.vx;
-		sbPtr->DynPtr->LinImpulse.vy+=sbPtr->DynPtr->LinVelocity.vy;
-		sbPtr->DynPtr->LinImpulse.vz+=sbPtr->DynPtr->LinVelocity.vz;
-		sbPtr->DynPtr->LinVelocity.vx = sbPtr->DynPtr->LinVelocity.vy = sbPtr->DynPtr->LinVelocity.vz = 0;
-		sbPtr->DynPtr->IgnoreSameObjectsAsYou = 1;
-		/* Experiment... */
-		sbPtr->DynPtr->UseStandardGravity=1;
-		sbPtr->DynPtr->Mass	= 160;
-		/* Okay... */
-		#else
 		Convert_Alien_To_Corpse(sbPtr,this_death,damage);
-		#endif
 	}
 }
 
@@ -1722,14 +1638,6 @@ void Execute_Alien_Dying(STRATEGYBLOCK *sbPtr)
 	LOCALASSERT(sbPtr);
 	alienStatusPointer = (ALIEN_STATUS_BLOCK *)(sbPtr->SBdataptr);    	
 	LOCALASSERT(alienStatusPointer);
-	
-	//sbPtr->DynPtr->LinVelocity.vx = 0;
-	//sbPtr->DynPtr->LinVelocity.vy = 0;
-	//sbPtr->DynPtr->LinVelocity.vz = 0;
-
-	//sbPtr->DynPtr->LinImpulse.vx = 0;
-	//sbPtr->DynPtr->LinImpulse.vy = 0;
-	//sbPtr->DynPtr->LinImpulse.vz = 0;
 	
 	{
 		DISPLAYBLOCK *dispPtr = sbPtr->SBdptr;
@@ -2094,7 +2002,6 @@ int Alien_TargetFilter(STRATEGYBLOCK *candidate) {
 			/* Valid. */
 			return(1);
 			break;
-	#if SupportWindows95
 		case I_BehaviourNetGhost:
 			{
 				NETGHOSTDATABLOCK *dataptr;
@@ -2103,7 +2010,6 @@ int Alien_TargetFilter(STRATEGYBLOCK *candidate) {
 					case I_BehaviourMarinePlayer:
 					case I_BehaviourPredatorPlayer:
 						return(1);
-						//return(0);
 						break;
 					case I_BehaviourAlienPlayer:
 					default:
@@ -2112,7 +2018,6 @@ int Alien_TargetFilter(STRATEGYBLOCK *candidate) {
 				}
 			}
 			break;
-	#endif
 		default:
 			return(0);
 			break;
@@ -2155,29 +2060,18 @@ STRATEGYBLOCK *Alien_GetNewTarget(VECTORCH *alienpos, STRATEGYBLOCK *me) {
 		
 					if (dist<neardist) {
 						/* Check visibility? */
-						//if (candidate->SBdptr) {
 							if (!NPC_IsDead(candidate)) {
 								if ((IsModuleVisibleFromModule(dmod,candidate->containingModule))) {
 									nearest=candidate;
 									neardist=dist;
 								}	
 							}
-						//}
 					}
 				}
 			}
 		}
 	}
 
-	#if 0
-	if (nearest==NULL) {
-		if (Alien_TargetFilter(Player->ObStrategyBlock)) {
-			nearest=Player->ObStrategyBlock;
-		} else {
-			nearest=NULL; /* Erk! */
-		}
-	}
-	#endif
 	
 	return(nearest);
 
@@ -2262,8 +2156,6 @@ typedef struct alien_save_block
 	int PounceDetected;
 	int JumpDetected;
 	int EnablePounce;
-	
-
 	int incidentFlag;
 	int incidentTimer;
 
@@ -2275,22 +2167,13 @@ typedef struct alien_save_block
 	int FarStateTimer;
 	int NearStateTimer;
 	int IAmCrouched;
-
-
 	int huntingModuleIndex;
 	int currentAttackCode;
-//	NPC_MOVEMENTDATA moveData;
 	NPC_WANDERDATA wanderData;
 
-//	HMODELCONTROLLER HModelController;
-
-//	STRATEGYBLOCK* generator_sbptr;//0 unless created by a generator
-
 	char Target_SBname[SB_NAME_LENGTH];
-
 	char Generator_SBname[SB_NAME_LENGTH];
 
-	//strategyblock stuff
 	int integrity;
 	DAMAGEBLOCK SBDamageBlock;
 	DYNAMICSBLOCK dynamics;

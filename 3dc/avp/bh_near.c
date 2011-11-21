@@ -18,7 +18,6 @@
 #include "pfarlocs.h"
 #include "targeting.h"
 #include "weapons.h"
-#define UseLocalAssert Yes
 #include "ourasert.h"
 
 #include "psnd.h"
@@ -176,9 +175,6 @@ void NearAlienBehaviour(STRATEGYBLOCK *sbPtr)
 			SlackTotal+=slack;
 			SlackSize++;
 		}
-		#if 0
-		PrintDebuggingText("MaxSpeed = %d, SynthSpeed = %d, SetSpeed = %d, Slack %d\n",alienStatusPointer->MaxSpeed,synthSpeed,setSpeed,slack);
-		#endif
 	}
 
 	/* zero alien's velocity */
@@ -292,15 +288,6 @@ void NearAlienBehaviour(STRATEGYBLOCK *sbPtr)
 
 	}
 
-	#if 0
-	//now dealt with in AddPlayerAndObjectUpdateMessages
-	/*  */
-	if (AvP.Network != I_No_Network)
-	{
-		AddNetMsg_AlienAIState(sbPtr);
-	}
-	/*  */
-	#endif
 }	
 
 int GetAlienCrawlMode(STRATEGYBLOCK *sbPtr) {
@@ -454,16 +441,12 @@ void Force_Alien_Running_Sequence(STRATEGYBLOCK *sbPtr) {
 		}
 		case ((int)HMSQT_AlienStand):
 		{
-			//if (alienStatusPointer->HModelController.Sub_Sequence!=(int)ASSS_Standard) {
 				redo=1;
-			//}
 			break;
 		}
 		case ((int)HMSQT_AlienCrouch):
 		{
-			//if (alienStatusPointer->HModelController.Sub_Sequence!=(int)ACrSS_Standard) {
 				redo=1;
-			//}
 			break;
 		}
 		default:
@@ -631,15 +614,6 @@ static void DoAlienAIAttackSound(STRATEGYBLOCK *sbPtr) {
 	PlayAlienSound((int)alienStatusPointer->Type,ASC_Swipe,0,
 		NULL,&sbPtr->DynPtr->Position);
 
-	#if 0	
-	if (AvP.Network != I_No_Network)
-	{
-		soundIndex=ActiveSounds[alienStatusPointer->soundHandle2].soundIndex;
-		if (soundIndex!=SID_NOSOUND) {
-			AddNetMsg_SpotAlienSound(soundIndex,pitch,&dynPtr->Position);
-		}
-	}
-	#endif
 
 }
 
@@ -732,9 +706,6 @@ static void AlienNearDamageShell(STRATEGYBLOCK *sbPtr)
 		if (workingflags&1) {
 		
 	    	/* Do the alien attack sound */
-			#if 0 /* There are now sounds on the sequences. */
-			DoAlienAIAttackSound(sbPtr);
-			#endif
 
 			/* Oops, check range first. */
 			if (dodamage) {
@@ -835,7 +806,6 @@ static void AlienNearState_Approach(STRATEGYBLOCK *sbPtr)
 		if(VectorDistance(&(alienStatusPointer->Target->DynPtr->Position),&(dynPtr->Position)) < ALIEN_CURVETOPLAYERDIST)		  
 		{
 			curveToPlayer = 1;	
-			//targetPos = alienStatusPointer->Target->DynPtr->Position;					
 			GetTargetingPointOfObject_Far(alienStatusPointer->Target, &targetPos);
 			/* do climb on walls, etc */
 			if (AlienIsAbleToClimb(sbPtr)) {
@@ -863,7 +833,6 @@ static void AlienNearState_Approach(STRATEGYBLOCK *sbPtr)
 		/* curve to the player... */
 		/* translate target into alien's local space */
 
-		//textprint("curving alien \n");
 
 		{
 			MATRIXCH toLocalSpaceMatrix = dynPtr->OrientMat;
@@ -926,15 +895,8 @@ static void AlienNearState_Approach(STRATEGYBLOCK *sbPtr)
 						targetPos.vx,
 						distanceToTarget
 					);
-				#if 0
-				if ( (targetPos.vy < -ALIEN_ATTACKDISTANCE_MIN)
-				   &&(targetPos.vx*targetPos.vx+targetPos.vz*targetPos.vz < 2*ALIEN_ATTACKDISTANCE_MIN*ALIEN_ATTACKDISTANCE_MIN)
-				   &&(DotProduct(&dynPtr->GravityDirection,(VECTORCH*)&dynPtr->OrientMat.mat21)>64500) 
-				   &&(sbPtr->containingModule==playerPherModule))
-				#else
 				if ((dynPtr->UseStandardGravity==0)&&(sbPtr->containingModule==playerPherModule)) {
 					int dot;
-					//VECTORCH velocityDirection=dynPtr->LinVelocity;
 					VECTORCH velocityDirection;
 					GetTargetingPointOfObject_Far(alienStatusPointer->Target, &velocityDirection);
 					velocityDirection.vx -= dynPtr->Position.vx;
@@ -944,7 +906,6 @@ static void AlienNearState_Approach(STRATEGYBLOCK *sbPtr)
 					Normalise(&velocityDirection);
 					dot=DotProduct(&dynPtr->GravityDirection,&velocityDirection);
 					if (dot<-60000)
-				#endif
 				{
 					/* patrick 29/7/97: I have added the extra condition of not being in the same module as
 					the player, so that alien does not jump at entry-points */
@@ -954,9 +915,7 @@ static void AlienNearState_Approach(STRATEGYBLOCK *sbPtr)
 					dynPtr->LinImpulse.vy -= MUL_FIXED(dynPtr->GravityDirection.vy,ALIEN_JUMPVELOCITY);
 					dynPtr->LinImpulse.vz -= MUL_FIXED(dynPtr->GravityDirection.vz,ALIEN_JUMPVELOCITY);
 				}
-				#if 1
 				}
-				#endif
 			 	RotateVector(&dynPtr->LinVelocity,&dynPtr->OrientMat);
 				
 				/* align to velocity */
@@ -968,8 +927,6 @@ static void AlienNearState_Approach(STRATEGYBLOCK *sbPtr)
 	{
 		/* use standard NPC direction finding... */
 		VECTORCH velocityDirection = {0,0,0};
-
-		//textprint("non curving alien \n");
 
 		NPCGetMovementDirection(sbPtr, &velocityDirection, &targetPos,&alienStatusPointer->waypointManager);
 		if (AlienIsEncouragedToCrawl()&&(alienStatusPointer->EnableWaypoints)) {
@@ -1133,30 +1090,17 @@ static void AlienNearState_Approach(STRATEGYBLOCK *sbPtr)
 	}
 	
 	/* test here for impeding collisions, and not being able to reach target... */
-	#if ALL_NEW_AVOIDANCE_ALIEN
-	{
-		if (New_NPC_IsObstructed(sbPtr,&alienStatusPointer->avoidanceManager)) {
-			/* Go to all new avoidance. */
-			alienStatusPointer->BehaviourState = ABS_Avoidance;  		
-			alienStatusPointer->NearStateTimer = NPC_AVOIDTIME;
-			InitWaypointManager(&alienStatusPointer->waypointManager);
-			return;
-		}
-	}
-	#else
 	{
 		STRATEGYBLOCK *destructableObject = NULL;
 		NPC_OBSTRUCTIONREPORT obstruction;
 		NPC_IsObstructed(sbPtr,&(alienStatusPointer->moveData),&obstruction,&destructableObject);
 		if(obstruction.environment)
 		{
-			#if 1
 			NPC_InitMovementData(&(alienStatusPointer->moveData));
 			NPCGetAvoidanceDirection(sbPtr, &(alienStatusPointer->moveData.avoidanceDirn),&obstruction);
 			alienStatusPointer->BehaviourState = ABS_Avoidance;  		
 			alienStatusPointer->NearStateTimer = NPC_AVOIDTIME;
 			return;
-			#endif
 		} else if(obstruction.destructableObject) {
 			LOCALASSERT(destructableObject);
 			CauseDamageToObject(destructableObject,&TemplateAmmo[AMMO_ALIEN_OBSTACLE_CLEAR].MaxDamage[AvP.Difficulty], ONE_FIXED,NULL);
@@ -1182,7 +1126,6 @@ static void AlienNearState_Approach(STRATEGYBLOCK *sbPtr)
 			return;
 		}
 	}
-	#endif
 
 	/* still here?... make some noise */
 	if ((FastRandom()&127)<20) {
@@ -1201,11 +1144,8 @@ static void AlienNearState_Attack(STRATEGYBLOCK *sbPtr)
 	LOCALASSERT(alienStatusPointer);
 	LOCALASSERT(dynPtr);
 
-	/* The following should be #if 0, but I'll not check that in until the player is unclimbable. */
-	#if 1
 	/* don't climb on walls, etc */
 	dynPtr->UseStandardGravity=1;
-	#endif
 	/* Nowadays, other things can be stuck to walls... sigh. */
 
 	if (alienStatusPointer->Target==NULL) {
@@ -1239,16 +1179,6 @@ static void AlienNearState_Attack(STRATEGYBLOCK *sbPtr)
 		orientationDirn.vy -= MUL_FIXED(dot,dynPtr->GravityDirection.vy);
 		orientationDirn.vz -= MUL_FIXED(dot,dynPtr->GravityDirection.vz);
 
-		#if 0
-		{
-			VECTORCH point;
-			/* Wacky test. */
-			GetTargetingPointOfObject_Far(sbPtr,&point);
-			Normalise(&orientationDirn);
-			MakeParticle(&point,&orientationDirn,PARTICLE_PREDATOR_BLOOD);
-	
-		}
-		#endif
 
 		i = NPCOrientateToVector(sbPtr, &orientationDirn,NPC_TURNRATE,NULL);
 	}
@@ -1347,17 +1277,6 @@ static void AlienNearState_Wander(STRATEGYBLOCK *sbPtr)
 
 	/* Do something else? */
 
-	#if 0
-	if (alienStatusPointer->Mission==AM_GlobalHunt) {
-	
-		alienStatusPointer->BehaviourState = ABS_Hunt;  		
-		alienStatusPointer->NearStateTimer = 0;
-		InitWaypointManager(&alienStatusPointer->waypointManager);
-		/* no sequence change required */
-		return;
-
-	}
-	#endif
 
 	/* should we change to approach state? */
 	if(AlienHasPathToTarget(sbPtr))
@@ -1407,24 +1326,12 @@ static void AlienNearState_Wander(STRATEGYBLOCK *sbPtr)
 	NPCSetVelocity(sbPtr, &velocityDirection, alienStatusPointer->MaxSpeed);	
 
 	/* test here for impeding collisions, and not being able to reach target... */
-	#if ALL_NEW_AVOIDANCE_ALIEN
-	{
-		if (New_NPC_IsObstructed(sbPtr,&alienStatusPointer->avoidanceManager)) {
-			/* Go to all new avoidance. */
-			alienStatusPointer->BehaviourState = ABS_Avoidance;  		
-			alienStatusPointer->NearStateTimer = NPC_AVOIDTIME;
-			InitWaypointManager(&alienStatusPointer->waypointManager);
-			return;
-		}
-	}
-	#else
 	{
 		STRATEGYBLOCK *destructableObject = NULL;
 		NPC_OBSTRUCTIONREPORT obstruction;
 		NPC_IsObstructed(sbPtr,&(alienStatusPointer->moveData),&obstruction,&destructableObject);
 		if((obstruction.environment)||(obstruction.otherCharacter))
 		{
-			#if 1
 			/* go to avoidance */
 			NPC_InitMovementData(&(alienStatusPointer->moveData));
 			NPCGetAvoidanceDirection(sbPtr, &(alienStatusPointer->moveData.avoidanceDirn),&obstruction);						
@@ -1432,7 +1339,6 @@ static void AlienNearState_Wander(STRATEGYBLOCK *sbPtr)
 			alienStatusPointer->NearStateTimer = NPC_AVOIDTIME;
 			/* no sequence change required */
 			return;
-			#endif
 		}
 		if(obstruction.destructableObject)
 		{
@@ -1452,7 +1358,6 @@ static void AlienNearState_Wander(STRATEGYBLOCK *sbPtr)
 		/* no sequence change required */
 		return;
 	}
-	#endif
 }
 
 static void AlienNearState_Wait(STRATEGYBLOCK *sbPtr)
@@ -1525,24 +1430,6 @@ static void AlienNearState_Avoidance(STRATEGYBLOCK *sbPtr)
 	alienStatusPointer = (ALIEN_STATUS_BLOCK *)(sbPtr->SBdataptr);    
 	LOCALASSERT(alienStatusPointer);	          		
 		
-	#if ALL_NEW_AVOIDANCE_ALIEN
-	/* New avoidance kernel. */
-
-	/* Update sequence! */
-	AlienHandleMovingAnimation(sbPtr);
-
-	NPCSetVelocity(sbPtr, &(alienStatusPointer->avoidanceManager.avoidanceDirection), (alienStatusPointer->MaxSpeed));
-	/* Velocity CANNOT be zero, unless deliberately so! */	
-	{
-		AVOIDANCE_RETURN_CONDITION rc;
-		
-		rc=AllNewAvoidanceKernel(sbPtr,&alienStatusPointer->avoidanceManager);
-
-		if (rc!=AvRC_Avoidance) {
-			terminateState=1;
-		}
-	}
-	#else
 	/* set velocity */
 	LOCALASSERT((alienStatusPointer->moveData.avoidanceDirn.vx!=0)||
 				(alienStatusPointer->moveData.avoidanceDirn.vy!=0)||
@@ -1567,7 +1454,6 @@ static void AlienNearState_Avoidance(STRATEGYBLOCK *sbPtr)
 			terminateState = 1;
 		}
 	}
-	#endif
 	
 	if(terminateState)
 	{
@@ -1645,7 +1531,6 @@ static void AlienNearState_Retreat(STRATEGYBLOCK *sbPtr)
 		targetModule = NearNPC_GetTargetAIModuleForRetreat(sbPtr, &(alienStatusPointer->moveData));
 
 		if (targetModule) {
-			//textprint("Target module is %s\n",targetModule->name);
 			textprint("Target AI module found, %x.\n",(int)targetModule);
 		} else {
 			textprint("Target module is NULL!\n");
@@ -1664,7 +1549,6 @@ static void AlienNearState_Retreat(STRATEGYBLOCK *sbPtr)
 		
 		thisEp=GetAIModuleEP(targetModule,sbPtr->containingModule->m_aimodule);
 		if (!thisEp) {
-			//LOGDXFMT(("This assert is a busted adjacency!\nNo EP between %s and %s.",targetModule->name,sbPtr->containingModule->name));
 			LOGDXFMT(("This assert is a busted adjacency!"));
 			GLOBALASSERT(thisEp);
 		}
@@ -1682,24 +1566,12 @@ static void AlienNearState_Retreat(STRATEGYBLOCK *sbPtr)
 	NPCSetVelocity(sbPtr, &velocityDirection, alienStatusPointer->MaxSpeed);	
 
 	/* test here for impeding collisions, and not being able to reach target... */
-	#if ALL_NEW_AVOIDANCE_ALIEN
-	{
-		if (New_NPC_IsObstructed(sbPtr,&alienStatusPointer->avoidanceManager)) {
-			/* Go to all new avoidance. */
-			alienStatusPointer->BehaviourState = ABS_Avoidance;  		
-			alienStatusPointer->NearStateTimer = NPC_AVOIDTIME;
-			InitWaypointManager(&alienStatusPointer->waypointManager);
-			return;
-		}
-	}
-	#else
 	{
 		STRATEGYBLOCK *destructableObject = NULL;
 		NPC_OBSTRUCTIONREPORT obstruction;
 		NPC_IsObstructed(sbPtr,&(alienStatusPointer->moveData),&obstruction,&destructableObject);
 		if((obstruction.environment)||(obstruction.otherCharacter))
 		{
-			#if 1
 			/* go to avoidance */
 			NPC_InitMovementData(&(alienStatusPointer->moveData));
 			NPCGetAvoidanceDirection(sbPtr, &(alienStatusPointer->moveData.avoidanceDirn),&obstruction);						
@@ -1707,7 +1579,6 @@ static void AlienNearState_Retreat(STRATEGYBLOCK *sbPtr)
 			alienStatusPointer->NearStateTimer = NPC_AVOIDTIME;
 			/* no sequence change required */
 			return;
-			#endif
 		}
 		if(obstruction.destructableObject)
 		{
@@ -1727,7 +1598,6 @@ static void AlienNearState_Retreat(STRATEGYBLOCK *sbPtr)
 		/* no sequence change required */
 		return;
 	}
-	#endif
 }
 
 static void AlienNearState_Hunt(STRATEGYBLOCK *sbPtr)
@@ -1829,7 +1699,6 @@ static void AlienNearState_Hunt(STRATEGYBLOCK *sbPtr)
 		}
 
 		if (targetModule) {
-			//textprint("Target module is %s\n",targetModule->name);
 			textprint("Target AI module for hunt found, %x.\n",(int)targetModule);
 		} else {
 			textprint("Target module is NULL!\n");
@@ -1837,18 +1706,8 @@ static void AlienNearState_Hunt(STRATEGYBLOCK *sbPtr)
 
 		if (targetModule==NULL) {
 			/* Better have a handler for this. */
-			#if 0
-			alienStatusPointer->BehaviourState = ABS_Dormant;
-			alienStatusPointer->CurveTimeOut = 0;
-			if (HModelSequence_Exists(&alienStatusPointer->HModelController,HMSQT_AlienStand,ASSS_Dormant)) {
-				SetAlienShapeAnimSequence_Core(sbPtr,HMSQT_AlienStand,ASSS_Dormant,-1,ONE_FIXED);
-			} else {
-				SetAlienShapeAnimSequence_Core(sbPtr,HMSQT_AlienStand,ASSS_Standard,ONE_FIXED,(ONE_FIXED>>2));
-			}
-			#else
 			alienStatusPointer->BehaviourState = ABS_Wander;
 			alienStatusPointer->CurveTimeOut = 0;
-			#endif
 			return;
 		}
 
@@ -1881,7 +1740,6 @@ static void AlienNearState_Hunt(STRATEGYBLOCK *sbPtr)
 		thisEp=GetAIModuleEP(alienStatusPointer->huntingModule,sbPtr->containingModule->m_aimodule);
 		if (!thisEp) {
 			LOGDXFMT(("This assert is a busted adjacency!\nNo EP between %s and %s.",(*(alienStatusPointer->huntingModule->m_module_ptrs))->name,sbPtr->containingModule->name));
-			//LOGDXFMT(("This assert is a busted adjacency!"));
 			GLOBALASSERT(thisEp);
 		}
 		/* If that fired, there's a farped adjacency. */
@@ -1898,24 +1756,12 @@ static void AlienNearState_Hunt(STRATEGYBLOCK *sbPtr)
 	NPCSetVelocity(sbPtr, &velocityDirection, alienStatusPointer->MaxSpeed);	
 
 	/* test here for impeding collisions, and not being able to reach target... */
-	#if ALL_NEW_AVOIDANCE_ALIEN
-	{
-		if (New_NPC_IsObstructed(sbPtr,&alienStatusPointer->avoidanceManager)) {
-			/* Go to all new avoidance. */
-			alienStatusPointer->BehaviourState = ABS_Avoidance;  		
-			alienStatusPointer->NearStateTimer = NPC_AVOIDTIME;
-			InitWaypointManager(&alienStatusPointer->waypointManager);
-			return;
-		}
-	}
-	#else
 	{
 		STRATEGYBLOCK *destructableObject = NULL;
 		NPC_OBSTRUCTIONREPORT obstruction;
 		NPC_IsObstructed(sbPtr,&(alienStatusPointer->moveData),&obstruction,&destructableObject);
 		if((obstruction.environment)||(obstruction.otherCharacter))
 		{
-			#if 1
 			/* go to avoidance */
 			NPC_InitMovementData(&(alienStatusPointer->moveData));
 			NPCGetAvoidanceDirection(sbPtr, &(alienStatusPointer->moveData.avoidanceDirn),&obstruction);						
@@ -1923,7 +1769,6 @@ static void AlienNearState_Hunt(STRATEGYBLOCK *sbPtr)
 			alienStatusPointer->NearStateTimer = NPC_AVOIDTIME;
 			/* no sequence change required */
 			return;
-			#endif
 		}
 		if(obstruction.destructableObject)
 		{
@@ -1943,7 +1788,6 @@ static void AlienNearState_Hunt(STRATEGYBLOCK *sbPtr)
 		/* no sequence change required */
 		return;
 	}
-	#endif
 }
 
 /* Patrick 27/6/97 *********************************
@@ -1964,7 +1808,6 @@ void SetAlienShapeAnimSequence_Core(STRATEGYBLOCK *sbPtr,HMODEL_SEQUENCE_TYPES t
 	}
 
 	/* Consider wounding. */
-	#if WOUNDING_SPEED_EFFECTS
 	{
 		int factor;
 		
@@ -1975,7 +1818,6 @@ void SetAlienShapeAnimSequence_Core(STRATEGYBLOCK *sbPtr,HMODEL_SEQUENCE_TYPES t
 		}
 	
 	}
-	#endif
 
 	if (tweeningtime<=0) {
 		InitHModelSequence(&alienStatus->HModelController,(int)type,subtype,length);
@@ -2089,29 +1931,10 @@ int AlienIsAwareOfTarget(STRATEGYBLOCK *sbPtr) {
 	if (alienStatusPointer->Target==Player->ObStrategyBlock)
 	{
 		GLOBALASSERT(alienStatusPointer->Target->containingModule);
-		#if 0
-		{
-			PLAYER_STATUS *playerStatusPtr= (PLAYER_STATUS *) (Player->ObStrategyBlock->SBdataptr);
-			LOCALASSERT(playerStatusPtr);
-
-			if((playerStatusPtr->cloakOn==1)&&(playerStatusPtr->cloakPositionGivenAway==0)) {
-				return 0;
-			}
-		}
-		#endif
 		/* test for player being an alien */
 		if(AvP.PlayerType==I_Alien) {
 			return 0;
 		}
-		#if 0
-		/* Expensive path test? */
-		if (GetNextModuleForLink_Core(sbPtr->containingModule->m_aimodule,
-			alienStatusPointer->Target->containingModule->m_aimodule,4,1,1)) {
-			return(1);
-		} else {
-			return(0);
-		}
-		#endif
 	} else {
 		/* NPCs test... */
 		if (alienStatusPointer->Target==NULL) {
@@ -2120,21 +1943,12 @@ int AlienIsAwareOfTarget(STRATEGYBLOCK *sbPtr) {
 		} else {
 			GLOBALASSERT(alienStatusPointer->Target->containingModule);
 			/* Module visibility test? */
-			#if 1
 			if ((IsModuleVisibleFromModule(sbPtr->containingModule,
 				alienStatusPointer->Target->containingModule))) {
 				return(1);
 			} else {
 				return(0);
 			}
-			#else
-			if (GetNextModuleForLink_Core(sbPtr->containingModule->m_aimodule,
-				alienStatusPointer->Target->containingModule->m_aimodule,4,1,1)) {
-				return(1);
-			} else {
-				return(0);
-			}
-			#endif
 		}
 	}
 
@@ -2154,11 +1968,6 @@ int AlienHasPathToTarget(STRATEGYBLOCK *sbPtr) {
 			PLAYER_STATUS *playerStatusPtr= (PLAYER_STATUS *) (Player->ObStrategyBlock->SBdataptr);
 			LOCALASSERT(playerStatusPtr);
 
-			#if 0
-			if((playerStatusPtr->cloakOn==1)&&(playerStatusPtr->cloakPositionGivenAway==0)) {
-				return 0;
-			}
-			#endif
 		}
 		/* test for player being an alien */
 		if(AvP.PlayerType==I_Alien) {
@@ -2180,21 +1989,12 @@ int AlienHasPathToTarget(STRATEGYBLOCK *sbPtr) {
 		} else {
 			GLOBALASSERT(alienStatusPointer->Target->containingModule);
 			/* Module visibility test? */
-			#if 0
-			if ((IsModuleVisibleFromModule(sbPtr->containingModule,
-				alienStatusPointer->Target->containingModule))) {
-				return(1);
-			} else {
-				return(0);
-			}
-			#else
 			if (GetNextModuleForLink_Core(sbPtr->containingModule->m_aimodule,
 				alienStatusPointer->Target->containingModule->m_aimodule,4,1,1)) {
 				return(1);
 			} else {
 				return(0);
 			}
-			#endif
 		}
 	}
 

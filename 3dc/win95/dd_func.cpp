@@ -11,40 +11,6 @@ extern "C" {
 #include "ourasert.h"
 
 
-// for 640x480x8 experiment
-#define InterlaceExperiment No
-
-
-// In as separate define to debug because we
-// might want to leave it even in a published 
-// game.
-#define AllowReboot Yes
-
-// In as #define since there is no
-// obvious good behaviour on failure
-#define CheckForModeXInSubWindow No
-
-// Temporary hack!
-#define NoPalette No
-extern void TimeStampedMessage(char *s);
-
-// Nasty hack to try and fix non-appearance of font
-// on some machines, probably due to there not being
-// enough video memory for the font and BltFast
-// not working outside display memory.
-// According to Roxby, source colour keying won't work
-// on Blt in the Beta 3, so expect a grotty font with this on.
-// PS Source colour keying works, but the font
-// still doesn't appear on my machine in SubWindow
-// mode... Ho hum...
-#define NoBltFastOnFont No
-
-
-// Check to see if video mode is valid
-// and rewrite it if it isn't reported
-
-#define CheckVideoMode No
-
 /*
 	Globals
 */
@@ -54,9 +20,7 @@ LPDIRECTDRAWSURFACE     lpDDSPrimary;   // DirectDraw primary surface
 LPDIRECTDRAWSURFACE     lpDDSBack;      // DirectDraw back surface
 LPDIRECTDRAWSURFACE     lpDDSHiddenBack; // for system memory rendering target, stable configuration
 LPDIRECTDRAWPALETTE     lpDDPal[MaxPalettes];        // DirectDraw palette
-#if debug || PreBeta
 LPDIRECTDRAWSURFACE     lpDDDbgFont; // Debugging font, specific to current video mode
-#endif
 // For SubWindow mode
 LPDIRECTDRAWCLIPPER		lpDDClipper;
 // DirectDraw gdi surface
@@ -103,12 +67,6 @@ VIDEOMODEINFO			EngineVideoModes[] = {
 			24   // colour depth (bits per pixel) 
            };
 
-// Flag for backdrop composition
-
-// for 640x480x8 experiment
-#if InterlaceExperiment
-int oddDraw;
-#endif
 
 
 // Surface for Backdrop composition
@@ -171,9 +129,7 @@ void GenerateDirectDrawSurface()
     // Check for combination of a MODEX type mode
 	// and SubWindowing
 
-    #if AllowReboot
-	// THIS MAY NOT WORK!!!
-	  if (WindowMode == WindowModeSubWindow)
+ 	  if (WindowMode == WindowModeSubWindow)
 	    ddrval = lpDD->SetCooperativeLevel(hWndMain,
 		  DDSCL_NORMAL);
 	  else
@@ -181,29 +137,13 @@ void GenerateDirectDrawSurface()
           DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN | DDSCL_ALLOWREBOOT );
 
 	LOGDXERR(ddrval);
-	#else
-	// More stable even if crashes cannot be booted 
-	// out of?
-	if (WindowMode == WindowModeSubWindow)
-	    ddrval = lpDD->SetCooperativeLevel(hWndMain,
-		  DDSCL_NORMAL);
-	else
-  	    ddrval = lpDD->SetCooperativeLevel(hWndMain,
-          DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN | DDSCL_ALLOWMODEX);
-	LOGDXERR(ddrval);
-	#endif
 
-	TimeStampedMessage("Allow reboot thingy");
 
     if (ddrval != DD_OK)
-	#if debug
 		{
 		 ReleaseDirect3D();
 		 exit(0x2);
 	    }
-	#else
-	return;
-	#endif
 
    switch (ScreenDescriptorBlock.SDB_ScreenDepth)
       {
@@ -246,25 +186,11 @@ void GenerateDirectDrawSurface()
 		LOGDXERR(ddrval);
 
 		if (ddrval != DD_OK)
-		#if debug
 		{
 			ReleaseDirect3D();
 			exit(ddrval);
 		}
-		#else
-		{
-			if ((ddrval == DDERR_INVALIDMODE) ||
-			(ddrval == DDERR_GENERIC) ||
-			(ddrval == DDERR_INVALIDPIXELFORMAT))
-			{
-				AttemptVideoModeRestart = Yes;
-				VideoRestartMode = RestartDisplayModeNotAvailable;
-			}
-			return;
-		}
-		#endif
 	}
-	TimeStampedMessage("after SetDisplayMode");
 
 	// Create primary surface and back buffer
 	// IMPORTANT!!! Currently no support for triple
@@ -285,14 +211,10 @@ void GenerateDirectDrawSurface()
 		ddrval = lpDD->CreateSurface(&ddsd, &lpDDSPrimary, NULL);
 		LOGDXERR(ddrval);
 		if (ddrval != DD_OK)
-		#if debug
 		{
 		ReleaseDirect3D();
 		exit(0x41);
 		}
-		#else
-		return;
-		#endif
 
 		// Create back buffer
 		memset(&ddsd,0,sizeof(DDSURFACEDESC));
@@ -311,55 +233,38 @@ void GenerateDirectDrawSurface()
 		ddrval = lpDD->CreateSurface(&ddsd, &lpDDSBack, NULL);
 		LOGDXERR(ddrval);
 		if (ddrval != DD_OK)
-		#if debug
 		{
 		ReleaseDirect3D();
 		exit(0x5);
 		}
-		#else
-		return;
-		#endif
 
 		// Create clipper objects
 		ddrval = lpDD->CreateClipper(0, &lpDDClipper, NULL);
 		LOGDXERR(ddrval);
 		if (ddrval != DD_OK)
-		#if debug
 		{
 		ReleaseDirect3D();
 		exit(0x55);
 		}
-		#else
-		return;
-		#endif
 
 		ddrval = lpDDClipper->SetHWnd(0, hWndMain);
 		LOGDXERR(ddrval);
 		if (ddrval != DD_OK)
-		#if debug
 		{
 		ReleaseDirect3D();
 		exit(0x51);
 		}
-		#else
-		return;
-		#endif
 
 		ddrval = lpDDSPrimary->SetClipper(lpDDClipper);
 		LOGDXERR(ddrval);
 		if (ddrval != DD_OK)
-		#if debug
 		{
 		ReleaseDirect3D();
 		exit(0x52);
 		}
-		#else
-		return;
-		#endif
 	}
 	else // default to FullScreen... 
 	{
-		TimeStampedMessage("after 'default to FullScreen'");
 		if (DXMemoryMode == VideoMemoryPreferred)
 		{
 			ddcaps.dwSize = sizeof (ddcaps);
@@ -378,41 +283,12 @@ void GenerateDirectDrawSurface()
 
 			ddrval = lpDD->CreateSurface(&ddsd, &lpDDSPrimary, NULL);
 			LOGDXERR(ddrval);
-			TimeStampedMessage("after vm CreateSurface");
 
 			if (ddrval != DD_OK)
-			#if debug
 			{
 				ReleaseDirect3D();
 				exit(0x41);
 			}
-			#else
-			{
-				// For dubious modex emulation 
-				// problem fix and dubious driver
-				// cannot change to different bit depths
-				// fix.
-				// Note that this must be kept up to date!!!!
-				if ((ddrval == DDERR_OUTOFVIDEOMEMORY) &&
-				((VideoMode == VideoMode_DX_320x200x8) ||
-				(VideoMode == VideoMode_DX_320x200x8T) ||
-				(VideoMode == VideoMode_DX_320x240x8) ||
-				(VideoMode == VideoMode_DX_320x200x15)))
-				{
-					AttemptVideoModeRestart = Yes;
-					VideoRestartMode = RestartOutOfVidMemForPrimary;
-				}
-				else if ((ddrval == DDERR_INVALIDMODE) ||
-				(ddrval == DDERR_GENERIC) ||
-				(ddrval == DDERR_INVALIDPIXELFORMAT))
-				{
-					AttemptVideoModeRestart = Yes;
-					VideoRestartMode = RestartDisplayModeNotAvailable;
-				}
-
-				return;
-			}
-			#endif
 
 			// get a pointer to the back buffer
 			// DO I NEED TO SET A SIZE FIELD HERE??
@@ -421,17 +297,12 @@ void GenerateDirectDrawSurface()
 
 			ddrval = lpDDSPrimary->GetAttachedSurface(&ddscaps,&lpDDSBack);
 			LOGDXERR(ddrval);
-			TimeStampedMessage("after vm GetAttachedSurface");
 
 			if (ddrval != DD_OK)
-			#if debug
 			{
 			ReleaseDirect3D();
 			exit(0x5);
 			}
-			#else
-			return;
-			#endif
 			}
 			// assume we want a system memory
 			// rendering target, e.g. for MMX
@@ -456,19 +327,12 @@ void GenerateDirectDrawSurface()
 
 			ddrval = lpDD->CreateSurface(&ddsd, &lpDDSPrimary, NULL);
 			LOGDXERR(ddrval);
-			TimeStampedMessage("after vm CreateSurface");
 
 			if (ddrval != DD_OK)
-			#if debug
 			{
 				ReleaseDirect3D();
 				exit(ddrval);
 			}
-			#else
-			{
-				return;
-			}
-			#endif
 
 			// get a pointer to the back buffer
 			// Note that in this configuration the back
@@ -481,22 +345,18 @@ void GenerateDirectDrawSurface()
 			&ddscaps,
 			&lpDDSHiddenBack);
 			LOGDXERR(ddrval);
-			TimeStampedMessage("after vm GetAttachedSurface");
+
 	
 			if (ddrval != DD_OK)
-			#if debug
 			{
 				ReleaseDirect3D();
 				exit(ddrval);
 			}
-			#else
-			return;
-			#endif
 
 			// Save pixel format of primary
 			memcpy(&TempPixelFormat, &ddsd.ddpfPixelFormat, 
 			sizeof(DDPIXELFORMAT));
-			TimeStampedMessage("after memcpy 1");
+
 
 			// Create rendering target
 			memset(&ddsd,0,sizeof(DDSURFACEDESC));
@@ -508,34 +368,26 @@ void GenerateDirectDrawSurface()
 			// Ensure rendering target has same format as primary
 			memcpy(&ddsd.ddpfPixelFormat, &TempPixelFormat,
 			sizeof(DDPIXELFORMAT));
-			TimeStampedMessage("after memcpy 2");
+
 
 			// Request a 3D capable device so that
 			// Direct3D accesses will work
 			ddsd.ddsCaps.dwCaps = (DDSCAPS_OFFSCREENPLAIN | DDSCAPS_SYSTEMMEMORY | DDSCAPS_3DDEVICE);
 
 			ddrval = lpDD->CreateSurface(&ddsd, &lpDDSBack, NULL);
-			TimeStampedMessage("after CreateSurface");
 			LOGDXERR(ddrval);
 			if (ddrval != DD_OK)
-			#if debug
 			{
 				ReleaseDirect3D();
 				exit(ddrval);
 			}
-			#else
-			return;
-			#endif
 		}
 	}
 
 	// Set the Colour Palette (paletted modes only)
-	#if NoPalette
-	#else
     if (VideoModeColourDepth == 8)
 	  {
 
-		TimeStampedMessage("SHOULD NEVER GET HERE");
 
 	   if (WindowMode == WindowModeSubWindow)
 	   // Use system palette in a SubWindow case
@@ -578,14 +430,10 @@ void GenerateDirectDrawSurface()
 	LOGDXERR(ddrval);
 
           if (ddrval != DD_OK)
-	      #if debug
 		    {
 		     ReleaseDirect3D();
 	         exit(0x7);
 	        }
-	      #else
-	      return;
-	      #endif
 
           // Set palette on both buffers
           ddrval = lpDDSBack->SetPalette(lpDDPal[0]);
@@ -594,14 +442,10 @@ void GenerateDirectDrawSurface()
 	LOGDXERR(ddrval);
 
           if (ddrval != DD_OK)
-	      #if debug
 		    {
 		     ReleaseDirect3D();
 	         exit(ddrval);
 	        }
-	      #else
-	      return;
-	      #endif
 		  // Save palette in internal format for
 		  // use later
 		  // Out because it causes problems with
@@ -623,27 +467,19 @@ void GenerateDirectDrawSurface()
 								NULL);
 	LOGDXERR(ddrval);
           if (ddrval != DD_OK)
-	      #if debug
 		    {
 		     ReleaseDirect3D();
 	         exit(0x7);
 	        }
-	      #else
-	      return;
-	      #endif
 
 	      ddrval = lpDDSPrimary->SetPalette(lpDDPal[0]);
 	LOGDXERR(ddrval);
 
           if (ddrval != DD_OK)
-	      #if debug
 		    {
 		     ReleaseDirect3D();
 	         exit(0x8);
 	        }
-	      #else
-	      return;
-	      #endif
 
 // Set palette on BOTH buffers to work around
 // bug in Direct3D initialisation!!!
@@ -651,17 +487,12 @@ void GenerateDirectDrawSurface()
 	LOGDXERR(ddrval);
 
           if (ddrval != DD_OK)
-	      #if debug
 		    {
 		     ReleaseDirect3D();
 	         exit(0x8);
 	        }
-	      #else
-	      return;
-	      #endif
 	     }
       }
-    #endif // for NoPalette
 
     // Get the surface desc for AW DDSurface loads
     
@@ -670,16 +501,13 @@ void GenerateDirectDrawSurface()
     ddrval = lpDDSPrimary->GetSurfaceDesc(&ddsd);
     LOGDXERR(ddrval);
     GLOBALASSERT(DD_OK==ddrval);
-	TimeStampedMessage("after memset");
     AwSetSurfaceFormat(&ddsd);
-	TimeStampedMessage("after AwSetSurfaceFormat");
     
     // Do an initial lock and unlock on the back buffer
 	// to pull out vital information such as the 
 	// surface description
 	LockSurfaceAndGetBufferPointer();
 	UnlockSurface();
-	TimeStampedMessage("after Lock & Unlock");
 
 } 
 
@@ -691,9 +519,7 @@ void		LockSurfaceAndGetBufferPointer()
    HRESULT          ddrval;
    int count = 0;
 
-   #if optimiseblit
    while (lpDDSBack->GetBltStatus(DDGBS_ISBLTDONE) != DD_OK);
-   #endif
 
    memset(&ddsdback, 0, sizeof(ddsdback));
    ddsdback.dwSize = sizeof(ddsdback);
@@ -716,12 +542,8 @@ void		LockSurfaceAndGetBufferPointer()
 	LOGDXERR(ddrval);
 	if (ddrval != DD_OK)
 	  {
-	   #if debug
 	   ReleaseDirect3D();
 	   exit(ddrval);
-	   #else
-	   return;
-	   #endif
 	  }
 
 	/* ddsdback now contains my lpSurface)*/
@@ -742,13 +564,12 @@ void UnlockSurface(void)
 	ddrval = lpDDSBack->Unlock((LPVOID)ScreenBuffer);
 	LOGDXERR(ddrval);
 
-    #if debug
 	if (ddrval != DD_OK)
 	  {
 	   ReleaseDirect3D();
 	   exit(ddrval);
 	  }
-	#endif
+
 }
 
 void FlipBuffers(void)
@@ -784,10 +605,6 @@ void FlipBuffers(void)
 	   // we are the tumbling jongleurs...
 	   if (DXMemoryMode == VideoMemoryPreferred)
 	     {
-          #if optimiseflip
-	      while (lpDDSBack->GetFlipStatus(DDGFS_ISFLIPDONE) == DDERR_WASSTILLDRAWING)
-		      ProcessProjectWhileWaitingToBeFlippable();
-	      #endif
 
           // we are going to flip with DDFLIP_WAIT on
 	      // even if optimiseflip is set. 
@@ -816,10 +633,6 @@ void FlipBuffers(void)
 	            NULL, DDBLT_WAIT, NULL);
 
           // And now do a standard flip
-          #if optimiseflip
-	      while (lpDDSBack->GetFlipStatus(DDGFS_ISFLIPDONE) == DDERR_WASSTILLDRAWING)
-		      ProcessProjectWhileWaitingToBeFlippable();
-	      #endif
 
           // we are going to flip with DDFLIP_WAIT on
 	      // even if optimiseflip is set. 
@@ -848,9 +661,6 @@ void FlipBuffers(void)
 	
 	HandleScreenShot();
 
-    #if InterlaceExperiment
-	oddDraw ^= 1;
-	#endif
 }
 
 void InGameFlipBuffers(void)
@@ -888,10 +698,6 @@ void InGameFlipBuffers(void)
 	   // we are the tumbling jongleurs...
 	   if (DXMemoryMode == VideoMemoryPreferred)
 	     {
-          #if optimiseflip
-	      while (lpDDSBack->GetFlipStatus(DDGFS_ISFLIPDONE) == DDERR_WASSTILLDRAWING)
-		      ProcessProjectWhileWaitingToBeFlippable();
-	      #endif
 
           // we are going to flip with DDFLIP_WAIT on
 	      // even if optimiseflip is set. 
@@ -920,11 +726,6 @@ void InGameFlipBuffers(void)
 		  ddrval = lpDDSHiddenBack->Blt(NULL, lpDDSBack,
 	            NULL, DDBLT_WAIT, NULL);
 
-          // And now do a standard flip
-          #if optimiseflip
-	      while (lpDDSBack->GetFlipStatus(DDGFS_ISFLIPDONE) == DDERR_WASSTILLDRAWING)
-		      ProcessProjectWhileWaitingToBeFlippable();
-	      #endif
 
           // we are going to flip with DDFLIP_WAIT on
 	      // even if optimiseflip is set. 
@@ -953,9 +754,7 @@ void InGameFlipBuffers(void)
 	
 	HandleScreenShot();
 
-    #if InterlaceExperiment
-	oddDraw ^= 1;
-	#endif
+  
 }
 
 // As of 29/4/96, slightly later in the day,
@@ -1010,29 +809,19 @@ void ColourFillBackBuffer(int FillColour)
 	ddbltfx.dwFillColor	= FillColour;
 
 	/* lets blt a color to the surface*/
-    #if optimiseblit 
 	while (lpDDSBack->GetBltStatus(DDGBS_CANBLT) != DD_OK);
-	#endif
 
-	#if optimiseblit
 	ddrval = lpDDSBack->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_ASYNC, &ddbltfx);
 
     if (ddrval == DDERR_WASSTILLDRAWING)
 	  ddrval = lpDDSBack->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, 
 	                      &ddbltfx);
-	#else
-	ddrval = lpDDSBack->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddbltfx);
-	#endif
 
 	LOGDXERR(ddrval);
 	if (ddrval != DD_OK)
 	  {
-	   #if debug
 	   ReleaseDirect3D();
 	   exit(ddrval);
-	   #else
-	   return;
-	   #endif
 	  }
 }
 
@@ -1057,28 +846,18 @@ void ColourFillBackBufferQuad(int FillColour, int LeftX,
 	ddbltfx.dwFillColor	= FillColour;
 	
 	/* lets blt a color to the surface*/
-    #if optimiseblit 
 	while (lpDDSBack->GetBltStatus(DDGBS_CANBLT) != DD_OK);
-	#endif
 
-	#if optimiseblit
 	ddrval = lpDDSBack->Blt(&destRect, NULL, NULL, DDBLT_COLORFILL | DDBLT_ASYNC, &ddbltfx);
 
     if (ddrval == DDERR_WASSTILLDRAWING)
 	  ddrval = lpDDSBack->Blt(&destRect, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddbltfx);
-	#else
-	ddrval = lpDDSBack->Blt(&destRect, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddbltfx);
-	#endif
 
 	LOGDXERR(ddrval);
 	if (ddrval != DD_OK)
 	  {
-	   #if debug
 	   ReleaseDirect3D();
 	   exit(ddrval);
-	   #else
-	   return;
-	   #endif
 	  }
 }
 
@@ -1093,31 +872,20 @@ void BlitToBackBuffer(void* lpBackground, RECT* destRectPtr, RECT* srcRectPtr)
 {
 	HRESULT ddrval;
 
-    #if optimiseblit 
 	while (lpDDSBack->GetBltStatus(DDGBS_CANBLT) != DD_OK);
-	#endif
 
-	#if optimiseblit
 	ddrval = lpDDSBack->Blt(destRectPtr, (LPDIRECTDRAWSURFACE) lpBackground,
 	  srcRectPtr, DDBLT_ASYNC, NULL);
 
     if (ddrval == DDERR_WASSTILLDRAWING)
 	  ddrval = lpDDSBack->Blt(destRectPtr, (LPDIRECTDRAWSURFACE) lpBackground,
 	             srcRectPtr, DDBLT_WAIT, NULL);
-	#else
-	ddrval = lpDDSBack->Blt(destRectPtr, (LPDIRECTDRAWSURFACE) lpBackground,
-	  srcRectPtr, DDBLT_WAIT, NULL);
-	#endif
 
 	LOGDXERR(ddrval);
 	if (ddrval != DD_OK)
 	  {
-	   #if debug
 	   ReleaseDirect3D();
 	   exit(ddrval);
-	   #else
-	   return;
-	   #endif
 	  }
 }
 
@@ -1135,122 +903,24 @@ void BlitToBackBufferWithoutTearing(void* lpBackground, RECT* destRectPtr, RECT*
 	ddbltfx.dwSize = sizeof(ddbltfx);
 	ddbltfx.dwDDFX = DDBLTFX_NOTEARING;
 
-    #if optimiseblit 
 	while (lpDDSBack->GetBltStatus(DDGBS_CANBLT) != DD_OK);
-	#endif
 
-	#if optimiseblit
 	ddrval = lpDDSBack->Blt(destRectPtr, (LPDIRECTDRAWSURFACE) lpBackground,
 	  srcRectPtr, DDBLT_ASYNC | DDBLT_DDFX, &ddbltfx);
 
     if (ddrval == DDERR_WASSTILLDRAWING)
 	  ddrval = lpDDSBack->Blt(destRectPtr, (LPDIRECTDRAWSURFACE) lpBackground,
 	             srcRectPtr, DDBLT_WAIT | DDBLT_DDFX, &ddbltfx);
-	#else
-	ddrval = lpDDSBack->Blt(destRectPtr, (LPDIRECTDRAWSURFACE) lpBackground,
-	  srcRectPtr, DDBLT_WAIT | DDBLT_DDFX, &ddbltfx);
-	#endif
 
 	LOGDXERR(ddrval);
 	if (ddrval != DD_OK)
 	  {
-	   #if debug
 	   ReleaseDirect3D();
 	   exit(ddrval);
-	   #else
-	   return;
-	   #endif
 	  }
 }
 
-#if 0
 
-// Note Blt is used rather than BltFast because BltFast does
-// not support the DDBLTFX structure and therefore cannot accept
-// a rotated blit
-
-void RotatedBlitToBackBuffer(void* lpBackground, RECT* destRectPtr, RECT* srcRectPtr, int RollZ)
-
-{
-	HRESULT ddrval;
-	DDBLTFX ddbltfx;
-
-    memset(&ddbltfx, 0, sizeof(ddbltfx));
-	ddbltfx.dwSize = sizeof(ddbltfx);
-	ddbltfx.dwRotationAngle = RollZ;
-
-    #if optimiseblit 
-	while (lpDDSBack->GetBltStatus(DDGBS_CANBLT) != DD_OK);
-	#endif
-
-	#if optimiseblit
-	ddrval = lpDDSBack->Blt(destRectPtr, (LPDIRECTDRAWSURFACE) lpBackground,
-	  srcRectPtr, DDBLT_ASYNC | DDBLT_ROTATIONANGLE, &ddbltfx);
-
-    if (ddrval == DDERR_WASSTILLDRAWING)
-	  ddrval = lpDDSBack->Blt(destRectPtr, (LPDIRECTDRAWSURFACE) lpBackground,
-	             srcRectPtr, DDBLT_WAIT | DDBLT_ROTATIONANGLE, &ddbltfx);
-	#else
-	ddrval = lpDDSBack->Blt(destRectPtr, (LPDIRECTDRAWSURFACE) lpBackground,
-	  srcRectPtr, DDBLT_WAIT | DDBLT_ROTATIONANGLE, &ddbltfx);
-	#endif
-
-	LOGDXERR(ddrval);
-	if (ddrval != DD_OK)
-	  {
-	   #if debug
-	   ReleaseDirect3D();
-	   exit(ddrval);
-	   #else
-	   return;
-	   #endif
-	  }
-}
-
-// Note Blt is used rather than BltFast because BltFast does not
-// support DDBLTFX and therefore cannot be used to attempt to
-// prevent tearing
-
-void RotatedBlitToBackBufferWithoutTearing(void* lpBackground, RECT* destRectPtr, RECT* srcRectPtr, int RollZ)
-
-{
-	HRESULT ddrval;
-	DDBLTFX ddbltfx;
-
-    memset(&ddbltfx, 0, sizeof(ddbltfx));
-	ddbltfx.dwSize = sizeof(ddbltfx);
-	ddbltfx.dwDDFX = DDBLTFX_NOTEARING;
-	ddbltfx.dwRotationAngle = RollZ;
-
-    #if optimiseblit 
-	while (lpDDSBack->GetBltStatus(DDGBS_CANBLT) != DD_OK);
-	#endif
-
-	#if optimiseblit
-	ddrval = lpDDSBack->Blt(destRectPtr, (LPDIRECTDRAWSURFACE) lpBackground,
-	  srcRectPtr, DDBLT_ASYNC | DDBLT_DDFX | DDBLT_ROTATIONANGLE, &ddbltfx);
-
-    if (ddrval == DDERR_WASSTILLDRAWING)
-	  ddrval = lpDDSBack->Blt(destRectPtr, (LPDIRECTDRAWSURFACE) lpBackground,
-	             srcRectPtr, DDBLT_WAIT | DDBLT_DDFX | DDBLT_ROTATIONANGLE, &ddbltfx);
-	#else
-	ddrval = lpDDSBack->Blt(destRectPtr, (LPDIRECTDRAWSURFACE) lpBackground,
-	  srcRectPtr, DDBLT_WAIT | DDBLT_DDFX | DDBLT_ROTATIONANGLE, &ddbltfx);
-	#endif
-
-	LOGDXERR(ddrval);
-	if (ddrval != DD_OK)
-	  {
-	   #if debug
-	   ReleaseDirect3D();
-	   exit(ddrval);
-	   #else
-	   return;
-	   #endif
-	  }
-}
-
-#endif
 
 
 // Note x, y are assumed to be TOP LEFT of character
@@ -1273,7 +943,6 @@ void RotatedBlitToBackBufferWithoutTearing(void* lpBackground, RECT* destRectPtr
 // look right.  
 // Will have to be looked at at some stage, 'tho.
 
-#if debug || PreBeta
 void BlitWin95Char(int x, int y, unsigned char toprint)
 
 {
@@ -1283,9 +952,6 @@ void BlitWin95Char(int x, int y, unsigned char toprint)
 	int FontIndex;
 	RECT source;
     HRESULT ddrval;
-	#if NoBltFastOnFont
-	RECT destination;
-	#endif
 
 	// Check for data out of range for font
     if ((toprint < FontStart) || (toprint > FontEnd))
@@ -1308,37 +974,19 @@ void BlitWin95Char(int x, int y, unsigned char toprint)
 	source.bottom = ((FontIndex + 1) * CharHeight);
 
     // Do blit
-	#if NoBltFastOnFont
-	destination.left = x;
-	destination.top = y;
-	destination.right = (x+CharWidth);
-	destination.bottom = (y+CharHeight);
-	ddrval = lpDDSBack->Blt(&destination, lpDDDbgFont,
-	       &source, DDBLT_WAIT | DDBLT_KEYSRC, NULL);
-	#else
 	ddrval = lpDDSBack->BltFast(x, y,
 			 lpDDDbgFont, &source, 
 			 DDBLTFAST_WAIT | DDBLTFAST_SRCCOLORKEY);
-	#endif
 
 	LOGDXERR(ddrval);
     if (ddrval != DD_OK)
-	#if debug && 0
 	  {
 	   ReleaseDirect3D();
 	   exit(0x11);
 	  }
-	#else
-	 bltwin95char_ok = 0;
-	 return;
-	#endif
+
 }
 
-#else
-void BlitWin95Char(int x, int y, unsigned char toprint)
-{
-}
-#endif
 
 // IMPORTANT!!! FIXME!!!!
 
@@ -1470,12 +1118,8 @@ BOOL InitialiseDirectDrawObject(void)
 	LOGDXERR(ddrval);
 	   if (ddrval != DD_OK)
 	     {
-	      #if debug
 	      ReleaseDirect3D();
 	      exit(ddrval);
-	      #else
-	      return FALSE;
-	      #endif
 	     }
       }
 
@@ -1492,17 +1136,10 @@ BOOL InitialiseDirectDrawObject(void)
 	   LOGDXERR(ddrval);
 
        if (ddrval != DD_OK)
-	   #if debug
 	      {
 	       ReleaseDirect3D();
 	       exit(ddrval);
 	      }
-	   #else
-	      {
-	       ReleaseDirect3D(); // for safety
-	       return FALSE;
-	      }
-	   #endif
 	  }
 	else
 	{
@@ -1519,17 +1156,10 @@ BOOL InitialiseDirectDrawObject(void)
 	LOGDXERR(ddrval);
 
     if (ddrval != DD_OK)
-	#if debug
 	   {
 	    ReleaseDirect3D();
 	    exit(ddrval);
 	   }
-	#else
-	   {
-	    ReleaseDirect3D(); // for safety
-	    return FALSE;
-	   }
-	#endif
 
     // Put statistics into globals
 	TotalVideoMemory = (int) (direct_draw_caps.dwVidMemTotal);
@@ -1556,17 +1186,10 @@ BOOL InitialiseDirectDrawObject(void)
 	LOGDXERR(ddrval);
 
     if (ddrval != DD_OK)
-	#if debug
 	   {
 	    ReleaseDirect3D();
 	    exit(ddrval);
 	   }
-	#else
-	   {
-	    ReleaseDirect3D(); // for safety
-	    return FALSE;
-	   }
-	#endif
 
     // Check that the video mode asked
 	// for (initially at least in 
@@ -1588,25 +1211,8 @@ BOOL InitialiseDirectDrawObject(void)
 	// only intended for debugging and the failure
 	// case exits with an appropriate DirectDraw
 	// error anyway.
-	#if CheckVideoMode
-	if (WindowMode == WindowModeFullScreen)
-	  {
-	   if (!(CheckForVideoModes(VideoMode)))
-	     {
-	      VideoMode = VideoMode_DX_640x480x8;
-	      if (!(CheckForVideoModes(VideoMode)))
-	        {
-		     VideoMode = VideoMode_DX_640x480x15;
-		     if (!(CheckForVideoModes(VideoMode)))
-		       {
-			    ReleaseDirect3D(); // for safety
-			    return FALSE;
-			   }
-		    } 
-	     }
-	  }
-	#endif // for CheckVideoMode
 
+	// Note. Code Removed    adj 
 	return TRUE; // Successful completion
 }
 
@@ -1625,35 +1231,11 @@ static BOOL ReallyChangeDDObj(void)
 	     for this.
 	   */
 	   {
-		#if debug
 	    ReleaseDirect3D();
 	    exit(0x997798);
-		#else
-		return FALSE;
-		#endif
 	   }
 
-    /*
-		Initialise global to say whether
-		we think there is an onboard 3D 
-		acceleration card / motherboard 
-		built-in
-	*/
-	#if 0
-    TestInitD3DObject();
-
-/*
-	This is (HOPEFULLY!!) now the right
-	place to put this call.  Note that it is
-	not absolutely certain that we can do test
-	blits from DirectDraw without setting
-	a cooperative level, however... And note also
-	that MMX works better with the back buffer in
-	system memory...
-*/
-    TestMemoryAccess();
-	#endif
-	return TRUE;
+ 	return TRUE;
 }
 
 int SelectDirectDrawObject(LPGUID pGUID)
@@ -1675,17 +1257,10 @@ int SelectDirectDrawObject(LPGUID pGUID)
 	LOGDXERR(ddrval);
 
     if (ddrval != DD_OK)
-	#if debug
 	   {
 	    ReleaseDirect3D();
 	    exit(ddrval);
 	   }
-	#else
-	   {
-	    ReleaseDirect3D(); // for safety
-	    return FALSE;
-	   }
-	#endif
 
     // Put statistics into globals
 	TotalVideoMemory = (int) (direct_draw_caps.dwVidMemTotal);
@@ -1712,17 +1287,10 @@ int SelectDirectDrawObject(LPGUID pGUID)
 	LOGDXERR(ddrval);
 
     if (ddrval != DD_OK)
-	#if debug
 	   {
 	    ReleaseDirect3D();
 	    exit(ddrval);
 	   }
-	#else
-	   {
-	    ReleaseDirect3D(); // for safety
-	    return FALSE;
-	   }
-	#endif
 
     // Check that the video mode asked
 	// for (initially at least in 
@@ -1744,25 +1312,8 @@ int SelectDirectDrawObject(LPGUID pGUID)
 	// only intended for debugging and the failure
 	// case exits with an appropriate DirectDraw
 	// error anyway.
-	#if CheckVideoMode
-	if (WindowMode == WindowModeFullScreen)
-	  {
-	   if (!(CheckForVideoModes(VideoMode)))
-	     {
-	      VideoMode = VideoMode_DX_640x480x8;
-	      if (!(CheckForVideoModes(VideoMode)))
-	        {
-		     VideoMode = VideoMode_DX_640x480x15;
-		     if (!(CheckForVideoModes(VideoMode)))
-		       {
-			    ReleaseDirect3D(); // for safety
-			    return FALSE;
-			   }
-		    } 
-	     }
-	  }
-	#endif // for CheckVideoMode
 
+	// Code Removed adj
 	return TRUE; // Successful completion
 }
 
@@ -1911,9 +1462,6 @@ int ChangePalette (unsigned char* NewPalette)
 	   (VideoModeTypeScreen != VideoModeType_8T))
 	  return No;
 
-    // Check for FullScreen mode
-	// if (WindowMode != WindowModeFullScreen)
-	//  return No;
 
     // Set up number of entries to change
 	if (ScreenDescriptorBlock.SDB_Flags & SDB_Flag_222)
@@ -1957,14 +1505,10 @@ int GetAvailableVideoMemory(void)
 	LOGDXERR(ddrval);
 
   if (ddrval != DD_OK)
-  #if debug
      {
       ReleaseDirect3D();
       exit(ddrval);
      }
-  #else
-     return -1;
-  #endif
 
   return (int) (ddcaps.dwVidMemFree);
 }
@@ -2149,40 +1693,6 @@ int GetSingleColourForPrimary(int Colour)
     return(RetVal);
 }
 
-#if triplebuffer
-// NOTE TRIPLE BUFFERING SUPPORT HAS BEEN -->REMOVED<--
-// ON THE GROUNDS THAT THE SECOND BACK BUFFER TAKES UP
-// EXTRA MEMORY AND IT'S NOT GOING TO GO ANY FASTER
-// ANYWAY UNLESS YOUR VIDEO CARD FLIPS IN HARDWARE AND
-// TAKES MORE THAN ABOUT 10 MILLISECONDS TO DO IT.
-// WHICH I CERTAINLY HOPE ISN'T TRUE...
-
-// NOTE ALSO: THIS FUNCTION DOESN'T WORK! (DESPITE
-// THE DOCUMENTATION).  YOU NEED TO USE GETATTACHEDSURFACE
-// TWICE INSTEAD.  SEE ARSEWIPE CODE FOR A WORKING
-// EXAMPLE (NOTE THAT TRIPLE BUFFERING CAN BE OPTIMAL
-// IN ARSEWIPE BECAUSE IT'S 2D, AND THE TIME TO THE NEXT
-// SURFACE LOCK IN A RENDERING CYCLE CAN THUS BE MUCH LESS
-// THAN IN 3DC).
-
-// defines this function as FAR PASCAL, i.e.
-// using Windows standard parameter passing convention,
-// which will be neecessary for all callbacks
-
-HRESULT WINAPI InitTripleBuffers(LPDIRECTDRAWSURFACE lpdd, 
-	 LPDDSURFACEDESC lpsd, LPVOID lpc)
-{
-	if ((lpsd->ddsCaps.dwCaps & DDSCAPS_FLIP) &&
-	   (!(lpsd->ddsCaps.dwCaps & DDSCAPS_FRONTBUFFER))
-	   && (BackBufferEnum < MaxBackBuffers))
-	  lpDDSBack[BackBufferEnum++] = lpdd;
-
-    if (BackBufferEnum == MaxBackBuffers)
-	  return(DDENUMRET_CANCEL);
-	else
-	  return(DDENUMRET_OK);
-}
-#endif
 
 
 

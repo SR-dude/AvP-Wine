@@ -366,6 +366,7 @@ extern void SaveDeviceAndVideoModePreferences(void)
 {
 	SetDeviceAndVideoModePreferences();
 
+	/* adj */
 	FILE* file=fopen("AvP_Video.cfg","wb");
 	if(!file) return;
 	fwrite(&PreferredDeviceAndVideoMode,sizeof(DEVICEANDVIDEOMODE),1,file);

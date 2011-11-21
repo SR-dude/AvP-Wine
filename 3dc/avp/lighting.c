@@ -47,11 +47,6 @@ void AddLightingEffectToObject(DISPLAYBLOCK *objectPtr, enum LIGHTING_EFFECTS_ID
 			lightPtr->RedScale=255*256;
 			lightPtr->GreenScale=120*256;
 			lightPtr->BlueScale=0;
-			#if PSX
-			lightPtr->LightColour.r=255;
-			lightPtr->LightColour.g=120;
-			lightPtr->LightColour.b=0;
-			#endif
 
 			break;
 		}
@@ -69,11 +64,6 @@ void AddLightingEffectToObject(DISPLAYBLOCK *objectPtr, enum LIGHTING_EFFECTS_ID
 			lightPtr->RedScale=255*256;
 			lightPtr->GreenScale=120*256;
 			lightPtr->BlueScale=0;
-			#if PSX
-			lightPtr->LightColour.r=255;
-			lightPtr->LightColour.g=120;
-			lightPtr->LightColour.b=0;
-			#endif
 
 			break;
 		}
@@ -87,24 +77,10 @@ void AddLightingEffectToObject(DISPLAYBLOCK *objectPtr, enum LIGHTING_EFFECTS_ID
 			/* lightblock light type */
 			lightPtr->LightType = LightType_PerVertex;
 			/* range */
-			#if 0
-			lightPtr->LightRange = 5000; /* ? */
-
-			lightPtr->RedScale=255*256;
-			lightPtr->GreenScale=192*256;
-			lightPtr->BlueScale=128*256;
-			#else
 			lightPtr->LightRange = 10000; /* ? */
 			lightPtr->RedScale=255*256;
 			lightPtr->GreenScale=230*256;
 			lightPtr->BlueScale=200*256;
-			#endif
-			#if PSX
-			lightPtr->LightColour.r=255;
-			lightPtr->LightColour.g=192;
-			lightPtr->LightColour.b=128;
-			#endif
-
 			break;
 		}
 		case LFX_PARTICLECANNON:
@@ -121,11 +97,6 @@ void AddLightingEffectToObject(DISPLAYBLOCK *objectPtr, enum LIGHTING_EFFECTS_ID
 			lightPtr->RedScale=255*256;
 			lightPtr->GreenScale=32*256;
 			lightPtr->BlueScale=0; 
-			#if PSX
-			lightPtr->LightColour.r=255;
-			lightPtr->LightColour.g=32;
-			lightPtr->LightColour.b=0;
-			#endif
 			break;
 		}
 		case LFX_ROCKETJET:
@@ -142,12 +113,6 @@ void AddLightingEffectToObject(DISPLAYBLOCK *objectPtr, enum LIGHTING_EFFECTS_ID
 			lightPtr->RedScale=255*256;
 			lightPtr->GreenScale=255*256;
 			lightPtr->BlueScale=128*256;
-			#if PSX
-			lightPtr->LightColour.r=255;
-			lightPtr->LightColour.g=255;
-			lightPtr->LightColour.b=128;
-			#endif
-
 			break;
 		}
 		case LFX_FLARE:
@@ -164,11 +129,6 @@ void AddLightingEffectToObject(DISPLAYBLOCK *objectPtr, enum LIGHTING_EFFECTS_ID
 			lightPtr->RedScale=255*256;
 			lightPtr->GreenScale=200*256;
 			lightPtr->BlueScale=255*256;
-			#if PSX
-			lightPtr->LightColour.r=255;
-			lightPtr->LightColour.g=64;
-			lightPtr->LightColour.b=255;
-			#endif
 
 			break;
 		}
@@ -186,11 +146,6 @@ void AddLightingEffectToObject(DISPLAYBLOCK *objectPtr, enum LIGHTING_EFFECTS_ID
 			lightPtr->RedScale=255*256;
 			lightPtr->GreenScale=64*256;
 			lightPtr->BlueScale=255*256;
-			#if PSX
-			lightPtr->LightColour.r=64;
-			lightPtr->LightColour.g=64;
-			lightPtr->LightColour.b=255;
-			#endif
 
 			break;
 		}
@@ -601,16 +556,7 @@ void HandleLightElementSystem(void)
 				lightPtr->BlueScale=  ONE_FIXED;
 
 				lightElementPtr->LightBlock.LightWorld = Player->ObWorld;//RotatingLightPosition;
-//				lightElementPtr->LightBlock.LightWorld.vx += MUL_FIXED(2000,GetCos((CloakingPhase/2)&4095));  					
 				lightElementPtr->LightBlock.LightWorld.vy -= 2200;  					
-//				lightElementPtr->LightBlock.LightWorld.vz += MUL_FIXED(2000,GetSin((CloakingPhase/2)&4095));  					
-				#if 0
-				{	
-
-					VECTORCH zero = {0,0,0};
-					MakeParticle(&(lightElementPtr->LightBlock.LightWorld),&zero,PARTICLE_SPARK);	
-				}
-				#endif
 				break;
 			}
 			case LIGHTELEMENT_ALIEN_TEETH:
@@ -630,8 +576,6 @@ void HandleLightElementSystem(void)
 					/* lightblock light type */
 					lightPtr->LightType = LightType_PerVertex;
 
-					//lightPtr->RedScale=	  255*256;
-					//lightPtr->GreenScale= 120*256;
 					lightPtr->RedScale=	  255*(200+(CloakingPhase%56));
 					lightPtr->GreenScale= 120*(200+((CloakingPhase/8)%56));
 					lightPtr->BlueScale=  0;

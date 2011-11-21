@@ -45,11 +45,8 @@
  
 
 #include "paintball.h"
-/* for win 95 net support */
-#if SupportWindows95
 #include "pldghost.h"
 #include "pldnet.h"
-#endif
 
 /*KJL****************************************************************************************
 *  										G L O B A L S 	            					    *
@@ -90,7 +87,6 @@ void CalculateWhereGunIsPointing(TEMPLATE_WEAPON_DATA *twPtr, PLAYER_WEAPON_DATA
 
 	TransposeMatrixCH(&matrix);
 
-//	textprint("Calculating where gun is pointing...\n");
 
 	/* unnormalised vector in the direction	which the gun's muzzle is pointing, IN VIEW SPACE */				
 	/* very useful when considering sprites, which lie in a Z-plane in view space */
@@ -184,7 +180,6 @@ void CalculatePlayersTarget(TEMPLATE_WEAPON_DATA *twPtr, PLAYER_WEAPON_DATA *wea
 		PaintBallMode.TargetNormal = LOS_ObjectNormal;
 	}
 
-	//textprint("Exiting CPT - PT.DP is %x, PT.HMS is %x\n",PlayersTarget.DispPtr,PlayersTarget.HModelSection);
 
 	if (PlayersTarget.DispPtr) {
 		if (PlayersTarget.HModelSection) {
@@ -388,7 +383,6 @@ void SmartTarget(int speed,int projectile_speed)
 		trackedObject=NULL;
 	}
 
-//	textprint("Tracking object %x ",trackedObject);
 	{
 		int screenX;
 		int screenY;
@@ -400,24 +394,6 @@ void SmartTarget(int speed,int projectile_speed)
 			VECTORCH targetView;
 			extern VIEWDESCRIPTORBLOCK *ActiveVDBList[];
 			VIEWDESCRIPTORBLOCK *VDBPtr = ActiveVDBList[0];
-			#if 0
-			STRATEGYBLOCK *sbPtr = trackedObject->ObStrategyBlock;
-		   	int offsetX,offsetY;
-			
-			{
-			  	/* calculate offset required to aim at the middle torso rather
-				than the sprite's bollocks */
-				MATRIXCH mat;
-				int offsetMag;
-				{
-					SHAPEHEADER	*shapePtr = GetShapeData(sbPtr->SBdptr->ObShape);
-			   		offsetMag = shapePtr->shapeminy/2;
-				}
-				
-				offsetX = MUL_FIXED(trackedObject->ObMat.mat21,offsetMag);
-				offsetY = MUL_FIXED(trackedObject->ObMat.mat22,offsetMag);
-			}
-			#endif
 			/* Set targetView. */
 			SmartTarget_GetCofM(trackedObject,&targetView);
 
@@ -453,18 +429,14 @@ void SmartTarget(int speed,int projectile_speed)
 			{
 				screenX = WideMulNarrowDiv
 								(				 			
-									//trackedObject->ObView.vx,//+offsetX,
 									targetView.vx,
 									VDBPtr->VDB_ProjX,
-									//trackedObject->ObView.vz
 									targetView.vz
 								);
 			   	screenY = WideMulNarrowDiv
 			   					(
-			   						//trackedObject->ObView.vy,//+offsetY,  
 									targetView.vy*4,
 			   						VDBPtr->VDB_ProjY,	    	  
-									//trackedObject->ObView.vz
 									(targetView.vz*3)
 								);
 		  		CurrentlySmartTargetingObject=1;
@@ -919,15 +891,7 @@ int SmartTarget_TargetFilter(STRATEGYBLOCK *candidate)
 			if (NPC_IsDead(candidate)) {
 				return(0);
 			} else {
-				#if 0
-				if (NPCPredatorIsCloaked(candidate)) {
-					return(0);
-				} else {
-					return(1);
-				}
-				#else
 				return(1);
-				#endif
 			}
 			break;
 		case I_BehaviourAlien:
@@ -944,22 +908,13 @@ int SmartTarget_TargetFilter(STRATEGYBLOCK *candidate)
 				return(1);
 			}
 			break;
-	#if SupportWindows95
 		case I_BehaviourNetGhost:
 			{
 				NETGHOSTDATABLOCK *dataptr;
 				dataptr=candidate->SBdataptr;
 				switch (dataptr->type) {
 					case I_BehaviourPredatorPlayer:
-						#if 0
-						if (dataptr->CloakingEffectiveness) {
-							return(0);
-						} else {
-							return(1);
-						}
-						#else
 						return(1);
-						#endif
 						break;
 					case I_BehaviourMarinePlayer:
 					case I_BehaviourAlienPlayer:
@@ -998,7 +953,6 @@ int SmartTarget_TargetFilter(STRATEGYBLOCK *candidate)
 				}
 			}
 			break;
-	#endif
 		default:
 			return(0);
 			break;
@@ -1057,9 +1011,6 @@ void GetTargetingPointOfObject(DISPLAYBLOCK *objectPtr, VECTORCH *targetPtr)
 		/* KJL 12:23:26 15/05/98 - need to consider the player differently */
 		if (objectPtr == Player)
 		{
-			#if 0
-			*targetPtr = Global_VDB_Ptr->VDB_World;
-			#else
 			int height;
 
 			/* Let's try a little experiment. */
@@ -1077,16 +1028,9 @@ void GetTargetingPointOfObject(DISPLAYBLOCK *objectPtr, VECTORCH *targetPtr)
 			targetPtr->vx=MUL_FIXED(Player->ObStrategyBlock->DynPtr->OrientMat.mat21,height);
 			targetPtr->vy=MUL_FIXED(Player->ObStrategyBlock->DynPtr->OrientMat.mat22,height);
 			targetPtr->vz=MUL_FIXED(Player->ObStrategyBlock->DynPtr->OrientMat.mat23,height);
-			#if 0
-			targetPtr->vx+=Player->ObStrategyBlock->DynPtr->Position.vx;
-			targetPtr->vy+=Player->ObStrategyBlock->DynPtr->Position.vy;
-			targetPtr->vz+=Player->ObStrategyBlock->DynPtr->Position.vz;
-			#else
 			targetPtr->vx+=Player->ObWorld.vx;
 			targetPtr->vy+=Player->ObWorld.vy;
 			targetPtr->vz+=Player->ObWorld.vz;
-			#endif
-			#endif
 		}
 		else
 		{

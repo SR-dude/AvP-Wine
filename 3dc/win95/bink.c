@@ -28,7 +28,6 @@ void PlayBinkedFMV(char *filenamePtr)
 
 	if (!IntroOutroMoviesAreActive) return;
 
-//	if (!IntroOutroMoviesAreActive) return;
 	BinkSurfaceType = GetBinkPixelFormat();
 	
 	/* skip FMV if surface type not supported */
@@ -68,7 +67,6 @@ static int NextBinkFrame(BINK *binkHandle)
 
 	BinkCopyToBuffer(binkHandle,(void*)ScreenBuffer,640*2,480,(640-binkHandle->Width)/2,(480-binkHandle->Height)/2,BinkSurfaceType);
 
-	//BinkToBuffer(binkHandle,(640-binkHandle->Width)/2,(480-binkHandle->Height)/2,640*2,480,(void*)ScreenBuffer,GetBinkPixelFormat(&DisplayPixelFormat));
 
 	/* are we at the last frame yet? */
 	if ((binkHandle->FrameNum==(binkHandle->Frames-1))) return 0;
@@ -177,7 +175,8 @@ BINK *MenuBackground = 0;
 
 extern void StartMenuBackgroundBink(void)
 {
-	char *filenamePtr = "fmvs/menubackground.bik";//newer.bik";
+	/* adj */
+	char *filenamePtr = "fmvs/menubackground.bik";
 
 	/* open smacker file */
 	MenuBackground = BinkOpen(filenamePtr,0);

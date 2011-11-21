@@ -7,15 +7,10 @@
 	#define DB_COMMA ,
 #endif
 
-#pragma warning(disable: 4701)
 #include "awtexld.hpp"
-#pragma warning(default: 4701)
-
 #include "iff.hpp"
 #include "iff_ilbm.hpp"
-
 #include "list_tem.hpp"
-
 #include <limits.h>
 
 // conversion functors for IFF loader
@@ -104,12 +99,6 @@ class AwIffConvTransp
 			
 			Colour colAdj = pPalette[*pCol];
 			
-			#if defined(_MSC_VER) && _MSC_VER >= 1100
-				// VC5.0 gives inane warnings when += type operators
-				// are used on types smaller than int (even with
-				// explicit casting!)
-				#pragma warning(disable:4244)
-			#endif
 			if
 			(
 				   nBlueDiffUp <= nBlueDiffDown
@@ -156,12 +145,6 @@ class AwIffConvTransp
 			{
 				colAdj.g -= static_cast<unsigned char>(1<<pixelFormat.greenRightShift);
 			}
-			#if defined(_MSC_VER) && _MSC_VER == 1100
-				// VC5.0 gives inane warnings when += type operators
-				// are used on types smaller than int (even with
-				// explicit casting!)
-				#pragma warning(default:4244)
-			#endif
 			
 			return Colour::ConvNonTransp::DoConv(&colAdj);
 		}
@@ -497,11 +480,6 @@ AwBackupTexture * AwIffLoader::CreateBackupTexture()
 }
 
 // Valid file ID fields: 'FORM' 'LIST' 'CAT ' - we can load them all
-#ifdef _MSC_VER
-	// VC5.0 tries to compile out code that is in a library
-	// and it thinks isn't being used
-	#line 427
-#endif
 AWTEXLD_IMPLEMENT_DYNCREATE("FORM",AwIffLoader)
 AWTEXLD_IMPLEMENT_DYNCREATE("LIST",AwIffLoader)
 AWTEXLD_IMPLEMENT_DYNCREATE("CAT ",AwIffLoader)

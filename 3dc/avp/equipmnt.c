@@ -1,4 +1,4 @@
-/*****************************************************************************************************//*KJL*****************************************************************************
+/*KJL*****************************************************************************
 * Equipmnt.c - contains the data for all equipment that can be used in the game. *
 *                                                                                *
 *****************************************************************************KJL*/
@@ -13,7 +13,6 @@
 #include "sequnces.h"
 #include "weapons.h"
 
-#define USE_ENCUMBERANCE 0
 
 /* Weapon Functions */
 
@@ -161,11 +160,7 @@ enum WEAPON_ID MarineWeaponKey[MAX_NO_OF_WEAPON_SLOTS] = {
 	WEAPON_MARINE_PISTOL,
 	WEAPON_TWO_PISTOLS,
 	NULL_WEAPON,
-	#if 1
 	WEAPON_CUDGEL
-	#else
-	NULL_WEAPON
-	#endif
 };
 
 enum WEAPON_ID PredatorWeaponKey[MAX_NO_OF_WEAPON_SLOTS] = {
@@ -213,7 +208,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		FireNonAutomaticSecondaryAmmo, /* FireSecondaryFunction */
 		NULL,	/* WeaponInitFunction */
 		   
-	    /* TimeOutRateForState[MAX_NO_OF_WEAPON_STATES]; in 16.16 */
 		{
 			65536,							/* WEAPONSTATE_IDLE	*/
 			WEAPONSTATE_INSTANTTIMEOUT, /* WEAPONSTATE_FIRING_PRIMARY */
@@ -257,17 +251,16 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 	    /* SmartTargetRadius */
 	    0,
 		/* RestPosition; */
-		//{300,400,800},
 		{0,0,0},
 		
 		/* RecoilMaxZ; */
-		90, //0, //60,
+		90, 
 		/* RecoilMaxRandomZ; */
-		60, //0, //31,
+		60,
 		/* RecoilMaxXTilt; */
-		30, //0, //31,
+		30,
 		/* RecoilMaxYTilt; */
-		30, //0, //15,
+		30,
 
 		/* StrikePosition */
 		{0,0,0},
@@ -289,7 +282,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		/* InitialSubSequence */
 		(int)MHSS_Stationary,
 
-		#if USE_ENCUMBERANCE
 		{ /* Encum_Idle */
 			7*ONE_FIXED/8, /* MovementMultiple	*/
 			7*ONE_FIXED/8, /* TurningMultiple */
@@ -311,29 +303,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 			1, /* CanCrouch */
 			1, /* CanRun */
 		},
-		#else
-		{ /* Encum_Idle */
-			7*ONE_FIXED/8, /* MovementMultiple	*/
-			7*ONE_FIXED/8, /* TurningMultiple */
-			7*ONE_FIXED/8, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FirePrime */
-			2*ONE_FIXED/3, /* MovementMultiple	*/
-			7*ONE_FIXED/8, /* TurningMultiple */
-			2*ONE_FIXED/3, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FireSec */
-			ONE_FIXED/2, /* MovementMultiple	*/
-			7*ONE_FIXED/8, /* TurningMultiple */
-			2*ONE_FIXED/3, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		#endif		
 		/* UseStateMovement :1; */
 		0,
 		/* IsSmartTarget :1; */
@@ -385,7 +354,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		NULL, /* FireSecondaryFunction */
 		NULL,	/* WeaponInitFunction */
 
-	    /* TimeOutRateForState[MAX_NO_OF_WEAPON_STATES]; in 16.16 */
 		{
 			0,/* WEAPONSTATE_IDLE	*/
 			
@@ -464,29 +432,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		/* InitialSubSequence */
 		-1,
 
-		#if USE_ENCUMBERANCE
-		{ /* Encum_Idle */
-			ONE_FIXED, /* MovementMultiple	*/
-			ONE_FIXED, /* TurningMultiple */
-			ONE_FIXED, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FirePrime */
-			ONE_FIXED, /* MovementMultiple	*/
-			ONE_FIXED, /* TurningMultiple */
-			ONE_FIXED, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FireSec */
-			ONE_FIXED, /* MovementMultiple	*/
-			ONE_FIXED, /* TurningMultiple */
-			ONE_FIXED, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		#else
 		{ /* Encum_Idle */
 			7*ONE_FIXED/8, /* MovementMultiple	*/
 			7*ONE_FIXED/8, /* TurningMultiple */
@@ -508,7 +453,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 			1, /* CanCrouch */
 			1, /* CanRun */
 		},
-		#endif
 
 		/* UseStateMovement :1; */
 		1,
@@ -560,7 +504,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		SmartgunSecondaryFire, /* FireSecondaryFunction */
 		NULL,	/* WeaponInitFunction */
 
-	    /* TimeOutRateForState[MAX_NO_OF_WEAPON_STATES]; in 16.16 */
 		{
 			65536,/* WEAPONSTATE_IDLE	*/
 			
@@ -611,13 +554,13 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		{0,0,0},
 		
 		/* RecoilMaxZ; */
-		60, //60,
+		60,
 		/* RecoilMaxRandomZ; */
-		31, //31,
+		31,
 		/* RecoilMaxXTilt; */
-		15, //31,
+		15,
 		/* RecoilMaxYTilt; */
-		15, //15,
+		15,
 
 		/* StrikePosition */
 		{0,0,0},
@@ -639,29 +582,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		/* InitialSubSequence */
 		(int)MHSS_Stationary,
 
-		#if USE_ENCUMBERANCE
-		{ /* Encum_Idle */
-			3*ONE_FIXED/4, /* MovementMultiple	*/
-			3*ONE_FIXED/4, /* TurningMultiple */
-			3*ONE_FIXED/4, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FirePrime */
-			ONE_FIXED/2, /* MovementMultiple	*/
-			ONE_FIXED/2, /* TurningMultiple */
-			ONE_FIXED/2, /* JumpingMultiple */
-			1, /* CanCrouch */
-			0, /* CanRun */
-		},
-		{ /* Encum_FireSec */
-			3*ONE_FIXED/4, /* MovementMultiple	*/
-			3*ONE_FIXED/4, /* TurningMultiple */
-			3*ONE_FIXED/4, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		#else
 		{ /* Encum_Idle */
 			7*ONE_FIXED/8, /* MovementMultiple	*/
 			7*ONE_FIXED/8, /* TurningMultiple */
@@ -683,7 +603,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 			1, /* CanCrouch */
 			1, /* CanRun */
 		},
-		#endif
 
 		/* UseStateMovement :1; */
 		0,
@@ -735,7 +654,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		NULL, /* FireSecondaryFunction */
 		NULL,	/* WeaponInitFunction */
 
-	    /* TimeOutRateForState[MAX_NO_OF_WEAPON_STATES]; in 16.16 */
 		{
 			65536,/* WEAPONSTATE_IDLE	*/
 			
@@ -786,13 +704,13 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		{-350,0,0},
 		
 		/* RecoilMaxZ; */
-		0, //60,
+		0,
 		/* RecoilMaxRandomZ; */
-		0, //31,
+		0,
 		/* RecoilMaxXTilt; */
-		0, //31,
+		0, 
 		/* RecoilMaxYTilt; */
-		0, //15,
+		0,
 
 		/* StrikePosition */
 		{0,0,0},
@@ -814,29 +732,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		/* InitialSubSequence */
 		(int)MHSS_Stationary,
 
-		#if USE_ENCUMBERANCE
-		{ /* Encum_Idle */
-			7*ONE_FIXED/8, /* MovementMultiple	*/
-			7*ONE_FIXED/8, /* TurningMultiple */
-			7*ONE_FIXED/8, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FirePrime */
-			7*ONE_FIXED/8, /* MovementMultiple	*/
-			7*ONE_FIXED/8, /* TurningMultiple */
-			7*ONE_FIXED/8, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FireSec */
-			7*ONE_FIXED/8, /* MovementMultiple	*/
-			7*ONE_FIXED/8, /* TurningMultiple */
-			7*ONE_FIXED/8, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		#else
 		{ /* Encum_Idle */
 			7*ONE_FIXED/8, /* MovementMultiple	*/
 			7*ONE_FIXED/8, /* TurningMultiple */
@@ -858,7 +753,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 			1, /* CanCrouch */
 			1, /* CanRun */
 		},
-		#endif
 
 		/* UseStateMovement :1; */
 		0,
@@ -910,7 +804,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		NULL, /* FireSecondaryFunction */
 		NULL,	/* WeaponInitFunction */
 
-	    /* TimeOutRateForState[MAX_NO_OF_WEAPON_STATES]; in 16.16 */
 		{
 			0,/* WEAPONSTATE_IDLE	*/
 			
@@ -989,29 +882,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		/* InitialSubSequence */
 		-1,
 
-		#if USE_ENCUMBERANCE
-		{ /* Encum_Idle */
-			ONE_FIXED, /* MovementMultiple	*/
-			ONE_FIXED, /* TurningMultiple */
-			ONE_FIXED, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FirePrime */
-			ONE_FIXED, /* MovementMultiple	*/
-			ONE_FIXED, /* TurningMultiple */
-			ONE_FIXED, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FireSec */
-			ONE_FIXED, /* MovementMultiple	*/
-			ONE_FIXED, /* TurningMultiple */
-			ONE_FIXED, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		#else
 		{ /* Encum_Idle */
 			7*ONE_FIXED/8, /* MovementMultiple	*/
 			7*ONE_FIXED/8, /* TurningMultiple */
@@ -1033,7 +903,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 			1, /* CanCrouch */
 			1, /* CanRun */
 		},
-		#endif
 
 		/* UseStateMovement :1; */
 		1,
@@ -1085,7 +954,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		NULL, /* FireSecondaryFunction */
 		NULL,	/* WeaponInitFunction */
 
-	    /* TimeOutRateForState[MAX_NO_OF_WEAPON_STATES]; in 16.16 */
 		{
 			65536,/* WEAPONSTATE_IDLE	*/
 			
@@ -1136,13 +1004,13 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		{0,0,0},
 		
 		/* RecoilMaxZ; */
-		0, //200,
+		0,
 		/* RecoilMaxRandomZ; */
-		0, //0,
+		0,
 		/* RecoilMaxXTilt; */
-		0, //24,
+		0, 
 		/* RecoilMaxYTilt; */
-		0, //0,
+		0, 
 
 		/* StrikePosition */
 		{0,0,0},
@@ -1164,29 +1032,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		/* InitialSubSequence */
 		(int)MHSS_Stationary,
 
-		#if USE_ENCUMBERANCE
-		{ /* Encum_Idle */
-			7*ONE_FIXED/8, /* MovementMultiple	*/
-			7*ONE_FIXED/8, /* TurningMultiple */
-			7*ONE_FIXED/8, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FirePrime */
-			0, /* MovementMultiple	*/
-			0, /* TurningMultiple */
-			0, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FireSec */
-			7*ONE_FIXED/8, /* MovementMultiple	*/
-			7*ONE_FIXED/8, /* TurningMultiple */
-			7*ONE_FIXED/8, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		#else
 		{ /* Encum_Idle */
 			7*ONE_FIXED/8, /* MovementMultiple	*/
 			7*ONE_FIXED/8, /* TurningMultiple */
@@ -1208,7 +1053,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 			1, /* CanCrouch */
 			1, /* CanRun */
 		},
-		#endif
 		
 		/* UseStateMovement :1; */
 		0,
@@ -1260,12 +1104,11 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		GrenadeLauncherChangeAmmo, /* FireSecondaryFunction */
 		GrenadeLauncherInit,	/* WeaponInitFunction */
 
-	    /* TimeOutRateForState[MAX_NO_OF_WEAPON_STATES]; in 16.16 */
 		{
 			65536,/* WEAPONSTATE_IDLE	*/
 			
 			WEAPONSTATE_INSTANTTIMEOUT, /* WEAPONSTATE_FIRING_PRIMARY */
-		   	(65536*3)/4, // Was *6...		/* WEAPONSTATE_RECOIL_PRIMARY */
+		   	(65536*3)/4, 		/* WEAPONSTATE_RECOIL_PRIMARY */
 			(65536*3)/4,	/* WEAPONSTATE_RELOAD_PRIMARY */
 
 			WEAPONSTATE_INSTANTTIMEOUT, /* WEAPONSTATE_FIRING_SECONDARY	*/
@@ -1311,13 +1154,13 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		{0,0,0},
 		
 		/* RecoilMaxZ; */
-		0, //60,
+		0,
 		/* RecoilMaxRandomZ; */
-		0, //31,
+		0,
 		/* RecoilMaxXTilt; */
-		0, //31,
+		0, 
 		/* RecoilMaxYTilt; */
-		0, //15,
+		0,
 
 		/* StrikePosition */
 		{0,0,0},
@@ -1339,29 +1182,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		/* InitialSubSequence */
 		(int)MHSS_Stationary,
 
-		#if USE_ENCUMBERANCE
-		{ /* Encum_Idle */
-			2*ONE_FIXED/3, /* MovementMultiple	*/
-			2*ONE_FIXED/3, /* TurningMultiple */
-			2*ONE_FIXED/3, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FirePrime */
-			2*ONE_FIXED/3, /* MovementMultiple	*/
-			2*ONE_FIXED/3, /* TurningMultiple */
-			2*ONE_FIXED/3, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FireSec */
-			2*ONE_FIXED/3, /* MovementMultiple	*/
-			2*ONE_FIXED/3, /* TurningMultiple */
-			2*ONE_FIXED/3, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		#else
 		{ /* Encum_Idle */
 			7*ONE_FIXED/8, /* MovementMultiple	*/
 			7*ONE_FIXED/8, /* TurningMultiple */
@@ -1383,7 +1203,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 			1, /* CanCrouch */
 			1, /* CanRun */
 		},
-		#endif
 
 		/* UseStateMovement :1; */
 		0,
@@ -1435,7 +1254,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		NULL, /* FireSecondaryFunction */
 		NULL,	/* WeaponInitFunction */
 
-	    /* TimeOutRateForState[MAX_NO_OF_WEAPON_STATES]; in 16.16 */
 		{
 			65536,/* WEAPONSTATE_IDLE	*/
 			
@@ -1474,7 +1292,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		/* ProbabilityOfJamming; */
 	    32,
 	    /* FiringRate;	*/
-	    //60*65536,
 	    100*65536,
 	    
 		/* SmartTargetSpeed; signed int, how fast the crosshair moves. */
@@ -1487,14 +1304,13 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		{0,0,0},
 
 		/* RecoilMaxZ; */
-		60, //60, //0,
+		60,
 		/* RecoilMaxRandomZ; */
-		31, //31, //0,
+		31, 
 		/* RecoilMaxXTilt; */
-		31, //31, //31, //0,
+		31,
 		/* RecoilMaxYTilt; */
-		31, //15, //15, //0,
-
+		31, 
 		/* StrikePosition */
 		{0,0,0},
 
@@ -1515,29 +1331,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		/* InitialSubSequence */
 		(int)MHSS_Stationary,
 		
-		#if USE_ENCUMBERANCE
-		{ /* Encum_Idle */
-			2*ONE_FIXED/3, /* MovementMultiple	*/
-			2*ONE_FIXED/3, /* TurningMultiple */
-			2*ONE_FIXED/3, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FirePrime */
-			0, /* MovementMultiple	*/
-			2*ONE_FIXED/3, /* TurningMultiple */
-			0, /* JumpingMultiple */
-			1, /* CanCrouch */
-			0, /* CanRun */
-		},
-		{ /* Encum_FireSec */
-			ONE_FIXED, /* MovementMultiple	*/
-			ONE_FIXED, /* TurningMultiple */
-			ONE_FIXED, /* JumpingMultiple */
-			1, /* CanCrouch */
-			0, /* CanRun */
-		},
-		#else
 		{ /* Encum_Idle */
 			7*ONE_FIXED/8, /* MovementMultiple	*/
 			7*ONE_FIXED/8, /* TurningMultiple */
@@ -1546,17 +1339,9 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 			1, /* CanRun */
 		},
 		{ /* Encum_FirePrime */
-			#if FORCE_MINIGUN_STOP
 			0, 			   /* MovementMultiple	*/
-			#else
-			2*ONE_FIXED/3, /* MovementMultiple	*/
-			#endif
 			7*ONE_FIXED/8, /* TurningMultiple */
-			#if FORCE_MINIGUN_STOP
 			0, 			   /* JumpingMultiple */
-			#else
-			2*ONE_FIXED/3, /* JumpingMultiple */
-			#endif
 			1, /* CanCrouch */
 			1, /* CanRun */
 		},
@@ -1567,7 +1352,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 			1, /* CanCrouch */
 			1, /* CanRun */
 		},
-		#endif
 
 		/* UseStateMovement :1; */
 		1,
@@ -1619,7 +1403,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		NULL, /* FireSecondaryFunction */
 		NULL,	/* WeaponInitFunction */
 
-	    /* TimeOutRateForState[MAX_NO_OF_WEAPON_STATES]; in 16.16 */
 		{
 			0,/* WEAPONSTATE_IDLE	*/
 			
@@ -1670,13 +1453,13 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		{0,0,0},
 
 		/* RecoilMaxZ; */
-		0, //60,
+		0,
 		/* RecoilMaxRandomZ; */
-		0, //31,
+		0,
 		/* RecoilMaxXTilt; */
-		0, //31,
+		0,
 		/* RecoilMaxYTilt; */
-		0, //15,
+		0,
 
 		/* StrikePosition */
 		{0,0,0},
@@ -1697,29 +1480,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		/* InitialSubSequence */
 		-1,
 		
-		#if USE_ENCUMBERANCE
-		{ /* Encum_Idle */
-			ONE_FIXED, /* MovementMultiple	*/
-			ONE_FIXED, /* TurningMultiple */
-			ONE_FIXED, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FirePrime */
-			ONE_FIXED, /* MovementMultiple	*/
-			ONE_FIXED, /* TurningMultiple */
-			ONE_FIXED, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FireSec */
-			ONE_FIXED, /* MovementMultiple	*/
-			ONE_FIXED, /* TurningMultiple */
-			ONE_FIXED, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		#else
 		{ /* Encum_Idle */
 			7*ONE_FIXED/8, /* MovementMultiple	*/
 			7*ONE_FIXED/8, /* TurningMultiple */
@@ -1741,7 +1501,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 			1, /* CanCrouch */
 			1, /* CanRun */
 		},
-		#endif
 
 		/* UseStateMovement :1; */
 		1,
@@ -1793,7 +1552,7 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		NULL, /* FireSecondaryFunction */
 		NULL,	/* WeaponInitFunction */
 
-	    /* TimeOutRateForState[MAX_NO_OF_WEAPON_STATES]; in 16.16 */
+	    
 		{
 			0,/* WEAPONSTATE_IDLE	*/
 			
@@ -1833,7 +1592,7 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 	    32,
 	    /* FiringRate;	*/
 	    1000*65536/60,
-//	    40*65536,
+
 	    
 		/* SmartTargetSpeed; signed int, how fast the crosshair moves. */
 		4,
@@ -1873,29 +1632,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		/* InitialSubSequence */
 		-1,
 		
-		#if USE_ENCUMBERANCE
-		{ /* Encum_Idle */
-			2*ONE_FIXED/3, /* MovementMultiple	*/
-			2*ONE_FIXED/3, /* TurningMultiple */
-			2*ONE_FIXED/3, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FirePrime */
-			2*ONE_FIXED/3, /* MovementMultiple	*/
-			2*ONE_FIXED/3, /* TurningMultiple */
-			2*ONE_FIXED/3, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FireSec */
-			2*ONE_FIXED/3, /* MovementMultiple	*/
-			2*ONE_FIXED/3, /* TurningMultiple */
-			2*ONE_FIXED/3, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		#else
 		{ /* Encum_Idle */
 			7*ONE_FIXED/8, /* MovementMultiple	*/
 			7*ONE_FIXED/8, /* TurningMultiple */
@@ -1917,7 +1653,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 			1, /* CanCrouch */
 			1, /* CanRun */
 		},
-		#endif
 
 		/* UseStateMovement :1; */
 		1,
@@ -1969,7 +1704,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		NULL, /* FireSecondaryFunction */
 		NULL,	/* WeaponInitFunction */
 
-	    /* TimeOutRateForState[MAX_NO_OF_WEAPON_STATES]; in 16.16 */
 		{
 			0,/* WEAPONSTATE_IDLE	*/
 			
@@ -2047,29 +1781,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		/* InitialSubSequence */
 		-1,
 		
-		#if USE_ENCUMBERANCE
-		{ /* Encum_Idle */
-			ONE_FIXED, /* MovementMultiple	*/
-			ONE_FIXED, /* TurningMultiple */
-			ONE_FIXED, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FirePrime */
-			ONE_FIXED, /* MovementMultiple	*/
-			ONE_FIXED, /* TurningMultiple */
-			ONE_FIXED, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FireSec */
-			ONE_FIXED, /* MovementMultiple	*/
-			ONE_FIXED, /* TurningMultiple */
-			ONE_FIXED, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		#else
 		{ /* Encum_Idle */
 			7*ONE_FIXED/8, /* MovementMultiple	*/
 			7*ONE_FIXED/8, /* TurningMultiple */
@@ -2091,7 +1802,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 			1, /* CanCrouch */
 			1, /* CanRun */
 		},
-		#endif
 
 		/* UseStateMovement :1; */
 		1,
@@ -2154,7 +1864,7 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		NULL, /* FireSecondaryFunction */
 		NULL,	/* WeaponInitFunction */
 
-	    /* TimeOutRateForState[MAX_NO_OF_WEAPON_STATES]; in 16.16 */
+	    
 		{
 			65536,/* WEAPONSTATE_IDLE	*/
 			
@@ -2205,13 +1915,13 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		{0,0,0},
 
 		/* RecoilMaxZ; */
-		0, //-1024,
+		0, 
 		/* RecoilMaxRandomZ; */
-		0, //0,
+		0, 
 		/* RecoilMaxXTilt; */
-		0, //0,
+		0,
 		/* RecoilMaxYTilt; */
-		0, //0,
+		0, 
 
 		/* StrikePosition */
 		{300,350,0},
@@ -2302,13 +2012,11 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		/* SecondaryAmmoID; */
 		AMMO_PRED_PISTOL,
 		   
-		//FirePredPistol, /* FirePrimaryFunction */
 		PredPistolSecondaryFire, /* FirePrimaryFunction */
 		NULL, /* FireSecondaryFunction */
-		//PlayerFirePredPistolFlechettes, /* FireSecondaryFunction */
 		NULL,	/* WeaponInitFunction */
 
-	    /* TimeOutRateForState[MAX_NO_OF_WEAPON_STATES]; in 16.16 */
+	    
 		{
 			65536,/* WEAPONSTATE_IDLE	*/
 			
@@ -2354,18 +2062,18 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 	    /* GunCrosshairSpeed;  integer, how fast the gun moves. */
 	    160,
 	    /* SmartTargetRadius in pixels */
-	    0, //55000,
+	    0, 
 		/* RestPosition; */
 		{0,0,0},
 		
 		/* RecoilMaxZ; */
-		0, //31,
+		0,
 		/* RecoilMaxRandomZ; */
-		0, //15,
+		0, 
 		/* RecoilMaxXTilt; */
-		0, //15,
+		0,
 		/* RecoilMaxYTilt; */
-		0, //7,
+		0, 
 
 		/* StrikePosition */
 		{0,0,0},
@@ -2384,10 +2092,8 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		"pistol",
 		/* InitialSequenceType */
 		(int)HMSQT_PredatorHUD,
-		//-1,
 		/* InitialSubSequence */
 		(int)PHSS_Stand,
-		//-1,
 
 		{ /* Encum_Idle */
 			ONE_FIXED, /* MovementMultiple	*/
@@ -2461,16 +2167,11 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		NULL, /* FireSecondaryFunction */
 		NULL,	/* WeaponInitFunction */
 
-	    /* TimeOutRateForState[MAX_NO_OF_WEAPON_STATES]; in 16.16 */
+	    
 		{
 			65536,/* WEAPONSTATE_IDLE	*/
-			#if 0
-			65536*2,					/* WEAPONSTATE_FIRING_PRIMARY */
-		   	WEAPONSTATE_INSTANTTIMEOUT,	/* WEAPONSTATE_RECOIL_PRIMARY */
-			#else
 		   	WEAPONSTATE_INSTANTTIMEOUT,	/* WEAPONSTATE_FIRING_PRIMARY */
 			65536*2,					/* WEAPONSTATE_RECOIL_PRIMARY */
-			#endif
 			65536*4,					/* WEAPONSTATE_RELOAD_PRIMARY */
 
 			WEAPONSTATE_INSTANTTIMEOUT, /* WEAPONSTATE_FIRING_SECONDARY	*/
@@ -2488,13 +2189,8 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		},
 		{
 			GenericPredatorWeapon_Idle,  /* WEAPONSTATE_IDLE	*/
-			#if 0
-			GenericPredatorWeapon_Firing,  /* WEAPONSTATE_FIRING_PRIMARY */
-			GenericPredatorWeapon_Idle,  /* WEAPONSTATE_RECOIL_PRIMARY */
-			#else
 			GenericPredatorWeapon_Idle,  /* WEAPONSTATE_FIRING_PRIMARY */
 			SpearGun_Recoil,  /* WEAPONSTATE_RECOIL_PRIMARY */
-			#endif
 			GenericPredatorWeapon_Reload,  /* WEAPONSTATE_RELOAD_PRIMARY */
 			GenericPredatorWeapon_Idle,  /* WEAPONSTATE_FIRING_SECONDARY	*/
 			GenericPredatorWeapon_Idle,  /* WEAPONSTATE_RECOIL_SECONDARY	*/
@@ -2521,13 +2217,13 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		{0,0,0},
 		
 		/* RecoilMaxZ; */
-		0, //80,
+		0, 
 		/* RecoilMaxRandomZ; */
-		0, //31,
+		0, 
 		/* RecoilMaxXTilt; */
-		0, //31,	//-31?
+		0, 
 		/* RecoilMaxYTilt; */
-		0, //15,
+		0,
 
 		/* StrikePosition */
 		{0,0,0},
@@ -2615,12 +2311,11 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		/* SecondaryAmmoID; */
 		AMMO_NONE,
 		   
-		//FirePCPlasmaCaster, /* FirePrimaryFunction */
 		SecondaryFirePCPlasmaCaster, /* FirePrimaryFunction */
 		SecondaryFirePCPlasmaCaster, /* FireSecondaryFunction */
 		NULL,	/* WeaponInitFunction */
 
-	    /* TimeOutRateForState[MAX_NO_OF_WEAPON_STATES]; in 16.16 */
+	    
 		{
 			65536,/* WEAPONSTATE_IDLE	*/
 			
@@ -2643,7 +2338,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		},
 		{
 			PlasmaCaster_Idle,  /* WEAPONSTATE_IDLE	*/
-			//WristConsole_Use,  /* WEAPONSTATE_FIRING_PRIMARY */
 			PlasmaCaster_Idle,  /* WEAPONSTATE_FIRING_PRIMARY */
 			PlasmaCaster_Recoil,  /* WEAPONSTATE_RECOIL_PRIMARY */
 			PlasmaCaster_Idle,  /* WEAPONSTATE_RELOAD_PRIMARY */
@@ -2672,13 +2366,13 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		{0,0,0},
 		
 		/* RecoilMaxZ; */
-		0, //-1024,
+		0, 
 		/* RecoilMaxRandomZ; */
-		0, //0,
+		0, 
 		/* RecoilMaxXTilt; */
-		0, //0,
+		0, 
 		/* RecoilMaxYTilt; */
-		0, //0,
+		0, 
 
 		/* StrikePosition */
 		{300,350,0},
@@ -2725,9 +2419,9 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		/* IsSmartTarget :1; */
 		1,
 		/* PrimaryIsRapidFire   :1; */   
-		1, //0
+		1, 
 		/* PrimaryIsAutomatic	:1; */
-		1, //0
+		1,
 		/* PrimaryIsMeleeWeapon :1; */
 		0,  
 		/* SecondaryIsRapidFire   :1; */   
@@ -2771,7 +2465,7 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		NULL, 	/* FireSecondaryFunction */
 		NULL,	/* WeaponInitFunction */
 
-	    /* TimeOutRateForState[MAX_NO_OF_WEAPON_STATES]; in 16.16 */
+	    
 		{
 			65536,/* WEAPONSTATE_IDLE	*/
 			
@@ -2822,13 +2516,13 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		{0,0,0},
 
 		/* RecoilMaxZ; */
-		0, //-1024,
+		0, 
 		/* RecoilMaxRandomZ; */
-		0, //0,
+		0,
 		/* RecoilMaxXTilt; */
-		0, //0,
+		0,
 		/* RecoilMaxYTilt; */
-		0, //0,
+		0,
 
 		/* StrikePosition */
 		{300,350,0},
@@ -2921,12 +2615,11 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		FireExtinguisher, /* FireSecondaryFunction */
 		NULL,	/* WeaponInitFunction */
 
-	    /* TimeOutRateForState[MAX_NO_OF_WEAPON_STATES]; in 16.16 */
+	    
 		{
 			65536,/* WEAPONSTATE_IDLE	*/
 			
 			65536>>2, /* WEAPONSTATE_FIRING_PRIMARY */
-			//65536*2, 					/* WEAPONSTATE_FIRING_PRIMARY */
 		   	WEAPONSTATE_INSTANTTIMEOUT,	/* WEAPONSTATE_RECOIL_PRIMARY */
 			WEAPONSTATE_INSTANTTIMEOUT,	/* WEAPONSTATE_RELOAD_PRIMARY */
 
@@ -2973,13 +2666,13 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		{0,0,0},
 		
 		/* RecoilMaxZ; */
-		0, //-1024,
+		0, 
 		/* RecoilMaxRandomZ; */
-		0, //0,
+		0, 
 		/* RecoilMaxXTilt; */
-		0, //0,
+		0, 
 		/* RecoilMaxYTilt; */
-		0, //0,
+		0,
 
 		/* StrikePosition */
 		{300,350,0},
@@ -3071,7 +2764,7 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		NULL, /* FireSecondaryFunction */
 		NULL,	/* WeaponInitFunction */
 
-	    /* TimeOutRateForState[MAX_NO_OF_WEAPON_STATES]; in 16.16 */
+	    
 		{
 			65536,/* WEAPONSTATE_IDLE	*/
 			
@@ -3122,13 +2815,13 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		{0,0,0},
 
 		/* RecoilMaxZ; */
-		0, //-1024,
+		0,
 		/* RecoilMaxRandomZ; */
-		0, //0,
+		0, 
 		/* RecoilMaxXTilt; */
-		0, //0,
+		0, 
 		/* RecoilMaxYTilt; */
-		0, //0,
+		0,
 
 		/* StrikePosition */
 		{300,350,0},
@@ -3219,18 +2912,15 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		/* SecondaryAmmoID; */
 		AMMO_ALIEN_TAIL,
 		   
-		//MeleeWeapon_180Degree_Front, /* FirePrimaryFunction */
 		NULL, /* FirePrimaryFunction */
 		NULL, /* FireSecondaryFunction */
 		NULL,	/* WeaponInitFunction */
 
-	    /* TimeOutRateForState[MAX_NO_OF_WEAPON_STATES]; in 16.16 */
+	    
 		{
 			0,/* WEAPONSTATE_IDLE	*/
 			
-			//65536*4, /* WEAPONSTATE_FIRING_PRIMARY */
 			65536*6, /* WEAPONSTATE_FIRING_PRIMARY */
-		   	//65536*2, /* WEAPONSTATE_RECOIL_PRIMARY */
 		   	WEAPONSTATE_INSTANTTIMEOUT, /* WEAPONSTATE_RECOIL_PRIMARY */
 			WEAPONSTATE_INSTANTTIMEOUT,	/* WEAPONSTATE_RELOAD_PRIMARY */
 
@@ -3266,13 +2956,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 	    0,
 	    /* FiringRate;	*/
 	    1*65536,
-	    
-		///* SmartTargetSpeed; signed int, how fast the crosshair moves. */
-		//4,
-	    ///* GunCrosshairSpeed;  integer, how fast the gun moves. */
-	    //160,
-	    ///* SmartTargetRadius in pixels */
-	    //0,
 		/* SmartTargetSpeed; signed int, how fast the crosshair moves. */
 		0,
 	    /* GunCrosshairSpeed;  integer, how fast the gun moves. */
@@ -3283,13 +2966,13 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		{0,0,0},
 		   
 		/* RecoilMaxZ; */
-		0, //-1024,
+		0, 
 		/* RecoilMaxRandomZ; */
-		0, //0,
+		0,
 		/* RecoilMaxXTilt; */
-		0, //0,
+		0,
 		/* RecoilMaxYTilt; */
-		0, //0,
+		0,
 
 		/* StrikePosition */
 		{600,-100,400},
@@ -3377,12 +3060,11 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		/* SecondaryAmmoID; */
 		AMMO_NONE,
 		   
-		//MeleeWeapon_90Degree_Front, /* FirePrimaryFunction */
 		NULL, /* FirePrimaryFunction */
 		NULL, /* FireSecondaryFunction */
 		NULL,	/* WeaponInitFunction */
 
-	    /* TimeOutRateForState[MAX_NO_OF_WEAPON_STATES]; in 16.16 */
+	    
 		{
 			0,/* WEAPONSTATE_IDLE	*/
 			
@@ -3433,13 +3115,13 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		{0,0,0},
 
 		/* RecoilMaxZ; */
-		0, //0,
+		0, 
 		/* RecoilMaxRandomZ; */
-		0, //0,
+		0, 
 		/* RecoilMaxXTilt; */
-		0, //0,
+		0, 
 		/* RecoilMaxYTilt; */
-		0, //0,
+		0, 
 
 		/* StrikePosition */
 		{300,0,500},
@@ -3531,7 +3213,7 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		NULL, /* FireSecondaryFunction */
 		NULL,	/* WeaponInitFunction */
 
-	    /* TimeOutRateForState[MAX_NO_OF_WEAPON_STATES]; in 16.16 */
+	    
 		{
 			0,/* WEAPONSTATE_IDLE	*/
 			
@@ -3582,13 +3264,13 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		{0,0,0},
 		
 		/* RecoilMaxZ; */
-		0, //200,
+		0, 
 		/* RecoilMaxRandomZ; */
-		0, //0,
+		0, 
 		/* RecoilMaxXTilt; */
-		0, //24,
+		0,
 		/* RecoilMaxYTilt; */
-		0, //0,
+		0,
 
 		/* StrikePosition */
 		{0,0,0},
@@ -3676,12 +3358,11 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		/* SecondaryAmmoID; */
 		AMMO_CUDGEL,
 		   
-		//MeleeWeapon_90Degree_Front, /* FirePrimaryFunction */
 		NULL, /* FirePrimaryFunction */
 		NULL, /* FireSecondaryFunction */
 		NULL,	/* WeaponInitFunction */
 
-	    /* TimeOutRateForState[MAX_NO_OF_WEAPON_STATES]; in 16.16 */
+	    
 		{
 			65536,/* WEAPONSTATE_IDLE	*/
 			
@@ -3732,16 +3413,16 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		{0,0,0},
 
 		/* RecoilMaxZ; */
-		0, //-1024,
+		0, 
 		/* RecoilMaxRandomZ; */
-		0, //0,
+		0, 
 		/* RecoilMaxXTilt; */
-		0, //0,
+		0, 
 		/* RecoilMaxYTilt; */
-		0, //0,
+		0, 
 
 		/* StrikePosition */
-		{0,0,0}, //{300,350,0}, ???
+		{0,0,0}, 
 
 		/* Name; */
 		TEXTSTRING_INGAME_PULSERIFLE,
@@ -3760,7 +3441,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		/* InitialSubSequence */
 		(int)MHSS_Stationary,
 		
-		#if USE_ENCUMBERANCE
 		{ /* Encum_Idle */
 			7*ONE_FIXED/8, /* MovementMultiple	*/
 			7*ONE_FIXED/8, /* TurningMultiple */
@@ -3782,29 +3462,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 			1, /* CanCrouch */
 			1, /* CanRun */
 		},
-		#else
-		{ /* Encum_Idle */
-			7*ONE_FIXED/8, /* MovementMultiple	*/
-			7*ONE_FIXED/8, /* TurningMultiple */
-			7*ONE_FIXED/8, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FirePrime */
-			2*ONE_FIXED/3, /* MovementMultiple	*/
-			7*ONE_FIXED/8, /* TurningMultiple */
-			2*ONE_FIXED/3, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FireSec */
-			ONE_FIXED/2, /* MovementMultiple	*/
-			7*ONE_FIXED/8, /* TurningMultiple */
-			2*ONE_FIXED/3, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		#endif		
 		
 		/* UseStateMovement :1; */
 		0,
@@ -3856,7 +3513,7 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		FireNonAutomaticWeapon, /* FireSecondaryFunction */
 		NULL,	/* WeaponInitFunction */
 		   
-	    /* TimeOutRateForState[MAX_NO_OF_WEAPON_STATES]; in 16.16 */
+	    
 		{
 			65536,/* WEAPONSTATE_IDLE	*/
 			
@@ -3895,7 +3552,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		/* ProbabilityOfJamming; */
 	    32,
 	    /* FiringRate;	*/
-	    //1000*65536/60,
 		12*65536,
 	    
 		/* SmartTargetSpeed; signed int, how fast the crosshair moves. */
@@ -3905,17 +3561,16 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 	    /* SmartTargetRadius */
 	    0,
 		/* RestPosition; */
-		//{300,400,800},
 		{0,0,0},
 		
 		/* RecoilMaxZ; */
-		90, //0, //60,
+		90,
 		/* RecoilMaxRandomZ; */
-		60, //0, //31,
+		60,
 		/* RecoilMaxXTilt; */
-		30, //0, //31,
+		30, 
 		/* RecoilMaxYTilt; */
-		30, //0, //15,
+		30, 
 
 		/* StrikePosition */
 		{0,0,0},
@@ -3937,7 +3592,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		/* InitialSubSequence */
 		(int)MHSS_Stationary,
 
-		#if USE_ENCUMBERANCE
 		{ /* Encum_Idle */
 			7*ONE_FIXED/8, /* MovementMultiple	*/
 			7*ONE_FIXED/8, /* TurningMultiple */
@@ -3959,29 +3613,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 			1, /* CanCrouch */
 			1, /* CanRun */
 		},
-		#else
-		{ /* Encum_Idle */
-			7*ONE_FIXED/8, /* MovementMultiple	*/
-			7*ONE_FIXED/8, /* TurningMultiple */
-			7*ONE_FIXED/8, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FirePrime */
-			2*ONE_FIXED/3, /* MovementMultiple	*/
-			7*ONE_FIXED/8, /* TurningMultiple */
-			2*ONE_FIXED/3, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FireSec */
-			ONE_FIXED/2, /* MovementMultiple	*/
-			7*ONE_FIXED/8, /* TurningMultiple */
-			2*ONE_FIXED/3, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		#endif		
 		/* UseStateMovement :1; */
 		0,
 		/* IsSmartTarget :1; */
@@ -4032,12 +3663,10 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		NULL, /* FireSecondaryFunction */
 		NULL,	/* WeaponInitFunction */
 
-	    /* TimeOutRateForState[MAX_NO_OF_WEAPON_STATES]; in 16.16 */
+	    
 		{
 			65536,/* WEAPONSTATE_IDLE	*/
 			
-			//WEAPONSTATE_INSTANTTIMEOUT, /* WEAPONSTATE_FIRING_PRIMARY */
-			//((65536*1000)/1625), /* WEAPONSTATE_FIRING_PRIMARY */
 			((65536*2000)/1625), /* WEAPONSTATE_FIRING_PRIMARY */
 		   	(65000), 						/* WEAPONSTATE_RECOIL_PRIMARY */
 			65536*2/3,					/* WEAPONSTATE_RELOAD_PRIMARY */
@@ -4085,13 +3714,13 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		{200,0,0},
 		
 		/* RecoilMaxZ; */
-		0, //200,
+		0,
 		/* RecoilMaxRandomZ; */
-		0, //0,
+		0, 
 		/* RecoilMaxXTilt; */
-		0, //24,
+		0,
 		/* RecoilMaxYTilt; */
-		0, //0,
+		0, 
 
 		/* StrikePosition */
 		{0,0,0},
@@ -4113,29 +3742,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		/* InitialSubSequence */
 		(int)MHSS_Stationary,
 
-		#if USE_ENCUMBERANCE
-		{ /* Encum_Idle */
-			7*ONE_FIXED/8, /* MovementMultiple	*/
-			7*ONE_FIXED/8, /* TurningMultiple */
-			7*ONE_FIXED/8, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FirePrime */
-			0, /* MovementMultiple	*/
-			0, /* TurningMultiple */
-			0, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FireSec */
-			7*ONE_FIXED/8, /* MovementMultiple	*/
-			7*ONE_FIXED/8, /* TurningMultiple */
-			7*ONE_FIXED/8, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		#else
 		{ /* Encum_Idle */
 			7*ONE_FIXED/8, /* MovementMultiple	*/
 			7*ONE_FIXED/8, /* TurningMultiple */
@@ -4157,7 +3763,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 			1, /* CanCrouch */
 			1, /* CanRun */
 		},
-		#endif
 		
 		/* UseStateMovement :1; */
 		0,
@@ -4209,18 +3814,16 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		FireMarineTwoPistolsSecondary, /* FireSecondaryFunction */
 		NULL,	/* WeaponInitFunction */
 		   
-	    /* TimeOutRateForState[MAX_NO_OF_WEAPON_STATES]; in 16.16 */
+	    
 		{
 			65536,/* WEAPONSTATE_IDLE	*/
 			
 			WEAPONSTATE_INSTANTTIMEOUT,	/* WEAPONSTATE_FIRING_PRIMARY */
-			//(65536*5),					/* WEAPONSTATE_RECOIL_PRIMARY */
 			WEAPONSTATE_INSTANTTIMEOUT,	/* WEAPONSTATE_RECOIL_PRIMARY */
 			((65536)/3),						/* WEAPONSTATE_RELOAD_PRIMARY */
 										
 			WEAPONSTATE_INSTANTTIMEOUT, /* WEAPONSTATE_FIRING_SECONDARY */
 			WEAPONSTATE_INSTANTTIMEOUT, /* WEAPONSTATE_RECOIL_SECONDARY */
-		   	//(65536*5),					/* WEAPONSTATE_RECOIL_SECONDARY */
 			65536,						/* WEAPONSTATE_RELOAD_SECONDARY */
 
 			(65536),					/* WEAPONSTATE_SWAPPING_IN	*/ /* Was >>2 */
@@ -4250,7 +3853,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		/* ProbabilityOfJamming; */
 	    32,
 	    /* FiringRate;	*/
-	    //1000*65536/60,
 		12*65536,
 	    
 		/* SmartTargetSpeed; signed int, how fast the crosshair moves. */
@@ -4260,17 +3862,16 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 	    /* SmartTargetRadius */
 	    0,
 		/* RestPosition; */
-		//{300,400,800},
 		{0,0,0},
 		
 		/* RecoilMaxZ; */
-		90, //0, //60,
+		90, 
 		/* RecoilMaxRandomZ; */
-		60, //0, //31,
+		60,
 		/* RecoilMaxXTilt; */
-		30, //0, //31,
+		30, 
 		/* RecoilMaxYTilt; */
-		30, //0, //15,
+		30, 
 
 		/* StrikePosition */
 		{0,0,0},
@@ -4292,7 +3893,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		/* InitialSubSequence */
 		(int)MHSS_Stationary,
 
-		#if USE_ENCUMBERANCE
 		{ /* Encum_Idle */
 			7*ONE_FIXED/8, /* MovementMultiple	*/
 			7*ONE_FIXED/8, /* TurningMultiple */
@@ -4314,29 +3914,6 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 			1, /* CanCrouch */
 			1, /* CanRun */
 		},
-		#else
-		{ /* Encum_Idle */
-			7*ONE_FIXED/8, /* MovementMultiple	*/
-			7*ONE_FIXED/8, /* TurningMultiple */
-			7*ONE_FIXED/8, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FirePrime */
-			2*ONE_FIXED/3, /* MovementMultiple	*/
-			7*ONE_FIXED/8, /* TurningMultiple */
-			2*ONE_FIXED/3, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FireSec */
-			ONE_FIXED/2, /* MovementMultiple	*/
-			7*ONE_FIXED/8, /* TurningMultiple */
-			2*ONE_FIXED/3, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		#endif		
 		/* UseStateMovement :1; */
 		0,
 		/* IsSmartTarget :1; */
@@ -4375,155 +3952,7 @@ TEMPLATE_WEAPON_DATA	TemplateWeapon[MAX_NO_OF_WEAPON_TEMPLATES] =
 		1,
 	},
 
-	#if 0
-	/*KJL***********
-	* 	TEMPLATE   *
-	***********KJL*/
-	{
-		/* PrimaryAmmoID; */
-		/* SecondaryAmmoID; */
-		AMMO_NONE,
-		/* SecondaryAmmoID; */
-		AMMO_NONE,
-		   
-		NULL, /* FirePrimaryFunction */
-		NULL, /* FireSecondaryFunction */
-		NULL,	/* WeaponInitFunction */
 
-	    /* TimeOutRateForState[MAX_NO_OF_WEAPON_STATES]; in 16.16 */
-		{
-			0,/* WEAPONSTATE_IDLE	*/
-			
-			WEAPONSTATE_INSTANTTIMEOUT, /* WEAPONSTATE_FIRING_PRIMARY */
-		   	WEAPONSTATE_INSTANTTIMEOUT,	/* WEAPONSTATE_RECOIL_PRIMARY */
-			WEAPONSTATE_INSTANTTIMEOUT,	/* WEAPONSTATE_RELOAD_PRIMARY */
-
-			WEAPONSTATE_INSTANTTIMEOUT, /* WEAPONSTATE_FIRING_SECONDARY	*/
-			WEAPONSTATE_INSTANTTIMEOUT,	/* WEAPONSTATE_RECOIL_SECONDARY	*/
-			WEAPONSTATE_INSTANTTIMEOUT,	/* WEAPONSTATE_RELOAD_SECONDARY	*/
-										
-			65536,						/* WEAPONSTATE_SWAPPING_IN	*/
-			65536,						/* WEAPONSTATE_SWAPPING_OUT	*/
-			65536,						/* WEAPONSTATE_JAMMED */
-			WEAPONSTATE_INSTANTTIMEOUT, /* WEAPONSTATE_WAITING */
-
-			WEAPONSTATE_INSTANTTIMEOUT, /* WEAPONSTATE_READYING */
-			WEAPONSTATE_INSTANTTIMEOUT, /* WEAPONSTATE_UNREADYING */
-
-		},
-		{
-			NULL,  /* WEAPONSTATE_IDLE	*/
-			NULL,  /* WEAPONSTATE_FIRING_PRIMARY */
-			NULL,  /* WEAPONSTATE_RECOIL_PRIMARY */
-			NULL,  /* WEAPONSTATE_RELOAD_PRIMARY */
-			NULL,  /* WEAPONSTATE_FIRING_SECONDARY	*/
-			NULL,  /* WEAPONSTATE_RECOIL_SECONDARY	*/
-			NULL,  /* WEAPONSTATE_RELOAD_SECONDARY	*/
-			NULL,  /* WEAPONSTATE_SWAPPING_IN	*/
-			NULL,  /* WEAPONSTATE_SWAPPING_OUT	*/
-			NULL,  /* WEAPONSTATE_JAMMED */
-			NULL,  /* WEAPONSTATE_WAITING */
-			NULL,  /* WEAPONSTATE_READYING */
-			NULL,  /* WEAPONSTATE_UNREADYING */
-		},
-		/* ProbabilityOfJamming; */
-	    32,
-	    /* FiringRate;	*/
-	    1*65536,
-	    
-		/* SmartTargetSpeed; signed int, how fast the crosshair moves. */
-		4,
-	    /* GunCrosshairSpeed;  integer, how fast the gun moves. */
-	    160,
-	    /* SmartTargetRadius in pixels */
-	    50,
-		/* RestPosition; */
-		{300,400,800},
-		
-		/* RecoilMaxZ; */
-		60,
-		/* RecoilMaxRandomZ; */
-		31,
-		/* RecoilMaxXTilt; */
-		31,
-		/* RecoilMaxYTilt; */
-		15,
-
-		/* Name; */
-		TEXTSTRING_INGAME_BLANK,
-
-		/* WeaponShapeName; */
-	    "Plasma",
-		/* MuzzleFlashShapeName; */
-	    "Sntrymuz",
-		/* RiffName */
-		NULL,
-		/* HierarchyName */
-		NULL,
-		/* InitialSequenceType */
-		-1,
-		/* InitialSubSequence */
-		-1,
-
-		{ /* Encum_Idle */
-			ONE_FIXED, /* MovementMultiple	*/
-			ONE_FIXED, /* TurningMultiple */
-			ONE_FIXED, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FirePrime */
-			ONE_FIXED, /* MovementMultiple	*/
-			ONE_FIXED, /* TurningMultiple */
-			ONE_FIXED, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		{ /* Encum_FireSec */
-			ONE_FIXED, /* MovementMultiple	*/
-			ONE_FIXED, /* TurningMultiple */
-			ONE_FIXED, /* JumpingMultiple */
-			1, /* CanCrouch */
-			1, /* CanRun */
-		},
-		/* UseStateMovement :1; */
-		0,
-		/* IsSmartTarget :1; */
-		0,
-		/* PrimaryIsRapidFire   :1; */   
-		0,  
-		/* PrimaryIsAutomatic	:1; */
-		0,
-		/* PrimaryIsMeleeWeapon :1; */
-		0,
-		/* SecondaryIsRapidFire   :1; */   
-		0,  
-		/* SecondaryIsAutomatic	:1; */
-		0,
-		/* SecondaryIsMeleeWeapon :1; */
-		0,  
-		/* HasShapeAnimation */
-		0,
-		/* HasTextureAnimation */
-		0,
-		/* FireWhenCloaked */
-		1,
-		/* FireInChangeVision */
-		1,
-		/* FirePrimaryLate */
-		0,
-		/* FireSecondaryLate */
-		0,
-		/* PrimaryMuzzleFlash */
-		0,
-		/* SecondaryMuzzleFlash */
-		0,
-		/* LogAccuracy */
-		0,
-		/* LogShots */
-		0,
-	},
-	#endif
 };
 
 TEMPLATE_AMMO_DATA		TemplateAmmo[MAX_NO_OF_AMMO_TEMPLATES] =
@@ -4640,7 +4069,6 @@ TEMPLATE_AMMO_DATA		TemplateAmmo[MAX_NO_OF_AMMO_TEMPLATES] =
 	{
 		500*65536,
 		{
-			//6,0,6,0,0,0,
 			{
 				8,0,2,0,0,0,
 				0,	/* ExplosivePower */
@@ -4848,7 +4276,7 @@ TEMPLATE_AMMO_DATA		TemplateAmmo[MAX_NO_OF_AMMO_TEMPLATES] =
 				AMMO_SADAR_TOW,
 			},
 		},
-		14000, //Was 7500,
+		14000, 
 		TEXTSTRING_AMMO_SHORTNAME_SADAR_TOW, /* ShortName */
 		1,
 		0
@@ -4911,7 +4339,6 @@ TEMPLATE_AMMO_DATA		TemplateAmmo[MAX_NO_OF_AMMO_TEMPLATES] =
 	{
 		800*65536,
 		{
-			//11,0,1,0,0,0,
 			{
 				20,0,8,0,0,0,
 				0,	/* ExplosivePower */
@@ -5343,62 +4770,6 @@ TEMPLATE_AMMO_DATA		TemplateAmmo[MAX_NO_OF_AMMO_TEMPLATES] =
 		0,
 		0
 	},
-	#if 0
-	/* AMMO_PRED_PISTOL */
-	{
-		100*65536,		/* AmmoPerMagazine */
-		{
-			{
-				20,0,0,5,2,0,
-				0,	/* ExplosivePower */
-				0,	/* Slicing */
-				1,	/* ProduceBlood */
-				0,	/* ForceBoom */
-				0,	/* BlowUpSections */
-				0,	/* Special */
-				0,	/* MakeExitWounds */
-				AMMO_PRED_PISTOL,
-			},
-			{
-				20,0,0,5,2,0,
-				0,	/* ExplosivePower */
-				0,	/* Slicing */
-				1,	/* ProduceBlood */
-				0,	/* ForceBoom */
-				0,	/* BlowUpSections */
-				0,	/* Special */
-				0,	/* MakeExitWounds */
-				AMMO_PRED_PISTOL,
-			},
-			{
-				20,0,0,5,2,0,
-				0,	/* ExplosivePower */
-				0,	/* Slicing */
-				1,	/* ProduceBlood */
-				0,	/* ForceBoom */
-				0,	/* BlowUpSections */
-				0,	/* Special */
-				0,	/* MakeExitWounds */
-				AMMO_PRED_PISTOL,
-			},
-			{
-				20,0,0,5,2,0,
-				0,	/* ExplosivePower */
-				0,	/* Slicing */
-				1,	/* ProduceBlood */
-				0,	/* ForceBoom */
-				0,	/* BlowUpSections */
-				0,	/* Special */
-				0,	/* MakeExitWounds */
-				AMMO_PRED_PISTOL,
-			},
-		},				/* MaxDamage */
-		5000,			/* MaxRange */
-		TEXTSTRING_AMMO_SHORTNAME_UNKNOWN, /* ShortName */
-		1,				/* CreatesProjectile */
-		0				
-	},
-	#else
 	/* AMMO_PRED_PISTOL */
 	{
 		100*65536,		/* AmmoPerMagazine */
@@ -5453,13 +4824,11 @@ TEMPLATE_AMMO_DATA		TemplateAmmo[MAX_NO_OF_AMMO_TEMPLATES] =
 		1,				/* CreatesProjectile */
 		0				/* ExplosionIsFlat */
 	},
-	#endif
 	/* AMMO_PRED_RIFLE */
 	{
 		20*65536,		/* AmmoPerMagazine */
 		{
 			{
-				//0,0,40,0,10,0,  //That's just wuss!
 				0,0,200,0,20,0,
 				0,	/* ExplosivePower */
 				2,	/* Slicing */
@@ -5614,7 +4983,6 @@ TEMPLATE_AMMO_DATA		TemplateAmmo[MAX_NO_OF_AMMO_TEMPLATES] =
 		},
 		1000,
 		TEXTSTRING_INGAME_DISC,
-//		TEXTSTRING_AMMO_SHORTNAME_UNKNOWN, /* ShortName */
 		1,
 		1
 	},
@@ -7413,7 +6781,6 @@ TEMPLATE_AMMO_DATA		TemplateAmmo[MAX_NO_OF_AMMO_TEMPLATES] =
 	{
 		500*65536,
 		{
-			//6,0,6,0,0,0,
 			{
 				8,0,2,0,0,0,
 				0,	/* ExplosivePower */
@@ -7468,7 +6835,6 @@ TEMPLATE_AMMO_DATA		TemplateAmmo[MAX_NO_OF_AMMO_TEMPLATES] =
 	{
 		800*65536,
 		{
-			//11,0,1,0,0,0,
 			{
 				20,0,8,0,0,0,
 				0,	/* ExplosivePower */
@@ -7894,7 +7260,7 @@ TEMPLATE_AMMO_DATA		TemplateAmmo[MAX_NO_OF_AMMO_TEMPLATES] =
 				AMMO_FRISBEE,
 			},
 		},
-		14000, //Was 7500,
+		14000, 
 		TEXTSTRING_AMMO_SHORTNAME_SKEETER, /* ShortName */
 		1,
 		0
@@ -8047,35 +7413,6 @@ DAMAGE_PROFILE DeathVolumeDamage={0,0,1,0,0,0,0,0,0,0,0,0,0,AMMO_NONE};
 GRENADE_LAUNCHER_DATA GrenadeLauncherData;
 PRED_DISC_MODES ThisDiscMode;
 SMARTGUN_MODES SmartgunMode;
-/*KJL****************************************************************************************
-*                                    P R O T O T Y P E S	                                *
-****************************************************************************************KJL*/
-
-/*KJL****************************************************************************************
-*                                     F U N C T I O N S	                                    *
-****************************************************************************************KJL*/
-
-/*KJL**********************************************************
-* Initialise the generic data used for weapon templates, etc. *
-**********************************************************KJL*/
-void InitialiseEquipment(void)
-{
-	#if 0
-    int i = MAX_NO_OF_WEAPON_TEMPLATES;
-
-	while(i--)
-	{
-		TemplateWeapon[i].RestPosition.vx = 0;	
-		TemplateWeapon[i].RestPosition.vy = 0;	
-		TemplateWeapon[i].RestPosition.vz = 0;	
-	}
-	#endif
-	/* KJL 15:47:30 03/19/97 - not much happening here */	
-}
-
-
-
-
 
 /*
 	10 mm culw rounds   (Ceramic - Ultra Light Weight) 0.05 Kg each. (1.5 oz!!)
@@ -8100,113 +7437,6 @@ void InitialiseEquipment(void)
 
 
 */
-#if 0
-/* Prototype HModel for minigun */
-
-KEYFRAME_DATA Handle_First_Frame = {
-	{0,0,0},	/* Offset */
-	{0,0,0}, /* Deltas */
-	{ONE_FIXED,0,0,0}, /* Quat? */
-	{0,0,0,0,}, /* Next quat */
-	0,	/* Omega */
-	0,	/* oneoversinomega */
-	0,  /* oneoversequencelength */
-	65535, /* Time to next frame */
-	NULL, /* Pointer to next frame */
-};
-
-KEYFRAME_DATA Barrel_Second_Frame = {
-	{129,50,674},	/* Offset */
-	{0,0,0}, /* Deltas */
-	{ONE_FIXED>>1,0,0,56756}, /* Quat? */
-	{0,0,0,0,}, /* Next quat */
-	0,	/* Omega */
-	0,	/* oneoversinomega */
-	0,  /* oneoversequencelength */
-	ONE_FIXED, /* Time to next frame */
-	NULL, /* Pointer to next frame */
-};
-
-KEYFRAME_DATA Barrel_First_Frame = {
-	{129,50,674},	/* Offset */
-	{0,0,0}, /* Deltas */
-	{ONE_FIXED,0,0,0}, /* Quat? */
-	{0,0,0,0,}, /* Next quat */
-	0,	/* Omega */
-	0,	/* oneoversinomega */
-	0,  /* oneoversequencelength */
-	ONE_FIXED, /* Time to next frame */
-	&Barrel_Second_Frame, /* Pointer to next frame */
-};
-
-SEQUENCE Handle_Sequence = {
-	0,
-	&Handle_First_Frame	
-};
-
-SEQUENCE Barrel_Sequence = {
-	0,
-	&Barrel_First_Frame
-};
-
-SECTION H_Minigun_Barrel = {
-	0,
-	NULL,
-	"Hminibar",
-	"MinigunBarrel",
-	NULL,
-	1,
-	&Barrel_Sequence,
-	{
-		100,	/* Health */
-		50,		/* Armour */
-		0, /* IsOnFire */
-		{
-			0,	/* Acid Resistant */
-			1,	/* Fire Resistant */
-			1,	/* Electric Resistant */
-			1,	/* Perfect Armour */
-			0,	/* Electric Sensitive */
-			0,	/* Combustability */
-		},
-	},
-	{0,0,0,},
-	0
-};
-
-SECTION *Handle_Branches[] = {
-	&H_Minigun_Barrel,
-	NULL
-};
-
-SECTION H_Minigun_Handle = {
-	0,
-	NULL,
-	"Hminihan",
-	"MinigunHandle",
-	Handle_Branches,
-	1,
-	&Handle_Sequence,
-	{
-		100,	/* Health */
-		50,		/* Armour */
-		0, /* IsOnFire */
-		{
-			0,	/* Acid Resistant */
-			1,	/* Fire Resistant */
-			1,	/* Electric Resistant */
-			1,	/* Perfect Armour */
-			0,	/* Electric Sensitive */
-			0,	/* Combustability */
-		},
-	},
-	{0,0,0,},
-	section_is_master_root
-};
-
-#endif
-
-
 
 
 BOOL AreDamageProfilesEqual(DAMAGE_PROFILE* profile1,DAMAGE_PROFILE* profile2)
@@ -8236,3 +7466,5 @@ BOOL AreDamageProfilesEqual(DAMAGE_PROFILE* profile1,DAMAGE_PROFILE* profile2)
 		return FALSE;
 	}
 }
+
+

@@ -1,17 +1,8 @@
 /* Patrick 5/6/97 -------------------------------------------------------------
   AvP platform specific sound management source
   ----------------------------------------------------------------------------*/
-
-#ifdef DAVEW
-	#define DB_LEVEL 4
-#else
-	#define DB_LEVEL 3
-#endif
-
 #include "3dc.h"
 #include "inline.h"
-
-
 #include "module.h"
 #include "stratdef.h"
 #include "gamedef.h"
@@ -26,10 +17,8 @@
 #include "vmanpset.h"
 #include <windows.h>
 #include "ffstdio.h"
-/* Davew 27/7/98 --------------------------------------------------------------
-	Internal types.
-	--------------------------------------------------------------------------*/
-/* Defines for the flags. */
+
+
 #define SOUND_DEFAULT		0x00000000
 #define SOUND_VOICE_MGER	0x00000001
 #define SOUND_EAX			0x00000002
@@ -818,12 +807,8 @@ int PlatPlaySound(activeIndex)
 		return SOUND_PLATFORMERROR;
 	}
 
-#if 1
 	/* Do we need to get a DirectSound3D buffer. */
-	if((ActiveSounds[activeIndex].threedee))/* &&
-		(GameSounds[gameIndex].flags & SAMPLE_IN_HW) &&
-		(SoundConfig.flags & SOUND_EAX) &&
-		(SoundConfig.flags & SOUND_USE_3DHW)) */
+	if((ActiveSounds[activeIndex].threedee))
 	{
 		db_log5("Going for a DirectSound3DBuffer.");
 		hres = IDirectSoundBuffer_QueryInterface
@@ -838,26 +823,8 @@ int PlatPlaySound(activeIndex)
 			db_logf5(("Error: Failed to get a DirectSound3DBuffer. res %x", hres));
 		}
 	}
-#endif
 
-#if 0
-	if((SoundConfig.flags & SOUND_EAX) &&
-		(GameSounds[gameIndex].flags & SAMPLE_IN_HW) &&
-		(ActiveSounds[activeIndex].ds3DBufferP))
-	{
-		db_log5("Going for a EAX property set.");
-		hres = IDirectSound3DBuffer_QueryInterface
-			(
-				ActiveSounds[activeIndex].ds3DBufferP,
-				&IID_IKsPropertySet,
-				(void**) &(ActiveSounds[activeIndex].PropSetP)
-			);
-		if(hres != DD_OK)
-		{
-			db_logf3(("Failed to get the property set for a DirectSoundBuffer. res %x", hres));
-		}
-	}
-#endif
+
 
 	/* may need to initialise pitch before playing */
 	if(ActiveSounds[activeIndex].pitch != GameSounds[gameIndex].pitch)
@@ -1206,17 +1173,6 @@ int PlatDo3dSound(int activeIndex)
 					(D3DVALUE) relativePosn.vz,
 					DS3D_DEFERRED
 				);
-#if 0
-// No doppler for now.
-			IDirectSound3DBuffer_SetVelocity
-				(
-					ActiveSounds[activeIndex].ds3DBufferP,
-					(D3DVALUE) ActiveSounds[activeIndex].threedeedata.velocity.vx,
-					(D3DVALUE) ActiveSounds[activeIndex].threedeedata.velocity.vy,
-					(D3DVALUE) ActiveSounds[activeIndex].threedeedata.velocity.vz,
-					DS3D_DEFERRED
-				);
-#endif
 		}
 		else
 		{
@@ -1855,16 +1811,6 @@ static int ToneToFrequency(int currentFrequency, int currentPitch, int newPitch)
 
 void PlatUpdatePlayer()
 {
-#if 0
-	IDirectSound3DListener_SetPosition
-		(
-			DS3DListener,
-			(D3DVALUE) Global_VDB_Ptr->VDB_World.vx,
-			(D3DVALUE) Global_VDB_Ptr->VDB_World.vy,
-			(D3DVALUE) Global_VDB_Ptr->VDB_World.vz,
-			DS3D_DEFERRED
-		);
-#endif
 	if (Global_VDB_Ptr)
 	{
 		extern int NormalFrameTime;
@@ -2211,14 +2157,6 @@ extern unsigned char *ExtractWavFile(int soundIndex, unsigned char *bufferPtr)
 		
 		/* Read data from file to buffer */
 		RebSndRead(audioPtr1,1,myChunkHeader.chunkLength,bufferPtr);
-		#if 0
-		if(res != (size_t)myChunkHeader.chunkLength)
-		{
-			LOCALASSERT(1==0);
-			IDirectSoundBuffer_Release(sndBuffer);		
-			return 0;
-		}
-		#endif
 		/* then unlock it and close the file */
 		hres = IDirectSoundBuffer_Unlock(sndBuffer,audioPtr1,audioBytes1,audioPtr2,audioBytes2);
 		if (hres!=DS_OK)
@@ -2318,7 +2256,8 @@ int PlatDontUse3DSoundHW()
 
 	return 1;
 }
-#if 1
+
+
 void UpdateSoundFrequencies(void)
 {
 	extern int SoundSwitchedOn;
@@ -2340,4 +2279,4 @@ void UpdateSoundFrequencies(void)
 		}
 	}
 }
-#endif
+

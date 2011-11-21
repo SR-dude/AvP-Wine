@@ -1,28 +1,11 @@
 #include <stdio.h>
-
 #include "system.h"
-
-#if PSX
-#else //PSX
-
 #include "shape.h"
-/*
 
-CUBE_
-
-*/
-
-/*
-
-Prototype CUBE Data 
-
-*/
 
 #define PLAYER_RADIUS 300
 #define cube_scale 1/40
-
 #define CUBE_PolyType I_Polygon
-
 #define CUBE_colour1 col24(255,16,16)
 
 int *CUBE_points[];
@@ -33,9 +16,7 @@ int *CUBE_items[];
 SHAPEINSTR CUBE_instructions[];
 
 int CUBE_points0[]; 
-
 int CUBE_normals0[]; 
-
 int CUBE_vnormals0[]; 
 
 /* Items Data */
@@ -165,4 +146,4 @@ int *CUBE_items[]={
 	Term
 };
 
-#endif //PSX
+

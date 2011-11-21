@@ -11,74 +11,34 @@
 /* Includes ********************************************************/
 #include "3dc.h"
 #include "gadget.h"
+#include "module.h"
+#include "modcmds.hpp"
+#include "stratdef.h"
+#include "dynblock.h"
+#define UseLocalAssert Yes
+#include "ourasert.h"
 
-	#if UseGadgets
-		#include "module.h"
-		#include "modcmds.hpp"
-		#include "stratdef.h"
-		#include "dynblock.h"
-	#endif
-	
-	#define UseLocalAssert Yes
-	#include "ourasert.h"
 
-/* Version settings ************************************************/
-
-/* Constants *******************************************************/
-
-/* Macros **********************************************************/
-
-/* Imported function prototypes ************************************/
-
-/* Imported data ***************************************************/
 #ifdef __cplusplus
 	extern "C"
 	{
 #endif
-		#if UseGadgets
 		extern SCENEMODULE **Global_ModulePtr;
 		extern DISPLAYBLOCK* Player;
-		#endif
 
-		#if 0
-		extern OurBool			DaveDebugOn;
-		extern FDIEXTENSIONTAG	FDIET_Dummy;
-		extern IFEXTENSIONTAG	IFET_Dummy;
-		extern FDIQUAD			FDIQuad_WholeScreen;
-		extern FDIPOS			FDIPos_Origin;
-		extern FDIPOS			FDIPos_ScreenCentre;
-		extern IFOBJECTLOCATION IFObjLoc_Origin;
-		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
-		extern IFCOLOUR			IFColour_Dummy;
- 		extern IFVECTOR			IFVec_Zero;
-		#endif
 #ifdef __cplusplus
 	};
 #endif
 
 
 
-/* Exported globals ************************************************/
-
-/* Internal type definitions ***************************************/
-
-/* Internal function prototypes ************************************/
-
-/* Internal globals ************************************************/
-
-/* Exported function definitions ***********************************/
-
-#if UseGadgets
 // namespace ModuleCommands
 void ModuleCommands :: ListModules(void)
 {
 
 	char Msg[256];
 
-	if
-	(
-		Global_ModulePtr
-	)
+	if ( Global_ModulePtr )
 	{
 		SCENEMODULE* pSceneModule = Global_ModulePtr[0];
 
@@ -99,10 +59,7 @@ void ModuleCommands :: ListModules(void)
 
 					// Diagnostic on pModule:
 					{
-						if
-						(
-							pModule -> name
-						)
+						if ( pModule -> name )
 						{
 							// Get upper-case module name:
 							char TempName[256];
@@ -117,23 +74,11 @@ void ModuleCommands :: ListModules(void)
 
 							*pCh_Dst = 0;
 
-							sprintf
-							(
-								Msg,
-								"MODULE:%3i \"%s\"",
-								Index,
-								TempName
-							);
+							sprintf ( Msg, "MODULE:%3i \"%s\"", Index, TempName );
 						}
 						else
 						{
-							sprintf
-							(
-								Msg,
-								"MODULE:%3i NULL NAME",
-								Index,
-								pModule -> name
-							);							
+							sprintf	( Msg, "MODULE:%3i NULL NAME",	Index, pModule -> name	);							
 						}
 						
 
@@ -147,12 +92,7 @@ void ModuleCommands :: ListModules(void)
 
 				}
 
-				sprintf
-				(
-					Msg,
-					"END OF MODULE LISTING (%i MODULES)",
-					ModuleArraySize
-				);
+				sprintf ( Msg, "END OF MODULE LISTING (%i MODULES)", ModuleArraySize );
 				GADGET_NewOnScreenMessage( Msg );
 
 			}
@@ -180,45 +120,28 @@ void ModuleCommands :: TryToTeleport(char* UpperCasePotentialModuleName)
 
 	// If we find a match we try to teleport the player...
 
-	/* PRECONDITION */
-	{
-		GLOBALASSERT( UpperCasePotentialModuleName );
-	}
+	GLOBALASSERT( UpperCasePotentialModuleName );
 
-	/* CODE */
-	{
-		char Msg[256];
+	char Msg[256];
 
-		{
-			sprintf
-			(
-				Msg,
-				"TELEPORT REQUEST TO MODULE \"%s\"",
-				UpperCasePotentialModuleName
-			);
+	sprintf	( Msg,	"TELEPORT REQUEST TO MODULE \"%s\"", UpperCasePotentialModuleName );
 			
-			GADGET_NewOnScreenMessage( Msg );
-		}
+	GADGET_NewOnScreenMessage( Msg );
 
-		MODULE* pModule_Targ = FindModule( UpperCasePotentialModuleName );
+	MODULE* pModule_Targ = FindModule( UpperCasePotentialModuleName );
 
-		if ( !pModule_Targ )
+	if ( !pModule_Targ )
 		{
 			GADGET_NewOnScreenMessage( "UNRECOGNISED MODULE" );
 			return;
 		}
 
-		GLOBALASSERT( pModule_Targ );
+	GLOBALASSERT( pModule_Targ );
 
-		#if 1
-		GADGET_NewOnScreenMessage( "(FOUND THE MODULE)" );
-		#endif
+	GADGET_NewOnScreenMessage( "(FOUND THE MODULE)" );
 
-		TeleportPlayerToModule
-		(
-			pModule_Targ
-		);
-	}
+	TeleportPlayerToModule ( pModule_Targ );
+	
 }
 
 MODULE* ModuleCommands :: FindModule(char* UpperCasePotentialModuleName)
@@ -228,10 +151,7 @@ MODULE* ModuleCommands :: FindModule(char* UpperCasePotentialModuleName)
 
 	MODULE* pModule_Found = NULL;
 
-	if
-	(
-		Global_ModulePtr
-	)
+	if ( Global_ModulePtr )
 	{
 		SCENEMODULE* pSceneModule = Global_ModulePtr[0];
 
@@ -249,53 +169,16 @@ MODULE* ModuleCommands :: FindModule(char* UpperCasePotentialModuleName)
 					MODULE* pModule = *ppModule_I;
 
 					// Diagnostic on pModule:
-					{
-						if
-						(
-							pModule -> name
-						)
-						{
-							//use a case insensitive comparison instead of converting
-							//to upper case
-							#if 0
-							// Get upper-case module name:
-							char TempName[256];
-							char* pCh_Dst = &TempName[0];
-							char* pCh_Src = pModule -> name;
-							int CharCount = 0;
-							while ( (*pCh_Src) && (CharCount < 255) )
-							{
-								*(pCh_Dst++) = toupper( *(pCh_Src++));
-								CharCount++;
-							}
+					if ( pModule -> name )
+					 	{
 
-							*pCh_Dst = 0;
-							#endif
 
-							#if 1
-							if
-							(
-								0 == _stricmp
-								(
-									pModule -> name,
-									UpperCasePotentialModuleName
-								)
-							)
-							{
-								// Got a match:
-								pModule_Found = pModule;
-							}
-							#else
-							sprintf
-							(
-								Msg,
-								"MODULE:%3i \"%s\"",
-								Index,
-								TempName
-							);
-							#endif
+							if ( 0 == _stricmp ( pModule -> name, UpperCasePotentialModuleName ) )
+								{
+									// Got a match:
+									pModule_Found = pModule;
+								}
 						}
-					}
 
 					// Advance to next MODULE*
 					(ppModule_I++);
@@ -323,14 +206,9 @@ MODULE* ModuleCommands :: FindModule(char* UpperCasePotentialModuleName)
 
 void ModuleCommands :: TeleportPlayerToModule(MODULE* pModule_Dst)
 {
-	/* PRECONDITION */
-	{
-		GLOBALASSERT( pModule_Dst );
-	}
+	GLOBALASSERT( pModule_Dst );
 
-	/* CODE */
-	{
-		if (Player )
+	if (Player )
 		{
 			if ( Player -> ObStrategyBlock )
 			{
@@ -355,10 +233,7 @@ void ModuleCommands :: TeleportPlayerToModule(MODULE* pModule_Dst)
 			}
 		}
 		
-	}
+	
 }
-#endif // UseGadgets
 
 
-
-/* Internal function definitions ***********************************/

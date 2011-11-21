@@ -36,7 +36,6 @@ extern "C++"
 {
 #include "r2base.h"
 #include "pcmenus.h"
-//#include "projload.hpp" // c++ header which ignores class definitions/member functions if __cplusplus is not defined ?
 #include "chnkload.hpp" // c++ header which ignores class definitions/member functions if __cplusplus is not defined ?
 extern void D3D_RenderHUDString_Centred(char *stringPtr, int centreX, int y, int colour);
 extern void D3D_RenderHUDNumber_Centred(unsigned int number,int x,int y,int colour);
@@ -44,12 +43,8 @@ extern void D3D_RenderHUDNumber_Centred(unsigned int number,int x,int y,int colo
 };
 
 #include "d3d_hud.h"
-
-
 #define UseLocalAssert No
 #include "ourasert.h"
-											
-
 #include "vision.h"
 #define RGBLIGHT_MAKE(rr,gg,bb) \
 ( \
@@ -231,9 +226,6 @@ void D3D_InitialiseMarineHUD(void)
 		/* load in sfx */
 		SpecialFXImageNumber = CL_LoadImageOnce("Common\\partclfx.RIM",LIO_D3DTEXTURE|LIO_RELATIVEPATH|LIO_RESTORABLE);
 
-//		SpecialFXImageNumber = CL_LoadImageOnceEx("flame1",IRF_D3D,DDSCAPS_SYSTEMMEMORY,0);;
-//		SpecialFXImageNumber = CL_LoadImageOnceEx("star",IRF_D3D,DDSCAPS_SYSTEMMEMORY,0);;
-//		SmokyImageNumber = CL_LoadImageOnceEx("smoky",IRF_D3D,DDSCAPS_SYSTEMMEMORY,0);
 
 	}
 
@@ -244,14 +236,10 @@ void D3D_InitialiseMarineHUD(void)
 
 	HUDScaleFactor = DIV_FIXED(ScreenDescriptorBlock.SDB_Width,640);	
 
-	#if UseGadgets
-//	MotionTrackerGadget::SetCentre(r2pos(100,100));
-	#endif
 }
 
 void LoadCommonTextures(void)
 {
-//	PredatorVisionChangeImageNumber = CL_LoadImageOnce("HUDs\\Predator\\predvisfx.RIM",LIO_D3DTEXTURE|LIO_RELATIVEPATH|LIO_RESTORABLE);
 	if(AvP.Network==I_No_Network)
 	{
 		switch(AvP.PlayerType)
@@ -270,7 +258,6 @@ void LoadCommonTextures(void)
 			case I_Marine:
 			{
 				StaticImageNumber = CL_LoadImageOnce("Common\\static.RIM",LIO_D3DTEXTURE|LIO_RELATIVEPATH|LIO_RESTORABLE|LIO_TRANSPARENT);
-//			   	ChromeImageNumber = CL_LoadImageOnce("Common\\water2.RIM",LIO_D3DTEXTURE|LIO_RELATIVEPATH|LIO_RESTORABLE|LIO_TRANSPARENT);
 				break;
 			}
 			default:
@@ -282,15 +269,12 @@ void LoadCommonTextures(void)
    		PredatorNumbersImageNumber = CL_LoadImageOnce("HUDs\\Predator\\predNumbers.RIM",LIO_D3DTEXTURE|LIO_RELATIVEPATH|LIO_RESTORABLE);
    		StaticImageNumber = CL_LoadImageOnce("Common\\static.RIM",LIO_D3DTEXTURE|LIO_RELATIVEPATH|LIO_RESTORABLE|LIO_TRANSPARENT);
 		AlienTongueImageNumber = CL_LoadImageOnce("HUDs\\Alien\\AlienTongue.RIM",LIO_D3DTEXTURE|LIO_RELATIVEPATH|LIO_RESTORABLE);
-	  //	ChromeImageNumber = CL_LoadImageOnce("Common\\water2.RIM",LIO_D3DTEXTURE|LIO_RELATIVEPATH|LIO_RESTORABLE|LIO_TRANSPARENT);
 	}
 	
 	HUDFontsImageNumber = CL_LoadImageOnce("Common\\HUDfonts.RIM",LIO_D3DTEXTURE|LIO_RELATIVEPATH|LIO_RESTORABLE);
 	SpecialFXImageNumber = CL_LoadImageOnce("Common\\partclfx.RIM",LIO_D3DTEXTURE|LIO_RELATIVEPATH|LIO_RESTORABLE/*|LIO_TRANSPARENT*/);
 	CloudyImageNumber = CL_LoadImageOnce("Common\\cloudy.RIM",LIO_D3DTEXTURE|LIO_RELATIVEPATH|LIO_RESTORABLE);
 	BurningImageNumber = CL_LoadImageOnce("Common\\burn.RIM",LIO_D3DTEXTURE|LIO_RELATIVEPATH|LIO_RESTORABLE);
-//	RebellionLogoImageNumber = CL_LoadImageOnce("Common\\logo.RIM",LIO_D3DTEXTURE|LIO_RELATIVEPATH|LIO_RESTORABLE|LIO_TRANSPARENT);
-//	FoxLogoImageNumber = CL_LoadImageOnce("Common\\foxlogo.RIM",LIO_D3DTEXTURE|LIO_RELATIVEPATH|LIO_RESTORABLE|LIO_TRANSPARENT);
 	
 	
 	{
@@ -315,12 +299,10 @@ void LoadCommonTextures(void)
 		
 	}
 
-	#if 1
 	{
 		extern void InitDrawTest(void);
 		InitDrawTest();
 	}
-	#endif
 
 }
 void D3D_BLTMotionTrackerToHUD(int scanLineSize)
@@ -407,7 +389,6 @@ void D3D_BLTMotionTrackerToHUD(int scanLineSize)
 	D3D_HUD_Setup();
 	D3D_HUDQuad_Output(HUDImageNumber,quadVertices,RGBALIGHT_MAKE(255,255,255,HUDTranslucencyLevel));
 	
-	#if 1
 	{
 		HUDImageDesc imageDesc;
 
@@ -426,7 +407,6 @@ void D3D_BLTMotionTrackerToHUD(int scanLineSize)
 
  		Draw_HUDImage(&imageDesc);
 	}
-	#endif
 
 	/* KJL 16:14:29 30/01/98 - draw bottom bar of MT */
 	{
@@ -482,21 +462,8 @@ extern void D3D_BlitWhiteChar(int x, int y, unsigned char c)
 {
 	HUDImageDesc imageDesc;
 	
-//	if (c>='a' && c<='z') c-='a'-'A';
-
-//	if (c<' ' || c>'_') return;
 	if (c==' ') return;
 
-	#if 0
-	imageDesc.ImageNumber = HUDFontsImageNumber;
-
-	imageDesc.TopLeftX = x;
-	imageDesc.TopLeftY = y;
-	imageDesc.TopLeftU = 1+((c-32)&15)*7;
-	imageDesc.TopLeftV = 2+((c-32)>>4)*11;
-	imageDesc.Height = 8;
-	imageDesc.Width = 5;
-	#else
 	imageDesc.ImageNumber = AAFontImageNumber;
 
 	imageDesc.TopLeftX = x;
@@ -505,7 +472,6 @@ extern void D3D_BlitWhiteChar(int x, int y, unsigned char c)
 	imageDesc.TopLeftV = 1+((c-32)>>4)*16;
 	imageDesc.Height = 15;
 	imageDesc.Width = 15;
-	#endif
 	imageDesc.Scale = ONE_FIXED;
 	imageDesc.Translucency = 255;
 	imageDesc.Red = 255;
@@ -519,7 +485,6 @@ void D3D_DrawHUDFontCharacter(HUDCharDesc *charDescPtr)
 {
 	HUDImageDesc imageDesc;
 
-  //	if (charDescPtr->Character<' ' || charDescPtr->Character>'_') return;
 	if (charDescPtr->Character == ' ') return;
 
 	imageDesc.ImageNumber = AAFontImageNumber;
@@ -700,12 +665,12 @@ void D3D_BLTGunSightToHUD(int screenX, int screenY, enum GUNSIGHT_SHAPE gunsight
 
 void LoadBackdropImage(void)
 {
-#if 1
+
 	extern int BackdropImage;
 	extern char LevelName[];
 	if (!strcmp(LevelName,"pred03"))
 	  	BackdropImage = CL_LoadImageOnce("Envrnmts\\Pred03\\backdrop.RIM",LIO_D3DTEXTURE|LIO_RELATIVEPATH|LIO_RESTORABLE);
-#endif
+
 }
 
 

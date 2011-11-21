@@ -22,29 +22,17 @@ extern void ActivateSelfDestructSequence(int seconds);
 GAMEOBJECT GameObjects[] = 
 {
 	GOT_LIFTOVERRIDE1,
-	//0x4b630a49,0xe6d1ca,
 	0,0,
-	
 	GOT_LIFTOVERRIDE2,
-	//0xa90f8f50,0x252139,
 	0,0,
-	
 	GOT_LIFTOVERRIDE3,
-	//0x32d82514,0x286a42,
 	0,0,
-	
 	GOT_LIFTOVERRIDE4,
-	//0xa2befeb4,0xe2e009,
 	0,0,
-
 	GOT_SELFDESTRUCT,
-	//0xf2d0d89c,0x923401,
 	0,0,
-	
 	GOT_PREDSHIP1,
-	//0x385fb8b9,0x7e14ad,
 	0,0,
-	
 	GOT_PREDSHIP2,
 	0,0,
 
@@ -384,7 +372,6 @@ void InitGameFlowSystem (struct player_status * ps, INITGAMEFLOWTYPE igft)
 			{
 				ps->CurrentMission = MarineMission_NoneAsYet;
 				ps->StateChangeObjectFlags = 0;
-				//ps->securityClearances = MakeFlag (LS_Gen1_Entrance);
 				ps->securityClearances = 0;
 				
 				break;
@@ -459,183 +446,5 @@ STRATEGYBLOCK *GetMeThisStrategyBlock(GAMETARGETOBJECTS This_One) {
 	return(FindSBWithName(GameStratblockList[num].SBname));
 
 }
-
-BOOL GameFlowStateChangeObjectEncountered (STRATEGYBLOCK * sbPtr)
-{
-	//I don't hink any of these are necessary any more - Richard.
-	#if 0
-	char * id = sbPtr->SBname;
-
-	if (!(AvP.Network == I_No_Network) || !GameFlowOn)
-	{
- 		return (0);
-	}
-
-	switch (AvP.PlayerType)
-	{
-		case I_Marine:
-		{
-			switch (PlayerStatusPtr->CurrentMission)
-			{
-				case MarineMission_DisableLifts:
-				{
-					GAMEOBJECT * goptr = GetGameObject (id);
-				
-					GLOBALASSERT(0);
-					/* How could that happen??? */
-					
-					if (goptr)
-					{
-						if (goptr->StateChangeObjectNum >= GOT_LIFTOVERRIDE1 && 
-								goptr->StateChangeObjectNum <= GOT_LIFTOVERRIDE4)
-						{
-							PlayerStatusPtr->StateChangeObjectFlags |= MakeFlag (goptr->StateChangeObjectNum);
-						}
-						if (goptr->StateChangeObjectNum == GOT_LIFTOVERRIDE3)
-						{
-							PlayerStatusPtr->securityClearances &= ~MakeFlag (LS_Gen3Internal);
-						}
-					}
-					
-					if (
-							(PlayerStatusPtr->StateChangeObjectFlags & MakeFlag (GOT_LIFTOVERRIDE1)) &&
-							(PlayerStatusPtr->StateChangeObjectFlags & MakeFlag (GOT_LIFTOVERRIDE2)) &&
-							(PlayerStatusPtr->StateChangeObjectFlags & MakeFlag (GOT_LIFTOVERRIDE3)) &&
-							(PlayerStatusPtr->StateChangeObjectFlags & MakeFlag (GOT_LIFTOVERRIDE4)) 
-							)
-					{
-						PlayerStatusPtr->securityClearances |= MakeFlag (LS_Gen1_Gen3);
-					}
-					
-					break;
-				}
-				
-				case MarineMission_DestructBase:
-				{
-					GAMEOBJECT * goptr = GetGameObject (id);
-
-					GLOBALASSERT(0);
-					/* How could that happen??? */
-
-					if (goptr) if (goptr->StateChangeObjectNum == GOT_SELFDESTRUCT)
-					{
-						ActivateSelfDestructSequence(150);
-						PlayerStatusPtr->securityClearances |= MakeFlag (LS_MPS4_SURFACE);
-					}
-					
-					break;
-				}
-				
-				case MarineMission_NoneAsYet:
-				{
-					/* This is Jules's level.  CDF 1/12/97 */
-					GAMEOBJECT * goptr = GetGameObject (id);
-					
-					if (goptr) {
-						switch (goptr->StateChangeObjectNum) {
-							case GOT_FAKESWITCH_IN_GENERATOR:
-							{
-								STRATEGYBLOCK *target;
-								
-								target=NULL;
-								target=GetMeThisStrategyBlock(GT_YARD_DOOR_1);
-								if (target) {
-									UnlockThisProxdoor(target);
-								}
-								target=NULL;
-								target=GetMeThisStrategyBlock(GT_YARD_DOOR_2);
-								if (target) {
-									UnlockThisProxdoor(target);
-								}
-								target=NULL;
-								target=GetMeThisStrategyBlock(GT_YARD_DOOR_3);
-								if (target) {
-									UnlockThisProxdoor(target);
-								}
-								target=NULL;
-								target=GetMeThisStrategyBlock(GT_YARD_DOOR_4);
-								if (target) {
-									UnlockThisProxdoor(target);
-								}
-								ActivateHive();
-																								
-								break;
-							}
-							case GOT_DATALOG_1:
-							case GOT_DATALOG_2:
-							case GOT_DATALOG_3:
-								PlayerStatusPtr->StateChangeObjectFlags |= MakeFlag (goptr->StateChangeObjectNum);
-								return(1);
-								break;
-							case GOT_ENDLEVEL_EVENT:
-								if (
-										(PlayerStatusPtr->StateChangeObjectFlags & MakeFlag (GOT_DATALOG_1)) &&
-										(PlayerStatusPtr->StateChangeObjectFlags & MakeFlag (GOT_DATALOG_2)) &&
-										(PlayerStatusPtr->StateChangeObjectFlags & MakeFlag (GOT_DATALOG_3)) 
-									) {
-										/* I guess we'd better end the level, then. */
-										textprint("\n\n\nEND OF LEVEL!\n\n\n");
-										AvP.MainLoopRunning = 0;
-									}
-								break;
-							default:
-								textprint("Unknown gameflow object %d! I'm well confused!\n",goptr->StateChangeObjectNum);
-								GLOBALASSERT(0);
-								break;
-						}
-					}					
-
-					break;
-				}
-				
-				default:
-				{
-					break;
-				}
-			}
-			
-			break;
-		}
-		
-		case I_Predator:
-		{
-			#if 1
-			return(1);
-			#else
-			switch (PlayerStatusPtr->CurrentMission)
-			{
-				case PredMission_GetShipGen3:
-				case PredMission_GetShipCMC2:
-				{
-					GAMEOBJECT * goptr = GetGameObject (id);
-					if (goptr) 
-						if (goptr->StateChangeObjectNum == GOT_PREDSHIP1 ||
-								goptr->StateChangeObjectNum == GOT_PREDSHIP2)
-						{
-							PlayerStatusPtr->StateChangeObjectFlags |= MakeFlag (goptr->StateChangeObjectNum);
-							return(1);
-						}
-				
-					break;
-				}
-			
-				default:
-				{
-					break;
-				}
-			}
-			#endif
-			break;
-		}
-
-		default:
-		{
-			break;
-		}
-	}
-	#endif
-	return(0);
-}
-
 
 

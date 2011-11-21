@@ -1,4 +1,3 @@
-
 // Interface  functions (written in C++) for
 // Direct3D immediate mode system
 
@@ -15,18 +14,13 @@ extern "C" {
 #define INITGUID
 
 #include "3dc.h"
-
 #include "awtexld.h"
-
 #include "dxlog.h"
 #include "module.h"
 #include "inline.h"
-
 #include "d3_func.h"
 #include "d3dmacs.h"
-
 #include "string.h"
-
 #include "kshape.h"
 #include "eax.h"
 #include "vmanpset.h"
@@ -41,73 +35,13 @@ extern "C++" {
 #include "ourasert.h"
 
 
-
-// FIXME!!! Structures in d3d structure
-// never have any size field set!!!
-// This is how it's done in Microsoft's
-// demo code --- but ARE THEY LYING???
-
-// As far as I know the execute buffer should always be in
-// system memory on any configuration, but this may
-// eventually have to be changed to something that reacts
-// to the caps bit in the driver, once drivers have reached
-// the point where we can safely assume that such bits will be valid.
-#define ForceExecuteBufferIntoSystemMemory Yes
-
-// To define TBLEND mode --- at present
-// it must be on for ramp textures and
-// off for evrything else...
-#define ForceTBlendCopy No
-
-// Set to Yes for debugging, to No for normal
-// operations (i.e. if we need a palettised
-// file for an accelerator, load it from
-// pre-palettised data, using code not yet 
-// written as of 27 / 8/ 96)
-#define QuantiseOnLoad Yes
-
 // Set to Yes to make default texture filter bilinear averaging rather
 // than nearest
 BOOL BilinearTextureFilter = 1;
 
 extern LPDIRECTDRAW lpDD;
 
-#if 0//
-// Externs
 
-extern int VideoMode;
-extern int DXMemoryMode;
-extern int ZBufferRequestMode;
-extern int RasterisationRequestMode;
-extern int SoftwareScanDrawRequestMode;
-extern SCREENDESCRIPTORBLOCK ScreenDescriptorBlock;
-extern VIEWDESCRIPTORBLOCK* Global_VDB_Ptr;
-extern IMAGEHEADER ImageHeaderArray[];
-extern BOOL MMXAvailable;
-
-
-//Globals
-
-int D3DDriverMode;
-
-
-
-static unsigned char DefaultD3DTextureFilterMin;
-static unsigned char DefaultD3DTextureFilterMax;
-
-
-#if SuppressWarnings
-static int* itemptr_tmp;
-
-#ifdef __WATCOMC__
-#pragma warning 389 5
-#pragma message("Note: Disabled Warning W389 'Integral value may be truncated...'")
-#endif
-
-#endif
-
-
-#endif //
 HRESULT LastError;
 int ExBufSize;
 
@@ -270,23 +204,19 @@ BOOL InitialiseDirect3DImmediateMode(void)
 // Evidently not.  Still, probably a good thing to do...
 // But!!! The whole banding problem appears to be a 
 // modeX emulation problem on some 3D accelerator cards...
-   #if 1
    if (ScanDrawMode == ScanDrawDirectDraw)
      {
 	  ReleaseDirect3DNotDDOrImages();
 	  return TRUE;
 	 }
-   #endif
 
 
 //  Note that this must be done BEFORE the D3D device object is created
-    #if SupportZBuffering
-    if (ZBufferMode != ZBufferOff)
+     if (ZBufferMode != ZBufferOff)
 	{
     	RetVal = CreateD3DZBuffer();
 		if (RetVal == FALSE) return FALSE;
 	}
-	#endif
 
 //  Set up Direct3D device object (must be linked to back buffer)
     LastError = lpDDSBack->QueryInterface(d3d.Driver[d3d.CurrentDriver].Guid,
@@ -310,15 +240,11 @@ BOOL InitialiseDirect3DImmediateMode(void)
 	LOGDXERR(LastError);
 
     if (LastError != D3D_OK) 
-    #if debug
       {
 	   ReleaseDirect3D();
 	   exit(LastError);
 	  }
-    #else
-      return FALSE;
-    #endif
-
+ 
     d3d.CurrentTextureFormat = StartFormat;
 
     // NEW NEW NEW
@@ -394,11 +320,7 @@ BOOL InitialiseDirect3DImmediateMode(void)
    d3dexDesc.dwSize = sizeof(D3DEXECUTEBUFFERDESC);
    d3dexDesc.dwFlags = D3DDEB_BUFSIZE | D3DDEB_CAPS;
    d3dexDesc.dwBufferSize = ExBufSize;
-   #if ForceExecuteBufferIntoSystemMemory
    d3dexDesc.dwCaps = D3DDEBCAPS_SYSTEMMEMORY;
-   #else
-   d3dexDesc.dwCaps = D3DDEBCAPS_MEM; // untested!!!
-   #endif
 
    // Create buffer
    LastError = d3d.lpD3DDevice->CreateExecuteBuffer
@@ -420,7 +342,6 @@ BOOL InitialiseDirect3DImmediateMode(void)
   return TRUE; 	   
 }
 
-#if 1
 
 // Note that error conditions have been removed
 // on the grounds that an early exit will prevent 
@@ -462,60 +383,6 @@ BOOL RenderD3DScene(void)
 	return TRUE;
 }
 
-#else
-
-int Time1, Time2, Time3, Time4;
-
-BOOL RenderD3DScene(void)
-
-{
-
-    // Begin scene
-	// My theory is that the functionality of this
-	// thing must invoke a DirectDraw surface lock
-	// on the back buffer without telling you.  However,
-	// we shall see...
-
-    Time1 = GetWindowsTickCount();
-
-	LastError = d3d.lpD3DDevice->BeginScene();
-	LOGDXERR(LastError);
-
-	if (LastError != D3D_OK)
-	  return FALSE;
-
-    Time2 = GetWindowsTickCount();
-
-	// Execute buffer
-	#if 1
-	LastError = d3d.lpD3DDevice->Execute(lpD3DExecCmdBuf, 
-	          d3d.lpD3DViewport, D3DEXECUTE_UNCLIPPED);
-	LOGDXERR(LastError);
-	#else
-	LastError = d3d.lpD3DDevice->Execute(lpD3DExecCmdBuf, 
-	          d3d.lpD3DViewport, D3DEXECUTE_CLIPPED);
-	LOGDXERR(LastError);
-	#endif
-
-	if (LastError != D3D_OK)
-	  return FALSE;
-
-    Time3 = GetWindowsTickCount();
-
-	// End scene
-    LastError = d3d.lpD3DDevice->EndScene();
-	LOGDXERR(LastError);
-
-	if (LastError != D3D_OK)
-	  return FALSE;
-
-    Time4 = GetWindowsTickCount();
-
-	   
-
-	return TRUE;
-
-#endif
 
 
 // With a bit of luck this should automatically
@@ -533,9 +400,7 @@ void ReleaseDirect3D(void)
     DeallocateAllImages();
     RELEASE(d3d.lpD3DViewport);
     RELEASE(d3d.lpD3DDevice);
-	#if SupportZBuffering
     RELEASE(lpZBuffer);
-	#endif
     RELEASE(lpDDPal[0]);
     RELEASE(lpDDSBack);
     RELEASE(lpDDSPrimary);
@@ -564,9 +429,7 @@ void ReleaseDirect3DNotDDOrImages(void)
 {
     RELEASE(d3d.lpD3DViewport);
     RELEASE(d3d.lpD3DDevice);
-	#if SupportZBuffering
     RELEASE(lpZBuffer);
-	#endif
     RELEASE(d3d.lpD3D);
 }
 
@@ -576,9 +439,7 @@ void ReleaseDirect3DNotDD(void)
     DeallocateAllImages();
     RELEASE(d3d.lpD3DViewport);
     RELEASE(d3d.lpD3DDevice);
-	#if SupportZBuffering
     RELEASE(lpZBuffer);
-	#endif
     RELEASE(d3d.lpD3D);
 }
 
@@ -602,7 +463,7 @@ void ReleaseDirect3DNotDD(void)
 
 void WritePolygonToExecuteBuffer(int* itemptr)
 
-{
+{ // adj stubs
 }
 
 void WriteGouraudPolygonToExecuteBuffer(int* itemptr)
@@ -631,7 +492,6 @@ void WriteGouraud3dTexturedPolygonToExecuteBuffer(int* itemptr)
 {
 }
 
-#if SupportZBuffering
 
 // To make effective use of 16 bit z buffers (common
 // on hardware accelerators) we must have a z coordinate 
@@ -649,7 +509,7 @@ void WriteGouraud3dTexturedPolygonToExecuteBuffer(int* itemptr)
 
 void WriteZBPolygonToExecuteBuffer(int* itemptr)
 
-{
+{ // adj stubs
 }
 
 void WriteZBGouraudPolygonToExecuteBuffer(int* itemptr)
@@ -678,7 +538,6 @@ void WriteZBGouraud3dTexturedPolygonToExecuteBuffer(int* itemptr)
 {
 }
 
-#endif
 	
 
 
@@ -758,7 +617,6 @@ void ReleaseD3DTexture(void* D3DTexture)
 }
 
 
-#if SupportZBuffering
 
 BOOL CreateD3DZBuffer(void)
 
@@ -766,9 +624,7 @@ BOOL CreateD3DZBuffer(void)
     DDSURFACEDESC ddsd;
 
     // For safety, kill any existing z buffer
-	#if SupportZBuffering
 	RELEASE(lpZBuffer);
-	#endif
 
     
 	// If we do not have z buffering support
@@ -808,12 +664,8 @@ BOOL CreateD3DZBuffer(void)
         ddsd.dwZBufferBitDepth = 8;
     else 
 	  {
-	   #if debug
 	   ReleaseDirect3D();
 	   exit(0x511621);
-	   #else
-	   return FALSE;
-	   #endif
 	  }
 
     // Eight-bit z buffer? Fuck off.
@@ -867,7 +719,6 @@ void FlushD3DZBuffer(void)
 }
 void SecondFlushD3DZBuffer(void)
 {
-	#if 1
 	{
 	   WriteEndCodeToExecuteBuffer();
   	   UnlockExecuteBufferAndPrepareForUse();
@@ -884,14 +735,10 @@ void SecondFlushD3DZBuffer(void)
 	
 	/* lets blt a color to the surface*/
 	LastError = lpZBuffer->Blt(NULL, NULL, NULL, DDBLT_DEPTHFILL | DDBLT_WAIT, &ddbltfx);
-	#else
-	extern void ClearZBufferWithPolygon(void);
-	ClearZBufferWithPolygon();
-	#endif
 }
 
 
-#endif
+
 void FlushZB(void)
 {
     HRESULT hRes; 
@@ -917,33 +764,3 @@ void FlushZB(void)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 

@@ -17,50 +17,11 @@
 #include "ahudgadg.hpp"
 #include "indexfnt.hpp"
 #include "trepgadg.hpp"
-	#define UseLocalAssert Yes
-	#include "ourasert.h"
+#define UseLocalAssert Yes
+#include "ourasert.h"
 
-/* Version settings ************************************************/
-
-/* Constants *******************************************************/
-
-/* Macros **********************************************************/
-
-/* Imported function prototypes ************************************/
-
-/* Imported data ***************************************************/
-#ifdef __cplusplus
-	extern "C"
-	{
-#endif
-		#if 0
-		extern OurBool			DaveDebugOn;
-		extern FDIEXTENSIONTAG	FDIET_Dummy;
-		extern IFEXTENSIONTAG	IFET_Dummy;
-		extern FDIQUAD			FDIQuad_WholeScreen;
-		extern FDIPOS			FDIPos_Origin;
-		extern FDIPOS			FDIPos_ScreenCentre;
-		extern IFOBJECTLOCATION IFObjLoc_Origin;
-		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
-		extern IFCOLOUR			IFColour_Dummy;
- 		extern IFVECTOR			IFVec_Zero;
-		#endif
-#ifdef __cplusplus
-	};
-#endif
-
-
-
-/* Exported globals ************************************************/
-
-/* Internal type definitions ***************************************/
-
-/* Internal function prototypes ************************************/
-
-/* Internal globals ************************************************/
 
 /* Exported function definitions ***********************************/
-#if UseGadgets
 
 // class Gadget
 // public:
@@ -72,7 +33,6 @@
 	// empty
 }
 
-#if debug
 void Gadget :: Render_Report
 (
 	const struct r2pos& R2Pos,
@@ -94,11 +54,8 @@ void Gadget :: Render_Report
 		FixP_Alpha
 	);
 }
-#endif
-
-// protected:
-
 // end of class Gadget
+
 
 extern void GADGET_Init(void)
 {
@@ -136,15 +93,9 @@ extern void GADGET_Render(void)
 {
 	/* expects to be called within the rendering part of the main loop */
 
-	/* PRECONDITION */
-	{
-	}
 
 	/* CODE */
 	{
-		#if 0
-		textprint("GADGET_Render()\n");
-		#endif
 
 		// under construction...
 		GLOBALASSERT( RootGadget :: GetRoot() );
@@ -155,29 +106,6 @@ extern void GADGET_Render(void)
 			ONE_FIXED // int FixP_Alpha
 		);
 
-		#if 0
-		// Test all the fonts:
-		{
-			SCString* pSCString_Test = new SCString("FONT TEST STRING");
-
-			for (int i=0;i<NUM_FONTS;i++)
-			{
-				IndexedFont* pFont = IndexedFont :: GetFont( (fonts)i );
-				GLOBALASSERT(pFont);
-
-				r2pos R2Pos_TempCursor(0,i*20);
-
-				pFont -> Render_Unclipped
-				(
-					R2Pos_TempCursor, // struct r2pos& R2Pos_Cursor,
-					ONE_FIXED, // int FixP_Alpha,
-					*pSCString_Test// const SCString& SCStr
-				);
-			}
-
-			pSCString_Test -> R_Release();
-		}
-		#endif
 	}
 }
 
@@ -187,13 +115,7 @@ extern void GADGET_ScreenModeChange_Setup(void)
 	/* expects to be called immediately before anything happens to the screen
 	mode */
 
-	/* PRECONDITION */
-	{
-	}
-
-	/* CODE */
-	{
-	}
+// adj stub
 }
 
 
@@ -245,12 +167,11 @@ extern void RemoveTheConsolePlease(void)
 }
 
 
-#endif // UseGadgets
+
 
 void SCString :: SendToScreen(void)
 {
 	// adds this as a new on-screen message
-	#if UseGadgets
 	/* PRECONDITION */
 	{
 		GLOBALASSERT( RootGadget :: GetRoot() );
@@ -266,15 +187,7 @@ void SCString :: SendToScreen(void)
 			);
 		}
 	}
-	#else
-	{
-		// do nothing
-	}
-	#endif // UseGadgets
+
 }
 
 
-
-
-
-/* Internal function definitions ***********************************/

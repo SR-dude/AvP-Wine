@@ -392,19 +392,6 @@ void TrackObjectIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int mult
 	TRACK_OBJECT_BEHAV_BLOCK* to_bhv = sbPtr->SBdataptr;
 	LOCALASSERT(to_bhv);
 
-	#if 0
-	
-	if((AvP.Network==I_Peer)&&(!InanimateDamageFromNetHost))
-	{
-		//add track damaged net message
-		return;
-	}
-	else if(AvP.Network==I_Host) 
-	{
-		//add track damaged net message
-		//if(sbPtr->SBDamageBlock.Health <= 0) AddNetMsg_InanimateObjectDestroyed(sbPtr);
-	}
-	#endif
 
 	if(AvP.Network != I_No_Network)
 	{

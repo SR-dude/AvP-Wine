@@ -17,16 +17,12 @@
 
 #include "ourasert.h"
 #include "bh_plift.h"
-
-#if SupportWindows95
-/* for win95 net game support */
 #include "pldnet.h"
 #include "pldghost.h"
-#endif
 
 /* prototypes for this file */
 static int SquashingSomething(DYNAMICSBLOCK *dynPtr);
-static void PushPassengersUpwards(DYNAMICSBLOCK *dynPtr);
+// adj static void PushPassengersUpwards(DYNAMICSBLOCK *dynPtr);
 static int ActivatedByPlayer(DYNAMICSBLOCK *dynPtr);
 static int PlayerIsNearOtherTerminal(STRATEGYBLOCK *sbPtr);
 static int NetPlayerAtOtherTerminal(STRATEGYBLOCK *sbPtr);
@@ -83,12 +79,9 @@ void PlatformLiftBehaviour(STRATEGYBLOCK *sbPtr)
 			}
 			else
 			{
-				#if SupportWindows95
 				LOCALASSERT(AvP.Network==I_Peer);
 				if(ActivatedByPlayer(dynPtr)) AddNetMsg_RequestPlatformLiftActivate(sbPtr);
-				#endif
 			}						
-			//textprint("Platform state: at rest\n");
 			break;
 		}
 		case(PLBS_Activating):
@@ -144,8 +137,6 @@ void PlatformLiftBehaviour(STRATEGYBLOCK *sbPtr)
 				}
 			}
 			
-			PushPassengersUpwards(dynPtr);
-			//textprint("Platform state: going up\n");
 			break; 
 		}
 		case(PLBS_GoingDown):
@@ -173,13 +164,10 @@ void PlatformLiftBehaviour(STRATEGYBLOCK *sbPtr)
 				{
 					if(SquashingSomething(dynPtr))
 					{
-//						sbPtr->DynPtr->Displacement.vy = 0;					
-						//	SendPlatformLiftUp(sbPtr);
 					}
 				}
 			}
 
-			//textprint("Platform state: going down\n");
 			break; 
 		}
 		default:
@@ -220,10 +208,8 @@ void PlatformLiftBehaviour(STRATEGYBLOCK *sbPtr)
 	}
 
 
-	//textprint("Platform pos: %d / %d / %d\n",platformliftdata->upHeight,dynPtr->Position.vy,platformliftdata->downHeight);
 
 	/* send state messages in net game */
-	#if SupportWindows95
 	if(AvP.Network==I_Host)
 	{
 		if(platformliftdata->netMsgCount>0)
@@ -236,7 +222,6 @@ void PlatformLiftBehaviour(STRATEGYBLOCK *sbPtr)
 			platformliftdata->netMsgCount--;	
 		}
 	}
-	#endif
 }
 	   
 void InitialisePlatformLift(void* bhdata, STRATEGYBLOCK *sbPtr)
@@ -364,13 +349,6 @@ void StopPlatformLift(STRATEGYBLOCK *sbPtr)
 	sbPtr->DynPtr->Displacement.vx = sbPtr->DynPtr->Displacement.vy = sbPtr->DynPtr->Displacement.vz = 0;
 	platformliftdata->state = PLBS_AtRest;
 
-	/* just to stop drift... */
-	/*
-	if(PLiftIsNearerUpThanDown(sbPtr))
-		sbPtr->DynPtr->Position.vy = platformliftdata->upHeight;
-	else
-		sbPtr->DynPtr->Position.vy = platformliftdata->downHeight;
-	*/
 	platformliftdata->netMsgCount = PLATFORMLIFT_NUMNETMESSAGES;
 
 	//stop sound if the lift has any
@@ -428,37 +406,6 @@ static int SquashingSomething(DYNAMICSBLOCK *dynPtr)
 	return squashingSomething;
 }
 
-static void PushPassengersUpwards(DYNAMICSBLOCK *dynPtr)
-{
-	#if 0
-	struct collisionreport *nextReport;
-
-	LOCALASSERT(dynPtr);
-	nextReport = dynPtr->CollisionReportPtr;
-				
-	/* walk the collision report list, looking for collisions against objects */
-	while(nextReport)
-	{
-		STRATEGYBLOCK *sbPtr = nextReport->ObstacleSBPtr;
-		if(sbPtr)
-		{
-			DYNAMICSBLOCK *objDynPtr = sbPtr->DynPtr;
-			if (objDynPtr)
-			{
-				int upwardsImpulse = -MUL_FIXED(GRAVITY_STRENGTH,NormalFrameTime) - PLATFORMLIFT_SPEED;
-
-				if (objDynPtr->LinImpulse.vy > upwardsImpulse)
-				{
-					objDynPtr->LinImpulse.vy = upwardsImpulse;
-					objDynPtr->IsInContactWithFloor =1;
-					PrintDebuggingText("I'M PUSHING UP AN OBJECT!");
-				}
-			}
-		}		
-		nextReport = nextReport->NextCollisionReportPtr;
-	}
-	#endif
-}
 
 static int ActivatedByPlayer(DYNAMICSBLOCK *dynPtr)
 {
@@ -470,7 +417,6 @@ static int ActivatedByPlayer(DYNAMICSBLOCK *dynPtr)
 	/* walk the collision report list, looking for collisions against objects */
 	while(nextReport)
 	{
-///		textprint("collision with %p\n",nextReport->ObstacleSBPtr);
 		if(nextReport->ObstacleSBPtr == Player->ObStrategyBlock) return 1;		
 	
 		nextReport = nextReport->NextCollisionReportPtr;
@@ -510,7 +456,6 @@ static int PlayerIsNearOtherTerminal(STRATEGYBLOCK *sbPtr)
 the lift track...*/
 static int NetPlayerAtOtherTerminal(STRATEGYBLOCK *sbPtr)
 {
-#if SupportWindows95
 	extern int NumActiveStBlocks;
 	extern STRATEGYBLOCK *ActiveStBlockList[];	
 	
@@ -563,9 +508,6 @@ static int NetPlayerAtOtherTerminal(STRATEGYBLOCK *sbPtr)
 		}
 	}		
 	return 0;
-#else
-	return 0;
-#endif
 }
 
 

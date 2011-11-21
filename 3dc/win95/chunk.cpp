@@ -1,37 +1,14 @@
 #include <string.h>
-
 #include "chunk.hpp"
-
-#if engine
 
 #define UseLocalAssert No
 #include "ourasert.h"
 #define assert(x) GLOBALASSERT(x)
-
-#else
-
-#if cencon
-#include "ccassert.h"
-#else
-#include <assert.h>
-#endif
-
-#endif
-
-
-#if cencon
-#include "environs.hpp"
-#else
-#define twprintf printf
-
-#ifdef cencon
-#define new my_new
-#endif
+#include "hash_tem.hpp"
 
 char * users_name = "Player";
-#endif
 
-#include "hash_tem.hpp"
+
 Chunk * Parent_File;
 
 // Non class functions ( only one as yet )
@@ -75,7 +52,6 @@ void list_chunks_in_file(List<int> * pList, HANDLE hand, char const * chunk_id)
 	}
 }
 
-#ifndef RIFF_OPTIMIZE
 List<int> list_chunks_in_file (HANDLE & hand, const char * chunk_id)
 {
 
@@ -85,7 +61,7 @@ List<int> list_chunks_in_file (HANDLE & hand, const char * chunk_id)
 
 	return chunk_list;
 }
-#endif
+
 
 //////////////////////////////////////////////
 
@@ -384,7 +360,7 @@ void Chunk_With_Children::fill_data_block(char * data_start)
 
 }
 
-#ifndef RIFF_OPTIMIZE
+
 List<Chunk *> Chunk_With_Children::lookup_child (const char * class_ident) const
 {
 	List<Chunk *> child_list;
@@ -393,7 +369,7 @@ List<Chunk *> Chunk_With_Children::lookup_child (const char * class_ident) const
 	
 	return child_list;
 }
-#endif
+
 
 void Chunk_With_Children::lookup_child (const char * class_ident,List<Chunk*>& child_list) const
 {
@@ -439,7 +415,7 @@ unsigned Chunk_With_Children::count_children (char const * class_ident) const
 
 Chunk* Chunk_With_Children::lookup_single_child (const char * class_ident) const
 {
-	#if debug
+
 	//if debug make sure there is at most one of the required chunk type
 	Chunk * child_ptr = children;
 	Chunk * chunk_found=0;
@@ -454,22 +430,6 @@ Chunk* Chunk_With_Children::lookup_single_child (const char * class_ident) const
 			child_ptr = child_ptr->next;
 		}
 	return chunk_found;
-	#else
-	Chunk * child_ptr = children;
-
-	if (children)	
-		while	(child_ptr != NULL) {
-			if (strncmp (class_ident, child_ptr->identifier, 8) == NULL)
-			{
-				assert (!child_ptr->r_u_miscellaneous());
-				return child_ptr;
-			}
-			child_ptr = child_ptr->next;
-		}
-	return 0;
-	#endif
-	
-
 	
 }
 

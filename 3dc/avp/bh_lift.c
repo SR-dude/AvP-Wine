@@ -27,14 +27,8 @@
 #include "bh_lnksw.h"
 #include "bh_binsw.h"
 #include "bh_lift.h"
-
 #include "psnd.h"
-
-
-#if SupportWindows95
-/* for win95 net game support */
 #include "pldghost.h"
-#endif
 
 extern int NormalFrameTime;
 // stuff for environment changing 
@@ -283,7 +277,6 @@ void LiftBehaveFun(STRATEGYBLOCK* sbptr)
 
 			 	// now we have a station to go to, we start the lift in motion
 			 	// unless we have just pressed the current floor switch again
-			 	
 			 	if(lift_ctrl->dest_station == lift_ctrl->curr_station)
 		 		{
 		 			// we have just called the lift to the same place
@@ -295,36 +288,21 @@ void LiftBehaveFun(STRATEGYBLOCK* sbptr)
 		 		{
 		 			// if there is a dest, set the lift to go
 		 			// close current stations 
-					#if PC_E3DEMO
-					LIFT_STATION* dest_stn = lift_ctrl->lift_stations[lift_ctrl->dest_station];
-		 			#endif
 
 		 			lift_stn = lift_ctrl->lift_stations[lift_ctrl->curr_station];
 
-					#if PC_E3DEMO
-					if(dest_stn->env != AvP.CurrentEnv)
-					{
-					// turn off inter env lifts
-						NewOnScreenMessage(GetTextString(TEXTSTRING_DB_ACCESSDENIED));
-						RequestState(dest_stn->lift_floor_switch, 0, 0);
-			 			lift_ctrl->dest_station = -1;
-			 			dest_stn->called = 0;
-					}
-					else
-					#endif				
-					{				
-			 			lift_ctrl->prev_station = lift_ctrl->curr_station;
-			 			if(lift_stn->lift_door)
-	 					{
-	 						// no door - must be on another env
-	 						RequestState(lift_stn->lift_door, 0, 0);
-	 					}
-			 			lift_ctrl->state = I_ls_closing_door;
-					}
+		 			lift_ctrl->prev_station = lift_ctrl->curr_station;
+		 			if(lift_stn->lift_door)
+ 					{
+ 						// no door - must be on another env
+ 						RequestState(lift_stn->lift_door, 0, 0);
+ 					}
+		 			lift_ctrl->state = I_ls_closing_door;
 		 		}
 			 		
 			 	break;
 			 }
+
 			case I_ls_closing_door:
 				{
 					// lift station for the current lift position has to 
@@ -483,8 +461,6 @@ void LiftBehaveFun(STRATEGYBLOCK* sbptr)
 								lift_ctrl->dest_station = -1;
 								lift_ctrl->state = I_ls_opening_door;					
 								
-								/* roxby: i have taken this out - patrick */
-								/* GLOBALASSERT(mptr); */
 								Sound_Play(SID_LIFT_END,"h");
 								Sound_Stop(lift_ctrl->SoundHandle);
 															
@@ -513,28 +489,6 @@ void LiftBehaveFun(STRATEGYBLOCK* sbptr)
 							 	// not really ness and it complecates things
 							 	old_pos = lift_stn_old->lift_module;
 							 	new_pos = lift_stn_new->lift_module;
-#if 0						 				
-							
-							 	if(lift_stn_new->called)	
-						 		{
-						 			lift_ctrl->state = I_ls_opening_door;	
-						 			RequestState(lift_stn_new->lift_call_switch, 0, 0);
-						 			if(lift_stn_new->lift_floor_switch)
-						 				RequestState(lift_stn_new->lift_floor_switch, 0, 0);
-						 			RequestState(lift_stn_new->lift_door, 1, 0);
-
-						 			if(old_pos)
-						 				{	
-						 					// if we don't have an old pos, we must
-						 					// be coming from another env
-						 					TeleportContents(new_pos, old_pos,lift_ctrl->floor_switches_fixed);
-						 				}
-
-						 			lift_stn_new->called = 0;
-
-						 		}
-							 	else
-#endif
 						 		{												
 						 			// futher to go - move along now
 						 			lift_ctrl->delay_between_floors += LIFT_MOVE_DELAY;
@@ -800,8 +754,6 @@ void CleanUpLiftControl()
   		UpdateWeaponShape(); // so we get the correct shape in the MSL
   	}
 }
-
-
 
 
 

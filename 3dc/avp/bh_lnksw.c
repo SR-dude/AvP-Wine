@@ -30,12 +30,10 @@ static BOOL check_link_switch_states (LINK_SWITCH_BEHAV_BLOCK * lsbb)
 	int i=0;
 	LSWITCH_ITEM * lsi = lsbb->lswitch_list;
 
-//	textprint ("Checking link states\n");
 
 	if (!lsbb->state)
 		return(No);
 
-//	textprint ("Link switch OK\n");
 
 	while (i < lsbb->num_linked_switches)
 	{
@@ -46,7 +44,6 @@ static BOOL check_link_switch_states (LINK_SWITCH_BEHAV_BLOCK * lsbb)
 			// if it's off return No
 			if (!bsbb->state)
 				return(No);
-//			textprint ("Switch %d OK\n", i);
 		
 		}
 		else if(lsi[i].bswitch->I_SBtype==I_BehaviourLinkSwitch)
@@ -64,29 +61,11 @@ static BOOL check_link_switch_states (LINK_SWITCH_BEHAV_BLOCK * lsbb)
 		i++;
 	}
 
-//	textprint ("Link switchs activated\n");
 
 	return(Yes);
 }
 
-#if 0
-static void set_link_switch_states_off (LINK_SWITCH_BEHAV_BLOCK * lsbb)
-{
-	int i=0;
-	LSWITCH_ITEM * lsi = lsbb->lswitch_list;
-
-	while (lsi[i].bswitch && i < MAX_SWITCHES_FOR_LINK)
-	{
-		BINARY_SWITCH_BEHAV_BLOCK * bsbb = ((BINARY_SWITCH_BEHAV_BLOCK *)lsi[i].bswitch->SBdataptr);
-		
-		// if it's on, tell it to go off
-		
-		if (! ((bsbb->state && bsbb->rest_state) || (!bsbb->state && !bsbb->rest_state)) )
-			RequestState (lsi->bswitch, 0, 0);
-		i++;
-	}
-}
-#endif
+// adj static void set_link_switch_states_off (LINK_SWITCH_BEHAV_BLOCK * lsbb);
 
 void* LinkSwitchBehaveInit(void* bhdata, STRATEGYBLOCK* sbptr)
 {
@@ -310,7 +289,6 @@ void LinkSwitchBehaveFun(STRATEGYBLOCK* sbptr)
 	GLOBALASSERT((ls_bhv->bhvr_type == I_BehaviourLinkSwitch));
   	dptr = sbptr->SBdptr;
 
-//	if(AvP.Network!=I_No_Network) return; /* disable for network game */
 
 	/****** 
 		What I need to do - check to see if we have

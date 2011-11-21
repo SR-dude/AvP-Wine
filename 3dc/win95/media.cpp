@@ -42,6 +42,7 @@ unsigned MediaMedium::GetRemainingSize()
 
 // MediaWinFileMedium
 
+// adj I think _MEDIA_WIN_TARGET is true becuase I need this
 #ifdef _MEDIA_WIN_TARGET
 
 unsigned MediaWinFileMedium::GetRemainingSize()

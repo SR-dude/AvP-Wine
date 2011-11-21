@@ -3,7 +3,6 @@
 #include "mempool.h"
 
 
-#if USE_LEVEL_MEMORY_POOL
 
 #define MAX_NUM_MEMORY_BLOCK 40
 #define MEMORY_BLOCK_SIZE (1024*1024)
@@ -56,5 +55,3 @@ void ClearMemoryPool()
 }
 
 
-
-#endif

@@ -1,24 +1,22 @@
-
 extern "C"
 {
-	#include "3dc.h"
-	//#include "intro.hpp"
-	#include "inline.h"
-	#include "smacker.h"
-	#include "avp_menus.h"
-	extern int NormalFrameTime;
-	extern SCREENDESCRIPTORBLOCK ScreenDescriptorBlock;
-	extern DDPIXELFORMAT DisplayPixelFormat;
-	extern LPDIRECTDRAWSURFACE lpDDSBack;
-	extern int GotAnyKey;
-	extern int DebouncedGotAnyKey;
 
-	extern AVPMENUGFX AvPMenuGfxStorage[];
+#include "3dc.h"
+#include "inline.h"
+#include "smacker.h"
+#include "avp_menus.h"
+
+extern int NormalFrameTime;
+extern SCREENDESCRIPTORBLOCK ScreenDescriptorBlock;
+extern DDPIXELFORMAT DisplayPixelFormat;
+extern LPDIRECTDRAWSURFACE lpDDSBack;
+extern int GotAnyKey;
+extern int DebouncedGotAnyKey;
+
+extern AVPMENUGFX AvPMenuGfxStorage[];
 extern void DirectReadKeyboard(void);
 
-
 static bool IntroHasAlreadyBeenPlayed = 1;
-
 
 void Show_CopyrightInfo(void);
 void Show_Presents(void);
@@ -53,20 +51,16 @@ extern void PlayIntroSequence(void)
 	FlipBuffers();
 	ClearScreenToBlack();
 
+/*adj fixme */
 	PlayBinkedFMV("FMVs/logos.bik");
-	//PlayFMV("FMVs/rebellion.smk");
 
 	StartMenuMusic();
 	ResetFrameCounter();
 	
 	Show_Presents();
-	#if ALLOW_SKIP_INTRO
+
 	if (!GotAnyKey) Show_ARebellionGame();
 	if (!GotAnyKey) Show_AvPLogo();
-	#else
-	Show_ARebellionGame();
-	Show_AvPLogo();
-	#endif
 
 }
 extern void ShowSplashScreens(void)
@@ -205,8 +199,6 @@ void Show_Presents(void)
 	
 			if (timeRemaining > 6*ONE_FIXED)
 			{
-			  //	DrawGraphicWithFadingLevel(&Starfield_Backdrop,timeRemaining-7*ONE_FIXED);
-//				DrawAvPMenuGfx_Faded(AVPMENUGFX_BACKDROP, 0, 0, 15*ONE_FIXED-timeRemaining*2,AVPMENUFORMAT_LEFTJUSTIFIED);
 				FadedScreen((15*ONE_FIXED-timeRemaining*2)/3);
 			}
 			else if (timeRemaining > 5*ONE_FIXED)
@@ -224,17 +216,11 @@ void Show_Presents(void)
 			
 			FlipBuffers();
 		}
-		#if ALLOW_SKIP_INTRO
 		DirectReadKeyboard();	
-		#endif
 		FrameCounterHandler();
 		timeRemaining-=NormalFrameTime;
 	}
-	#if ALLOW_SKIP_INTRO
 	while((timeRemaining>0) && !GotAnyKey);
-	#else
-	while(timeRemaining>0);// && !GotAnyKey);
-	#endif
 }
 
 void Show_ARebellionGame(void)
@@ -247,26 +233,19 @@ void Show_ARebellionGame(void)
 			char *textPtr = GetTextString(TEXTSTRING_PRESENTS);
 			int y = (480-AvPMenuGfxStorage[AVPMENUGFX_AREBELLIONGAME].Height)/2;
 			DrawMainMenusBackdrop();
-//			DrawAvPMenuGfx(AVPMENUGFX_BACKDROP, 0, 0, ONE_FIXED+1,AVPMENUFORMAT_LEFTJUSTIFIED);
 			PlayMenuMusic();
 
 			if (timeRemaining > 13*ONE_FIXED/2)
 			{
-//				DrawAvPMenuGfx(AVPMENUGFX_AREBELLIONGAME, MENU_CENTREX, y, 14*ONE_FIXED-timeRemaining*2,AVPMENUFORMAT_CENTREJUSTIFIED);
 				RenderMenuText(textPtr,MENU_CENTREX,y,14*ONE_FIXED-timeRemaining*2,AVPMENUFORMAT_CENTREJUSTIFIED);
-//				DrawGraphicWithAlphaChannel(&RebellionLogo,timeRemaining*2-13*ONE_FIXED);
  			}
 			else if (timeRemaining > 5*ONE_FIXED)
 			{
-//				DrawAvPMenuGfx(AVPMENUGFX_AREBELLIONGAME, MENU_CENTREX, y, ONE_FIXED,AVPMENUFORMAT_CENTREJUSTIFIED);
 				RenderMenuText(textPtr,MENU_CENTREX,y,ONE_FIXED,AVPMENUFORMAT_CENTREJUSTIFIED);
-//				DrawGraphicWithAlphaChannel(&RebellionLogo,0);
 			}
 			else if (timeRemaining > 3*ONE_FIXED)
 			{
-//				DrawAvPMenuGfx(AVPMENUGFX_AREBELLIONGAME, MENU_CENTREX, y, (timeRemaining-3*ONE_FIXED)/2,AVPMENUFORMAT_CENTREJUSTIFIED);
 				RenderMenuText(textPtr,MENU_CENTREX,y,(timeRemaining-3*ONE_FIXED)/2,AVPMENUFORMAT_CENTREJUSTIFIED);
-//				DrawGraphicWithAlphaChannel(&RebellionLogo, ONE_FIXED - (timeRemaining-3*ONE_FIXED)/2);
 			}
 
 			FlipBuffers();
@@ -275,11 +254,7 @@ void Show_ARebellionGame(void)
 		FrameCounterHandler();
 		timeRemaining-=NormalFrameTime;
 	}
-	#if ALLOW_SKIP_INTRO
 	while((timeRemaining>0) && !GotAnyKey);
-	#else
-	while(timeRemaining>0);// && !GotAnyKey);
-	#endif
 }
 void Show_AvPLogo(void)
 {
@@ -290,7 +265,6 @@ void Show_AvPLogo(void)
 		{
 			int y = (480-AvPMenuGfxStorage[AVPMENUGFX_ALIENSVPREDATOR].Height)/2;
 			DrawMainMenusBackdrop();
-//			DrawAvPMenuGfx(AVPMENUGFX_BACKDROP, 0, 0, ONE_FIXED+1,AVPMENUFORMAT_LEFTJUSTIFIED);
 			PlayMenuMusic();
 
 			if (timeRemaining > 9*ONE_FIXED/2)
@@ -313,11 +287,7 @@ void Show_AvPLogo(void)
 		FrameCounterHandler();
 		timeRemaining-=NormalFrameTime;
 	}
-	#if ALLOW_SKIP_INTRO
 	while((timeRemaining>0) && !GotAnyKey);
-	#else
-	while(timeRemaining>0);// && !GotAnyKey);
-	#endif
 }
 
 };

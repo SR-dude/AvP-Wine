@@ -1,7 +1,3 @@
-#ifdef NDEBUG
-;
-#else
-
 char const * list_fail_get_data_from_sentinel	= "%s: Tried to get data from sentinel\n";
 char const * list_fail_add_entry_after     		= "%s: Tried to add after a nonexistent List entry\n";
 char const * list_fail_add_entry_before    		= "%s: Tried to add before a nonexistent List entry\n";
@@ -23,6 +19,5 @@ char const * lit_fail_operator             		= "%s: Tried to take contents of se
 char const * lit_fail_delete_current       		= "%s: Tried to delete sentinel of List\n";
 char const * lit_fail_change_current       		= "%s: Tried to change contents of sentinel of List\n";
 
-#endif
 
 

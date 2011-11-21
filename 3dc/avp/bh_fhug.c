@@ -26,7 +26,6 @@
 #include "showcmds.h"
 #include "sfx.h"
 
-#define HUGGER_STATE_PRINT	0
 
 /* external global variables used in this file */
 extern int ModuleArraySize;
@@ -211,65 +210,41 @@ void FacehuggerBehaviour(STRATEGYBLOCK *sbPtr)
 		{
 			case(FHNS_Approach):
 			{
-				#if HUGGER_STATE_PRINT
-					PrintDebuggingText("Hugger Approaching...\n");
-				#endif
 				Execute_FHNS_Approach(sbPtr);
 				break;
 			}
 			case(FHNS_Attack):
 			{
-				#if HUGGER_STATE_PRINT
-					PrintDebuggingText("Hugger Attacking...\n");
-				#endif
 				Execute_FHNS_Attack(sbPtr);
 				break;
 			}
 			case(FHNS_Wait):
 			{
-				#if HUGGER_STATE_PRINT
-					PrintDebuggingText("Hugger Waiting...\n");
-				#endif
 				Execute_FHNS_Wait(sbPtr);
 				break;
 			}
 			case(FHNS_Avoidance):
 			{
-				#if HUGGER_STATE_PRINT
-					PrintDebuggingText("Hugger Avoiding...\n");
-				#endif
 				Execute_FHNS_Avoidance(sbPtr);
 				break;
 			}
 			case(FHNS_Dying):
 			{
-				#if HUGGER_STATE_PRINT
-					PrintDebuggingText("Hugger Dying...\n");
-				#endif
 				Execute_FHNS_Dying(sbPtr);
 				break;
 			}
 			case(FHNS_Floating):
 			{
-				#if HUGGER_STATE_PRINT
-					PrintDebuggingText("Hugger Floating...\n");
-				#endif
 				Execute_FHNS_Float(sbPtr);
 				break;
 			}
 			case(FHNS_Jumping):
 			{
-				#if HUGGER_STATE_PRINT
-					PrintDebuggingText("Hugger Jumping...\n");
-				#endif
 				Execute_FHNS_Jumping(sbPtr);
 				break;
 			}
 			case(FHNS_AboutToJump):
 			{
-				#if HUGGER_STATE_PRINT
-					PrintDebuggingText("Hugger AboutToJump...\n");
-				#endif
 				Execute_FHNS_AboutToJump(sbPtr);
 				break;
 			}
@@ -345,7 +320,6 @@ void MakeFacehuggerNear(STRATEGYBLOCK *sbPtr)
 	facehuggerStatusPointer->jumping = 0;
    	
    	/* state and sequence init */
-	//dPtr->ShapeAnimControlBlock = &facehuggerStatusPointer->ShpAnimCtrl;
 	dPtr->HModelControlBlock=&facehuggerStatusPointer->HModelController;
    	if ((facehuggerStatusPointer->nearBehaviourState!=FHNS_Floating)
    		&&(facehuggerStatusPointer->nearBehaviourState!=FHNS_Dying)) {
@@ -385,15 +359,10 @@ void FacehuggerIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multi
 	FACEHUGGER_STATUS_BLOCK *facehuggerStatusPointer;    
 
 	LOCALASSERT(sbPtr);
-	//Sound_Play(SID_ACID_SPRAY,"dp",&(sbPtr->DynPtr->Position),(FastRandom() & 255) - 128);
 
  	facehuggerStatusPointer = (FACEHUGGER_STATUS_BLOCK *)(sbPtr->SBdataptr);    
 	LOCALASSERT(facehuggerStatusPointer);	          		
 
-	#if 0
-	/* reduce facehugger health */
-	if(facehuggerStatusPointer->health>0) facehuggerStatusPointer->health -= damage; 	
-	#endif											 
 
 	if (facehuggerStatusPointer->nearBehaviourState==FHNS_Floating) {
 		Wake_Hugger(sbPtr);
@@ -429,9 +398,7 @@ static void KillFaceHugger(STRATEGYBLOCK *sbPtr,DAMAGE_PROFILE *damage)
 		Sound_Stop(fhugStatusPointer->soundHandle);			
 	}
 
-	//Sound_Play(SID_BUGDIE3,"d",&(dynPtr->Position));
 
-	#if 1
 	{
 		PLAYER_STATUS *playerStatusPointer= (PLAYER_STATUS *) (Player->ObStrategyBlock->SBdataptr);
 		
@@ -440,7 +407,6 @@ static void KillFaceHugger(STRATEGYBLOCK *sbPtr,DAMAGE_PROFILE *damage)
 			playerStatusPointer->MyFaceHugger=NULL;
 		}
 	}
-	#endif
 
 	/*If face hugger has a death target ,send a request*/
 	if(fhugStatusPointer->death_target_sbptr)
@@ -494,7 +460,6 @@ static void Execute_FHNS_Approach(STRATEGYBLOCK *sbPtr)
 	FACEHUGGER_STATUS_BLOCK *fhugStatusPointer;    
 	DYNAMICSBLOCK *dynPtr;
 	VECTORCH targetPos;
-	//int approachingAirDuct = 0;
 
 	LOCALASSERT(sbPtr);
 	fhugStatusPointer=(FACEHUGGER_STATUS_BLOCK *)(sbPtr->SBdataptr);    
@@ -616,27 +581,6 @@ static void Execute_FHNS_Approach(STRATEGYBLOCK *sbPtr)
 		}
 	}		
 
-	/* check for state changes: 
-	firstly, are we in contact with the player? */
-	#if 0
-	if(InContactWithPlayer(dynPtr)&&HuggerShouldAttackPlayer())
-	{
-		fhugStatusPointer->nearBehaviourState = FHNS_Attack;
-		fhugStatusPointer->stateTimer = FACEHUGGER_NEARATTACKTIME;
-		SetHuggerAnimationSequence(sbPtr,HSS_Attack,ONE_FIXED);		
-		dynPtr->DynamicsType = DYN_TYPE_NO_COLLISIONS; 	/* turn off collisons */	
-		dynPtr->GravityOn = 0;							/* turn off gravity */
-		sbPtr->maintainVisibility = 0;					/* turn off visibility support- be carefull! */
-
-		/* Attach to player! */
-		{
-			PLAYER_STATUS *playerStatusPointer= (PLAYER_STATUS *) (Player->ObStrategyBlock->SBdataptr);
-			
-			playerStatusPointer->MyFaceHugger=sbPtr;
-		}
-		return;
-	}
-	#endif
 
 	/* is player visible?: if not, go to wait */
 	if(!HuggerShouldAttackPlayer())
@@ -646,22 +590,16 @@ static void Execute_FHNS_Approach(STRATEGYBLOCK *sbPtr)
 		return;
 	}
 
-	#if 1
 	/* should we jump at the player? */
 	if (sbPtr->SBDamageBlock.IsOnFire==0) {
 		int distanceToPlayer = VectorDistance(&(dynPtr->Position),&(Player->ObStrategyBlock->DynPtr->Position));
 		if((distanceToPlayer<=FACEHUGGER_JUMPDISTANCE)&&(dynPtr->IsInContactWithFloor))
 		{
-			#if 0
-			JumpAtPlayer(sbPtr);
-			#else
 			fhugStatusPointer->nearBehaviourState = FHNS_AboutToJump;
 			fhugStatusPointer->stateTimer = 0;
-			#endif
 			return;
 		}
 	}
-	#endif
 
 	{
 		STRATEGYBLOCK *destructableObject = NULL;
@@ -1053,7 +991,6 @@ static void Execute_FHNS_Jumping(STRATEGYBLOCK *sbPtr)
 			if (i==0) {
 				/* Still not right!  Wait for proper facing. */
 				fhugStatusPointer->HModelController.Playing=0;
-				//CheckPounceIntegrity(sbPtr);
 				return;
 			} else {
 				/* Okay, pounce! */
@@ -1065,7 +1002,6 @@ static void Execute_FHNS_Jumping(STRATEGYBLOCK *sbPtr)
 			}
 		} else {
 			/* Yup, still tweening.  Check state validity? */
-			//CheckPounceIntegrity(sbPtr);
 		}
 	} else {
 		/* We must be in the jump.  Can't break out of this until we hit something. */
@@ -1220,9 +1156,6 @@ static void Execute_FHNS_AboutToJump(STRATEGYBLOCK *sbPtr)
 		}
 	}
 }
-
-
-
 
 
 

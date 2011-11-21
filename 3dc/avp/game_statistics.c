@@ -974,9 +974,6 @@ extern void DoStatisticsScreen(int completed_level)
 			ScreenDescriptorBlock.SDB_Width/2,20,COLOUR_RED);
 	}
 	
-	#if 0
-	RenderStringCentred(GetTextString(TEXTSTRING_GAMESTATS_NAME),TABPOINT1A,40,COLOUR_WHITE);
-	#endif
 	RenderStringCentred(GetTextString(TEXTSTRING_GAMESTATS_YOUR),TABPOINT2,40,COLOUR_WHITE);
 	RenderStringCentred(GetTextString(TEXTSTRING_GAMESTATS_BEST),TABPOINT3,40,COLOUR_WHITE);
 	RenderStringCentred(GetTextString(TEXTSTRING_GAMESTATS_TARGET),TABPOINT4,40,COLOUR_WHITE);

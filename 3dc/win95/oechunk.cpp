@@ -1,13 +1,7 @@
-#if objedit
-#include "Template.hpp"
-#endif
-
 #include "oechunk.h"
 #include "chunk.hpp"
 
-#ifdef cencon
-#define new my_new
-#endif
+
 //macro for helping to force inclusion of chunks when using libraries
 FORCE_CHUNK_INCLUDE_IMPLEMENT(oechunk)
 

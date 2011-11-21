@@ -189,7 +189,6 @@ void FarAlienBehaviour(STRATEGYBLOCK *sbPtr)
 		
 		if(PointIsInModule(thisModule, &localCoords)==0)
 		{
-			#if (!PSX)
 			textprint("FAR ALIEN MODULE CONTAINMENT FAILURE \n");
 
 			LOGDXFMT(("Alien containment failure: %s alien is in %s, position is %d,%d,%d:\nModule extents are: %d:%d, %d:%d, %d:%d",
@@ -199,7 +198,6 @@ void FarAlienBehaviour(STRATEGYBLOCK *sbPtr)
 				thisModule->m_maxz,thisModule->m_minz));
 
 			LOCALASSERT(1==0);
-			#endif
 		}  
 	}
 	#endif
@@ -251,8 +249,6 @@ static void Execute_AFS_Hunt(STRATEGYBLOCK *sbPtr)
 	}
 
 	/* check to see if the player is invisible, etc... */
-//	if ((!AlienIsAwareOfTarget(sbPtr))
-//		||(alienStatusPointer->Target!=Player->ObStrategyBlock))
 	if ((!AlienIsAwareOfTarget(sbPtr))&&(alienStatusPointer->Target==Player->ObStrategyBlock)
 		&&(NPC_IsDead(Player->ObStrategyBlock)))
 	{
@@ -270,32 +266,17 @@ static void Execute_AFS_Hunt(STRATEGYBLOCK *sbPtr)
 	{
 		alienStatusPointer->FarStateTimer = ALIEN_FAR_MOVE_TIME;
 
-		#if 0
 		/* Better have a handler for this. */
-		alienStatusPointer->BehaviourState = ABS_Dormant;
-		alienStatusPointer->CurveTimeOut = 0;
-		if (HModelSequence_Exists(&alienStatusPointer->HModelController,HMSQT_AlienStand,ASSS_Dormant)) {
-			SetAlienShapeAnimSequence_Core(sbPtr,HMSQT_AlienStand,ASSS_Dormant,-1,ONE_FIXED);
-		} else {
-			SetAlienShapeAnimSequence_Core(sbPtr,HMSQT_AlienStand,ASSS_Standard,ONE_FIXED,(ONE_FIXED>>2));
-		}
-		#else
 		alienStatusPointer->BehaviourState = ABS_Wander;
 		alienStatusPointer->CurveTimeOut = 0;
-		#endif
 		return;		
 	}
 
 	/* Examine target, and decide what to do */
 	GLOBALASSERT(AIModuleIsPhysical(targetModule));
 	
-	#if 0
-	ProcessFarAlienTargetModule(sbPtr, targetModule);
 	/* reset the timer */
-	alienStatusPointer->FarStateTimer = ALIEN_FAR_MOVE_TIME;
-	#else
 	alienStatusPointer->FarStateTimer = ProcessFarAlienTargetModule(sbPtr, targetModule);
-	#endif
 }
 
 
@@ -306,22 +287,7 @@ static void Execute_AFS_Hunt(STRATEGYBLOCK *sbPtr)
   ----------------------------------------------------------------*/
 static void Execute_AFS_Wait(STRATEGYBLOCK *sbPtr)
 {
-	/* do nothing */
-
-	//#if ULTRAVIOLENCE
-	/* Look, now there might be no enemies. */
-	#if 0
-	/* ...I think not. */
-
-	ALIEN_STATUS_BLOCK *alienStatusPointer;    
-
-	alienStatusPointer=(ALIEN_STATUS_BLOCK *)(sbPtr->SBdataptr);    
-	LOCALASSERT(alienStatusPointer);
-
-	alienStatusPointer->BehaviourState = ABS_Hunt;
-	alienStatusPointer->FarStateTimer = 0; /* forces execution of new state next frame*/
-
-	#endif
+// adj
 }
 
 static void Execute_AFS_Approach(STRATEGYBLOCK *sbPtr) {
@@ -335,7 +301,6 @@ static void Execute_AFS_Approach(STRATEGYBLOCK *sbPtr) {
 
 	if (Validate_Target(alienStatusPointer->Target,alienStatusPointer->Target_SBname)==0) {
 		/* Whoops, no target. */	
-		//GLOBALASSERT(0);
 		/* Go back to hunt. */
 		alienStatusPointer->BehaviourState = ABS_Hunt;
 		alienStatusPointer->FarStateTimer = 0; /* forces execution of new state next frame*/
@@ -386,9 +351,6 @@ static void Execute_AFS_Attack(STRATEGYBLOCK *sbPtr) {
 		to do something. Otherwise just return. */
 		if(alienStatusPointer->FarStateTimer>0) return;
 	
-		#if 0
-		CauseDamageToObject(alienStatusPointer->Target,&TemplateAmmo[AMMO_NPC_ALIEN_CLAW].MaxDamage[AvP.Difficulty], ONE_FIXED,NULL);
-		#endif
 		/* Kersplat. */
 		alienStatusPointer->FarStateTimer=ALIEN_ATTACKTIME;
 		/* Cunning, eh? */
@@ -454,13 +416,8 @@ static void Execute_AFS_Retreat(STRATEGYBLOCK *sbPtr)
 	/* Examine target, and decide what to do */
 	GLOBALASSERT(AIModuleIsPhysical(targetModule));
 
-	#if 0	
-	ProcessFarAlienTargetModule(sbPtr, targetModule);
 	/* reset the timer */
-	alienStatusPointer->FarStateTimer = ALIEN_FAR_MOVE_TIME;			
-	#else
 	alienStatusPointer->FarStateTimer = ProcessFarAlienTargetModule(sbPtr, targetModule);
-	#endif
 }
 
 static void Execute_AFS_Wander(STRATEGYBLOCK *sbPtr)
@@ -512,13 +469,8 @@ static void Execute_AFS_Wander(STRATEGYBLOCK *sbPtr)
 	/* Examine target, and decide what to do */
 	GLOBALASSERT(AIModuleIsPhysical(targetModule));
 	
-	#if 0
-	ProcessFarAlienTargetModule(sbPtr, targetModule);
 	/* reset the timer */
-	alienStatusPointer->FarStateTimer = ALIEN_FAR_MOVE_TIME;			
-	#else
 	alienStatusPointer->FarStateTimer = ProcessFarAlienTargetModule(sbPtr, targetModule);
-	#endif
 }
 
 
@@ -594,13 +546,8 @@ static int ProcessFarAlienTargetModule(STRATEGYBLOCK *sbPtr, AIMODULE* targetMod
 		}
 		case(NPCTM_LiftDoorOpen):
 		{
-			#if 0
-			/* do nothing: don't really want to go into a lift, or we'll get trapped */
-			FarNpc_FlipAround(sbPtr);
-			#else
 			/* Another pre-written screw up! */
 			LocateFarNPCInAIModule(sbPtr, targetModule);
-			#endif
 			break;
 		}
 		case(NPCTM_LiftDoorNotOpen):
@@ -784,7 +731,6 @@ void LocateFarNPCInAIModule(STRATEGYBLOCK *sbPtr, AIMODULE *targetModule)
 			return;	
 		}
 
-		//if(ModuleCurrVisArray[(*(targetModule->m_module_ptrs))->m_index])
 		if (AIModuleIsVisible(targetModule)) 
 		{
 			/* the target is visible... */
@@ -811,7 +757,6 @@ void LocateFarNPCInAIModule(STRATEGYBLOCK *sbPtr, AIMODULE *targetModule)
 	if it's not visible, use an auxilary location. If there aren't any auxilary
 	locations, use the entry point. */
 
-	//if(ModuleCurrVisArray[(*(targetModule->m_module_ptrs))->m_index])
 	if (AIModuleIsVisible(targetModule)) 
 	{
 		newPosition = targetEntryPoint->position;
@@ -822,19 +767,10 @@ void LocateFarNPCInAIModule(STRATEGYBLOCK *sbPtr, AIMODULE *targetModule)
    		/* pick an auxilary location: if there aren't any, use the entry point */
 		if(noOfAuxLocs)
 		{
-			#if 0 
-   			int npcHeight;
-			#endif
    			targetLocInx = FastRandom() % noOfAuxLocs;
    			newPosition = auxLocsList[targetLocInx];
    			/* move up 1/2 npc height, plus a bit more(100). this only applies
    			to auxilary locations, not eps */			
-			#if 0 
-			npcHeight = (mainshapelist[sbPtr->shapeIndex]->shapemaxy 
-   				- mainshapelist[sbPtr->shapeIndex]->shapeminy)/2;
-   			if(npcHeight>1000) npcHeight = 1000;
-   			newPosition.vy -=(npcHeight + 100); 	 
-			#endif
 
 			if(AvP.Network != I_No_Network)
 			{
@@ -863,19 +799,6 @@ void LocateFarNPCInAIModule(STRATEGYBLOCK *sbPtr, AIMODULE *targetModule)
 		
 		renderModule=ModuleFromPosition(&temp_Pos,sbPtr->containingModule);
 		if (renderModule==NULL) {
-			#if 0
-			LOGDXFMT(("Right, here comes the assert.\nNoOfAuxLocs %d.\nTargetLocInx %d\n"
-			,noOfAuxLocs,targetLocInx));
-			if (*(targetModule->m_module_ptrs)) {
-				LOGDXFMT(("TargetModule %s.\nContainingModule %s.\n",(*(targetModule->m_module_ptrs))->name,sbPtr->containingModule->name));
-			} else {
-				LOGDXFMT(("TargetModule not found.\nContainingModule %s.\n",sbPtr->containingModule->name));
-			}
-			LOGDXFMT(("I really should crash out here.\n"));
-
-			//GLOBALASSERT(renderModule);
-			NewOnScreenMessage("DODGED A BULLET.\n");
-			#endif
 			return;
 		}
 	}
@@ -920,7 +843,6 @@ void LocateFarNPCInAIModule(STRATEGYBLOCK *sbPtr, AIMODULE *targetModule)
 		
 		if(PointIsInModule(thisModule, &localCoords)==0)
 		{
-			#if (!PSX)
 			textprint("FAR ALIEN MODULE CONTAINMENT FAILURE \n");
 
 			LOGDXFMT(("Alien containment failure: alien is in %s, position is %d,%d,%d:\nModule extents are: %d:%d, %d:%d, %d:%d",
@@ -929,7 +851,6 @@ void LocateFarNPCInAIModule(STRATEGYBLOCK *sbPtr, AIMODULE *targetModule)
 				thisModule->m_maxz,thisModule->m_minz));
 
 			LOCALASSERT(1==0);
-			#endif
 		}  
 	}
 	#endif

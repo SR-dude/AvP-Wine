@@ -99,6 +99,8 @@ char *Predator_Loaded_Shape_Names[I_Num_Character_Shapes] =
 
 static int LoadedShapesInMSL[I_Num_Character_Shapes];
 
+
+/*adj - stub ?*/
 void InitCharacterMSLReferences()
 {
 	int shape_num = I_Num_Character_Shapes;
@@ -109,20 +111,14 @@ void InitCharacterMSLReferences()
 				{
 					case I_Marine:
 						{
-//							LoadedShapesInMSL[shape_num] =
-//								 GetLoadedShapeMSL(Marine_Loaded_Shape_Names[shape_num]);					
 							break;
 						}
 					case I_Predator:
 						{
-//							LoadedShapesInMSL[shape_num] =
-//								 GetLoadedShapeMSL(Predator_Loaded_Shape_Names[shape_num]);					
 							break;
 						}
 					case I_Alien:
 						{
-//							LoadedShapesInMSL[shape_num] =
-//								 GetLoadedShapeMSL(Alien_Loaded_Shape_Names[shape_num]);					
 							break;
 						}
 

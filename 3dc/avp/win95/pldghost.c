@@ -29,10 +29,6 @@ d  ----------------------------------------------------------------------*/
 #define UseLocalAssert Yes
 #include "ourasert.h"
 
-/*----------------------------------------------------------------------
-  Global Variables
-  ----------------------------------------------------------------------*/
-
 
 /*----------------------------------------------------------------------
   External globals
@@ -154,7 +150,6 @@ void UpdateGhost(STRATEGYBLOCK *sbPtr,VECTORCH *position,EULER *orientation,int 
 	/* update the dynamics block */
 	{
 		DYNAMICSBLOCK *dynPtr = sbPtr->DynPtr;
-//		dynPtr->Position = dynPtr->PrevPosition = *position;
 		dynPtr->PrevPosition = dynPtr->Position;
 		dynPtr->PrevOrientMat = dynPtr->OrientMat;
 		dynPtr->Position = *position;
@@ -163,12 +158,6 @@ void UpdateGhost(STRATEGYBLOCK *sbPtr,VECTORCH *position,EULER *orientation,int 
 		TransposeMatrixCH(&dynPtr->OrientMat);
 	}
 	UpdateObjectTrails(sbPtr);
-	#if 0	
-	if (ghostData->type == I_BehaviourPredatorEnergyBolt)
-	{
-	 	MakePlasmaTrailParticles(sbPtr->DynPtr,32);
-	}
-	#endif
 
 
 	/* if we're a player type, update the animation sequence */
@@ -182,15 +171,6 @@ void UpdateGhost(STRATEGYBLOCK *sbPtr,VECTORCH *position,EULER *orientation,int 
 		}
    	}					   
 
-	/* KJL 15:59:59 26/11/98 - no pheromone trails */
-	#if 0
-	if (AvP.PlayerType == I_Alien)
-	{
-		if ((ghostData->type==I_BehaviourMarinePlayer)
-		  ||(ghostData->type==I_BehaviourPredatorPlayer))
-		NewTrailPoint(sbPtr->DynPtr);
-	}
-	#endif
 
 	/* KJL 16:58:04 17/06/98 - we want to update anims differently for NPCS */
 	if((ghostData->type==I_BehaviourMarine)||
@@ -448,7 +428,6 @@ STRATEGYBLOCK *CreateNetGhost(DPID playerId, int objectId, VECTORCH *position, E
 		DYNAMICSBLOCK *dynPtr;
 
 		/* need different templates for objects and sprites */
-		#if EXTRAPOLATION_TEST
 		if(type==I_BehaviourMarinePlayer||type==I_BehaviourAlienPlayer||type==I_BehaviourPredatorPlayer || type==I_BehaviourAlien)
 		{
 			dynPtr = AllocateDynamicsBlock(DYNAMICS_TEMPLATE_MARINE_PLAYER);
@@ -458,7 +437,6 @@ STRATEGYBLOCK *CreateNetGhost(DPID playerId, int objectId, VECTORCH *position, E
 			}
 		}
 		else
-		#endif
 		{
 			dynPtr = AllocateDynamicsBlock(DYNAMICS_TEMPLATE_NET_GHOST);
 		}
@@ -513,13 +491,11 @@ STRATEGYBLOCK *CreateNetGhost(DPID playerId, int objectId, VECTORCH *position, E
 		ghostData->invulnerable=0;
 		ghostData->onlyValidFar=0;
 
-		#if EXTRAPOLATION_TEST
 		ghostData->velocity.vx=0;
 		ghostData->velocity.vy=0;
 		ghostData->velocity.vz=0;
 		ghostData->extrapTimerLast=0;
 		ghostData->extrapTimer=0;
-		#endif
 		
 		/* Clear HModelController. */
 		ghostData->HModelController.Seconds_For_Sequence=0;
@@ -685,20 +661,11 @@ STRATEGYBLOCK *CreateNetGhost(DPID playerId, int objectId, VECTORCH *position, E
 					GLOBALASSERT(subtype==AMMO_PRED_DISC);
 					GLOBALASSERT(root_section);
 
-					#if 0
-					Create_HModel(&ghostData->HModelController,root_section);
-					InitHModelSequence(&ghostData->HModelController,HMSQT_MarineStand,MSSS_Minigun_Delta,ONE_FIXED);
-					ProveHModel_Far(&ghostData->HModelController,sbPtr);
-
-					/* Just to make sure. */
-					sbPtr->shapeIndex = GetLoadedShapeMSL("Shell");
-					#else
 					/* Now it's not hierarchical! */
 					disc_section=GetThisSection(root_section,"disk");
 					GLOBALASSERT(disc_section);
 
 					sbPtr->shapeIndex = disc_section->ShapeNum;
-					#endif
 				}
 				break;
 				
@@ -749,7 +716,6 @@ STRATEGYBLOCK *CreateNetGhost(DPID playerId, int objectId, VECTORCH *position, E
 }
 
 int UseExtrapolation=1;
-#if EXTRAPOLATION_TEST
 void PlayerGhostExtrapolation()
 {
 	extern int NumActiveStBlocks;
@@ -820,12 +786,6 @@ void PlayerGhostExtrapolation()
 					}
 
 
-					/*
-					if(sbPtr->SBdptr)
-					{
-						sbPtr->SBdptr->ObRadius=1200;
-					}
-					*/
 
 				}
 				else
@@ -896,7 +856,6 @@ void PostDynamicsExtrapolationUpdate()
 		}
 	}	
 }
-#endif //EXTRAPOLATION_TEST
 
 extern HIERARCHY_VARIANT_DATA* GetHierarchyAlternateShapeSetCollectionFromLibrary(const char* rif_name,int index);
 void ChangeGhostMarineAccoutrementSet(HMODELCONTROLLER *HModelController,DPID playerId)
@@ -945,9 +904,7 @@ void ChangeGhostMarineAccoutrementSet(HMODELCONTROLLER *HModelController,DPID pl
 			replacement_array[a].replaced_section_name);
 		if (target_section) {
 			target_section->Shape=replacement_array[a].replacement_shape;
-			#if 1
 			target_section->ShapeNum=replacement_array[a].replacement_shape_index;
-			#endif
 			
 			Setup_Texture_Animation_For_Section(target_section);
 			
@@ -1142,9 +1099,6 @@ void CreatePredatorHModel(NETGHOSTDATABLOCK *ghostDataPtr, int weapon)
 	InitHModelSequence(&ghostDataPtr->HModelController,(int)HMSQT_PredatorStand,(int)PSSS_Standard,ONE_FIXED);
 	ghostDataPtr->currentAnimSequence = PredSQ_Stand;
 	
-//	ghostDataPtr->GunflashSectionPtr=GetThisSectionData(ghostDataPtr->HModelController.section_data,"dum flash");
-//	GLOBALASSERT(ghostDataPtr->GunflashSectionPtr);
-
 	/* CDF 11/4/98 Elevation Delta Sequence. */
 	{
 		DELTA_CONTROLLER *delta;
@@ -1558,7 +1512,6 @@ void HandleGhostGunFlashEffect(STRATEGYBLOCK *sbPtr, int gunFlashOn)
 	LOCALASSERT((ghostData->type == I_BehaviourMarinePlayer)||
 				(ghostData->type == I_BehaviourPredatorPlayer));
 
-	//ReleasePrintDebuggingText("Muzzle Flash %d\n",gunFlashOn);
 
 	/* Handle two pistols? */
 	if (ghostData->type == I_BehaviourMarinePlayer) {
@@ -1643,17 +1596,6 @@ void HandleGhostGunFlashEffect(STRATEGYBLOCK *sbPtr, int gunFlashOn)
 			}
 		}
 	}
-	#if 0
-	/* KJL 15:32:57 13/05/98 - Tracer code - isn't working too well */
-	if(ghostData->GunflashSectionPtr && !(FastRandom()&15)) 
-	{
-		VECTORCH endPosition = ghostData->GunflashSectionPtr->World_Offset;
-		endPosition.vx += ghostData->GunflashSectionPtr->SecMat.mat31>>3; 
-		endPosition.vy += ghostData->GunflashSectionPtr->SecMat.mat32>>3; 
-		endPosition.vz += ghostData->GunflashSectionPtr->SecMat.mat33>>3; 
-		MakeParticle(&(ghostData->GunflashSectionPtr->World_Offset),&endPosition,PARTICLE_TRACER);
-	}
-	#endif
 
 }
 
@@ -1755,33 +1697,6 @@ static void UpdatePlayerGhostAnimSequence(STRATEGYBLOCK *sbPtr, int sequence, in
 						ghostData->HModelController.LoopAfterTweening=1;
 					}
 
-					#if 0
-					if(ghostData->currentAnimSequence==ASQ_RunningAttack_Claw ||
-					   ghostData->currentAnimSequence==ASQ_RunningTailStrike ||
-					   ghostData->currentAnimSequence==ASQ_RunningAttack_Claw_Backwards ||
-					   ghostData->currentAnimSequence==ASQ_RunningTailStrike_Backwards ||
-					   ghostData->currentAnimSequence==ASQ_CrawlingAttack_Claw ||
-					   ghostData->currentAnimSequence==ASQ_CrawlingAttack_Claw_Backwards ||
-					   ghostData->currentAnimSequence==ASQ_CrawlingTailStrike ||
-					   ghostData->currentAnimSequence==ASQ_CrawlingTailStrike_Backwards ||
-					   ghostData->currentAnimSequence==ASQ_Run ||
-					   ghostData->currentAnimSequence==ASQ_RunningTailPoise ||
-					   ghostData->currentAnimSequence==ASQ_Run_Backwards ||
-					   ghostData->currentAnimSequence==ASQ_RunningTailPoise_Backwards ||
-					   ghostData->currentAnimSequence==ASQ_Crawl ||
-					   ghostData->currentAnimSequence==ASQ_Scamper ||
-					   ghostData->currentAnimSequence==ASQ_CrawlingTailPoise ||
-					   ghostData->currentAnimSequence==ASQ_Crawl_Backwards ||
-					   ghostData->currentAnimSequence==ASQ_Scamper_Backwards ||
-					   ghostData->currentAnimSequence==ASQ_CrawlingTailPoise_Backwards)
-
-					{
-						if(ghostData->HModelController.Tweening==Controller_NoTweening)
-						{
-							HModel_SetToolsRelativeSpeed(&ghostData->HModelController,(512*ONE_FIXED)/18000/*ALIEN_MOVESCALE*/);
-						}
-					}
-					#endif
 					
 
 					return;
@@ -2177,7 +2092,6 @@ static void SetPlayerGhostAnimationSequence(STRATEGYBLOCK *sbPtr, int sequence, 
 						}
 					} else {
 						InitHModelTweening(&ghostData->HModelController,(ONE_FIXED)>>3,(int)HMSQT_MarineStand,(int)MSSS_Standard,ONE_FIXED,1);
-	//					InitHModelSequence(&ghostData->HModelController,(int)HMSQT_MarineStand,(int)MSSS_Standard,ONE_FIXED);
 					}
 					break;
 				}
@@ -2550,20 +2464,6 @@ static void SetPlayerGhostAnimationSequence(STRATEGYBLOCK *sbPtr, int sequence, 
 					ghostData->HModelController.Looped=1;
 					break;
 				}
-				#if 0
-				case(ASQ_CrawlingTailStrike):
-				{
-					InitHModelTweening(&ghostData->HModelController,(ONE_FIXED>>3),(int)HMSQT_AlienCrawl,(int)ACSS_Attack_Tail,ONE_FIXED/*(ONE_FIXED/6)*/,1);
-					break;
-				}
-				case(ASQ_CrawlingTailStrike_Backwards):
-				{
-					InitHModelSequence(&ghostData->HModelController,(int)HMSQT_AlienCrawl,(int)ACSS_Attack_Tail,ONE_FIXED/*(ONE_FIXED/6)*/);
-					ghostData->HModelController.Reversed=1;
-					ghostData->HModelController.Looped=1;
-					break;
-				}
-				#endif
 				case(ASQ_Crouch):
 				case(ASQ_CrouchedTailPoise):
 				{
@@ -2976,7 +2876,6 @@ void HandlePlayerGhostWeaponSound(STRATEGYBLOCK *sbPtr, int weapon, int firingPr
 				Sound_Stop(ghostData->SoundHandle);
 			}
 			if ((firingPrimary)||(firingSecondary)) {
-				//ReleasePrintDebuggingText("Ghost Gunfire Sound!\n");
 				Sound_Play(SID_SHOTGUN,"hd",&(sbPtr->DynPtr->Position));
 			}
 			break;
@@ -3133,11 +3032,6 @@ void HandlePlayerGhostWeaponSound(STRATEGYBLOCK *sbPtr, int weapon, int firingPr
 			LOCALASSERT(type==I_BehaviourPredatorPlayer);
 			/* stop sound if we've got it */
 			//use the sounds connected to the hierarchy
-			#if 0
-			if(ghostData->SoundHandle != SOUND_NOACTIVEINDEX) Sound_Stop(ghostData->SoundHandle);				
-			if((firingPrimary)&&(ghostData->SoundHandle == SOUND_NOACTIVEINDEX)) 
-				Sound_Play(SID_SWIPE,"ehd",&(ghostData->SoundHandle),&(sbPtr->DynPtr->Position));
-			#endif
 			break;
 		}
 		case(WEAPON_PRED_PISTOL):
@@ -3148,54 +3042,15 @@ void HandlePlayerGhostWeaponSound(STRATEGYBLOCK *sbPtr, int weapon, int firingPr
 				if(ghostData->SoundHandle == SOUND_NOACTIVEINDEX) {
 				   	Sound_Play(SID_PRED_PISTOL,"hd",&(sbPtr->DynPtr->Position));					
 				}
-				//   	Sound_Play(SID_PULSE_LOOP,"elhd",&(ghostData->SoundHandle),&(sbPtr->DynPtr->Position));					
-				//else
-				//	Sound_Update3d(ghostData->SoundHandle, &(sbPtr->DynPtr->Position));
-				#if 0
-				if (sbPtr->SBdptr)
-				{
-					ProveHModel(&ghostData->HModelController,sbPtr->SBdptr);
-					//create the particles for the pistol firing
-					{
-						SECTION_DATA *muzzle;
-						VECTORCH null_vec;
-
-						muzzle=GetThisSectionData(ghostData->HModelController.section_data,"dum flash");
-						
-						null_vec.vx=0;
-						null_vec.vy=0;
-						null_vec.vz=0;
-
-						GLOBALASSERT(muzzle);
-
-//						FirePredPistolFlechettes(&muzzle->World_Offset,&null_vec,&muzzle->SecMat,0,&ghostData->timer,FALSE);
-//						CreatePPPlasmaBoltKernel(&muzzle->World_Offset,&muzzle->SecMat, 0);
-					}
-				}
-				#endif
-			}
-			else
-			{
-				//if(ghostData->SoundHandle != SOUND_NOACTIVEINDEX) 
-				//{	
-				//	Sound_Stop(ghostData->SoundHandle);				
-				//	Sound_Play(SID_PULSE_END,"hd",&(sbPtr->DynPtr->Position));									
-				//}
 			}
 			break;
 		}
 		case(WEAPON_PRED_RIFLE):
 		{
 			LOCALASSERT(type==I_BehaviourPredatorPlayer);
-			#if 0
-			/* stop sound if we've got it */
-			if(ghostData->SoundHandle != SOUND_NOACTIVEINDEX) Sound_Stop(ghostData->SoundHandle);				
-			//sound is played by spear creation
-			#else
 			/* stop sound if we've got it */
 			if(ghostData->SoundHandle != SOUND_NOACTIVEINDEX) Sound_Stop(ghostData->SoundHandle);
 			if(firingPrimary) Sound_Play(SID_PRED_LASER,"hd",&(sbPtr->DynPtr->Position));
-			#endif
 			break;
 		}
 		case(WEAPON_PRED_SHOULDERCANNON):
@@ -3216,28 +3071,10 @@ void HandlePlayerGhostWeaponSound(STRATEGYBLOCK *sbPtr, int weapon, int firingPr
 		}
 		case(WEAPON_ALIEN_CLAW):
 		{
-			//appropriate sounds should be triggered by the animation
-			#if 0
-			LOCALASSERT(type==I_BehaviourAlienPlayer);
-			/* stop sound if we've got it */
-			//if(ghostData->SoundHandle != SOUND_NOACTIVEINDEX) Sound_Stop(ghostData->SoundHandle);				
-
-			if((firingPrimary)&&(ghostData->SoundHandle == SOUND_NOACTIVEINDEX)) 
-				Sound_Play(SID_SWIPE,"ehd",&(ghostData->SoundHandle),&(sbPtr->DynPtr->Position));
-			#endif
-
 			break;
 		}
 		case(WEAPON_ALIEN_GRAB):
 		{
-			//appropriate sounds should be triggered by the animation
-			#if 0
-			LOCALASSERT(type==I_BehaviourAlienPlayer);
-			/* stop sound if we've got it */
-			if(ghostData->SoundHandle != SOUND_NOACTIVEINDEX) Sound_Stop(ghostData->SoundHandle);				
-			if((firingPrimary)&&(ghostData->SoundHandle == SOUND_NOACTIVEINDEX)) 
-				Sound_Play(SID_SWISH,"ehd",&(ghostData->SoundHandle),&(sbPtr->DynPtr->Position));
-			#endif
 			break;
 		}
 		case(WEAPON_ALIEN_SPIT):
@@ -4100,7 +3937,6 @@ void KillGhost(STRATEGYBLOCK *sbPtr,int objectId)
 		case(I_BehaviourPredatorPlayer):	
 		{
 			/* Drop through, for the moment. */
-			#if EXTRAPOLATION_TEST
 			sbPtr->DynPtr->LinImpulse.vx=0;
 			sbPtr->DynPtr->LinImpulse.vy=0;
 			sbPtr->DynPtr->LinImpulse.vz=0;
@@ -4115,7 +3951,6 @@ void KillGhost(STRATEGYBLOCK *sbPtr,int objectId)
 			
 			sbPtr->DynPtr->ToppleForce=TOPPLE_FORCE_NONE;
 			
-			#endif
 			break;
 		}
 		case(I_BehaviourGrenade):
@@ -4172,7 +4007,7 @@ void KillGhost(STRATEGYBLOCK *sbPtr,int objectId)
 	sbPtr->DynPtr->GravityOn=1;
 
 	/* And the final touch. */
-//	KillRandomSections(ghostData->HModelController.section_data,(ONE_FIXED>>2));
+
 }
 
 extern void ApplyGhostCorpseDeathAnim(STRATEGYBLOCK *sbPtr,int deathId)
@@ -4389,7 +4224,6 @@ extern void KillAlienAIGhost(STRATEGYBLOCK *sbPtr,int death_code,int death_time,
 	//Allow players to walk through the corpse
 	sbPtr->DynPtr->OnlyCollideWithEnvironment = 1;
 	
-	#if EXTRAPOLATION_TEST
 	sbPtr->DynPtr->LinImpulse.vx=0;
 	sbPtr->DynPtr->LinImpulse.vy=0;
 	sbPtr->DynPtr->LinImpulse.vz=0;
@@ -4399,11 +4233,9 @@ extern void KillAlienAIGhost(STRATEGYBLOCK *sbPtr,int death_code,int death_time,
 	sbPtr->DynPtr->LinVelocity.vz=0;
 
 	sbPtr->DynPtr->UseStandardGravity=1;
-	
 	sbPtr->DynPtr->IsNetGhost=1;
-	
 	sbPtr->DynPtr->ToppleForce=TOPPLE_FORCE_NONE;
-	#endif
+
 	//allow the corpse to fall to the floor
 	sbPtr->DynPtr->GravityOn=1;
 
@@ -5033,7 +4865,6 @@ STRATEGYBLOCK *MakeNewCorpse()
 	}
 
 	/* And the final touch. */
-//	KillRandomSections(corpseData->HModelController.section_data,(ONE_FIXED>>2));
 
 	return(sbPtr);
 }

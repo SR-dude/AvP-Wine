@@ -1,25 +1,17 @@
 #include "advwin32.h"
 #include "iff.hpp"
-
 #include <stdio.h>
 #include <tchar.h>
-#if 1
-//#if defined(_CPPRTTI) && !defined(NDEBUG)
-	#include <typeinfo>
-#endif
-
-#ifndef NDEBUG
-	#define HT_FAIL(str) (::IFF::DisplayMessage(TEXT("IFF Internal Error"),TEXT(str)),exit(-45))
-#endif
-
+#include <typeinfo>
+#define HT_FAIL(str) (::IFF::DisplayMessage(TEXT("IFF Internal Error"),TEXT(str)),exit(-45))
 #include "hash_tem.hpp"
+
 namespace IFF
 {
 	/*****************************/
 	/* Original File: iffObj.cpp */
 	/*****************************/
 
-	#ifndef NDEBUG
 	
 		static bool g_bAllocListActive = false;
 		
@@ -32,31 +24,12 @@ namespace IFF
 				}
 				~AllocList()
 				{
-					#if 1
-//					#ifdef _CPPRTTI
-						// this works in MSVC 5.0 - ie. the macro is defined if RTTI is turned on
-						// but there appears to be no preprocessor way of determining if RTTI is turned on under Watcom
-						// No, I think it works in Watcom too, actually...
-						#pragma message("Run-Time Type Identification (RTTI) is enabled")
 						for (Iterator itLeak(*this) ; !itLeak.Done() ; itLeak.Next())
 						{
 							TCHAR buf[256];
 							::wsprintf(buf,TEXT("Object not deallocated:\nType: %s\nRefCnt: %u"),typeid(*itLeak.Get()).name(),itLeak.Get()->m_nRefCnt);
 							DisplayMessage(TEXT("Memory Leak!"),buf);
 						}
-					#else // ! _CPPRTTI
-						unsigned nRefs(0);
-						for (Iterator itLeak(*this) ; !itLeak.Done() ; itLeak.Next())
-						{
-							nRefs += itLeak.Get()->m_nRefCnt;
-						}
-						if (Size())
-						{
-							char buf[256];
-							::sprintf(buf,"Objects not deallocated:\nNumber of Objects: %u\nNumber of References: %u",Size(),nRefs);
-							DisplayMessage("Memory Leaks!",buf);
-						}
-					#endif // ! _CPPRTTI
 					g_bAllocListActive = false;
 				}
 		};
@@ -74,7 +47,6 @@ namespace IFF
 				g_listAllocated.RemoveAsserted(pObj);
 		}
 		
-	#endif // ! NDEBUG
 
 	/******************************/
 	/* Original File: iffFile.cpp */
@@ -92,7 +64,6 @@ namespace IFF
 		return ! ar.m_bError;
 	}
 	
-	#ifndef IFF_READ_ONLY
 		bool GenericFile::Write(::MediaMedium * pMedium)
 		{
 			ArchvOut ar;
@@ -104,30 +75,18 @@ namespace IFF
 			
 			return ! ar.m_bError;
 		}
-	#endif // ! IFF_READ_ONLY
 	
 	
-	#ifdef _IFF_WIN_TARGET
-		typedef ::MediaWinFileMedium DeviceFileHandle;
-	#else
 		typedef ::MediaStdFileMedium DeviceFileHandle;
-	#endif
 	
 	bool GenericFile::Load(TCHAR const * pszFileName)
 	{
-		#ifndef IFF_READ_ONLY
 			if (m_pszFileName) delete[] m_pszFileName;
 			m_pszFileName = new TCHAR [_tcslen(pszFileName)+1];
 			_tcscpy(m_pszFileName,pszFileName);
-		#endif // ! IFF_READ_ONLY
 		
-		#ifdef _IFF_WIN_TARGET
-			::MediaWinFileMedium * pMedium = new ::MediaWinFileMedium;
-			pMedium->Open(pszFileName, GENERIC_READ);
-		#else
 			::MediaStdFileMedium * pMedium = new ::MediaStdFileMedium;
 			pMedium->Open(pszFileName, "rb");
-		#endif
 		
 		bool bRet = Load(pMedium);
 		
@@ -136,7 +95,6 @@ namespace IFF
 		return bRet;
 	}
 	
-	#ifndef IFF_READ_ONLY
 		bool GenericFile::Write(TCHAR const * pszFileName)
 		{
 			if (pszFileName)
@@ -148,13 +106,8 @@ namespace IFF
 			
 			if (!m_pszFileName) return false;
 			
-			#ifdef _IFF_WIN_TARGET
-				::MediaWinFileMedium * pMedium = new ::MediaWinFileMedium;
-				pMedium->Open(pszFileName, GENERIC_WRITE);
-			#else
 				::MediaStdFileMedium * pMedium = new ::MediaStdFileMedium;
 				pMedium->Open(pszFileName, "wb");
-			#endif
 			
 			bool bRet = Write(pMedium);
 			
@@ -162,7 +115,6 @@ namespace IFF
 			
 			return bRet;
 		}
-	#endif // ! IFF_READ_ONLY
 
 	void File::Serialize(Archive * pArchv)
 	{
@@ -605,11 +557,6 @@ namespace IFF {
 	/* Original File: iffMscCk.cpp */
 	/*******************************/
 
-	#ifdef IFF_READ_ONLY
-		
-		void MiscChunk::Serialize(Archive * ){}
-	
-	#else // ! IFF_READ_ONLY
 	
 		void MiscChunk::Serialize(Archive * pArchv)
 		{
@@ -763,7 +710,6 @@ namespace IFF {
 			pSub->Release();
 		}
 		
-	#endif // IFF_READ_ONLY
 
 	/*******************************/
 	/* Original File: iffArchI.cpp */

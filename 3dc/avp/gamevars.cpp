@@ -3,41 +3,22 @@
 	This file contains game-specific console variables
 	
  */
-//#include "rentrntq.h"
 #include "3dc.h"
 #include "module.h"
 #include "inline.h"
 
 #include "stratdef.h"
 #include "gamedef.h"
-
 #include "davehook.h"
-
-
 #include "r2base.h"
 	// hooks to R2 code
-
 #include "gadget.h"
 	// hooks to gadgets code
-
 #include "daemon.h"
 	// hooks to daemon code
-
 #include "rentrntq.h"
-
-//#include "ammo666.hpp"
-
-//#include "iofocus.h"
-
-//#include "statpane.h"
-
-//#include "font.h"
-
-//#include "hudgadg.hpp"
-
 #include "consvar.hpp"
 #include "conscmnd.hpp"
-
 #include "equipmnt.h"
 #include "pldnet.h"
 #include "avp_menus.h"
@@ -49,46 +30,32 @@ extern "C"
 extern int TimeScale;
 extern int MotionTrackerScale;
 extern int LeanScale;
-
 extern int CrouchIsToggleKey;
 extern int CloakingMode;
 extern int LogConsoleTextToFile;
-
 extern int PlanarGravity;
-
-
 extern int GlobalLevelOfDetail_Hierarchical;
 extern int JoystickEnabled;
-
 extern int SkyColour_R;
 extern int SkyColour_G;
 extern int SkyColour_B;
-
 extern int DrawCompanyLogos;
-
 extern int QuantumObjectDieRollOveride;
-
 extern int WireFrameMode;
 extern int LightScale;
-
 extern int MotionTrackerSpeed; 
 extern int MotionTrackerVolume;
-
 extern int DrawFullBright;
-
 extern void ChangeToMarine();
 extern void ChangeToAlien();
 extern void ChangeToPredator();
-
 extern int SentrygunSpread;
 int PlaySounds;
 int DopplerShiftIsOn;
-
 extern int UseExtrapolation;
-
 extern int DebuggingCommandsActive;
-
 extern int AutoWeaponChangeOn;
+
 
 void CreateGameSpecificConsoleVariables(void)
 {
@@ -112,17 +79,7 @@ void CreateGameSpecificConsoleVariables(void)
 	PlaySounds=1;
 	DrawFullBright=0;
 
-	#ifndef AVP_DEBUG_VERSION // allow debug commands without -debug
-	BOOL IsACheat = TRUE;
-	#else
 	BOOL IsACheat = FALSE;
-	#endif
-
-	#ifndef AVP_DEBUG_VERSION // allow debug commands without -debug
-	#ifndef AVP_DEBUG_FOR_FOX // allow debug commands without -debug
-	if (DebuggingCommandsActive)
-	#endif
-	#endif
 	{
 		ConsoleVariable :: MakeSimpleConsoleVariable_FixP
 		(
@@ -201,7 +158,6 @@ void CreateGameSpecificConsoleVariables(void)
 		);
 	}
 
-	#if CONSOLE_DEBUGGING_COMMANDS_ACTIVATED
 	ConsoleVariable :: MakeSimpleConsoleVariable_FixP
 	(
 		MotionTrackerScale, // int& Value_ToUse,
@@ -418,17 +374,6 @@ void CreateGameSpecificConsoleVariables(void)
 		0, // int MinVal_New,
 		65536 // int MaxVal_New
 	);
-	#endif
-/*
-	MakeSimpleConsoleVariable_Int
-	(
-		bEnableTextprint, // int& Value_ToUse,
-		"TEXT", // ProjChar* pProjCh_ToUse,
-		"(ENABLE/DISABLE DIAGNOSTIC TEXT)", // ProjChar* pProjCh_Description_ToUse
-		0, // int MinVal_New,
-		1  // int MaxVal_New
-	);
-*/
 
 	ConsoleVariable :: MakeSimpleConsoleVariable_FixP
 	(

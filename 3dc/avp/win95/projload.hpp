@@ -94,7 +94,6 @@ public:
 	
 	SECTION * build_hierarchy (Object_Hierarchy_Chunk * ohc,char* hierarchy_name);
 	
-	void delete_section(SECTION *);
 	
 	
 };

@@ -986,9 +986,6 @@ extern void RestartNetworkGame(int seed);
 
 extern void DeallocatePlayersMirrorImage();
 
-void InitNetLog(void);
-void LogNetInfo(char *msg);
-
 extern BOOL AreThereAnyLivesLeft();
 
 extern void DoMultiplayerSpecificHud();

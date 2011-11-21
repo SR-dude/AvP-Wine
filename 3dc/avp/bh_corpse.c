@@ -520,13 +520,6 @@ void Convert_Xenoborg_To_Corpse(STRATEGYBLOCK *sbPtr,DEATH_DATA *this_death) {
 	/* KJL 17:19:35 27/08/98 - ignore the player, other body parts, etc */
 	sbPtr->DynPtr->OnlyCollideWithEnvironment = 1;
 
-	#if 0
-	/* Electric death sound? */
-	if (corpseDataPtr->This_Death->Electrical) {
-		Sound_Play(SID_ED_ELEC_DEATH,"de",&sbPtr->DynPtr->Position,&corpseDataPtr->SoundHandle4);
-	}
-	#endif
-
 }
 
 void CorpseBehaveFun(STRATEGYBLOCK *sbPtr)
@@ -682,9 +675,7 @@ void CorpseBehaveFun(STRATEGYBLOCK *sbPtr)
 		}
 	}
 	
-	#if CORPSE_SIGHTINGS
 	Marine_CorpseSightingTest(sbPtr);
-	#endif
 
 	/* Finally consider destructing preds. */
 	if (corpseDataPtr->destructTimer>=0) {
@@ -832,11 +823,6 @@ void CorpseIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple,
 }
 
 
-
-
-
-
-
 /*--------------------**
 ** Loading and Saving **
 **--------------------*/
@@ -863,15 +849,9 @@ typedef struct corpse_save_block
 	int ARealMarine;
 	/* If you're an alien... */
 	int subtype;
-
 	int Wounds;
-
 	int DeathFiring	:1;
-
-	
 	int deathCode;
-
-	//strategyblock stuff
 	int integrity;
 	DAMAGEBLOCK SBDamageBlock;
 	DYNAMICSBLOCK dynamics;

@@ -13,115 +13,39 @@
 /* Includes ********************************************************/
 #include "3dc.h"
 #include "gadget.h"
-
-#if SupportWindows95
-
 #include "rentrntq.h"
+#include "iofocus.h"
+#include "hudgadg.hpp"
+#include "textin.hpp"
+#include "consbind.hpp"
 
-	#if UseGadgets
-	#include "iofocus.h"
-	#include "hudgadg.hpp"
-	#include "textin.hpp"
-	#include "consbind.hpp"
-	#endif
+#define UseLocalAssert Yes
+#include "ourasert.h"
 
-	#define UseLocalAssert Yes
-	#include "ourasert.h"
-
-/* Version settings ************************************************/
-
-/* Constants *******************************************************/
-	#define MAX_Q_MESSAGES (256)
-
-#if 0
-	#if 1
-	#define METACHAR_CHANGEFOCUS	'~'
-	#else
-	#define METACHAR_CHANGEFOCUS	'\r'
-	#endif
-
-	#define METAKEY_CHANGEFOCUS_VK	(0xdf)
-		/*
-			DHM 14/1/98:
-			------------
-
-			I have been asked to make this key the
-			
-				"you know, the tilde key, the one in the top left of everyone's
-				keyboards, like Quake does"
-
-			However, I have yet to find a keyboard for which the tilde key is in the
-			top left.
-
-			I obtained the value (0xdf) by experiment on my keyboard.  According to 
-			the Petzold book:
-
-				"Although all keys cause keystroke messages, the table does not
-				include any symbol keys (such as the key with the / and ? symbols).
-				These keys have virtual key codes of 128 and above, and they are often
-				defined differently for international keyboards. You can determine the
-				values of these virtual key codes using the KEYLOOK program that is shown
-				later in this chapter, but normally you should not process keystroke
-				messages for these keys."
-
-			What about DirectInput?
- 
-		*/
-#endif
-
-/* Macros **********************************************************/
-
-/* Imported function prototypes ************************************/
-
-/* Imported data ***************************************************/
-#ifdef __cplusplus
-	extern "C"
-	{
-#endif
-		#if 0
-		extern OurBool			DaveDebugOn;
-		extern FDIEXTENSIONTAG	FDIET_Dummy;
-		extern IFEXTENSIONTAG	IFET_Dummy;
-		extern FDIQUAD			FDIQuad_WholeScreen;
-		extern FDIPOS			FDIPos_Origin;
-		extern FDIPOS			FDIPos_ScreenCentre;
-		extern IFOBJECTLOCATION IFObjLoc_Origin;
-		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
-		extern IFCOLOUR			IFColour_Dummy;
- 		extern IFVECTOR			IFVec_Zero;
-		#endif
-#ifdef __cplusplus
-	};
-#endif
+#define MAX_Q_MESSAGES (256)
 
 
-
-/* Exported globals ************************************************/
 
 /* Internal type definitions ***************************************/
-	enum QEntryCategory
+enum QEntryCategory
+{
+	QEntryCat_WM_CHAR,
+	QEntryCat_WM_KEYDOWN,
+	NUM_Q_ENTRY_CATS
+};
+
+struct Q_Entry
+{
+	enum QEntryCategory QEntryCat;
+	union
 	{
-		QEntryCat_WM_CHAR,
-		QEntryCat_WM_KEYDOWN,
+		char Ch;
+		// Valid for: QEntryCat_WM_CHAR
+		WPARAM wParam;
+		// Valid for: QEntryCat_WM_KEYDOWN
+	} CatData; 
+};
 
-		NUM_Q_ENTRY_CATS
-	};
-
-	struct Q_Entry
-	{
-		enum QEntryCategory QEntryCat;
-
-		union
-		{
-			char Ch;
-				// Valid for: QEntryCat_WM_CHAR
-
-			WPARAM wParam;
-				// Valid for: QEntryCat_WM_KEYDOWN
-		} CatData; 
-	};
-
-/* Internal function prototypes ************************************/
 
 /* Internal globals ************************************************/
 	static struct Q_Entry OurQ[MAX_Q_MESSAGES];
@@ -167,7 +91,6 @@ void RE_ENTRANT_QUEUE_WinMain_FlushMessages(void)
 {
 	// Process the messages:
 	{
-		#if UseGadgets
 		// AVP/Win95-specific code
 		if ( HUDGadget :: GetHUD() )
 		{
@@ -195,13 +118,6 @@ void RE_ENTRANT_QUEUE_WinMain_FlushMessages(void)
 								);
 							}
 						}
-						#if 0
-						textprint
-						(
-							"\n\n\nWM_CHAR message flushed; code=0x%x\n\n\n",
-							Ch
-						);
-						#endif
 					}
 					break;
 
@@ -248,24 +164,6 @@ void RE_ENTRANT_QUEUE_WinMain_FlushMessages(void)
 							}
 
 						}
-						else
-						{
-							#if KeyBindingUses_WM_KEYDOWN
-							// 6/4/98:
-							// Pass the key to the console-binding code:
-							KeyBinding::Process_WM_KEYDOWN
-							(
-								OurQ[i] . CatData . wParam
-							);
-							#endif
-						}
-						#if 0
-						textprint
-						(
-							"\n\n\nWM_KEYDOWN message flushed; code=0x%x\n\n\n",
-							OurQ[i] . CatData . wParam
-						);
-						#endif
 
 					}
 					break;
@@ -273,7 +171,6 @@ void RE_ENTRANT_QUEUE_WinMain_FlushMessages(void)
 				}
 			}
 		}
-		#endif
 	}
 
 	// Clear the messages (only place where a semaphore might be needed):
@@ -285,10 +182,3 @@ void RE_ENTRANT_QUEUE_WinMain_FlushMessagesWithoutProcessing(void)
 	NumQMessages = 0;
 }
 
-/* Internal function definitions ***********************************/
-
-
-
-
-
-#endif // SupportWindows95

@@ -12,12 +12,6 @@ extern "C" {
 #include "3dc.h"
 #include "inline.h"
 
-// For modifications necessary to make Alt-Tabbing
-// behaviour (WM_ACTIVATEAPP) work full screen.
-// This is necessary to support full screen
-// ActiveMovie play.
-
-#define SupportAltTab Yes
 
 // Globals
 
@@ -55,11 +49,7 @@ extern BOOL bActive;
 long GetWindowsTickCount(void)
 
 {
-    #if 0
-	return GetTickCount();
-	#else
 	return timeGetTime();
-	#endif
 }
 
 // This function is set up using a PeekMessage check,
@@ -101,19 +91,6 @@ void CheckForWindowsMessages(void)
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 
-			#if (!SupportAltTab)
-			// Panic
-			if (!bActive)
-			{
-				// Dubious hack...
-				#if 0
-				ExitSystem();
-				#else
-				ReleaseDirect3D();
-				exit(0x00);
-				#endif
-			}
-			#endif
 		}
 		
 		// JH 13/2/98 - if the app is not active we should not return from the message lopp
@@ -173,16 +150,11 @@ BOOL SpawnRasterThread()
 
     if (RasterThread == NULL)
 	  {
-       #if debug
 	   ReleaseDirect3D();
 	   exit(0xabab);
-	   #else
-	   return FALSE;
-       #endif
 	  }
 
-    #if 1
-	// Set the priority on the thread to
+ 	// Set the priority on the thread to
 	// below normal, since we want this thread
 	// to be unimportant --- it is only monitoring
 	// the hardware rasteriser.  Hopefully.
@@ -195,7 +167,6 @@ BOOL SpawnRasterThread()
 	// when using CreateThread.
 	SetThreadPriority(RasterThread, 
 	   THREAD_PRIORITY_NORMAL);
-	#endif
 
 	return TRUE;
 }
@@ -230,12 +201,8 @@ BOOL WaitForRasterThread()
     // Failed to get a status report on the thread
 	if (RetVal == FALSE)
 	  {
-	   #if debug
 	   ReleaseDirect3D();
 	   exit(0xabbb);
-	   #else
-	   return FALSE;
-	   #endif
 	  }
 
 	return TRUE;
@@ -256,8 +223,8 @@ BOOL WaitForRasterThread()
 
 static unsigned int GetCPUId(void)
 {
-// adj
-#if 0
+
+#if 0 // adj stub
 	unsigned int retval;
 	_asm
 	{
@@ -276,6 +243,9 @@ static unsigned int GetCPUId(void)
 
 PROCESSORTYPES ReadProcessorType(void)
 {
+/* adj */
+
+
 	SYSTEM_INFO SystemInfo;
 	int ProcessorType;
 	PROCESSORTYPES RetVal;
@@ -300,12 +270,6 @@ PROCESSORTYPES ReadProcessorType(void)
 		 else
 		 	RetVal = PType_Pentium;
 		 break;
-
-       #if 0
-	   case PROCESSOR_INTEL_SOMETHING:
-		 RetVal = PType_Klamath;
-		 break;
-	   #endif
 
 	   default:
 	     RetVal = PType_OffTopOfScale;

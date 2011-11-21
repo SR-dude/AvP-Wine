@@ -455,7 +455,7 @@ void InitAVPNetGame(void)
 //		ConvertNetNameToUpperCase(netGameData.playerData[0].name);
 	}
 
-	InitNetLog();
+
 }
 
 void InitAVPNetGameForHost(int species, int gamestyle, int level)
@@ -494,7 +494,6 @@ void InitAVPNetGameForHost(int species, int gamestyle, int level)
 			netGameData.playerData[i].startFlag = 0;		
 		}
 		for(j=0;j<3;j++) netGameData.teamScores[j] = 0;
-//		netGameData.myGameState = NGS_Playing;
 
 		
 		netGameData.myCharacterSubType=NGSCT_General;
@@ -534,17 +533,7 @@ void InitAVPNetGameForHost(int species, int gamestyle, int level)
 		netGameData.myStartFlag = 0;
 		netGameData.gameType = gamestyle;
 		netGameData.levelNumber = level;
-//		netGameData.scoreLimit = 0;
-//		netGameData.timeLimit = 0;
-//		netGameData.invulnerableTime = 5;
 		netGameData.GameTimeElapsed = 0;
-
-//		netGameData.characterKillValues[NGCT_Marine]=100;
-//		netGameData.characterKillValues[NGCT_Predator]=150;
-//		netGameData.characterKillValues[NGCT_Alien]=75;
-//		netGameData.baseKillValue=100;
-//		netGameData.useDynamicScoring=1;
-//		netGameData.useCharacterKillValues=1;
 
 		netGameData.stateCheckTimeDelay=0;
 		netGameData.gameDescriptionTimeDelay=0;
@@ -571,7 +560,6 @@ void InitAVPNetGameForHost(int species, int gamestyle, int level)
 	netGameData.playerData[0].playerId = AVPDPNetID;
 	strncpy(netGameData.playerData[0].name,AVPDPplayerName.lpszShortNameA,NET_PLAYERNAMELENGTH-1);
 	netGameData.playerData[0].name[NET_PLAYERNAMELENGTH-1] = '\0';
-//	ConvertNetNameToUpperCase(netGameData.playerData[0].name);
 
 	{
 		int myIndex;
@@ -583,7 +571,6 @@ void InitAVPNetGameForHost(int species, int gamestyle, int level)
 	
 	netGameData.LMS_AlienIndex=-1;
 
-	InitNetLog();
 
 	//make sure our time scale is set correctly
 	switch(netGameData.gameSpeed)
@@ -677,7 +664,6 @@ void InitAVPNetGameForJoin(void)
 	netNextLocalObjectId = 1;	/* init local object network id */
 	numMessagesReceived = 0;	/* these are for testing */
 	numMessagesTransmitted = 0;
-	InitNetLog();
 
 	
 	netGameData.myStrategyCheckSum=0;
@@ -735,8 +721,6 @@ void NetCollectMessages(void)
 	/* only bother colecting messages under certain game conditions... */
 	if((netGameData.myGameState!=NGS_StartUp)&&(netGameData.myGameState!=NGS_Playing)&&(netGameData.myGameState!=NGS_Joining)&&(netGameData.myGameState!=NGS_EndGameScreen)) return;
 
-	InitNetLog();
-	LogNetInfo("Collecting Messages... \n");
 
 	/* collects messages until something other than DP_OK is returned (eg DP_NoMessages) */
 	if(!netGameData.skirmishMode)
@@ -756,7 +740,6 @@ void NetCollectMessages(void)
 			}	
 		}
 	}
-	LogNetInfo("... Finished collecting Messages\n");
 
 	/* check ghost integrities */
 	MaintainGhosts();
@@ -800,7 +783,6 @@ void NetCollectMessages(void)
 							TransmitEndOfGameNetMsg();
 							netGameData.myGameState = NGS_EndGameScreen;
 							break;
-						//	AvP.MainLoopRunning = 0;
 						}
 					}
 				}			
@@ -895,32 +877,12 @@ void NetCollectMessages(void)
 	/* print my score on the screen (temporary) */
 	if(netGameData.myGameState==NGS_Playing)
 	{
-		#if 0
-		int myScore;
-		int myIndex = PlayerIdInPlayerList(AVPDPNetID);
-		myScore = AddUpPlayerFrags(myIndex);
-		LOCALASSERT(myIndex!=NET_IDNOTINPLAYERLIST);		
-		#if PreBeta
-		{
-			extern void	jtextprint(const char *t,...);
-			jtextprint("NET GAME SCORE: %d \n", myScore);	
-		}
-		#else
-			textprint("NET GAME SCORE: %d \n", myScore);	
-		#endif
 
-		#else
-		#endif
-
-		#if EXTRAPOLATION_TEST
-		{
-			extern void PlayerGhostExtrapolation();
-			PlayerGhostExtrapolation();
-		}
-		#endif
+		extern void PlayerGhostExtrapolation();
+		PlayerGhostExtrapolation();
+		
 	}
 
-	LogNetInfo("Finished message collection post-processing \n");
 
 	if(MultiplayerObservedPlayer)
 	{
@@ -962,12 +924,10 @@ static void ProcessSystemMessage(char *msgP,unsigned int msgSize)
 					AddPlayerToGame(id,name);
 				}
 			}
-			LogNetInfo("system message:  DPSYS_CREATEPLAYERORGROUP \n");
 			break;
 		}
 		case DPSYS_DELETEPLAYERFROMGROUP:
 		{
-//					NewOnScreenMessage("A PLAYER HAS DISCONNECTED");
 			/* ignore */
 			break;
 		}
@@ -985,10 +945,8 @@ static void ProcessSystemMessage(char *msgP,unsigned int msgSize)
 				{
 					DPID id = destroyMessage->dpId;
 					RemovePlayerFromGame(id);
-//					NewOnScreenMessage("A PLAYER HAS DISCONNECTED");
 				}
 			}
-			LogNetInfo("system message:  DPSYS_DESTROYPLAYERORGROUP \n");
 			break;
 		}
 		case DPSYS_HOST:
@@ -1007,9 +965,6 @@ static void ProcessSystemMessage(char *msgP,unsigned int msgSize)
 				//but the new host can create some more
 				AvP.NetworkAIServer = (netGameData.gameType==NGT_Coop);
 				Inform_NewHost();
-//				TransmitEndOfGameNetMsg();
-//				netGameData.myGameState = NGS_EndGame;
-//				AvP.MainLoopRunning = 0;
 
 				if(LobbiedGame)
 				{
@@ -1017,21 +972,12 @@ static void ProcessSystemMessage(char *msgP,unsigned int msgSize)
 					LobbiedGame=LobbiedGame_Server;
 				}
 			}
-			LogNetInfo("system message:  DPSYS_HOST \n");
 			break;
 		}
 		case DPSYS_SESSIONLOST:
 		{
 			/* Aha. I have lost my connection. Time to exit the game gracefully.*/
 			NewOnScreenMessage("Session lost!!");
-			/*
-			if((netGameData.myGameState==NGS_StartUp)||(netGameData.myGameState==NGS_Joining)||(netGameData.myGameState==NGS_Playing))
-			{
-				netGameData.myGameState = NGS_Error_HostLost;
-			}
-			
-			LogNetInfo("system message:  DPSYS_SESSIONLOST \n");
-			*/
 			break;
 		}
 		case DPSYS_SETPLAYERORGROUPDATA:
@@ -1149,7 +1095,6 @@ static void ProcessGameMessage(DPID senderId, char *msgP,unsigned int msgSize)
 	NETMESSAGEHEADER *headerPtr;
 	char *endOfMessage;
 		
-	LogNetInfo("Processing a game message \n");
 
 	/* check the dp message */
 	{
@@ -1169,9 +1114,6 @@ static void ProcessGameMessage(DPID senderId, char *msgP,unsigned int msgSize)
 	/* In leaving or error states, we can ignore game messages */
 	if((netGameData.myGameState!=NGS_StartUp)&&(netGameData.myGameState!=NGS_Playing)&&(netGameData.myGameState!=NGS_Joining)&&(netGameData.myGameState!=NGS_EndGameScreen)) return;
 
-	/* validate the sender from our player list, unless we're in startup mode */
-//	if((netGameData.myGameState!=NGS_StartUp)&&
-//	   (PlayerIdInPlayerList(senderId)==NET_IDNOTINPLAYERLIST)) return;
 	
 	/* the message includes garry's dp extented header, so skip past this
 	and find the end of the message (for checking integrity) */
@@ -1518,35 +1460,10 @@ static void ProcessGameMessage(DPID senderId, char *msgP,unsigned int msgSize)
 	at the end of the message buffer*/
 	LOCALASSERT(subMessagePtr==endOfMessage);
 
-	LogNetInfo("Finished processing a game message \n");
 
 }
 
-#if CalculateBytesSentPerSecond
-int GetBytesPerSecond(int bytesThisFrame)
-{
-	static int times[100];
-	static int bytes[100];
-	static int next_index;
-	int i;
-	int totalBytes=0;
 
-	times[next_index]=0;
-	bytes[next_index]=bytesThisFrame;
-	next_index=(next_index+1)%100;
-
-	for(i=0;i<100;i++)
-	{
-		times[i]+=NormalFrameTime;
-		totalBytes+=bytes[i];
-	}
-
-	if(!times[next_index]) return 0;
-	
-	return(DIV_FIXED(totalBytes,times[next_index]));
-
-}
-#endif
 
 /*----------------------------------------------------------------------
   Core function for sending messages
@@ -1554,7 +1471,6 @@ int GetBytesPerSecond(int bytesThisFrame)
 void NetSendMessages(void)
 {
 	/* some assertions about our game state */
-	//LOCALASSERT(!((AvP.Network==I_Host)&&(netGameData.myGameState==NGS_Leaving)));
 	LOCALASSERT(!((AvP.Network==I_Host)&&(netGameData.myGameState==NGS_Error_GameFull)));
 	LOCALASSERT(!((AvP.Network==I_Host)&&(netGameData.myGameState==NGS_Error_GameStarted)));
 	LOCALASSERT(!((AvP.Network==I_Host)&&(netGameData.myGameState==NGS_Error_HostLost)));
@@ -1563,7 +1479,6 @@ void NetSendMessages(void)
 	/* only bother sending messages under certain game conditions... */
 	if((netGameData.myGameState!=NGS_StartUp)&&(netGameData.myGameState!=NGS_EndGameScreen)&&(netGameData.myGameState!=NGS_Playing)&&(netGameData.myGameState!=NGS_Joining)) return;
 
-	LogNetInfo("Sending net messages... \n");
 
 	/* at this point, add player and other object updates... doing this here
 	ensures we are sending our most upto date info */
@@ -1575,13 +1490,11 @@ void NetSendMessages(void)
 		GameTimeSinceLastSend+=NormalFrameTime;
 		TimeCounterForExtrapolation+=NormalFrameTime;
 
-		#if EXTRAPOLATION_TEST
 		//update muzzle flashes here , since this happens after dynamics
 		{
 			extern void PostDynamicsExtrapolationUpdate();
 			PostDynamicsExtrapolationUpdate();
 		}
-		#endif
 		
 		if(netGameData.sendFrequency)
 		{
@@ -1590,9 +1503,6 @@ void NetSendMessages(void)
 			if(netGameData.sendTimer>0)
 			{
 				//don't send messages this frame
-				#if CalculateBytesSentPerSecond
-				PrintDebuggingText("Bytes/Second: %d\n",GetBytesPerSecond(0));
-				#endif
 				return;
 			}
 			netGameData.sendTimer+=netGameData.sendFrequency;
@@ -1734,14 +1644,10 @@ void NetSendMessages(void)
 			InitialiseSendMessageBuffer();
 		}
 
-//		PrintDebuggingText("Bytes: %d\n",numBytes);
-		#if CalculateBytesSentPerSecond
-		PrintDebuggingText("Bytes/Second: %d\n",GetBytesPerSecond(numBytes));
-		#endif
 		
 	}
 	
-	LogNetInfo("...Finished sending net message \n");
+
 }
 
 static void InitialiseSendMessageBuffer(void)
@@ -1773,9 +1679,7 @@ static void AddPlayerAndObjectUpdateMessages(void)
 	CORESPONDING CHANGE IN THE LIST OF OBJECTS TESTED BY FindObjectFromNetIndex(),
 	ELSE PLAYER WILL NOT BE ABLE TO RECEIVE MESSAGES ABOUT OWN OBJECTS OF THAT TYPE! */	
 
-	#if EXTRAPOLATION_TEST
 	AddNetMsg_FrameTimer();
-	#endif
 
 	while(sbIndex < NumActiveStBlocks)
 	{	
@@ -1804,7 +1708,6 @@ static void AddPlayerAndObjectUpdateMessages(void)
 			case(I_BehaviourNetCorpse):
 			case(I_BehaviourPPPlasmaBolt):
 			case(I_BehaviourFrisbee):
-//			case(I_BehaviourSpeargunBolt): //spear location is sent once , upon creation
 			{
 				
  				AddNetMsg_LocalObjectState(sbPtr);
@@ -1871,7 +1774,6 @@ void EndAVPNetGame(void)
 	}
 	
 
-	//netGameData.myGameState=NGS_Leaving;
 	RemovePlayerFromGame(AVPDPNetID);
 	TransmitPlayerLeavingNetMsg();
 	
@@ -1880,21 +1782,6 @@ void EndAVPNetGame(void)
 		DirectPlay_Disconnect();
 	}
 
-	#if 0
-	/* terminate our player */
-	if(AVPDPNetID) 
-	{
-		hres = IDirectPlay4_DestroyPlayer(glpDP, AVPDPNetID);
-		AVPDPNetID = NULL;
-	}
-	/* terminate the dp object */
-	if(glpDP) 
-	{
-		hres = IDirectPlay4_Close(lpDPlay3AAVP);
-		IDirectPlay4_Release(lpDPlay3AAVP);
-		lpDPlay3AAVP = NULL;
-	}
-	#endif
 	
 	/* reset our game mode here */
 	AvP.Network = I_No_Network;	
@@ -2107,7 +1994,6 @@ void AddNetMsg_PlayerState(STRATEGYBLOCK *sbPtr)
 
 	if(netGameData.myGameState!=NGS_Playing) return;
 
-	#if EXTRAPOLATION_TEST
 	if(UseExtrapolation && netGameData.sendFrequency)
 	{
 		//see if we can get away with sending reduced information about the player's state
@@ -2190,7 +2076,6 @@ void AddNetMsg_PlayerState(STRATEGYBLOCK *sbPtr)
 		
 		}
 	}
-	#endif
 	
 	/* check there's enough room in the send buffer */
 	{
@@ -2267,15 +2152,13 @@ void AddNetMsg_PlayerState(STRATEGYBLOCK *sbPtr)
 		messagePtr->zOrient = (dynPtr->OrientEuler.EulerZ>>NET_EULERSCALESHIFT);
 		 
 	
-		#if EXTRAPOLATION_TEST
 		messagePtr->velocity_x=dynPtr->LinVelocity.vx/100;
 		messagePtr->velocity_y=dynPtr->LinVelocity.vy/100;
 		messagePtr->velocity_z=dynPtr->LinVelocity.vz/100;
 		messagePtr->standard_gravity=dynPtr->UseStandardGravity;
-		#endif
 	}
 
-	/* KJL 17:04:22 26/01/98 - elevation (for weapon, etc.) */
+	/*  elevation (for weapon, etc.) */
 	{
 		PLAYER_STATUS *playerStatusPtr= (PLAYER_STATUS *) (Player->ObStrategyBlock->SBdataptr);
 		messagePtr->Elevation = playerStatusPtr->ViewPanX;
@@ -2434,10 +2317,6 @@ void AddNetMsg_PlayerState(STRATEGYBLOCK *sbPtr)
 		messagePtr->IAmInvulnerable=0;
 
 
-	/* whether or not I'm the host */
-//	if(AvP.Network==I_Host) messagePtr->IAmHost = 1;
-//	else messagePtr->IAmHost = 0;
-
 	/* whether or not I'm a cloaked predator */
 	{
  		PLAYER_STATUS *playerStatusPtr = (PLAYER_STATUS *)(Player->ObStrategyBlock->SBdataptr);
@@ -2493,7 +2372,7 @@ void AddNetMsg_PlayerState(STRATEGYBLOCK *sbPtr)
 	//reset last scream , so we don't keep sending it
 	netGameData.myLastScream=-1;
 
-	/* CDF 21/4/99 Add landing noise? */
+	/* Add landing noise? */
 	messagePtr->landingNoise=netGameData.landingNoise;
 	//reset that too!
 	netGameData.landingNoise=0;
@@ -2545,7 +2424,7 @@ void AddNetMsg_PlayerState_Minimal(STRATEGYBLOCK *sbPtr,BOOL sendOrient)
 	playerIndex = PlayerIdInPlayerList(AVPDPNetID);
 	GLOBALASSERT(playerIndex!=NET_IDNOTINPLAYERLIST);
 	
-	/* KJL 17:04:22 26/01/98 - elevation (for weapon, etc.) */
+	/*elevation (for weapon, etc.) */
 	{
 		PLAYER_STATUS *playerStatusPtr= (PLAYER_STATUS *) (Player->ObStrategyBlock->SBdataptr);
 		messagePtr->Elevation = playerStatusPtr->ViewPanX;
@@ -3009,8 +2888,6 @@ void AddNetMsg_PlayerLeaving(void)
 	NETMESSAGEHEADER *headerPtr;
 	int headerSize = sizeof(NETMESSAGEHEADER);
 
-	/* some conditions */
-	//LOCALASSERT(AvP.Network==I_Peer);
 	/* yes: need to send this before changing state, as we need to know our previous state,
 	and sendMessage requires one of these two states anyway */
 	LOCALASSERT((netGameData.myGameState==NGS_StartUp)||(netGameData.myGameState==NGS_Playing)||(netGameData.myGameState==NGS_Joining)||(netGameData.myGameState==NGS_EndGame)||(netGameData.myGameState==NGS_EndGameScreen));
@@ -3262,9 +3139,6 @@ void AddNetMsg_LocalObjectState(STRATEGYBLOCK *sbPtr)
 		DYNAMICSBLOCK *dynPtr = sbPtr->DynPtr;
 
 		LOCALASSERT(dynPtr);
-//		LOCALASSERT((dynPtr->Position.vx < 4194304)&&(dynPtr->Position.vx > -4194304)); /* 23 bits of data */
-//		LOCALASSERT((dynPtr->Position.vy < 4194304)&&(dynPtr->Position.vy > -4194304)); /* 23 bits of data */
-//		LOCALASSERT((dynPtr->Position.vz < 4194304)&&(dynPtr->Position.vz > -4194304)); /* 23 bits of data */
 		LOCALASSERT((dynPtr->OrientEuler.EulerX >=0 )&&(dynPtr->OrientEuler.EulerX < 4096)); /* 9 bits of signed data */
 		LOCALASSERT((dynPtr->OrientEuler.EulerY >=0 )&&(dynPtr->OrientEuler.EulerY < 4096)); /* 9 bits of signed data */
 		LOCALASSERT((dynPtr->OrientEuler.EulerZ >=0 )&&(dynPtr->OrientEuler.EulerZ < 4096));	/* 9 bits of signed data */
@@ -3288,7 +3162,6 @@ void AddNetMsg_LocalObjectState(STRATEGYBLOCK *sbPtr)
 
 	{
 		int obId = *((int *)(&(sbPtr->SBname[4])));
-//		LOCALASSERT((obId >= -NET_MAXOBJECTID)&&(obId <= NET_MAXOBJECTID));
 		messagePtr->objectId = obId;
 	}
 
@@ -3314,7 +3187,6 @@ void AddNetMsg_LocalObjectState(STRATEGYBLOCK *sbPtr)
 				(sbPtr->I_SBtype == I_BehaviourFrisbee)||
 				(sbPtr->I_SBtype == I_BehaviourNetCorpse));
 
-	#if 1
 	if (sbPtr->I_SBtype==I_BehaviourInanimateObject) {
 		INANIMATEOBJECT_STATUSBLOCK* objStatPtr = sbPtr->SBdataptr;
 
@@ -3324,7 +3196,6 @@ void AddNetMsg_LocalObjectState(STRATEGYBLOCK *sbPtr)
 		messagePtr->IOType = (unsigned char)IOT_Non;
 		messagePtr->subtype = (unsigned char)0;
 	}
-	#endif
 
 	if (sbPtr->I_SBtype==I_BehaviourPredatorDisc_SeekTrack) {
 	    PC_PRED_DISC_BEHAV_BLOCK *bbPtr = (PC_PRED_DISC_BEHAV_BLOCK * ) sbPtr->SBdataptr;
@@ -3586,12 +3457,7 @@ void AddNetMsg_LocalObjectDestroyed_Request(STRATEGYBLOCK *sbPtr)
 		}
 		
 		messagePtr->playerId = ghostData->playerId;
-/*
-		if((ghostData->playerObjectId < -NET_MAXOBJECTID)||(ghostData->playerObjectId > NET_MAXOBJECTID))
-		{
-			LOCALASSERT(1==0);
-		} 
-*/
+
 		messagePtr->objectId = ghostData->playerObjectId;	
 		/* That's it. */
 	}
@@ -3631,7 +3497,6 @@ void AddNetMsg_LocalObjectDestroyed(STRATEGYBLOCK *sbPtr)
 	/* fill out message */
 	{
 		int obId = *((int *)(&(sbPtr->SBname[4])));
-//		LOCALASSERT((obId >= -NET_MAXOBJECTID)&&(obId <= NET_MAXOBJECTID));
 		messagePtr->objectId = obId;
 	}
 }
@@ -4048,7 +3913,7 @@ void AddNetMsg_PlayerAutoGunState(STRATEGYBLOCK *sbPtr)
 	}
 }
 
-/* KJL 17:49:31 20/01/98 - transmit make decal info */
+/* transmit make decal info */
 void AddNetMsg_MakeDecal(enum DECAL_ID decalID, VECTORCH *normalPtr, VECTORCH *positionPtr, int moduleIndex)
 {
 	NETMESSAGEHEADER *headerPtr;
@@ -4105,7 +3970,7 @@ void AddNetMsg_MakeDecal(enum DECAL_ID decalID, VECTORCH *normalPtr, VECTORCH *p
 	messagePtr->ModuleIndex = moduleIndex;
 }
 
-/* KJL 14:34:45 08/04/98 - broadcast a message to the other players */
+/* broadcast a message to the other players */
 void AddNetMsg_ChatBroadcast(char *string,BOOL same_species_only)
 {
 	NETMESSAGEHEADER *headerPtr;
@@ -4180,7 +4045,7 @@ void AddNetMsg_ChatBroadcast(char *string,BOOL same_species_only)
 
 }
 
-/* KJL 11:28:44 27/04/98 - make an explosion (just the sfx; damage is handled separately */
+/* make an explosion (just the sfx; damage is handled separately */
 void AddNetMsg_MakeExplosion(VECTORCH *positionPtr, enum EXPLOSION_ID explosionID)
 {
 	NETMESSAGEHEADER *headerPtr;
@@ -4289,7 +4154,7 @@ void AddNetMsg_MakePlasmaExplosion(VECTORCH *positionPtr, VECTORCH *fromPosition
 	messagePtr->ExplosionID = explosionID;	
 }
 
-/* KJL 11:27:47 20/05/98 - predator laser sights */
+/* predator laser sights */
 void AddNetMsg_PredatorLaserSights(VECTORCH *positionPtr, VECTORCH *normalPtr, DISPLAYBLOCK *dispPtr)
 {
 	NETMESSAGEHEADER *headerPtr;
@@ -4406,13 +4271,6 @@ void AddNetMsg_LocalObjectOnFire(STRATEGYBLOCK *sbPtr)
 		}
 		
 		messagePtr->playerId = ghostData->playerId;
-		/* LOCALASSERT((ghostData->playerObjectId >= -NET_MAXOBJECTID)&&(ghostData->playerObjectId <= NET_MAXOBJECTID)); */
-/*
-		if((ghostData->playerObjectId < -NET_MAXOBJECTID)||(ghostData->playerObjectId > NET_MAXOBJECTID))
-		{
-			LOCALASSERT(1==0);
-		} 
-*/
 		messagePtr->objectId = ghostData->playerObjectId;	
 		
 		/* That's all, folks.  This object is on fire. */
@@ -4695,7 +4553,7 @@ void AddNetMsg_CreateWeapon(char* objectName,int type,VECTORCH* location)
 	messagePtr->location=*location;
 	messagePtr->type=type;
 }
-/* KJL 16:32:06 17/06/98 - alien AI network messages */
+/*alien AI network messages */
 void AddNetMsg_AlienAIState(STRATEGYBLOCK *sbPtr)
 {
 	NETMESSAGEHEADER *headerPtr;
@@ -4709,7 +4567,6 @@ void AddNetMsg_AlienAIState(STRATEGYBLOCK *sbPtr)
 	LOCALASSERT(dynPtr);
 	GLOBALASSERT(alienStatusPtr);
 
-	#if EXTRAPOLATION_TEST
 	if(UseExtrapolation && netGameData.sendFrequency)
 	{
 		BOOL updateRequired=FALSE;
@@ -4759,7 +4616,6 @@ void AddNetMsg_AlienAIState(STRATEGYBLOCK *sbPtr)
 		alienStatusPtr->lastFacingSent=facing;
 			
 	}
-	#endif
 	
 	/* check there's enough room in the send buffer */
 	{
@@ -4805,17 +4661,14 @@ void AddNetMsg_AlienAIState(STRATEGYBLOCK *sbPtr)
 		else messagePtr->zPos = dynPtr->Position.vz;
 		messagePtr->zOrient = (dynPtr->OrientEuler.EulerZ>>NET_EULERSCALESHIFT);
 
-		#if EXTRAPOLATION_TEST
 		messagePtr->standard_gravity=dynPtr->UseStandardGravity;
 		messagePtr->speed=Magnitude(&dynPtr->LinVelocity);
-		#endif
 	}
 
 	/* fill out anim sequence */
 	{
 
 		
-		#if 1
 		messagePtr->sequence_type = alienStatusPtr->HModelController.Sequence_Type;
 		messagePtr->sub_sequence = alienStatusPtr->HModelController.Sub_Sequence;
 		
@@ -4823,18 +4676,6 @@ void AddNetMsg_AlienAIState(STRATEGYBLOCK *sbPtr)
 		GLOBALASSERT(alienStatusPtr->HModelController.Seconds_For_Sequence>=0 && alienStatusPtr->HModelController.Seconds_For_Sequence<32*ONE_FIXED);
 		messagePtr->sequence_length = alienStatusPtr->HModelController.Seconds_For_Sequence>>8;
 		
-		#else
-		if (alienStatusPtr->HModelController.Tweening==Controller_NoTweening) {
-			messagePtr->sequence_type = alienStatusPtr->HModelController.Sequence_Type;
-			messagePtr->sub_sequence = alienStatusPtr->HModelController.Sub_Sequence;
-			messagePtr->sequence_length = alienStatusPtr->HModelController.Seconds_For_Sequence;
-		} else {
-			/* Might be junk. */
-			messagePtr->sequence_type  = -1;
-			messagePtr->sub_sequence   = -1;
-			messagePtr->sequence_length= -1;
-		}
-		#endif
 		messagePtr->AlienType =	alienStatusPtr->Type;
 	}
 
@@ -4847,7 +4688,6 @@ void AddNetMsg_AlienAIState(STRATEGYBLOCK *sbPtr)
 	/* fill out guid */
 	{
 		int guid = *((int *)(&(sbPtr->SBname[4])));
-//		LOCALASSERT((guid >= -NET_MAXOBJECTID)&&(guid <= NET_MAXOBJECTID));
 		messagePtr->Guid = guid;
 	}
 
@@ -4975,7 +4815,6 @@ void AddNetMsg_AlienAIKilled(STRATEGYBLOCK *sbPtr,int death_code,int death_time,
 	/* fill out guid */
 	{
 		int guid = *((int *)(&(sbPtr->SBname[4])));
-//		LOCALASSERT((guid >= -NET_MAXOBJECTID)&&(guid <= NET_MAXOBJECTID));
 		messagePtr->Guid = guid;
 	}
 
@@ -5208,7 +5047,6 @@ void AddNetMsg_Gibbing(STRATEGYBLOCK *sbPtr,int gibbFactor,int seed) {
 	/* fill out guid */
 	{
 		int guid = *((int *)(&(sbPtr->SBname[4])));
-//		LOCALASSERT((guid >= -NET_MAXOBJECTID)&&(guid <= NET_MAXOBJECTID));
 		messagePtr->Guid = guid;
 	}
 }
@@ -5507,8 +5345,6 @@ static void ProcessNetMsg_GameDescription(NETMESSAGE_GAMEDESCRIPTION *messagePtr
 			netGameData.playerData[i].startFlag = messagePtr->players[i].startFlag;
 		}
 		netGameData.gameType = (NETGAME_TYPE)messagePtr->gameType;
-		//level number got from the session description instead
-		//netGameData.levelNumber = messagePtr->levelNumber;
 		netGameData.scoreLimit = messagePtr->scoreLimit;
 		netGameData.timeLimit = messagePtr->timeLimit;
 		netGameData.invulnerableTime = messagePtr->invulnerableTime;
@@ -5694,16 +5530,6 @@ static void ProcessNetMsg_PlayerState(NETMESSAGE_PLAYERSTATE *messagePtr, DPID s
 	VECTORCH position;
 	int playerIndex;
 	STRATEGYBLOCK *sbPtr;
-#if 0
-	/* state check: if we're in startup and we've received this message from the host, we
-	should go into an error state: */
-	if((netGameData.myGameState==NGS_Joining)&&(messagePtr->IAmHost)) 
-	{
-		TransmitPlayerLeavingNetMsg();
-		netGameData.myGameState=NGS_Error_HostLost;	
-		AvP.MainLoopRunning = 0;
-	}
-#endif
 
 
 	position.vx = messagePtr->xPos;
@@ -5723,7 +5549,7 @@ static void ProcessNetMsg_PlayerState(NETMESSAGE_PLAYERSTATE *messagePtr, DPID s
 
 	playerIndex = PlayerIdInPlayerList(senderId);
 
-	/* KJL 14:47:22 06/04/98 - we don't seem to know about this person yet... ignore them */
+	/* we don't seem to know about this person yet... ignore them */
 	if (playerIndex==NET_IDNOTINPLAYERLIST) return;
 
 	sbPtr = FindGhost(senderId, GHOST_PLAYEROBJECTID);
@@ -5800,8 +5626,7 @@ static void ProcessNetMsg_PlayerState(NETMESSAGE_PLAYERSTATE *messagePtr, DPID s
 		{
 
 			/* If we are not a dead alien then we should have a ghost */		
-  //			if(!(((!(messagePtr->IAmAlive)))&&(netGameData.playerData[playerIndex].characterType==NGCT_Alien)))
-			if (messagePtr->IAmAlive)
+ 			if (messagePtr->IAmAlive)
 			{
 				{
 					AVP_BEHAVIOUR_TYPE type;
@@ -5875,7 +5700,6 @@ static void ProcessNetMsg_PlayerState(NETMESSAGE_PLAYERSTATE *messagePtr, DPID s
 			
 			ghostData->invulnerable=messagePtr->IAmInvulnerable;
 			
-			#if EXTRAPOLATION_TEST
 			{
 				VECTORCH velocity,diff;
 				int playerTimer=netGameData.playerData[playerIndex].timer;
@@ -5930,7 +5754,6 @@ static void ProcessNetMsg_PlayerState(NETMESSAGE_PLAYERSTATE *messagePtr, DPID s
 					sbPtr->DynPtr->ToppleForce=TOPPLE_FORCE_ALIEN;
 				}
 			}
-			#endif
 			
 			
 			if(messagePtr->scream!=31)
@@ -6014,7 +5837,7 @@ static void ProcessNetMsg_PlayerState_Minimal(NETMESSAGE_PLAYERSTATE_MINIMAL *me
 
 	playerIndex = PlayerIdInPlayerList(senderId);
 
-	/* KJL 14:47:22 06/04/98 - we don't seem to know about this person yet... ignore them */
+	/*we don't seem to know about this person yet... ignore them */
 	if (playerIndex==NET_IDNOTINPLAYERLIST) return;
 
 	sbPtr = FindGhost(senderId, GHOST_PLAYEROBJECTID);
@@ -6159,8 +5982,6 @@ static void ProcessNetMsg_PlayerKilled(NETMESSAGE_PLAYERKILLED *messagePtr, DPID
 	}
 
 	/* we have a ghost for this player: remove it if it's an alien */
-//	if(netGameData.playerData[senderPlayerIndex].characterType==NGCT_Alien)
-	//RemoveGhost(sbPtr);	
 	KillGhost(sbPtr,messagePtr->objectId);
 
 	Inform_PlayerHasDied(messagePtr->killerId, senderId,messagePtr->killerType,messagePtr->weaponIcon);
@@ -7150,7 +6971,7 @@ static char *ProcessNetMsg_ChatBroadcast(char *subMessagePtr, DPID senderId)
 		sprintf(OnScreenMessageBuffer,"%s: %s",netGameData.playerData[playerIndex].name,subMessagePtr+1);
 		NewOnScreenMessage(OnScreenMessageBuffer);
 	
-		/* KJL 99/2/5 - play 'incoming message' sound */
+		/*play 'incoming message' sound */
 		switch(netGameData.playerData[playerIndex].characterType)
 		{
 			case NGCT_Marine:
@@ -7286,14 +7107,6 @@ static void ProcessNetMsg_FragmentalObjectsStatus(NETMESSAGE_FRAGMENTALOBJECTSST
 
 				if (status) /* should exist */
 				{
-					#if 0
-					/* so if it doesn't exist, respawn it */
-					if(objectStatusPtr->respawnTimer!=0)
-					{
-						RespawnInanimateObject(sbPtr);
-						objectStatusPtr->respawnTimer=0;	
-					}
-					#endif
 				}
 				else /* shouldn't exist */
 				{
@@ -7321,14 +7134,6 @@ static void ProcessNetMsg_FragmentalObjectsStatus(NETMESSAGE_FRAGMENTALOBJECTSST
 				
 				if (status) /* should exist */
 				{
-					#if 0
-					/* so if it doesn't exist, respawn it */
-					if(pl_bhv->state==Light_State_Broken)
-					{
-						RespawnInanimateObject(sbPtr);
-						objectStatusPtr->respawnTimer=0;	
-					}
-					#endif
 				}
 				else /* shouldn't exist */
 				{
@@ -7476,7 +7281,6 @@ static void ProcessNetMsg_AlienAIState(NETMESSAGE_ALIENAISTATE *messagePtr, DPID
 		UpdateAlienAIGhost(sbPtr,&position,&orientation,messagePtr->sequence_type,messagePtr->sub_sequence,messagePtr->sequence_length<<8);
 	}
 
-	#if EXTRAPOLATION_TEST
 	if(sbPtr)
 	{
 		NETGHOSTDATABLOCK *ghostData;
@@ -7536,7 +7340,6 @@ static void ProcessNetMsg_AlienAIState(NETMESSAGE_ALIENAISTATE *messagePtr, DPID
 		}
 
 	}
-	#endif
 
 }
 
@@ -8051,15 +7854,6 @@ static STRATEGYBLOCK *FindEnvironmentObjectFromName(char *name)
 }
 
 
-/* asigns an object id to a strategyblock, such as a projectile */
-#if 0
-void AddNetGameObjectID(STRATEGYBLOCK *sbPtr)
-{
-	int *sbIdPtr = (int *)(&(sbPtr->SBname[0]));
-
-	*sbIdPtr = netNextLocalObjectId++;
-}
-#endif
 
 
 /* called by host only: updates the scores for a described kill, and sends a 
@@ -8401,7 +8195,7 @@ static MARINE_SEQUENCE GetMyMarineSequence(void)
 		}
 	}
 
-	/* KJL 14:27:14 10/29/97 - deal with jumping & falling */
+	/* deal with jumping & falling */
 	{
 		DYNAMICSBLOCK *dynPtr = Player->ObStrategyBlock->DynPtr;
 		if (!dynPtr->IsInContactWithFloor && (dynPtr->TimeNotInContactWithFloor==0))
@@ -8517,17 +8311,6 @@ static ALIEN_SEQUENCE GetMyAlienSequence(void)
 	else playerIsCrouching = 0;		
 
 	/* ChrisF 20/4/98: playerIsFiring now specifies alien weapon behaviour. */
-	//if((PlayerStatusPtr->WeaponSlot[PlayerStatusPtr->SelectedWeaponSlot].CurrentState==WEAPONSTATE_FIRING_PRIMARY)||
-	//   (PlayerStatusPtr->WeaponSlot[PlayerStatusPtr->SelectedWeaponSlot].CurrentState==WEAPONSTATE_RECOIL_PRIMARY))
-	//		playerIsFiring = 1;
-	//else playerIsFiring = 0;	
-	//
-	//if(PlayerStatusPtr->WeaponSlot[PlayerStatusPtr->SelectedWeaponSlot].WeaponIDNumber!=WEAPON_ALIEN_SPIT) {
-	//	usingCloseAttackWeapon = 1;
-	//} else {
-	//	usingCloseAttackWeapon = 0;
-	//}
-
 	switch(PlayerStatusPtr->WeaponSlot[PlayerStatusPtr->SelectedWeaponSlot].CurrentState) {
 		case (WEAPONSTATE_FIRING_PRIMARY):
 			if(Biting) {
@@ -8548,7 +8331,7 @@ static ALIEN_SEQUENCE GetMyAlienSequence(void)
 	}
 			
 
-	/* KJL 14:27:14 10/29/97 - deal with jumping & falling */
+	/* deal with jumping & falling */
 	{
 		DYNAMICSBLOCK *dynPtr = Player->ObStrategyBlock->DynPtr;
 		if (!dynPtr->IsInContactWithFloor && (dynPtr->TimeNotInContactWithFloor==0))
@@ -8790,7 +8573,7 @@ static PREDATOR_SEQUENCE GetMyPredatorSequence(void)
 		usingCloseAttackWeapon = 2;
 	else usingCloseAttackWeapon = 0;	
 
-	/* KJL 14:27:14 10/29/97 - deal with jumping & falling */
+	/* deal with jumping & falling */
 	{
 		DYNAMICSBLOCK *dynPtr = Player->ObStrategyBlock->DynPtr;
 		if (!dynPtr->IsInContactWithFloor && (dynPtr->TimeNotInContactWithFloor==0))
@@ -8934,7 +8717,6 @@ void TransmitEndOfGameNetMsg(void)
 	for(i=0;i<NET_MESSAGEITERATIONS;i++)
 	{
 		AddNetMsg_AllGameScores();
-	 //	AddNetMsg_EndGame();
 		NetSendMessages();
 	}
 	netGameData.stateCheckTimeDelay=3*ONE_FIXED;
@@ -8971,113 +8753,7 @@ void TransmitStartGameNetMsg(void)
 /* Patrick 29/7/97 --------------------------------------------------
 Stuff for assigning starting positions to network players
 ---------------------------------------------------------------------*/
-#if 0
-void TeleportNetPlayerToAStartingPosition(STRATEGYBLOCK *playerSbPtr, int startOfGame)
-{
-	extern int NumActiveStBlocks;
-	extern STRATEGYBLOCK *ActiveStBlockList[];	
-	int numStartPositions;
-	VECTORCH* startPositions;
 
-	int sbIndex = 0;
-	int numReadThro,numConsidered;
-	int start_index=0;
-	int found = 0;
-	
-	PLAYER_STATUS *psPtr=(PLAYER_STATUS*)playerSbPtr->SBdataptr;
-
-	/* some basic checks */
-	if(playerSbPtr==NULL) return;	
-	if(playerSbPtr->DynPtr==NULL) return;
-	if(!ActiveStBlockList) return;
-	if(NumActiveStBlocks<=0) return;
-
-	//set the players invulnerability timer
-	GLOBALASSERT(psPtr);
-	psPtr->invulnerabilityTimer=netGameData.invulnerableTime*ONE_FIXED;
-	
-		
-	//select the start positions for this character type
-	switch(AvP.PlayerType)
-	{
-		case I_Marine :
-			numStartPositions=numMarineStartPos;
-			startPositions=marineStartPositions;
-			break;
-
-		case I_Predator :
-			numStartPositions=numPredatorStartPos;
-			startPositions=predatorStartPositions;
-			break;
-
-		case I_Alien :
-			numStartPositions=numAlienStartPos;
-			startPositions=alienStartPositions;
-			break;
-	}
-	
-	
-	if(!numStartPositions) return;
-
-	/* pick a starting point*/
-	if(startOfGame)
-	{
-		numReadThro = (PlayerIdInPlayerList(AVPDPNetID))%8;
-		while(numReadThro<0)
-		{
-			//Probably haven't received the details of all the players yet
-			MinimalNetCollectMessages();
-			numReadThro = (PlayerIdInPlayerList(AVPDPNetID))%8;
-		}
-	}
-	else numReadThro = FastRandom()%numStartPositions;
-	numConsidered = 0;
-
-	/* and go through the list */
-	for(start_index=numReadThro;!found;start_index++)
-	{	
-		start_index%=numStartPositions;
-		
-		/* we are going to try this one: see if it's clear */
-		{
-			int sbIndex2 = 0;
-			STRATEGYBLOCK *sbPtr2;
-			int obstructed = 0;
-
-			while((sbIndex2 < NumActiveStBlocks)&&(!obstructed))
-			{	
-				sbPtr2 = ActiveStBlockList[sbIndex2++];
-				if(sbPtr2->I_SBtype==I_BehaviourNetGhost)
-				{
-					NETGHOSTDATABLOCK *ghostData = (NETGHOSTDATABLOCK *)sbPtr2->SBdataptr;
-					LOCALASSERT(ghostData);			
-					if((ghostData->type==I_BehaviourMarinePlayer)||
-				   	   (ghostData->type==I_BehaviourPredatorPlayer)||
-				   	   (ghostData->type==I_BehaviourAlienPlayer))
-					{
-						VECTORCH seperationVec;
-						LOCALASSERT(sbPtr2->DynPtr);
-						seperationVec = sbPtr2->DynPtr->Position;
-						seperationVec.vx -= startPositions[start_index].vx;
-						seperationVec.vy -= startPositions[start_index].vy;
-						seperationVec.vz -= startPositions[start_index].vz;					
-						if((Magnitude(&seperationVec)<2000)&&(numConsidered<8)) obstructed = 1;
-					}
-				}
-			}				
-		
-			numConsidered++;
-			if(!obstructed)
-			{
-				/* found a clear start position */
-				playerSbPtr->DynPtr->Position = playerSbPtr->DynPtr->PrevPosition = startPositions[start_index];
-				found = 1;
-				
-			}
-		}
-	}	
-}
-#else
 void TeleportNetPlayerToAStartingPosition(STRATEGYBLOCK *playerSbPtr, int startOfGame)
 {
 	int numStartPositions;
@@ -9203,7 +8879,7 @@ void TeleportNetPlayerToAStartingPosition(STRATEGYBLOCK *playerSbPtr, int startO
 	}
 
 }
-#endif
+
 
 /*Works out everyone's starting positions . Use a shared random numer seed
 in order to avoid having several players appearing at the same place*/
@@ -9319,32 +8995,6 @@ void StartOfGame_PlayerPlacement(STRATEGYBLOCK *playerSbPtr,int seed)
 	}
 }
 
-/* Patrick 4/8/97-------------------------------------
-   For testing purposes...
-   ---------------------------------------------------*/
-#define logNetGameProcesses 0
-#if logNetGameProcesses
-static FILE *netLogfile;
-#endif
-void InitNetLog(void)
-{
-#if logNetGameProcesses
-		netLogfile = fopen("NETINFO.TXT","w");
-		fprintf(netLogfile, "NETGAME DEBUGGING LOG \n \n");
-		fclose(netLogfile);
-#endif
-}
-
-void LogNetInfo(char *msg)
-{
-#if logNetGameProcesses
-		if(!msg) return;
-		netLogfile = fopen("NETINFO.TXT","a");
-		fprintf(netLogfile, msg);
-		fclose(netLogfile);
-#endif
-}
-
 
 
 DISPLAYBLOCK PlayersMirrorImage;
@@ -9439,12 +9089,11 @@ void CreatePlayersImageInMirror(void)
 
 void DeallocatePlayersMirrorImage()
 {
-	#if MIRRORING_ON
 	if(Current_Level_Requires_Mirror_Image())
 	{
 		Dispel_HModel(&PlayersMirrorGhost.HModelController);
 	}
-	#endif
+
 }
 
 
@@ -9519,7 +9168,6 @@ void RenderPlayersImageInMirror(void)
 		else firingSecondary = 0;
 	}
 
-//		if(!(((!(messagePtr->IAmAlive)))&&(netGameData.playerData[playerIndex].characterType==NGCT_Alien)))
 	{
 		{
 			PLAYER_STATUS *playerStatusPtr= (PLAYER_STATUS *) (Player->ObStrategyBlock->SBdataptr);
@@ -9548,7 +9196,7 @@ void RenderPlayersImageInMirror(void)
 }
 
 
-/* KJL 15:32:17 24/05/98 - respawn all game objects that have been destroyed */
+/* respawn all game objects that have been destroyed */
 void RestartNetworkGame(int seed)
 {
 	int i,j;
@@ -9601,7 +9249,6 @@ void RestartNetworkGame(int seed)
 	TurnOffMultiplayerObserveMode();
 	
 	//go to a new start position
-//	StartOfGame_PlayerPlacement(Player->ObStrategyBlock, seed);
 
 	netGameData.myGameState=NGS_Playing;
 
@@ -9614,13 +9261,13 @@ void RestartNetworkGame(int seed)
 
 
 
-/* KJL 15:46:19 09/04/98 - processing info pertaining to multiplayer games */
+/* processing info pertaining to multiplayer games */
 
 static void Inform_PlayerHasDied(DPID killer, DPID victim,NETGAME_CHARACTERTYPE killerType,char weaponIcon)
 {
 	int victimIndex = PlayerIdInPlayerList(victim);
 
-	/* KJL 15:35:38 09/04/98 - not knowing who the victim is what make things a bit awkward... */
+	/* not knowing who the victim is what make things a bit awkward... */
 	if(victimIndex==NET_IDNOTINPLAYERLIST) return;
 
 	
@@ -9646,7 +9293,7 @@ static void Inform_PlayerHasDied(DPID killer, DPID victim,NETGAME_CHARACTERTYPE 
 
 		default :
 		{
-			/* KJL 15:36:03 09/04/98 - killer should be set to null if it's a suicide */
+			/* killer should be set to null if it's a suicide */
 			/*killer==vitim means suicide now ,as well*/
 			if (killer && killer!=victim)
 			{
@@ -9709,7 +9356,7 @@ static void Inform_PlayerHasLeft(DPID player)
 {
 	int playerIndex = PlayerIdInPlayerList(player);
 
-	/* KJL 15:35:38 09/04/98 - not knowing who the player is what make things a bit awkward... */
+	/* not knowing who the player is what make things a bit awkward... */
 	if(playerIndex==NET_IDNOTINPLAYERLIST) return;
 
 	NetworkGameConsoleMessage(TEXTSTRING_MULTIPLAYERCONSOLE_LEAVEGAME,netGameData.playerData[playerIndex].name,0);
@@ -9719,7 +9366,7 @@ static void Inform_PlayerHasJoined(DPID player)
 {
 	int playerIndex = PlayerIdInPlayerList(player);
 
-	/* KJL 15:35:38 09/04/98 - not knowing who the player is what make things a bit awkward... */
+	/*not knowing who the player is what make things a bit awkward... */
 	if(playerIndex==NET_IDNOTINPLAYERLIST) return;
 
 	NetworkGameConsoleMessage(TEXTSTRING_MULTIPLAYERCONSOLE_JOINGAME,netGameData.playerData[playerIndex].name,0);
@@ -9728,7 +9375,7 @@ static void Inform_PlayerHasConnected(DPID player)
 {
 	int playerIndex = PlayerIdInPlayerList(player);
 
-	/* KJL 15:35:38 09/04/98 - not knowing who the player is what make things a bit awkward... */
+	/* not knowing who the player is what make things a bit awkward... */
 	if(playerIndex==NET_IDNOTINPLAYERLIST) return;
 
 	NetworkGameConsoleMessage(TEXTSTRING_MULTIPLAYERCONSOLE_CONNECTGAME,netGameData.playerData[playerIndex].name,0);
@@ -9791,7 +9438,6 @@ static int ReadStrategySynch(int objectNumber)
 
 
 
-#if 1
 static int GetDynamicScoreMultiplier(int playerKilledIndex,int killerIndex)
 {
 	int scoreFor;
@@ -9837,54 +9483,7 @@ static int GetDynamicScoreMultiplier(int playerKilledIndex,int killerIndex)
 	return mult;
 	
 }
-#else
-static int GetDynamicScoreMultiplier(int playerKilledIndex,int killerIndex)
-{
-	int i;
-	int scoreTotal=0;
-	int playerCount=0;
-	int playerKilledScore;
-	int mult;
 
-	GLOBALASSERT(playerKilledIndex!=killerIndex);
-	
-	//add up score of all players
-	for(i=0;i<NET_MAXPLAYERS;i++) 	
-	{
-		if(netGameData.playerData[i].playerId==NULL) continue;
-		
-		
-
-		playerCount++;
-		//give everyone a minimum score of 500 for the purpose of this calculation
-		scoreTotal+=max(500,netGameData.playerData[i].playerScore+500);
-	}
-	if(playerCount<3 || !scoreTotal) return ONE_FIXED;
-
-	playerKilledScore=max(500,netGameData.playerData[playerKilledIndex].playerScore+500);
-
-	//get average score of all players other than killed player
-	playerCount--;
-	scoreTotal=(scoreTotal-playerKilledScore)/playerCount;
-
-	if(playerKilledScore>scoreTotal)
-	{
-		int ratio=DIV_FIXED(playerKilledScore,scoreTotal);
-		mult=DIV_FIXED(10*ratio,10*ONE_FIXED+ratio);
-		if(mult<ONE_FIXED) mult=ONE_FIXED;
-	}
-	else
-	{
-		int ratio=DIV_FIXED(scoreTotal,playerKilledScore);
-		mult=DIV_FIXED(10*ONE_FIXED+ratio,10*ratio);
-		if(mult>ONE_FIXED) mult=ONE_FIXED;
-	}
-
-
-	return mult;
-	
-}
-#endif
 static int GetNetScoreForKill(int playerKilledIndex,int killerIndex)
 {
 	NETGAME_CHARACTERTYPE killerType=netGameData.playerData[killerIndex].characterType;
@@ -11272,57 +10871,8 @@ void DoMultiplayerSpecificHud()
 		    	RenderStringCentred(netGameData.playerData[index].name,ScreenDescriptorBlock.SDB_Width/2,ScreenDescriptorBlock.SDB_Height/2,0xff0000ff);
 			}
 		}
-	
 		
-		/*
-		{		
-			int i;
-			int myIndex = PlayerIdInPlayerList(AVPDPNetID);
-			LOCALASSERT(myIndex!=NET_IDNOTINPLAYERLIST);		
-			for(i=0;i<NET_MAXPLAYERS;i++)
-			{
-				if(netGameData.playerData[i].playerId)
-				{
-					if(netGameData.gameType==NGT_LastManStanding)
-					{
-						switch(netGameData.playerData[i].characterType)
-						{
-							case NGCT_Marine :
-								PrintDebuggingText("%s : %d   (Marine)\n",netGameData.playerData[i].name,netGameData.playerData[i].playerScore);
-								break;
-							case NGCT_Alien :
-								PrintDebuggingText("%s : %d   (Alien)\n",netGameData.playerData[i].name,netGameData.playerData[i].playerScore);
-								break;
-							case NGCT_Predator :
-								PrintDebuggingText("%s : %d   (Predator)\n",netGameData.playerData[i].name,netGameData.playerData[i].playerScore);
-								break;
-						}
-					}
-					else if(netGameData.gameType==NGT_Coop)
-					{
-						//show kills / deaths
-						int totalKills=netGameData.playerData[i].aliensKilled[0]+netGameData.playerData[i].aliensKilled[1]+netGameData.playerData[i].aliensKilled[2];
-						PrintDebuggingText("%s : %d/%d\n",netGameData.playerData[i].name,totalKills,netGameData.playerData[i].playerFrags[i]);
-					}
-					else
-					{
-						switch(netGameData.playerData[i].characterType)
-						{
-							case NGCT_Marine :
-								PrintDebuggingText("%s : %d   (%d)(Marine)\n",netGameData.playerData[i].name,netGameData.playerData[i].playerScore,GetNetScoreForKill(i,myIndex));
-								break;
-							case NGCT_Alien :
-								PrintDebuggingText("%s : %d   (%d)(Alien)\n",netGameData.playerData[i].name,netGameData.playerData[i].playerScore,GetNetScoreForKill(i,myIndex));
-								break;
-							case NGCT_Predator :
-								PrintDebuggingText("%s : %d   (%d)(Predator)\n",netGameData.playerData[i].name,netGameData.playerData[i].playerScore,GetNetScoreForKill(i,myIndex));
-								break;
-						}
-					}
-				}
-			}
-		}
-		*/
+
 	}
 	
 	//show the player's score

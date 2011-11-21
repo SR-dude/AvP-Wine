@@ -1,75 +1,33 @@
-
 #include "3dc.h"
 #include "inline.h"
 
+extern int sine[];
+extern int cosine[];
+extern int ScanDrawMode;
 
-
-/*
-
- externs for commonly used global variables and arrays
-
-*/
-
-	#if platform_pc
-	extern int sine[];
-	extern int cosine[];
-	#endif
-
-    #if SupportWindows95
-	extern int ScanDrawMode;
-	#endif
-
-
-/*
-
- General System Globals
-
-*/
 
 SCENE Global_Scene = 0;
-
-
-
-
-/*
-
- Screen Descriptor Block
-
-*/
-
 SCREENDESCRIPTORBLOCK ScreenDescriptorBlock;
 
 
-/*
+// View Descriptor Blocks
 
- View Descriptor Blocks
+int NumFreeVDBs;
+VIEWDESCRIPTORBLOCK *FreeVDBList[maxvdbs];
+static VIEWDESCRIPTORBLOCK **FreeVDBListPtr = &FreeVDBList[maxvdbs-1];
 
-*/
-
-	int NumFreeVDBs;
-	VIEWDESCRIPTORBLOCK *FreeVDBList[maxvdbs];
-	static VIEWDESCRIPTORBLOCK **FreeVDBListPtr = &FreeVDBList[maxvdbs-1];
-
-	int NumActiveVDBs;
-	VIEWDESCRIPTORBLOCK *ActiveVDBList[maxvdbs];
-	static VIEWDESCRIPTORBLOCK **ActiveVDBListPtr = &ActiveVDBList[0];
-
-	static VIEWDESCRIPTORBLOCK FreeVDBData[maxvdbs];
+int NumActiveVDBs;
+VIEWDESCRIPTORBLOCK *ActiveVDBList[maxvdbs];
+static VIEWDESCRIPTORBLOCK **ActiveVDBListPtr = &ActiveVDBList[0];
+static VIEWDESCRIPTORBLOCK FreeVDBData[maxvdbs];
 
 
 /* Clip Plane Block */
 
-	static CLIPPLANEPOINTS ClipPlanePoints;
-
-
+static CLIPPLANEPOINTS ClipPlanePoints;
 
 extern int GlobalAmbience;
 
-/*
-
- Support Functions
-
-*/
 
 
 /*
@@ -129,8 +87,6 @@ void VDBClipPlanes(VIEWDESCRIPTORBLOCK *vdb)
 
 /* Calculate Width and Height */
 
-	/* textprint("current wh = %d, %d\n", vdb->VDB_Width, vdb->VDB_Height); */
-
 	/* Width */
 
 	vdb->VDB_Width = vdb->VDB_ClipRight - vdb->VDB_ClipLeft;
@@ -139,10 +95,6 @@ void VDBClipPlanes(VIEWDESCRIPTORBLOCK *vdb)
 
 	vdb->VDB_Height = vdb->VDB_ClipDown - vdb->VDB_ClipUp;
 
-	#if 0
-	textprint("new wh = %d, %d\n", vdb->VDB_Width, vdb->VDB_Height);
-	WaitForReturn();
-	#endif
 
 
 /* Set up the Clip Planes */
@@ -328,67 +280,6 @@ CLIPPLANEPOINTS *cpp)
 }
 
 
-#if pc_backdrops
-
-/*
-
- Create the projector array used for cylindrically projected backdrops
-
- The array looks like this
-
-	unsigned short VDB_ProjectorXOffsets[MaxScreenWidth];
-
- For each centre relative x there is a projector. Using just the x and z
- components of the projector an angular offset from the centre (0) can be
- calculated using ArcTan().
-
- To calculate a projector one must reverse project each x value at a given
- z value. Rather than go on to create the normalised projector vector we can
- go straight to the ArcTan() to find the angular offset.
-
-*/
-
-static void CreateProjectorArray(VIEWDESCRIPTORBLOCK *vdb)
-
-{
-
-	int sx, x, vx, vz, i, ao;
-
-
-	vz = ONE_FIXED;
-
-	sx = vdb->VDB_ClipLeft;
-
-	i = 0;
-
-	while(sx < vdb->VDB_ClipRight) {
-
-		x = sx - vdb->VDB_CentreX;
-
-		vx = (x * vz) / vdb->VDB_ProjX;
-
-		ao = ArcTan(vx, vz);
-
-		vdb->VDB_ProjectorXOffsets[i] = ao;
-
-		#if 0
-		textprint("Pr. Offset %d = %u\n", i, vdb->VDB_ProjectorXOffsets[i]);
-		WaitForReturn();
-		#endif
-
-		sx++; i++;
-
-	}
-
-}
-
-#endif
-
-
-
-
-
-
 /*
 
  SetVDB requires a VIEWDESCRIPTORBLOCK
@@ -444,50 +335,36 @@ void SetVDB(vdb, fl, ty, d, cx,cy, prx,pry, mxp, cl,cr,cu,cd, h1,h2,hc, amb)
 
 	if(vdb->VDB_Flags & ViewDB_Flag_FullSize) {
 
-		vdb->VDB_Depth			= ScreenDescriptorBlock.SDB_Depth;
-
-        #if SupportWindows95
+	vdb->VDB_Depth		= ScreenDescriptorBlock.SDB_Depth;
         vdb->VDB_ScreenDepth    = ScreenDescriptorBlock.SDB_ScreenDepth;
-		#endif
-
-		vdb->VDB_CentreX		= ScreenDescriptorBlock.SDB_CentreX;
-		vdb->VDB_CentreY		= ScreenDescriptorBlock.SDB_CentreY;
-
-		vdb->VDB_ProjX			= ScreenDescriptorBlock.SDB_ProjX;
-		vdb->VDB_ProjY			= ScreenDescriptorBlock.SDB_ProjY;
-		vdb->VDB_MaxProj		= ScreenDescriptorBlock.SDB_MaxProj;
-
-		vdb->VDB_ClipLeft		= ScreenDescriptorBlock.SDB_ClipLeft;
-		vdb->VDB_ClipRight	= ScreenDescriptorBlock.SDB_ClipRight;
-		vdb->VDB_ClipUp		= ScreenDescriptorBlock.SDB_ClipUp;
-		vdb->VDB_ClipDown		= ScreenDescriptorBlock.SDB_ClipDown;
+	vdb->VDB_CentreX	= ScreenDescriptorBlock.SDB_CentreX;
+	vdb->VDB_CentreY	= ScreenDescriptorBlock.SDB_CentreY;
+	vdb->VDB_ProjX		= ScreenDescriptorBlock.SDB_ProjX;
+	vdb->VDB_ProjY		= ScreenDescriptorBlock.SDB_ProjY;
+	vdb->VDB_MaxProj	= ScreenDescriptorBlock.SDB_MaxProj;
+	vdb->VDB_ClipLeft	= ScreenDescriptorBlock.SDB_ClipLeft;
+	vdb->VDB_ClipRight	= ScreenDescriptorBlock.SDB_ClipRight;
+	vdb->VDB_ClipUp		= ScreenDescriptorBlock.SDB_ClipUp;
+	vdb->VDB_ClipDown	= ScreenDescriptorBlock.SDB_ClipDown;
 
 	}
 
 	else {
 
-        #if SupportWindows95
 		 if (ScanDrawMode == ScanDrawDirectDraw)
 		   vdb->VDB_Depth			= d;
 		 else
-		   vdb->VDB_Depth = VideoModeType_24;
-
-        vdb->VDB_ScreenDepth    = ScreenDescriptorBlock.SDB_ScreenDepth;
-		#else
-		vdb->VDB_Depth			= d;
-		#endif
-
-		vdb->VDB_CentreX		= cx;
-		vdb->VDB_CentreY		= cy;
-
-		vdb->VDB_ProjX			= prx;
-		vdb->VDB_ProjY			= pry;
-		vdb->VDB_MaxProj		= mxp;
-
-		vdb->VDB_ClipLeft		= cl;
-		vdb->VDB_ClipRight	= cr;
-		vdb->VDB_ClipUp		= cu;
-		vdb->VDB_ClipDown		= cd;
+			vdb->VDB_Depth = VideoModeType_24;
+			vdb->VDB_ScreenDepth    = ScreenDescriptorBlock.SDB_ScreenDepth;
+			vdb->VDB_CentreX	= cx;
+			vdb->VDB_CentreY	= cy;
+			vdb->VDB_ProjX		= prx;
+			vdb->VDB_ProjY		= pry;
+			vdb->VDB_MaxProj	= mxp;
+			vdb->VDB_ClipLeft	= cl;
+			vdb->VDB_ClipRight	= cr;
+			vdb->VDB_ClipUp		= cu;
+			vdb->VDB_ClipDown	= cd;
 
 		if(vdb->VDB_Flags & ViewDB_Flag_AdjustScale) {
 
@@ -555,57 +432,16 @@ void SetVDB(vdb, fl, ty, d, cx,cy, prx,pry, mxp, cl,cr,cu,cd, h1,h2,hc, amb)
 	/* Create the clip planes */
 
 	/* KJL 10:41:13 04/09/97 - set to constant so the same for all screen sizes! */
-	vdb->VDB_ClipZ = 64;//vdb->VDB_MaxProj;	/* Safe */
+	vdb->VDB_ClipZ = 64;
 
 	VDBClipPlanes(vdb);
 
-	#if 0
-	/* View Angle */
-
-	if(vdb->VDB_CentreX > vdb->VDB_CentreY) s = vdb->VDB_CentreX;
-	else s = vdb->VDB_CentreY;
-
-	z = vdb->VDB_MaxProj * 100;
-
-	x = (s * z) / vdb->VDB_MaxProj;
-
-	vdb->VDB_ViewAngle = ArcTan(x, z);
-
-	vdb->VDB_ViewAngleCos = GetCos(vdb->VDB_ViewAngle);
-
-
-	#if 0
-	textprint("View Angle = %d\n", vdb->VDB_ViewAngle);
-	WaitForReturn();
-	#endif
-
-
-	#if pc_backdrops
-
-	/* Projector Array */
-
-	CreateProjectorArray(vdb);
-
-	#endif
-
-
-	/* Hazing & Background Colour */
-
-	vdb->VDB_H1				= h1;
-	vdb->VDB_H2				= h2;
-	vdb->VDB_HInterval	= h2 - h1;
-	vdb->VDB_HColour		= hc;
-	#endif
 }
 
 
 
 
-/*
-
- Initialise the Free VDB List
-
-*/
+// Initialise the Free VDB List
 
 void InitialiseVDBs(void)
 
@@ -629,11 +465,7 @@ void InitialiseVDBs(void)
 }
 
 
-/*
-
- Get a VDB from the Free VDB list
-
-*/
+// Get a VDB from the Free VDB list
 
 VIEWDESCRIPTORBLOCK* AllocateVDB(void)
 
@@ -663,11 +495,9 @@ VIEWDESCRIPTORBLOCK* AllocateVDB(void)
 }
 
 
-/*
 
- Return a VDB to the Free VDB list
 
-*/
+// Return a VDB to the Free VDB list
 
 void DeallocateVDB(VIEWDESCRIPTORBLOCK *vdb)
 
@@ -681,11 +511,7 @@ void DeallocateVDB(VIEWDESCRIPTORBLOCK *vdb)
 }
 
 
-/*
-
- Allocate a VDB and make it active
-
-*/
+// Allocate a VDB and make it active
 
 VIEWDESCRIPTORBLOCK* CreateActiveVDB(void)
 
@@ -736,11 +562,9 @@ VIEWDESCRIPTORBLOCK* CreateActiveVDB(void)
 }
 
 
-/*
 
- Deallocate an active VDB
 
-*/
+// Deallocate an active VDB
 
 int DestroyActiveVDB(dblockptr)
 
@@ -760,9 +584,6 @@ int DestroyActiveVDB(dblockptr)
 
 			if(ActiveVDBList[i] == dblockptr) {
 
-				#if ProjectSpecificVDBs
-				ProjectSpecificVDBDestroy(dblockptr);
-				#endif
 
 				ActiveVDBList[i] = ActiveVDBList[NumActiveVDBs - 1];
 				NumActiveVDBs--;

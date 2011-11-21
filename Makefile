@@ -191,7 +191,6 @@ SOURCE_FILES= \
 	3dc/win95/iff_ilbm.cpp \
 	3dc/win95/ilbm_ext.cpp \
 	3dc/avp/support/indexfnt.cpp \
-	3dc/avp/win95/intro.cpp \
 	3dc/avp/inventry.c \
 	3dc/win95/io.c \
 	3dc/avp/win95/iofocus.cpp \
@@ -201,7 +200,6 @@ SOURCE_FILES= \
 	3dc/avp/win95/langplat.c \
 	3dc/avp/language.c \
 	3dc/avp/lighting.c \
-	3dc/win95/list_tem.cpp \
 	3dc/avp/load_shp.c \
 	3dc/avp/los.c \
 	3dc/win95/ltchunk.cpp \
@@ -210,8 +208,6 @@ SOURCE_FILES= \
 	3dc/maths.c \
 	3dc/win95/md5.c \
 	3dc/win95/media.cpp \
-	3dc/mem3dc.c \
-	3dc/mem3dcpp.cpp \
 	3dc/avp/mempool.c \
 	3dc/avp/messagehistory.c \
 	3dc/win95/mishchnk.cpp \
@@ -301,6 +297,7 @@ SOURCE_FILES= \
 	3dc/win95/zsp.cpp \
 	3dc/win95/di_func.cpp \
 	3dc/mathline.c \
+	3dc/win95/list_tem.cpp \
 	stubs.c
 
 HEADER_FILES= \
@@ -566,7 +563,7 @@ $(TARGET): $(OBJS)
 
 .PHONY: clean
 clean:
-	-rm -f $(OBJS) $(TARGET) AvP.dep
+	-rm -f $(OBJS) $(TARGET) AvP.dep debug_AvP.exe.so
 
 .PHONY: depends
 depends:

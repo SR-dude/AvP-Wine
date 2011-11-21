@@ -150,19 +150,7 @@ void Start_Progress_Bar()
 							0
 						);
 	}
-	#if 0
-	if(image)
-	{
-		//draw background image
-		lpDDSBack->Blt(0,image,0,DDBLT_WAIT,0);
-	}
-	else
-	{
-		//failed to load background graphic , make do with black background
-		ColourFillBackBuffer(0);
-	}
-	#endif
-  //	RenderGrabbedScreen();
+
 	//draw initial progress bar
 
 	LoadingBarEmpty_SrcRect.left=0;
@@ -180,11 +168,7 @@ void Start_Progress_Bar()
 		ColourFillBackBuffer(0);
 		if (LoadingBarEmpty) lpDDSBack->Blt(&LoadingBarEmpty_DestRect,LoadingBarEmpty,&LoadingBarEmpty_SrcRect,DDBLT_WAIT,0);
 
-		#if SOFTWARE_RENDERER
-		FlushSoftwareZBuffer();
-		#else
 		FlushD3DZBuffer();
-		#endif
 
 	 	ThisFramesRenderingHasBegun();
 
@@ -210,12 +194,10 @@ void Start_Progress_Bar()
 
 void Set_Progress_Bar_Position(int pos)
 {
-//	int NewPosition=((BarRight-BarLeft)*pos)/PBAR_LENGTH;
 	int NewPosition = DIV_FIXED(pos,PBAR_LENGTH);
 	if(NewPosition>CurrentPosition)
 	{
 		CurrentPosition=NewPosition;
-//		ColourFillBackBufferQuad(GetSingleColourForPrimary(0xff0000),BarLeft,BarTop,BarLeft+CurrentPosition,BarBottom);
 		LoadingBarFull_SrcRect.left=0;
 		LoadingBarFull_SrcRect.right=MUL_FIXED(639,NewPosition);
 		LoadingBarFull_SrcRect.top=0;
@@ -272,7 +254,6 @@ void Game_Has_Loaded(void)
 		CheckForWindowsMessages();
 		ReadUserInput();
 	
-//		FlipBuffers();
 
 		ColourFillBackBufferQuad
 		(

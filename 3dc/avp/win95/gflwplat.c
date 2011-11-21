@@ -108,14 +108,9 @@ void DoStartMissionSequence (PLAYERMISSION mission)
 	sprintf(buffer, "%s\n\nPress Return\n", messages[mission]);
 
 	ColourFillBackBuffer(0);
-#if PreBeta
-	jtextprint ("%s", buffer);
-	FlipBuffers();
-#elif debug
 	textprint ("%s", buffer);
 	FlushTextprintBuffer();
 	FlipBuffers();
-#endif
 	
 }
 
@@ -144,11 +139,7 @@ void ShowMissionMessage ()
 						PlayerStatusPtr->securityClearances,
 						PlayerStatusPtr->StateChangeObjectFlags);
 	
-#if PreBeta
-	jtextprint ("%s", buffer);
-#elif debug
 	textprint ("%s", buffer);
-#endif	
 }
 
 // this will only print one string from the top of the screen

@@ -206,9 +206,6 @@ void Deallocate_Track_Sound(TRACK_SOUND* ts)
 		LoseSound(ts->sound_loaded);
 	}
 	
-	#if !USE_LEVEL_MEMORY_POOL
-	DeallocateMem (ts);
-	#endif
 }
 
 void Update_Track_Position_Only(TRACK_CONTROLLER* tc)
@@ -548,11 +545,6 @@ void Deallocate_Track(TRACK_CONTROLLER* tc)
 		Deallocate_Track_Sound(tc->end_sound);
 	}
 	
-	#if !USE_LEVEL_MEMORY_POOL
-	if(tc->sections) DeallocateMem(tc->sections);
-	DeallocateMem(tc);
-	#endif
-	
 }
 
 
@@ -671,40 +663,6 @@ static void SmoothTrackPosition(TRACK_SECTION_DATA* trackPtr, int u, VECTORCH *o
 		outputPositionPtr->vz = (MUL_FIXED(a,u3)+MUL_FIXED(b,u2)+MUL_FIXED(c,u))/2+trackPtr->pivot_1.vz;
 	}
 }
-#if 0
-
-static void SmoothTrackPositionBSpline(TRACK_SECTION_DATA* trackPtr, int u, VECTORCH *outputPositionPtr)
-{
-	int u2 = MUL_FIXED(u,u);
-	int u3 = MUL_FIXED(u2,u);
-
- 	{
-		int a = (-trackPtr->pivot_0.vx		+3*trackPtr->pivot_1.vx	-3*trackPtr->pivot_2.vx	+1*trackPtr->pivot_3.vx);
-		int b = (3*trackPtr->pivot_0.vx		-6*trackPtr->pivot_1.vx	+3*trackPtr->pivot_2.vx	+0*trackPtr->pivot_3.vx);
-		int c = (-3*trackPtr->pivot_0.vx	+0*trackPtr->pivot_1.vx	+3*trackPtr->pivot_2.vx	+0*trackPtr->pivot_3.vx);
-		int d = (trackPtr->pivot_0.vx		+4*trackPtr->pivot_1.vx	+1*trackPtr->pivot_2.vx +0*trackPtr->pivot_3.vx);
-
-		outputPositionPtr->vx = (MUL_FIXED(a,u3)+MUL_FIXED(b,u2)+MUL_FIXED(c,u)+d)/6;
-	}
- 	{
-		int a = (-trackPtr->pivot_0.vy		+3*trackPtr->pivot_1.vy	-3*trackPtr->pivot_2.vy	+1*trackPtr->pivot_3.vy);
-		int b = (3*trackPtr->pivot_0.vy		-6*trackPtr->pivot_1.vy	+3*trackPtr->pivot_2.vy	+0*trackPtr->pivot_3.vy);
-		int c = (-3*trackPtr->pivot_0.vy	+0*trackPtr->pivot_1.vy	+3*trackPtr->pivot_2.vy	+0*trackPtr->pivot_3.vy);
-		int d = (trackPtr->pivot_0.vy		+4*trackPtr->pivot_1.vy	+1*trackPtr->pivot_2.vy +0*trackPtr->pivot_3.vy);
-
-		outputPositionPtr->vy = (MUL_FIXED(a,u3)+MUL_FIXED(b,u2)+MUL_FIXED(c,u)+d)/6;
-	}
- 	{
-		int a = (-trackPtr->pivot_0.vz		+3*trackPtr->pivot_1.vz	-3*trackPtr->pivot_2.vz	+1*trackPtr->pivot_3.vz);
-		int b = (3*trackPtr->pivot_0.vz		-6*trackPtr->pivot_1.vz	+3*trackPtr->pivot_2.vz	+0*trackPtr->pivot_3.vz);
-		int c = (-3*trackPtr->pivot_0.vz	+0*trackPtr->pivot_1.vz	+3*trackPtr->pivot_2.vz	+0*trackPtr->pivot_3.vz);
-		int d = (trackPtr->pivot_0.vz		+4*trackPtr->pivot_1.vz	+1*trackPtr->pivot_2.vz +0*trackPtr->pivot_3.vz);
-
-		outputPositionPtr->vz = (MUL_FIXED(a,u3)+MUL_FIXED(b,u2)+MUL_FIXED(c,u)+d)/6;
-	}
-}
-
-#endif
 
 static void SmoothTrackOrientation(TRACK_SECTION_DATA* trackPtr, int lerp, MATRIXCH* outputMatrixPtr)
 {

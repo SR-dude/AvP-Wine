@@ -50,10 +50,6 @@ static CharacterSoundEffects PredatorSounds={0,0,0,SID_NOSOUND};
 static CharacterSoundEffects QueenSounds={0,0,0,SID_NOSOUND};
 
 
-//static int num_voice_types=0;
-//static int num_voice_cats=0;
-//static ScreamVoiceType* voice_types=0;
-//static SOUNDINDEX global_last_sound;
 
 
 #if ALIEN_DEMO
@@ -64,94 +60,8 @@ static CharacterSoundEffects QueenSounds={0,0,0,SID_NOSOUND};
 #define ScreamFilePath "sound\\"
 #endif
 
-#if 0
-void LoadScreamSounds()
-{
-	if(voice_types) return;
 
-	HANDLE file=CreateFile(ScreamFileName,GENERIC_READ, 0, 0, OPEN_EXISTING,FILE_FLAG_RANDOM_ACCESS, 0);
-	if(file==INVALID_HANDLE_VALUE)
-	{
-		LOGDXFMT(("Failed to open %s",ScreamFileName));
-		return;
-	}
-
-	char* buffer;
-	int file_size;
-	unsigned long bytes_read;
-
-	file_size= GetFileSize(file,0);
-	buffer=new char[file_size+1];
-	ReadFile(file,buffer,file_size,&bytes_read,0);
-	CloseHandle(file);
-
-	if(strncmp("MARSOUND",buffer,8))
-	{
-		return;
-	}
-
-	char* bufpos=buffer+8;
-
-	num_voice_types=*(int*)bufpos;
-	bufpos+=4;
-	num_voice_cats=*(int*)bufpos;
-	bufpos+=4;
-	
-	voice_types=(ScreamVoiceType*) PoolAllocateMem(num_voice_types * sizeof(ScreamVoiceType));
-	
-	char wavpath[200]="npc\\marinevoice\\";
-	char* wavname=&wavpath[strlen(wavpath)];
-	for(int i=0;i<num_voice_types;i++)	
-	{
-		voice_types[i].category=(ScreamSoundCategory*) PoolAllocateMem( num_voice_cats * sizeof(ScreamSoundCategory));
-		for(int j=0;j<num_voice_cats;j++)
-		{
-			ScreamSoundCategory* cat=&voice_types[i].category[j];
-			cat->last_sound=SID_NOSOUND;
-			cat->num_sounds=*(int*)bufpos;
-			bufpos+=4;
-
-			if(cat->num_sounds)
-			{
-				cat->sounds=(ScreamSound*) PoolAllocateMem(cat->num_sounds * sizeof(ScreamSound));
-			}
-			else
-			{
-				cat->sounds=0;
-			}
-
-			for(int k=0;k<cat->num_sounds;)
-			{
-				ScreamSound * sound=&cat->sounds[k];
-
-				strcpy(wavname,bufpos);
-				bufpos+=strlen(bufpos)+1;
-
-				sound->pitch=*(int*)bufpos;
-				bufpos+=4;
-				sound->volume=*(int*)bufpos;
-				bufpos+=4;
-
-				sound->sound_loaded=GetSound(wavpath);
-				if(sound->sound_loaded)
-				{
-					k++;
-				}
-				else
-				{
-					cat->num_sounds--;
-				}
-
-			}
-
-		}
-	}
-
-	delete [] buffer;
-		
-}
-#endif
-
+/* adj */
 
 void CharacterSoundEffects::LoadSounds(const char* filename,const char* directory)
 {
@@ -247,19 +157,6 @@ void CharacterSoundEffects::LoadSounds(const char* filename,const char* director
 void CharacterSoundEffects::UnloadSounds()
 {
 	if(!voice_types) return;
-	#if !NEW_DEALLOCATION_ORDER
-	for(int i=0;i<num_voice_types;i++)
-	{
-		for(int j=0;j<num_voice_cats;j++)
-		{
-			ScreamSoundCategory* cat=&voice_types[i].category[j];
-			for(int k=0;k<cat->num_sounds;k++)
-			{
-				LoseSound(cat->sounds[k].sound_loaded);
-			}
-		}
-	}
-	#endif
 	voice_types=0;
 	num_voice_types=0;
 	num_voice_cats=0;
@@ -269,7 +166,6 @@ void CharacterSoundEffects::UnloadSounds()
 
 void CharacterSoundEffects::PlaySound(int VoiceType,int SoundCategory,int PitchShift,int* ExternalRef,VECTORCH* Location)
 {
-//	GLOBALASSERT(Location);
 	
 	if(!voice_types) return;
 	//make sure the values are within bounds
@@ -284,21 +180,6 @@ void CharacterSoundEffects::PlaySound(int VoiceType,int SoundCategory,int PitchS
 		}
 	}
 
-	#if 0
-	if(Location)
-	{
-		//need to make sure this sound is close enough to be heard
-		VECTORCH seperation=Player->ObWorld;
-		SubVector(Location,&seperation);
-		
-		//(default sound range is 32 metres)
-		if(Approximate3dMagnitude(&seperation)>32000)
-		{
-			//too far away . don't bother playing a sound.
-			return;
-		}
-	}
-	#endif
 
 	ScreamSoundCategory* cat=&voice_types[VoiceType].category[SoundCategory];
 	//make sure there are some sound for this category
@@ -345,6 +226,7 @@ void UnloadScreamSounds()
 }
 
 
+/*adj*/
 void LoadMarineScreamSounds()
 {
 	MarineSounds.LoadSounds("marsound.dat","npc\\marinevoice\\");

@@ -27,10 +27,7 @@
 #include "weapons.h"
 #include "lighting.h"
 #include "sfx.h"
-#if SupportWindows95
-/* for win95 net game support */
 #include "pldghost.h"
-#endif
 
 #include "avp_userprofile.h"
 #include "savegame.h"
@@ -39,9 +36,6 @@
 
 #define HDEBRIS_BLEEDING_TIME	(ONE_FIXED*2)
 
-/*KJL****************************************************************************************
-*                                    P R O T O T Y P E S	                                *
-****************************************************************************************KJL*/
 void MakeFleshRippingNoises(VECTORCH *positionPtr);
 
 /*KJL****************************************************************************************
@@ -292,13 +286,11 @@ void CreateShapeInstance(MODULEMAPBLOCK *mmbptr, char *shapeNamePtr)
 {
 	int shapenum;
 	shapenum = GetLoadedShapeMSL(shapeNamePtr);					
-	#if debug
 	if (shapenum<=0)
 	{
 		textprint("Unable to display shape:%s\n",shapeNamePtr);
 		LOCALASSERT(0);
 	}
-	#endif
 			
     mmbptr->MapShape = shapenum;
 	mmbptr->MapType = MapType_Default;
@@ -513,13 +505,6 @@ void AlienFragFun(STRATEGYBLOCK *sptr)
 	while (reportptr) {
 
 		if (reportptr->ObstacleSBPtr==NULL) {
-			#if 0
-			if (a==0) {
-				a=1;
-				sgbhv->counter=1;
-				sptr->I_SBtype=I_BehaviourSmokeGenerator;
-			}
-			#endif
 		}	
 		else if (reportptr->ObstacleSBPtr->SBdptr==Player)
 		{
@@ -582,12 +567,6 @@ void SmokeGeneratorBehaviour(STRATEGYBLOCK *sptr) {
 		sgbhv->smokes++;
 	}
 
-	#if 0
-	{
-		DYNAMICSBLOCK *dynPtr = sptr->DynPtr;
-		if (dynPtr) DynamicallyRotateObject(dynPtr);
-	}
-	#endif
 
 	while (reportptr) {
 		if (reportptr->ObstacleSBPtr)	{
@@ -637,13 +616,9 @@ void MakeFragments (STRATEGYBLOCK * sbptr)
 	VECTORCH diff;
 	int massfact;
 
-	#if SupportWindows95
 		int mslpos;
 		SHAPEFRAGMENT * frags;
 		SHAPEFRAGMENTDESC * fragdesc;
-	#else
-		int frags = 0;
-	#endif
 
 	if( (NumActiveBlocks > maxobjects-5)
 			|| (NumActiveStBlocks > maxstblocks-5))
@@ -663,7 +638,6 @@ void MakeFragments (STRATEGYBLOCK * sbptr)
 	posPtr = &(sbptr->DynPtr->Position);
 	
   
-#if SupportWindows95
 	mmbptr = &TempModuleMap;
 	
 	mslpos = sbptr->shapeIndex;
@@ -690,7 +664,6 @@ void MakeFragments (STRATEGYBLOCK * sbptr)
 			s3d.velocity.vy = 0;
 			s3d.velocity.vz = 0;
 			Sound_Play ((SOUNDINDEX)fragsound->sound_loaded->sound_num, "nvp", &s3d,fragsound->max_volume,fragsound->pitch);
-  			//Sound_Play((SOUNDINDEX)fragsound->sound_loaded->sound_num,"d",posPtr);  
 		}
 	}
 
@@ -805,7 +778,6 @@ void MakeFragments (STRATEGYBLOCK * sbptr)
 					Normalise(&impulse);
 									
 			 		impulse.vx/=generate_random_between(5,10);
-			  //	impulse.vy/=generate_random_between(5,10);
 			 		impulse.vz/=generate_random_between(5,10);
 				}
 			   	dynPtr->LinImpulse=impulse;
@@ -862,7 +834,6 @@ void MakeFragments (STRATEGYBLOCK * sbptr)
 
 		frags++;
 	}
-#endif
 
 }
 
@@ -929,7 +900,6 @@ DISPLAYBLOCK *MakeHierarchicalDebris(STRATEGYBLOCK *parent_sbPtr,SECTION_DATA *r
 	mmbptr = &TempModuleMap;
                
 	/* Doesn't really matter what shape gets generated... */
-	//CreateShapeInstance(mmbptr,root->sempai->ShapeName);
 	CreateShapeInstance(mmbptr,"Shell");
 
 	bhvr = I_BehaviourHierarchicalFragment;
@@ -1042,7 +1012,6 @@ DISPLAYBLOCK *MakeHierarchicalDebris(STRATEGYBLOCK *parent_sbPtr,SECTION_DATA *r
 							InitHModelTweening( &(((HDEBRIS_BEHAV_BLOCK * ) sbPtr->SBdataptr)->HModelController),(ONE_FIXED>>2),HMSQT_MarineStand,MSSS_Spasm,-1,1);
 							((HDEBRIS_BEHAV_BLOCK * ) sbPtr->SBdataptr)->HModelController.LockTopSection=1;
 							((HDEBRIS_BEHAV_BLOCK * ) sbPtr->SBdataptr)->HModelController.ZeroRootDisplacement=1;
-							//((HDEBRIS_BEHAV_BLOCK * ) sbPtr->SBdataptr)->HModelController.ZeroRootRotation=1;
 							root->SecMat=*orientation;
 							MakeFleshRippingNoises(positionPtr);
 						} else {						
@@ -1050,9 +1019,6 @@ DISPLAYBLOCK *MakeHierarchicalDebris(STRATEGYBLOCK *parent_sbPtr,SECTION_DATA *r
 							InitHModelTweening( &(((HDEBRIS_BEHAV_BLOCK * ) sbPtr->SBdataptr)->HModelController),(ONE_FIXED<<1),0,1,ONE_FIXED,0);
 							((HDEBRIS_BEHAV_BLOCK * ) sbPtr->SBdataptr)->HModelController.LockTopSection=1;
 							((HDEBRIS_BEHAV_BLOCK * ) sbPtr->SBdataptr)->HModelController.ZeroRootDisplacement=1;
-							//((HDEBRIS_BEHAV_BLOCK * ) sbPtr->SBdataptr)->HModelController.ZeroRootRotation=1;
-							
-							//dispPtr->ObMat=*orientation;
 							/* Below is an alternative... */
 							root->SecMat=*orientation;
 						}
@@ -1282,7 +1248,6 @@ DISPLAYBLOCK *MakeHierarchicalDebris(STRATEGYBLOCK *parent_sbPtr,SECTION_DATA *r
 			InitHModelTweening( &(((HDEBRIS_BEHAV_BLOCK * ) sbPtr->SBdataptr)->HModelController),(ONE_FIXED<<1),0,1,ONE_FIXED,0);
 			((HDEBRIS_BEHAV_BLOCK * ) sbPtr->SBdataptr)->HModelController.LockTopSection=1;
 			((HDEBRIS_BEHAV_BLOCK * ) sbPtr->SBdataptr)->HModelController.ZeroRootDisplacement=1;
-			//((HDEBRIS_BEHAV_BLOCK * ) sbPtr->SBdataptr)->HModelController.ZeroRootRotation=1;
 			root->SecMat=*orientation;
 		}
 
@@ -1293,7 +1258,6 @@ DISPLAYBLOCK *MakeHierarchicalDebris(STRATEGYBLOCK *parent_sbPtr,SECTION_DATA *r
 		dispPtr->HModelControlBlock=&(((HDEBRIS_BEHAV_BLOCK * ) sbPtr->SBdataptr)->HModelController);
 		
 		dispPtr->ObWorld=*positionPtr;
-		//dispPtr->ObMat=*orientation;
 		dispPtr->ObMat=Identity_RotMat;
 
 		LOCALASSERT(dispPtr->ObWorld.vx<1000000 && dispPtr->ObWorld.vx>-1000000);
@@ -1320,7 +1284,6 @@ DISPLAYBLOCK *MakeHierarchicalDebris(STRATEGYBLOCK *parent_sbPtr,SECTION_DATA *r
 		
 		dynPtr->Mass=50;
 
-   		#if 1
 		// Give explosion fragments an angular velocity
 		dynPtr->AngVelocity.EulerX = (FastRandom()&2047)-1024;
 		dynPtr->AngVelocity.EulerY = (FastRandom()&2047)-1024;
@@ -1331,25 +1294,16 @@ DISPLAYBLOCK *MakeHierarchicalDebris(STRATEGYBLOCK *parent_sbPtr,SECTION_DATA *r
 			if (random>0) dynPtr->LinImpulse.vx=(random+100)<<speed;
 			else dynPtr->LinImpulse.vx=(random-100)<<speed;
    		}
-    	{
+	    	{
 			int random = (FastRandom()&1023) - 768;
 			if (random>0) dynPtr->LinImpulse.vy=(random+100)<<speed;
 			else dynPtr->LinImpulse.vy=(random-100)<<speed;
 		}
-    	{
+	    	{
 			int random = (FastRandom()&1023) - 512;
 			if (random>0) dynPtr->LinImpulse.vz=(random+100)<<speed;
 			else dynPtr->LinImpulse.vz=(random-100)<<speed;
 		}
-		#else
-		dynPtr->AngVelocity.EulerX = 0;
-		dynPtr->AngVelocity.EulerY = 0;
-		dynPtr->AngVelocity.EulerZ = 0;
-
-		dynPtr->LinImpulse.vx=0;
-		dynPtr->LinImpulse.vy=0;
-		dynPtr->LinImpulse.vz=0;
-		#endif
 		
 		/* Set up default here for neatness. */
 		((HDEBRIS_BEHAV_BLOCK * ) sbPtr->SBdataptr)->Bounce_Sound=SID_NOSOUND;
@@ -1615,7 +1569,6 @@ void LoadStrategy_HierarchicalDebris(SAVE_BLOCK_STRATEGY_HEADER* header)
 		mmbptr = &TempModuleMap;
     	           
 		/* Doesn't really matter what shape gets generated... */
-		//CreateShapeInstance(mmbptr,root->sempai->ShapeName);
 		CreateShapeInstance(mmbptr,"Shell");
 
 

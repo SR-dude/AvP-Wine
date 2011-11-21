@@ -1,10 +1,5 @@
 #include "3dc.h"
-
 #include "mslhand.h"
-
-#if PSX
-#include "psx_inc.h"
-#endif
 
 #define UseLocalAssert 1
 #include "ourasert.h"
@@ -74,8 +69,6 @@ int GetNextMSLEntry(MSL_SECTION sect, unsigned int num_shapes, int auto_delete)
 
 void FlushMSLSection(MSL_SECTION sect)
 {
-
-#if StandardShapeLanguage
 
 	int i;
 	
@@ -177,11 +170,5 @@ void FlushMSLSection(MSL_SECTION sect)
 	begins[sect]=MSS_FREE;
 	ends[sect]=MSS_FREE;
 
-#else 
-
-printf("\nDo NOT call this function!\n");
-//GLOBALASSERT(1==0);
-
-#endif
 
 }

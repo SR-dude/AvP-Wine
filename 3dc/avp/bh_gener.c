@@ -54,53 +54,6 @@ int FarAliens;
 int Alt_FarAliens;
 int ShowHiveState=0;
 
-/* for testing */
-#define logGenData	0  					
-#if logGenData
-FILE *logFile;
-#endif
-
-/* load generator parameters: pc only*/
-//paramaters now got from rif file
-#define LOAD_PC_GENERATORPARAMS 0
-#if LOAD_PC_GENERATORPARAMS
-	static void LoadGeneratorParams(void);	
-
-
-/* Level hive/generator parameters -----------------------------
-
-Format:	max npcs, initial npcs per minute, 
-		change in npcs per minute (per minute, approx)
---------------------------------------------------------------*/ 
-HIVELEVELPARAMS hiveLevelData[] = 
-{
-{25,4,2,(ONE_FIXED*60)},	/* gen 1 : */
-{25,4,2,(ONE_FIXED*90)},	/* gen 2 : */
-{25,4,2,(ONE_FIXED*120)},	/* gen 3 : */
-{25,4,2,(ONE_FIXED*60)},	/* gen 4 : */
-{25,4,2,(ONE_FIXED*60)},	/* Medlab : */
-{25,4,2,(ONE_FIXED*60)},	/* cmc 1 : */
-{25,4,2,(ONE_FIXED*60)},	/* cmc 2 : */
-{25,4,2,(ONE_FIXED*60)},	/* cmc 3 : */
-{25,4,2,(ONE_FIXED*120)},	/* cmc 4 : */
-{25,4,2,(ONE_FIXED*60)},	/* cmc 5 : */
-{25,4,2,(ONE_FIXED*90)},	/* cmc 6 : */
-{25,4,2,(ONE_FIXED*60)},	/* sp 1 : */
-{25,4,2,(ONE_FIXED*60)},	/* sp 2 : */
-{25,4,2,(ONE_FIXED*60)},	/* sp 3 : */
-{25,4,2,(ONE_FIXED*60)},	/* r&d 1 : */
-{25,4,2,(ONE_FIXED*60)},	/* r&d 2 : */
-{25,4,2,(ONE_FIXED*60)},	/* r&d 3 : */
-{25,4,2,(ONE_FIXED*90)},	/* r&d 4 : */
-{25,4,2,(ONE_FIXED*60)},	/* mps 1 : */
-{25,4,2,(ONE_FIXED*120)},	/* mps 2 : */
-{25,4,2,(ONE_FIXED*60)},	/* mps 3 : */
-{25,4,2,(ONE_FIXED*120)},	/* mps 4 : */
-{25,4,2,(ONE_FIXED*60)},	/* surface : */
-{25,2,1,(ONE_FIXED*120)},	/* entrance : */
-};
-#endif
-
 
 /*
 Stuff for adjusting difficulty level according to player's performance
@@ -180,9 +133,7 @@ void GeneratorBehaviour(STRATEGYBLOCK *sbPtr)
 	LOCALASSERT(genBlock);
 		
 	/* don't do this for a net game */
-//	textprint("GenBeh\n");
 	if(AvP.Network != I_No_Network && AvP.NetworkAIServer==0) return;
-//	textprint("GenBeh ok\n");
 
 	/* if our number of generators/minute is not > 0, the generator system is
 	effectively turned off... */
@@ -226,13 +177,6 @@ void GeneratorBehaviour(STRATEGYBLOCK *sbPtr)
 	/* if generator is visible, do not create a new NPC */
 	if(ModuleCurrVisArray[(sbPtr->containingModule->m_index)]) 
 	{	
-		#if logGenData
-		{
-			logFile = fopen("D:/PATRICK/GENLOG.TXT","a");
-			fprintf(logFile, "generator: I am visible \n \n");		 		
- 			fclose(logFile);
-		}	
-		#endif
 		return;
 	}
 
@@ -268,13 +212,6 @@ void GeneratorBehaviour(STRATEGYBLOCK *sbPtr)
 	/* if there are too many NPCs in the module, do not create a new one */
 	if(PherAi_Buf[(sbPtr->containingModule->m_aimodule->m_index)] >= MAX_GENERATORNPCSPERMODULE)
 	{
-		#if logGenData
-		{
-			logFile = fopen("D:/PATRICK/GENLOG.TXT","a");
-			fprintf(logFile, "generator: too many aliens in my module \n \n");		 		
- 			fclose(logFile);
-		}	
-		#endif
 		return;
 	}
 	/* if there are too many npcs in the env, do not create a new one */
@@ -478,36 +415,6 @@ void InitHive(void)
 	FarAliens=0;
 	Alt_FarAliens=0;
 
-	/* don't do any more for a net game */
-	/* actually, do - Richard */
-//	if(AvP.Network != I_No_Network && AvP.NetworkAIServer==0) return;
-//	if(AvP.Network != I_No_Network)	return;
-
-	
-
-
-	/* set the level parameters */
-//	NPCHive.maxGeneratorNPCs = hiveLevelData[AvP.CurrentEnv].maxGeneratorNPCs;
-//	NPCHive.generatorNPCsPerMinute = hiveLevelData[AvP.CurrentEnv].generatorNPCsPerMinute;
-//	NPCHive.deltaGeneratorNPCsPerMinute = hiveLevelData[AvP.CurrentEnv].deltaGeneratorNPCsPerMinute;
-//	NPCHive.genRateTimer = (ONE_FIXED*60);
-//	
-//	/* validate these parameters */
-//	if(NPCHive.maxGeneratorNPCs > MAXGENNPCS_MAX) 
-//		NPCHive.maxGeneratorNPCs = MAXGENNPCS_MAX;
-//	if(NPCHive.maxGeneratorNPCs < MAXGENNPCS_MIN) 
-//		NPCHive.maxGeneratorNPCs = MAXGENNPCS_MIN;
-//	if(NPCHive.generatorNPCsPerMinute > GENSPERMINUTE_MAX) 
-//		NPCHive.generatorNPCsPerMinute = GENSPERMINUTE_MAX;
-//	if(NPCHive.generatorNPCsPerMinute < GENSPERMINUTE_MIN) 
-//		NPCHive.generatorNPCsPerMinute = GENSPERMINUTE_MIN;
-//	if(NPCHive.deltaGeneratorNPCsPerMinute > INCREASEGENSPERMINUTE_MAX) 
-//		NPCHive.deltaGeneratorNPCsPerMinute = INCREASEGENSPERMINUTE_MAX;
-//	if(NPCHive.deltaGeneratorNPCsPerMinute < INCREASEGENSPERMINUTE_MIN) 
-//		NPCHive.deltaGeneratorNPCsPerMinute = INCREASEGENSPERMINUTE_MIN;
-//
-//	/* init the hive timer */
-//	ResetHiveStateTime();
 
 	/* Now in ActivateHive. */
 		  
@@ -535,18 +442,6 @@ void InitHive(void)
 		}
 	}
 	
-	#if logGenData
-	{
-		logFile = fopen("D:/PATRICK/GENLOG.TXT","w");
-		fprintf(logFile, "GENERATOR/HIVE DATA LOG \n \n");
-		fprintf(logFile, "num Geners: %d \n",NPCHive.numGenerators);		
-		fprintf(logFile, "hive timer: %d \n",NPCHive.hiveStateTimer);		
-		fprintf(logFile, "max npcs: %d \n",NPCHive.maxGeneratorNPCs);		
-		fprintf(logFile, "npcs per min: %d \n",NPCHive.generatorNPCsPerMinute);		
-		fprintf(logFile, "change in npcs per min: %d \n \n",NPCHive.deltaGeneratorNPCsPerMinute);		
- 		fclose(logFile);
-	}	
-	#endif
 
 	ActivateHive();
 
@@ -614,7 +509,6 @@ void DoHive(void)
 {
 	/* don't do this for a net game */
 	if(AvP.Network != I_No_Network && AvP.NetworkAIServer==0) return;
-//	if(AvP.Network != I_No_Network)	return;
 
 	if(AvP.Network != I_No_Network)
 	{
@@ -633,21 +527,12 @@ void DoHive(void)
 		/* state change */
 		if(NPCHive.currentState == HS_Attack)
 		{
-			#if ULTRAVIOLENCE
-			/* Hackery.  An experiment. CDF 2/12/97.  Ha. */
-			NPCHive.currentState = HS_Attack;
-			#else
-			/* switch to regroup */
 			NPCHive.currentState = HS_Regroup;
-			#endif
 		}
 		else
 		{
 			/* switch to attack */
-			#if ULTRAVIOLENCE
-			#else
 			LOCALASSERT(NPCHive.currentState == HS_Regroup);
-			#endif
 			NPCHive.currentState = HS_Attack;
 		}
 		ResetHiveStateTime();
@@ -701,7 +586,6 @@ static void ResetGeneratorTimer(GENERATOR_BLOCK *genBlock)
 	LOCALASSERT(genBlock);
 		
 	/* shouldn't be doing this for a net game */
-//	LOCALASSERT(AvP.Network == I_No_Network);
 
 	if(genBlock->use_own_rate_values)
 	{
@@ -726,14 +610,6 @@ static void ResetGeneratorTimer(GENERATOR_BLOCK *genBlock)
 	if(genBlock->Timer>GENERATORTIME_MAX) genBlock->Timer=GENERATORTIME_MAX;
 	if(genBlock->Timer<GENERATORTIME_MIN) genBlock->Timer=GENERATORTIME_MIN;	
 
-	#if logGenData
-	{
-		logFile = fopen("D:/PATRICK/GENLOG.TXT","a");
-		fprintf(logFile, "Reset Gen Timer \n");		
-		fprintf(logFile, "gen timer to: %d seconds \n \n",genBlock->Timer);		 		
- 		fclose(logFile);
-	}	
-	#endif
 }
 
 static void ResetHiveStateTime(void)
@@ -741,20 +617,11 @@ static void ResetHiveStateTime(void)
 	int baseTime; 
 
 	/* shouldn't be doing this for a net game */
-//	LOCALASSERT(AvP.Network == I_No_Network);
 
 	/* set the timer, +- an eighth */	
 	baseTime = LoadedHiveData.hiveStateBaseTime;
 	NPCHive.hiveStateTimer = ((baseTime*7)/8) + (FastRandom()%(baseTime/4));
 
-	#if logGenData
-	{
-		logFile = fopen("D:/PATRICK/GENLOG.TXT","a");
-		fprintf(logFile, "Reset Hive Timer \n");		
-		fprintf(logFile, "hive timer to: %d seconds \n \n",NPCHive.hiveStateTimer);		 		
- 		fclose(logFile);
-	}	
-	#endif
 }  					
 
 
@@ -783,13 +650,6 @@ int NumGeneratorNPCsInEnv(void)
 		}
 	}
 
-	#if logGenData
-	{
-		logFile = fopen("D:/PATRICK/GENLOG.TXT","a");
-		fprintf(logFile, "current num gener npcs: %d \n \n",numOfNPCs);		 		
- 		fclose(logFile);
-	}	
-	#endif
 	return numOfNPCs;
 }
 int NumNPCsFromThisGenerator(STRATEGYBLOCK* gen_sbptr)
@@ -856,13 +716,6 @@ int NumGeneratorNPCsVisible(void)
 			if(sbPtr->SBdptr)numOfVisNPCs++;
 		}
 	}
-	#if logGenData
-	{
-		logFile = fopen("D:/PATRICK/GENLOG.TXT","a");
-		fprintf(logFile, "current num visible npcs: %d \n \n",numOfVisNPCs);		 		
- 		fclose(logFile);
-	}	
-	#endif
 	return numOfVisNPCs;
 }
 
@@ -878,13 +731,6 @@ void ForceAGenerator(void)
 	extern STRATEGYBLOCK *ActiveStBlockList[];	
 	int sbIndex = 0;
 	STRATEGYBLOCK *sbPtr;
-	#if logGenData
-	{
-		logFile = fopen("D:/PATRICK/GENLOG.TXT","a");
-		fprintf(logFile, "forcing a generator... \n");		 		
- 		fclose(logFile);
-	}	
-	#endif
 		
 	while(sbIndex < NumActiveStBlocks)
 	{	
@@ -898,174 +744,12 @@ void ForceAGenerator(void)
 			{	
 				/* found a generator with timer>0, so set it to zero and return */
 				genBlock->Timer = 0;
-				#if logGenData
-				{
-					logFile = fopen("D:/PATRICK/GENLOG.TXT","a");
-					fprintf(logFile, "... forced generator ref %d \n \n",sbIndex);		 		
- 					fclose(logFile);
-				}	
-				#endif
 				return;
 			}
 		}
 	}
-	#if logGenData
-	{
-		logFile = fopen("D:/PATRICK/GENLOG.TXT","a");
-		fprintf(logFile, "... didn't find one to force \n \n");		 		
- 		fclose(logFile);
-	}	
-	#endif
 
 }
-
-
-#if (SupportWindows95 && LOAD_PC_GENERATORPARAMS)
-static char genFileLine[128];
-static void LoadGeneratorParams(void)
-{
-	FILE* genParamsFile;
-	int numValsRead = 0;
-	
-	genParamsFile = fopen("GENPARAM.TXT","r");
-	
-	/* do nothing if we can't load the file */
-	if(!genParamsFile) return;
-
-	while(fgets((char*)genFileLine,128,genParamsFile))
-	{
-		if(!(strncmp((char*)genFileLine,"#",1))) continue; /* a comment line */
-		if(strlen((char*)genFileLine) > 4) continue; /* too long */
-
-		/* should be a data line... 
-		convert to an int and set appropriate value in hiveData[] */
-		{
-			int thisValue;
-			I_AVP_ENVIRONMENTS thisLevel = 0;
-		
-			thisValue = atoi(genFileLine);
-			switch(numValsRead/3)
-			{
-				case(0):
-				{
-					thisLevel = I_Gen1;
-					break;
-				}
-				case(1):
-				{
-					thisLevel = I_Gen2;
-					break;
-				}
-				case(2):
-				{
-					thisLevel = I_Gen3;
-					break;
-				}
-				case(3):
-				{
-					thisLevel = I_Medlab;
-					break;
-				}
-				case(4):
-				{
-					thisLevel = I_Cmc2;
-					break;
-				}
-				case(5):
-				{
-					thisLevel = I_Cmc4;
-					break;
-				}
-				case(6):
-				{
-					thisLevel = I_Cmc6;
-					break;
-				}
-				case(7):
-				{
-					thisLevel = I_Sp2;
-					break;
-				}
-				case(8):
-				{
-					thisLevel = I_Sp3;
-					break;
-				}
-				case(9):
-				{
-					thisLevel = I_Rnd2;
-					break;
-				}
-				case(10):
-				{
-					thisLevel = I_Rnd3;
-					break;
-				}
-				case(11):
-				{
-					thisLevel = I_Rnd4;
-					break;
-				}
-				case(12):
-				{
-					thisLevel = I_Mps2;
-					break;
-				}
-				case(13):
-				{
-					thisLevel = I_Mps4;
-					break;
-				}
-				case(14):
-				{
-					thisLevel = I_Surface;
-					break;
-				}
-				case(15):
-				{
-					thisLevel = I_Entrance;
-					break;
-				}
-				default:
-				{
-					/* there should only be 16 levels in the file */
-					LOCALASSERT(1==0);
-					continue;
-					break;
-				}
-			}
-
-			switch(numValsRead%3)
-			{
-				case(0):
-				{
-					hiveLevelData[thisLevel].maxGeneratorNPCs = thisValue;
-					break;
-				}
-				case(1):
-				{
-					hiveLevelData[thisLevel].generatorNPCsPerMinute = thisValue;
-					break;
-				}
-				case(2):
-				{
-					hiveLevelData[thisLevel].deltaGeneratorNPCsPerMinute = thisValue;
-					break;
-				}
-				default:
-				{
-					/* there should only be 16 levels in the file */
-					LOCALASSERT(1==0);
-					break;
-				}			
-			}
-		}
-		numValsRead++;
-	}
- 	fclose(genParamsFile);
-}	
-#endif
-
 
 
 void SetHiveParamaters(int enemytype,int max,int genpermin,int deltagenpermin,int time)
@@ -1198,12 +882,6 @@ void SaveHiveSettings()
 }
 
 
-
-
-
-
-
-
 int GeneratorBalance_PlayerScoreValue = 0;
 
 #define GENERATOR_BALANCE_DECAY  (ONE_FIXED * .01)
@@ -1250,9 +928,6 @@ static void GeneratorBalance_PerFrameMaintenance()
 	if(!UseGeneratorBalance) return;
 
 
-//	PrintDebuggingText("\n\n\n\n\nAI : %d\n",GeneratorBalance.AIScore);
-//	PrintDebuggingText("Player : %d\n",GeneratorBalance.PlayerScore);
-//	PrintDebuggingText("Counter : %d\n",GeneratorBalance.Counter);
 	PrintDebuggingText("\n\n\nAi Limit Shift : %d\n",GeneratorBalance.MaxAIShift);
 	
 
@@ -1270,12 +945,6 @@ static void GeneratorBalance_PerFrameMaintenance()
 				//make things easier
 				int ratio = DIV_FIXED(GeneratorBalance.PlayerScore+GeneratorBalance.PlayerValue,GeneratorBalance.AIScore+GeneratorBalance.PlayerValue);
 			
-/*			
-				if(ratio > (ONE_FIXED*1.1))
-				{
-					GeneratorBalance.RateMultiplier = DIV_FIXED(GeneratorBalance.RateMultiplier,ONE_FIXED *1.1);
-				}
-*/			
 				{
 					int decrement = ratio - ONE_FIXED;
 					if(GeneratorBalance.MaxAIShift < 0)
@@ -1298,12 +967,6 @@ static void GeneratorBalance_PerFrameMaintenance()
 			{
 				//make things harder
 				int ratio = DIV_FIXED(GeneratorBalance.AIScore+GeneratorBalance.PlayerValue,GeneratorBalance.PlayerScore+GeneratorBalance.PlayerValue);
-  /*				
-				if(ratio > (ONE_FIXED*1.1))
-				{
-					GeneratorBalance.RateMultiplier = MUL_FIXED(GeneratorBalance.RateMultiplier,ONE_FIXED *1.1);
-				}
-*/
 
 
 				{
@@ -1330,8 +993,6 @@ static void GeneratorBalance_PerFrameMaintenance()
 
 		if(GeneratorBalance.RateMultiplier > 4*ONE_FIXED) GeneratorBalance.RateMultiplier = 4*ONE_FIXED;
 		if(GeneratorBalance.RateMultiplier < ONE_FIXED/4) GeneratorBalance.RateMultiplier = ONE_FIXED/4;
-
-
 
    		
 	}

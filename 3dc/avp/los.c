@@ -40,6 +40,8 @@ extern char ShapeIsMorphed;
 extern int **ItemArrayPtr;
 extern POLYHEADER *PolyheaderPtr;
 
+/*adj*/
+
 #define AccessNextPolygon()\
 {\
 	int *itemPtr = *(ItemArrayPtr++);\
@@ -464,15 +466,9 @@ void CheckForRayIntersectionWithObject(DISPLAYBLOCK *dPtr)
 	}
 	
 	/* check objects position is sensible */
-	#if 0
-	LOCALASSERT(dPtr->ObWorld.vx<1000000 && dPtr->ObWorld.vx>-1000000);
-	LOCALASSERT(dPtr->ObWorld.vy<1000000 && dPtr->ObWorld.vy>-1000000);
-	LOCALASSERT(dPtr->ObWorld.vz<1000000 && dPtr->ObWorld.vz>-1000000);
-	#else
 	if(dPtr->ObWorld.vx>1000000 || dPtr->ObWorld.vx<-1000000) return;
 	if(dPtr->ObWorld.vy>1000000 || dPtr->ObWorld.vy<-1000000) return;
 	if(dPtr->ObWorld.vz>1000000 || dPtr->ObWorld.vz<-1000000) return;
-	#endif
 	if (dPtr==Player)
 	{
 		position = dPtr->ObStrategyBlock->DynPtr->Position;
@@ -486,13 +482,11 @@ void CheckForRayIntersectionWithObject(DISPLAYBLOCK *dPtr)
 	viewVectorAlpha.vy -= position.vy;
 	viewVectorAlpha.vz -= position.vz;
 	
-	#if 1
 	if (dPtr!=Player)
 	{
 		if (MagnitudeOfCrossProduct(&viewVectorAlpha,&viewVectorBeta)>dPtr->ObShapeData->shaperadius)
 			return;
 	}
-	#endif
 
 	/* if we're not dealing with a module, it's probably rotated */
 	if(!dPtr->ObMyModule&&dPtr!=Player)
@@ -515,7 +509,6 @@ void CheckForRayIntersectionWithObject(DISPLAYBLOCK *dPtr)
 	numberOfItems = SetupPolygonAccess(dPtr);
 	if (!dPtr->ObShape)
 	{
-//		PrintDebuggingText("polys %d\n",numberOfItems);
 	}
 
   	while(numberOfItems--)
@@ -544,7 +537,6 @@ void CheckForRayIntersectionWithObject(DISPLAYBLOCK *dPtr)
 			{
 				/* if the polygon is flagged as double-sided, and it's pointing
 				the wrong way, consider it to be flipped round */
-				//if((PolyheaderPtr->PolyFlags) & iflag_no_bfc)
 				/* KJL 16:06:11 10/07/98 - treat all polys as no bfc */
 				{
 					if (normDotBeta>0)

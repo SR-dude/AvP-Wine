@@ -1,5 +1,6 @@
 #include "txioctrl.h"
 
+// adj
 #ifdef MaxImageGroups
 
 #include "list_tem.hpp"

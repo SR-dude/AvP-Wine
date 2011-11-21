@@ -25,69 +25,8 @@ void HandleCheatModes(void)
 {
 	PLAYER_STATUS *playerStatusPtr= (PLAYER_STATUS *) (Player->ObStrategyBlock->SBdataptr);
 	
-	#if 1
 	playerStatusPtr->securityClearances = 0;
-	#else
-	/* KJL 16:28:54 05/11/97 - reveal map */
-	if (KeyboardInput[KEY_F9])
-	{
-		extern SCENE Global_Scene;
-		extern int ModuleArraySize;
-		MODULE **moduleList;
-   		int i;
-		
-		moduleList = MainSceneArray[Global_Scene]->sm_marray;
-
-		for(i = 0; i < ModuleArraySize; i++)
-		{
-			MODULE *modulePtr = moduleList[i];
-
-			if (modulePtr && modulePtr->m_mapptr)
-			{
-				modulePtr->m_flags |= m_flag_visible_on_map;
-			}
-		}    					       
-		NewOnScreenMessage(GetTextString(TEXTSTRING_INGAME_CHEATACTIVATED));
-	}
-		
-			
-//#if !GAMEFLOW_ON
-#if 0
-
-	/* give all security levels */	
-	if (KeyboardInput[KEY_F10])
-	{
-		playerStatusPtr->securityClearances = 0xffffffff;
-		NewOnScreenMessage(GetTextString(TEXTSTRING_INGAME_CHEATACTIVATED));
-	}
-	if (KeyboardInput[KEY_F5])
-	{
-		playerStatusPtr->securityClearances = 0x3f;
-		NewOnScreenMessage(GetTextString(TEXTSTRING_INGAME_CHEATACTIVATED));
-	}
-#endif
-
-	#if 1
-	/* give all weapons & ammo */
-	if((KeyboardInput[KEY_F11]))
-    {
- 	}
-	#endif
-	/* give immortality */
-	if (KeyboardInput[KEY_F12])
-	{
-		if(AvP.Network==I_No_Network)
-		{
-			NewOnScreenMessage(GetTextString(TEXTSTRING_INGAME_CHEATACTIVATED));
-			playerStatusPtr->IsImmortal = 1;
-		}
-		else
-		{
-			/* commit suicide */
-			CauseDamageToObject(Player->ObStrategyBlock, &certainDeath, ONE_FIXED,NULL);
-		}
-	}
-	#endif
+/* adj  Deleted some interesting cheats in original code */
 }
 
 void GiveAllWeaponsCheat(void)
@@ -101,8 +40,6 @@ void GiveAllWeaponsCheat(void)
         {
     		PLAYER_WEAPON_DATA *wdPtr = &playerStatusPtr->WeaponSlot[slot];
    	
-   	 	 	//if (slot == WEAPON_PLASMAGUN || slot == WEAPON_SONICCANNON) continue;
-			  
 			if (wdPtr->WeaponIDNumber==NULL_WEAPON) continue;
 			
 			if (wdPtr->Possessed==-1) continue; /* This weapon not allowed! */
@@ -140,8 +77,6 @@ void GiveAllWeaponsCheat(void)
         {
     		PLAYER_WEAPON_DATA *wdPtr = &playerStatusPtr->WeaponSlot[slot];
    	
-   	 	 	//if (slot == WEAPON_PLASMAGUN || slot == WEAPON_SONICCANNON) continue;
-			  
 			if (wdPtr->WeaponIDNumber==NULL_WEAPON) continue;
 		
 			if (wdPtr->Possessed==-1) continue; /* This weapon not allowed! */

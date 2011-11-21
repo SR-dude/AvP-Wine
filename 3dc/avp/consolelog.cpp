@@ -90,11 +90,3 @@ extern void OutputToConsoleLogfile(char *messagePtr)
 	}
 }
 
-
-
-
-
-
-
-
-				

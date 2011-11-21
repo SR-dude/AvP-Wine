@@ -366,41 +366,10 @@ FFILE * ffopen(char const * filename, char const * mode)
 	}
 
 	errno = ENOENT;
-	// ok, just use fopen (if debug)
-	#if debug && 0 // dont do this, caller should handle this situation
-	LOGDXFMT(("%s not in any fastfile",filename));
+// adj  ???
 
-	FILE * sfp = fopen(filename,mode);
-	if (!sfp) return 0;
-
-	fseek(sfp,0,SEEK_END);
-	length = ftell(sfp);
-	fseek(sfp,0,SEEK_SET);
-	data = malloc(length);
-	if (!data)
-	{
-		fclose(sfp);
-		return 0;
-	}
-	length = fread((void *)data,1,length,sfp);
-	
-	FFILE * fp = new FFILE;
-	fp->data_start = data;
-	fp->data_ptr = (unsigned char const *)data;
-	fp->length = length;
-	fp->pos = 0;
-	fp->remaining = length;
-	fp->flag = FFF_ALOC;
-	if (ferror(sfp))
-	{
-		fp->flag |= FFF_ERR;
-	}
-	fclose(sfp);
-	openlist.add_entry(fp);
-	return fp;
-	#else
 	return 0;
-	#endif
+	
 }
 
 size_t ffreadb(void * ptr, size_t n, FFILE * fp)

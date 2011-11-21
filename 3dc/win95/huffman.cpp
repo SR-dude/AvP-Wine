@@ -59,11 +59,7 @@ static HuffEncode EncodingTable[257];
 
 /* KJL 17:16:03 17/09/98 - Compression */
 static void PerformSymbolCensus(unsigned char *sourcePtr, int length);
-#ifdef __WATCOMC__
-static int HuffItemsSortSub(const void *cmp1, const void *cmp2);
-#else
 static int __cdecl HuffItemsSortSub(const void *cmp1, const void *cmp2);
-#endif
 static void SortCensusData(void);
 static void BuildHuffmanTree(void);
 static void MakeHuffTreeFromHuffItems(HuffNode *base, HuffItem *source, int count);
@@ -123,11 +119,8 @@ static void PerformSymbolCensus(unsigned char *sourcePtr, int length)
 	while (--length);
 }			
 
-#ifdef __WATCOMC__
-static int HuffItemsSortSub(const void *cmp1, const void *cmp2)
-#else
+
 static int __cdecl HuffItemsSortSub(const void *cmp1, const void *cmp2)
-#endif
 {
     if (((HuffItem *)cmp1)->Count > ((HuffItem *)cmp2)->Count)
         return  1;

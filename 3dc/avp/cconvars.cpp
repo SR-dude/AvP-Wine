@@ -588,7 +588,6 @@ void ResetPersonalBests(void) {
 
 void CreateMoreGameSpecificConsoleVariables(void)
 {
-	#if CONSOLE_DEBUGGING_COMMANDS_ACTIVATED
 	/* Calibrate Tail Hack */
 
 	ConsoleVariable :: MakeSimpleConsoleVariable_Int
@@ -608,16 +607,6 @@ void CreateMoreGameSpecificConsoleVariables(void)
 		1000  // int MaxVal_New
 	);
 
-	#if 0
-	ConsoleVariable :: MakeSimpleConsoleVariable_Int
-	(
-		RATweak, // int& Value_ToUse,
-		"RATWEAK", // ProjChar* pProjCh_ToUse,
-		"CLASSIFIED", // ProjChar* pProjCh_Description_ToUse
-		-512, // int MinVal_New,
-		512  // int MaxVal_New
-	);
-	#endif
 
 	ConsoleVariable :: MakeSimpleConsoleVariable_Int
 	(
@@ -880,14 +869,12 @@ void CreateMoreGameSpecificConsoleVariables(void)
 	);
 
 	/* Debugging */
-	#if 1
 	ConsoleCommand :: Make
 	(
 		"TOGGLE_SHAPERENDER",
 		"SWITCHES ALL HIERARCHY SECTIONS FOR SHELLS",
 		ToggleShapeRender
 	);
-	#endif
 	/* TEMPORARY */
 	ConsoleCommand :: Make
 	(
@@ -938,14 +925,6 @@ void CreateMoreGameSpecificConsoleVariables(void)
 		"TOGGLES HIVE STATUS PRINT",
 		Show_HiveState
 	);
-	#if 0
-	ConsoleCommand :: Make
-	(
-		"TOGGLEAMBIENCE",
-		"TOGGLES THE AMBIENT LIGHT",
-		Toggle_Ambience
-	);
-	#endif
 	ConsoleCommand :: Make
 	(
 		"SHOWSLACK",
@@ -1010,14 +989,6 @@ void CreateMoreGameSpecificConsoleVariables(void)
 		CastDummy
 	);
 
-	#if 0
-	ConsoleCommand :: Make
-	(
-		"SENTRYGUN",
-		"DROPS A SENTRY GUN",
-		CastSentrygun
-	);
-	#endif
 	ConsoleCommand :: Make
 	(
 		"ACTIVATE_GENERATORS",
@@ -1122,170 +1093,8 @@ void CreateMoreGameSpecificConsoleVariables(void)
 		"SETS THAT VALUE.",
 		SetRecoilMaxRandomZ
 	);
-	
-	#if 0
-	ConsoleVariable :: MakeSimpleConsoleVariable_Int
-	(
-		mx,
-		"MX",
-		"MOLOTOV X IMPULSE",
-		-ONE_FIXED,
-		ONE_FIXED
-	);
 
-	ConsoleVariable :: MakeSimpleConsoleVariable_Int
-	(
-		my,
-		"MY",
-		"MOLOTOV Y IMPULSE",
-		-ONE_FIXED,
-		ONE_FIXED
-	);
 
-	ConsoleVariable :: MakeSimpleConsoleVariable_Int
-	(
-		mz,
-		"MZ",
-		"MOLOTOV Z IMPULSE",
-		-ONE_FIXED,
-		ONE_FIXED
-	);
-	#endif
-
-	#if 0
-	/* Queen commands */
-
-	ConsoleVariable :: MakeSimpleConsoleVariable_Int
-	(
-		Queen_Step_Time,
-		"QSTEP-TIME",
-		"QUEEN STEP FORWARD TIME",
-		0,
-		(ONE_FIXED<<8)
-	);
-
-	ConsoleVariable :: MakeSimpleConsoleVariable_Int
-	(
-		Queen_Charge_Rate,
-		"QCHARGE_RATE",
-		"QUEEN CHARGE PACE",
-		0,
-		(ONE_FIXED<<8)
-	);
-
-	ConsoleVariable :: MakeSimpleConsoleVariable_Int
-	(
-		Queen_Step_Speed,
-		"QSTEP-SPEED",
-		"QUEEN STEP FORWARD SPEED",
-		0,
-		(ONE_FIXED)
-	);
-
-	ConsoleVariable :: MakeSimpleConsoleVariable_Int
-	(
-		Queen_Step_Mode,
-		"QSTEP-MODE",
-		"QUEEN STEP FORWARD MODE",
-		0,
-		1
-	);
-
-	ConsoleVariable :: MakeSimpleConsoleVariable_Int
-	(
-		Queen_Turn_Rate,
-		"QTURN-RATE",
-		"QUEEN TURN RATE",
-		0,
-		65536
-	);
-
-	ConsoleCommand :: Make
-	(
-		"QCOMM-STOP",
-		"STOPS SLAVE QUEEN.",
-		QComm_Stop
-	);
-
-	ConsoleCommand :: Make
-	(
-		"QCOMM-SF",
-		"ORDERS SLAVE QUEEN ONE STEP FORWARD.",
-		QComm_StepForward
-	);
-
-	ConsoleCommand :: Make
-	(
-		"QCOMM-SB",
-		"ORDERS SLAVE QUEEN ONE STEP Back.",
-		QComm_StepBack
-	);
-
-	ConsoleCommand :: Make
-	(
-		"QCOMM-TL",
-		"ORDERS SLAVE QUEEN TO TURN LEFT.",
-		QComm_TurnLeft
-	);
-
-	ConsoleCommand :: Make
-	(
-		"QCOMM-TR",
-		"ORDERS SLAVE QUEEN TO TURN RIGHT.",
-		QComm_TurnRight
-	);
-
-	ConsoleCommand :: Make
-	(
-		"QCOMM-HEEL",
-		"ORDERS SLAVE QUEEN TO COME TO PLAYER.",
-		QComm_Heel
-	);
-
-	ConsoleCommand :: Make
-	(
-		"QCOMM-TAUNT",
-		"ORDERS SLAVE QUEEN TO TAUNT.",
-		QComm_Taunt
-	);
-	
-	ConsoleCommand :: Make
-	(
-		"QCOMM-HISS",
-		"ORDERS SLAVE QUEEN TO HISS.",
-		QComm_Hiss
-	);
-
-	ConsoleCommand :: Make
-	(
-		"QCOMM-LS",
-		"ORDERS SLAVE QUEEN TO SWIPE (LEFT).",
-		QComm_LeftSwipe
-	);
-
-	ConsoleCommand :: Make
-	(
-		"QCOMM-RS",
-		"ORDERS SLAVE QUEEN TO SWIPE (Right).",
-		QComm_RightSwipe
-	);
-
-	ConsoleCommand :: Make
-	(
-		"QCOMM-ROUTE",
-		"ORDERS SLAVE QUEEN TO FOLLOW THE PROGRAMMED ROUTE.",
-		QComm_Route
-	);
-
-	ConsoleCommand :: Make
-	(
-		"QCOMM-CHARGE",
-		"ORDERS SLAVE QUEEN TO CHARGE.",
-		QComm_Charge
-	);
-	#endif
-
-	#endif
 }
 
 }; // extern "C"

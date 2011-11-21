@@ -10,7 +10,6 @@
 #include "ourasert.h"
 #include "pldghost.h"
 
-#if SupportModules
 
 /* imported externs */
 
@@ -301,10 +300,8 @@ void AllocateModuleObject(MODULE *mptr)
 	DISPLAYBLOCK *dptr;
 	MODULEMAPBLOCK *mapblockptr;
 	STRATEGYBLOCK *sb = 0;
-
-	#if SupportMorphing
 	MORPHCTRL *mc;
-	#endif
+
 
 	dptr_last = 0;
 
@@ -361,7 +358,6 @@ void AllocateModuleObject(MODULE *mptr)
 
 
 
-		#if SupportMorphing
 
 		/* If there is a strategy block, see if it has a MORPHCTRL structure */
 
@@ -379,25 +375,13 @@ void AllocateModuleObject(MODULE *mptr)
 
 				mc->ObMorphHeader = mapblockptr->MapMorphHeader;
 
-				/* OLD TEST - These values are now set elsewhere */
-				#if 0
-				if(mc->ObMorphHeader) {
-					mc->ObMorphCurrFrame = 0;
-					mc->ObMorphFlags = mph_flag_play/* | mph_flag_noloop | mph_flag_reverse*/;
-					mc->ObMorphSpeed = ONE_FIXED;
-				}
-				#endif
 
 			}
 
 		}
 
-		#endif	/* Support Morphing */
 
 
-		#if InterfaceEngine
-		dbptr->o_chunk = mapblockptr->o_chunk;
-		#endif
 
 		dptr->ObLightType = LightType_PerVertex;
 		dptr->ObFlags |= ObFlag_MultLSrc;
@@ -481,14 +465,11 @@ void AllocateModuleObject(MODULE *mptr)
 
 		/* Added Name to DISPLAYBLOCK */
 
-		#if SupportWindows95
 		dptr->name = mptr->name;
-		#endif
 
 		MapPostProcessing(dptr);
 
 
-		ModuleObjectJustAllocated(mptr);				/* Project Function */
 
 		/* Bug Fix */
 
@@ -530,7 +511,6 @@ void DeallocateModuleObject(MODULE *mptr)
 
 	if(mptr->m_dptr) {
 
-		ModuleObjectAboutToBeDeallocated(mptr);	/* Project Function */
 
 		dptr = mptr->m_dptr;
 
@@ -591,12 +571,7 @@ void PreprocessAllModules(void)
 
 
 
-/*
-
- A special function to deallocate the module visibility arrays
-
-*/
-
+//  A special function to deallocate the module visibility arrays
 void DeallocateModuleVisArrays(void)
 
 {
@@ -660,9 +635,6 @@ int GetModuleVisArrays(void)
 			ModuleCurrVisArray[i]  = 0;
 		}
 
-		#if 0
-		textprint("visibility arrays ok, size %d\n", ModuleArraySize);
-		#endif
 
 		return Yes;
 
@@ -673,14 +645,6 @@ int GetModuleVisArrays(void)
 }
 
 
-
-
-#define ppma_print No
-
-
-#if 1
-
-
 void PreprocessModuleArray(MODULE **m_array_ptr)
 {
 	MODULE **m_array = m_array_ptr;
@@ -688,9 +652,6 @@ void PreprocessModuleArray(MODULE **m_array_ptr)
 	int index;
 
 
-	#if ppma_print
-	textprint("PreprocessModuleArray %u\n", m_array_ptr);
-	#endif
 
 
 	index = 0;
@@ -707,49 +668,12 @@ void PreprocessModuleArray(MODULE **m_array_ptr)
 		m_ptr->m_index = index++;
 
 
-		#if ppma_print
-		textprint("\nModule %u, ", m_ptr);
-		PrintName(&m_ptr->m_name);
-		textprint(", index %d\n", m_ptr->m_index);
-		textprint("  (vptr = ");
-		PrintName(&m_ptr->m_vptr.mref_name);
-		textprint(")\n");
-		#endif
 
 
 		/* Convert module references from names to pointers */
 
 		if(!(m_ptr->m_flags & m_flag_gotptrs)) {
 
-			#if 0
-			/* Vertical Pointer */
-
-			ConvertModuleNameToPointer(&m_ptr->m_vptr, m_array_ptr);
-
-
-			/* Extent Pointer */
-
-			ConvertModuleNameToPointer(&m_ptr->m_ext, m_array_ptr);
-
-
-			/* Function Pointer */
-
-			ConvertModuleNameToPointer(&m_ptr->m_funref, m_array_ptr);
-
-
-			// Hack by John to make the m_link pointers work
-
-			if (m_ptr->m_link_ptrs)
-			{
-				MREF * m_link_ptr = m_ptr->m_link_ptrs;
-				
-				while (m_link_ptr->mref_ptr)
-				{
-					ConvertModuleNameToPointer(m_link_ptr++, m_array_ptr);
-				}
-
-			}
-			 #endif
 			/* VMODULE Array */
 
 			if(m_ptr->m_vmptr) {
@@ -758,18 +682,6 @@ void PreprocessModuleArray(MODULE **m_array_ptr)
 
 				PreprocessVMODIDATA(m_ptr->m_vmptr);
 
-				/* Convert MREF names to pointers */
-				/*
-				v_ptr = m_ptr->m_vmptr;
-
-				while(v_ptr->vmod_type != vmtype_term) {
-
-					ConvertModuleNameToPointer(&v_ptr->vmod_mref, m_array_ptr);
-
-					v_ptr++;
-
-				}
-				*/
 			}
 
 
@@ -792,17 +704,9 @@ void PreprocessModuleArray(MODULE **m_array_ptr)
 
 	}
 
-	/*WaitForReturn();*/
 
 }
 
-
-#else
-
-
-
-
-#endif
 
 
 /*
@@ -845,16 +749,7 @@ void PreprocessVMODIDATA(VMODULE *v_ptr)
 }
 
 
-/*
-
- Convert MREF name to MREF pointer
-
-*/
-
-
-#define cmntp_print No
-
-
+// Convert MREF name to MREF pointer
 void ConvertModuleNameToPointer(MREF *mref_ptr, MODULE **m_array_ptr)
 
 {
@@ -863,18 +758,12 @@ void ConvertModuleNameToPointer(MREF *mref_ptr, MODULE **m_array_ptr)
 	int StillSearching;
 
 
-	#if cmntp_print
-	textprint("ConvertModuleNameToPointer\n");
-	#endif
 
 
 	/* Set "null" names to null pointers */
 
 	if(CompareName((char *)&mref_ptr->mref_name, "null")) {
 
-		#if cmntp_print
-		textprint("making ptr null\n");
-		#endif
 
 		mref_ptr->mref_ptr = 0;
 		return;
@@ -884,9 +773,6 @@ void ConvertModuleNameToPointer(MREF *mref_ptr, MODULE **m_array_ptr)
 
 	/* Search for the module with the same name */
 
-	#if cmntp_print
-	textprint("Searching for name...\n");
-	#endif
 
 	StillSearching = Yes;
 
@@ -896,11 +782,6 @@ void ConvertModuleNameToPointer(MREF *mref_ptr, MODULE **m_array_ptr)
 
 		if(CompareName((char *)&mref_ptr->mref_name, (char *)&m_ptr->m_name)) {
 
-			#if cmntp_print
-			textprint("  found name ");
-			PrintName(&m_ptr->m_name);
-			textprint(", ptr %u\n", m_ptr);
-			#endif
 
 			mref_ptr->mref_ptr = m_ptr;
 			StillSearching = No;
@@ -919,16 +800,7 @@ void ConvertModuleNameToPointer(MREF *mref_ptr, MODULE **m_array_ptr)
 }
 
 
-/*
-
- Convert VMODIDATA.vmodidata_label names to VMODIDATA.vmodidata_ptr
-
-*/
-
-
-#define cvmntp_print No
-
-
+//  Convert VMODIDATA.vmodidata_label names to VMODIDATA.vmodidata_ptr
 void ConvertVModuleNameToPointer(VMODIDATA *vmodidata_ptr, VMODULE *v_array_ptr)
 
 {
@@ -936,18 +808,12 @@ void ConvertVModuleNameToPointer(VMODIDATA *vmodidata_ptr, VMODULE *v_array_ptr)
 	int StillSearching;
 
 
-	#if cvmntp_print
-	textprint("ConvertVModuleNameToPointer\n");
-	#endif
 
 
 	/* Set "null" names to null pointers */
 
 	if(CompareName((char *)&vmodidata_ptr->vmodidata_label, "null")) {
 
-		#if cvmntp_print
-		textprint("  making vmodidata_ptr null\n");
-		#endif
 
 		vmodidata_ptr->vmodidata_ptr = 0;
 		return;
@@ -957,9 +823,6 @@ void ConvertVModuleNameToPointer(VMODIDATA *vmodidata_ptr, VMODULE *v_array_ptr)
 
 	/* Search for the VMODULE with the same name */
 
-	#if cvmntp_print
-	textprint("  Searching for name...\n");
-	#endif
 
 	StillSearching = Yes;
 
@@ -967,11 +830,6 @@ void ConvertVModuleNameToPointer(VMODIDATA *vmodidata_ptr, VMODULE *v_array_ptr)
 
 		if(CompareName((char *)&vmodidata_ptr->vmodidata_label, (char *)&v_array_ptr->vmod_name)) {
 
-			#if cmntp_print
-			textprint("  found name ");
-			PrintName(&v_array_ptr->vmod_name);
-			textprint(", ptr %u\n", v_array_ptr);
-			#endif
 
 			vmodidata_ptr->vmodidata_ptr = v_array_ptr;
 			StillSearching = No;
@@ -1126,6 +984,6 @@ int IsAIModuleVisibleFromAIModule(AIMODULE *source,AIMODULE *target) {
 	return(0);
 }
 
-#endif
+
 
 

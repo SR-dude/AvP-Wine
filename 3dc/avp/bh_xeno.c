@@ -46,8 +46,6 @@
 #include "psnd.h"
 
 #define XENO_SENTRYTIME	(20)
-#define FAR_XENO_ACTIVITY	0
-#define FAR_XENO_FIRING		0
 
 #define XENO_WALKING_ANIM_SPEED	(ONE_FIXED<<1)
 #define XENO_TURNING_ANIM_SPEED	(ONE_FIXED<<1)
@@ -719,13 +717,6 @@ void XenoborgBehaviour(STRATEGYBLOCK *sbPtr)
 
 	VerifyDeltaControllers(sbPtr);
 
-	#if 0
-	/* zero velocity */
-	LOCALASSERT(sbPtr->DynPtr);
-	sbPtr->DynPtr->LinVelocity.vx = 0;
-	sbPtr->DynPtr->LinVelocity.vy = 0;
-	sbPtr->DynPtr->LinVelocity.vz = 0;
-	#endif
 
 	InitWaypointSystem(0);
 
@@ -911,13 +902,6 @@ void XenoborgBehaviour(STRATEGYBLOCK *sbPtr)
 	ComputeDeltaValues(sbPtr);
 
 	ProveHModel_Far(&xenoStatusPointer->HModelController,sbPtr);
-	
-	#if (FAR_XENO_FIRING==0)
-	if (xenoStatusPointer->IAmFar) {
-		xenoStatusPointer->FiringLeft=0;
-		xenoStatusPointer->FiringRight=0;
-	}
-	#endif
 
 	/* Now lets deal with the sounds. */
 	Xeno_MaintainSounds(sbPtr);
@@ -994,8 +978,6 @@ void MakeXenoborgNear(STRATEGYBLOCK *sbPtr)
 
 	xenoStatusPointer->IAmFar=0;
 
-	/* make a sound */
-	//Sound_Play(SID_ALIEN_HISS,"d",&sbPtr->DynPtr->Position);
 }
 
 void MakeXenoborgFar(STRATEGYBLOCK *sbPtr)
@@ -1218,7 +1200,6 @@ static void KillXeno(STRATEGYBLOCK *sbPtr,int wounds,DAMAGE_PROFILE *damage, int
 			deathtype=2;
 	 	} else if (MUL_FIXED(tkd,newmult)>250) {
 	 		/* Excessive bullets case 2. */
-	 		//xenoStatusPointer->GibbFactor=ONE_FIXED>>6;
 			deathtype=1;
 	 	}
 	}
@@ -1328,7 +1309,6 @@ void SetXenoborgShapeAnimSequence_Core(STRATEGYBLOCK *sbPtr,HMODEL_SEQUENCE_TYPE
 		InitHModelSequence(&xenoStatus->HModelController,(int)type,subtype,length);
 	} else {
 		InitHModelTweening(&xenoStatus->HModelController, tweeningtime, (int)type,subtype,length, 1);
-		//xenoStatus->HModelController.ElevationTweening=1;
 	}
 
 	xenoStatus->HModelController.Playing=1;
@@ -1820,18 +1800,8 @@ void Xeno_TurnAndTarget(STRATEGYBLOCK *sbPtr, int *ref_anglex,int *ref_angley) {
 	*ref_angley=angley;
 
 	/* Start turning / targeting procedure. */
-	#if 0
-	if ((xenoStatusPointer->headLock)
-		||(anglex>((((xenoStatusPointer->Torso_Twist>>4)+XENO_HEADPAN_GIMBALL)*7)/8))
-		||(anglex<((((xenoStatusPointer->Torso_Twist>>4)-XENO_HEADPAN_GIMBALL)*7)/8))) {
-
-		Xeno_TorsoMovement_TrackToAngle(sbPtr,XENO_TORSO_TWIST_RATE,anglex);
-
-	}
-	#else
 	/* Always torso twist. */
 	Xeno_TorsoMovement_TrackToAngle(sbPtr,XENO_TORSO_TWIST_RATE,anglex);
-	#endif
 	xenoStatusPointer->headLock=Xeno_HeadMovement_TrackToAngles(sbPtr,XENO_HEAD_LOCK_RATE,anglex,angley);
 
 	/* Now the arm. */
@@ -1898,12 +1868,7 @@ void Xeno_Limbs_ShootTheRoof(STRATEGYBLOCK *sbPtr) {
 	Xeno_LeftArmMovement_TrackLeftRight(sbPtr,XENO_ARM_LOCK_RATE);
 	Xeno_RightArmMovement_WaveUp(sbPtr,XENO_ARM_LOCK_RATE);
 	Xeno_RightArmMovement_TrackLeftRight(sbPtr,XENO_ARM_LOCK_RATE);
-	#if 0
-	Xeno_HeadMovement_ScanLeftRight(sbPtr,XENO_HEAD_SCAN_RATE);
-	Xeno_HeadMovement_ScanUpDown(sbPtr,XENO_HEAD_SCAN_RATE+2);
-	#else
 	Xeno_HeadMovement_TrackToAngles(sbPtr,XENO_HEAD_SCAN_RATE,0,XENO_HEADTILT_GIMBALL);
-	#endif
 	xenoStatusPointer->UseHeadLaser=0;
 	xenoStatusPointer->UseRALaser=1;
 	xenoStatusPointer->UseLALaser=1;
@@ -1996,17 +1961,8 @@ void Execute_Xeno_ActiveWait(STRATEGYBLOCK *sbPtr)
 
 	Xeno_TurnAndTarget(sbPtr,&anglex,&angley);
 
-	#if 0
-	if ((anglex>(((XENO_HEADPAN_GIMBALL)*7)/8))
-		||(anglex<-(((XENO_HEADPAN_GIMBALL)*7)/8))) {
-
-		Xeno_Enter_TurnToFace_State(sbPtr);
-
-	}
-	#else
 	/* Always turn to face too? */
 	Xeno_Enter_TurnToFace_State(sbPtr);
-	#endif
 
 }
 
@@ -2116,18 +2072,10 @@ void Execute_Xeno_ShootTheRoof(STRATEGYBLOCK *sbPtr)
 			EnforceXenoborgShapeAnimSequence_Core(sbPtr,HMSQT_Xenoborg,XBSS_Turn_Left,XENO_TURNING_ANIM_SPEED,(ONE_FIXED>>2));
 		}
 	
-		#if 0
-		/* Then turn to face it, of course. */
-
-		orientationDirn.vx = xenoStatusPointer->targetTrackPos.vx - sbPtr->DynPtr->Position.vx;
-		orientationDirn.vy = 0;
-		orientationDirn.vz = xenoStatusPointer->targetTrackPos.vz - sbPtr->DynPtr->Position.vz;
-		#else
 		/* Synthesize a new orientationDirn. */
 		orientationDirn.vx=sbPtr->DynPtr->OrientMat.mat11;
 		orientationDirn.vy=sbPtr->DynPtr->OrientMat.mat12;
 		orientationDirn.vz=sbPtr->DynPtr->OrientMat.mat13;
-		#endif
 		correctlyOrientated = NPCOrientateToVector(sbPtr, &orientationDirn,(NPC_TURNRATE>>XENO_FOOT_TURN_RATE),NULL);
 		
 	}
@@ -2256,11 +2204,7 @@ void Execute_Xeno_Follow(STRATEGYBLOCK *sbPtr)
 
 	}
 	
-	#if 0
-	EnforceXenoborgShapeAnimSequence_Core(sbPtr,HMSQT_Xenoborg,XBSS_Walking,XENO_WALKING_ANIM_SPEED,(ONE_FIXED>>2));
-	#else
 	XenoborgHandleMovingAnimation(sbPtr);
-	#endif
 
 	if (xenoStatusPointer->targetSightTest==0) {
 		Xeno_TorsoMovement_Centre(sbPtr,XENO_TORSO_TWIST_RATE);
@@ -2277,14 +2221,12 @@ void Execute_Xeno_Follow(STRATEGYBLOCK *sbPtr)
 		STRATEGYBLOCK *destructableObject = NULL;
 
 		NPC_IsObstructed(sbPtr,&(xenoStatusPointer->moveData),&xenoStatusPointer->obstruction,&destructableObject);
-		#if 1
 		if(xenoStatusPointer->obstruction.environment)
 		{
 			/* go to avoidance */
 			Xeno_Enter_Avoidance_State(sbPtr);
 			return;
 		}
-		#endif
 		if(xenoStatusPointer->obstruction.destructableObject)
 		{
 			LOCALASSERT(destructableObject);
@@ -2397,11 +2339,7 @@ void Execute_Xeno_Return(STRATEGYBLOCK *sbPtr)
 		}		
 	}
 
-	#if 0
-	EnforceXenoborgShapeAnimSequence_Core(sbPtr,HMSQT_Xenoborg,XBSS_Walking,XENO_WALKING_ANIM_SPEED,(ONE_FIXED>>2));
-	#else
 	XenoborgHandleMovingAnimation(sbPtr);
-	#endif
 	
 	Xeno_TorsoMovement_Centre(sbPtr,XENO_TORSO_TWIST_RATE);
 	Xeno_LeftArmMovement_Centre(sbPtr,XENO_ARM_LOCK_RATE);
@@ -2414,14 +2352,12 @@ void Execute_Xeno_Return(STRATEGYBLOCK *sbPtr)
 		STRATEGYBLOCK *destructableObject = NULL;
 
 		NPC_IsObstructed(sbPtr,&(xenoStatusPointer->moveData),&xenoStatusPointer->obstruction,&destructableObject);
-		#if 1
 		if(xenoStatusPointer->obstruction.environment)
 		{
 			/* go to avoidance */
 			Xeno_Enter_Avoidance_State(sbPtr);
 			return;
 		}
-		#endif
 		if(xenoStatusPointer->obstruction.destructableObject)
 		{
 			LOCALASSERT(destructableObject);
@@ -2458,11 +2394,7 @@ void Execute_Xeno_Avoidance(STRATEGYBLOCK *sbPtr)
 	}
 
 	/* Sequences... */
-	#if 0
-	EnforceXenoborgShapeAnimSequence_Core(sbPtr,HMSQT_Xenoborg,XBSS_Walking,XENO_WALKING_ANIM_SPEED,(ONE_FIXED>>2));
-	#else
 	XenoborgHandleMovingAnimation(sbPtr);
-	#endif
 	
 	if (xenoStatusPointer->targetSightTest==0) {
 		Xeno_TorsoMovement_Centre(sbPtr,XENO_TORSO_TWIST_RATE);
@@ -2596,7 +2528,6 @@ int Xenoborg_TargetFilter(STRATEGYBLOCK *candidate) {
 		case I_BehaviourXenoborg:
 			return(0);
 			break;
-		#if SupportWindows95
 		case I_BehaviourNetGhost:
 			{
 				NETGHOSTDATABLOCK *dataptr;
@@ -2613,7 +2544,6 @@ int Xenoborg_TargetFilter(STRATEGYBLOCK *candidate) {
 				}
 			}
 			break;
-		#endif
 		default:
 			return(0);
 			break;
@@ -2665,16 +2595,7 @@ STRATEGYBLOCK *Xenoborg_GetNewTarget(VECTORCH *xenopos, STRATEGYBLOCK *me) {
 		}
 	}
 
-	#if 0
-	if (nearest==NULL) {
-		if (Xenoborg_TargetFilter(Player->ObStrategyBlock)) {
-			nearest=Player->ObStrategyBlock;
-		} else {
-			nearest=NULL; /* Erk! */
-		}
-	}
-	#endif
-	
+
 	return(nearest);
 
 }
@@ -2704,18 +2625,6 @@ static void ComputeDeltaValues(STRATEGYBLOCK *sbPtr)
 		angle=-XENO_HEADPAN_GIMBALL;
 	}
 
-	#if 0
-	angle=angle*2;
-	
-	GLOBALASSERT(xenoStatusPointer->head_pan);
-
-	{
-		int fake_timer;
-
-		fake_timer=1024-angle;
-		fake_timer<<=5;
-		if (fake_timer==65536) fake_timer=65535;
-	#else
 	GLOBALASSERT(xenoStatusPointer->head_pan);
 
 	{
@@ -2727,7 +2636,6 @@ static void ComputeDeltaValues(STRATEGYBLOCK *sbPtr)
 		if (fake_timer>=65536) fake_timer=65535;
 		if (fake_timer<=0) fake_timer=0;
 
-	#endif
 
 		GLOBALASSERT(fake_timer>=0);
 		GLOBALASSERT(fake_timer<65536);
@@ -3918,7 +3826,6 @@ static void ProcessFarXenoborgTargetModule(STRATEGYBLOCK *sbPtr, AIMODULE* targe
 		case(NPCTM_LiftDoorOpen):
 		{
 			/* do nothing - can't use lifts	*/
-			//FarNpc_FlipAround(sbPtr);
 			/* What the hell!!! */
 			LocateFarNPCInAIModule(sbPtr, targetModule);
 			break;
@@ -3969,14 +3876,6 @@ void Execute_Xeno_ActiveWait_Far(STRATEGYBLOCK *sbPtr)
 	EnforceXenoborgShapeAnimSequence_Core(sbPtr,HMSQT_Xenoborg,XBSS_Powered_Up_Standard,ONE_FIXED,(ONE_FIXED>>2));
 
 	if (xenoStatusPointer->Target==NULL) {
-		#if FAR_XENO_ACTIVITY
-		/* Let's wave the head around. */
-		Xeno_TorsoMovement_Centre(sbPtr,XENO_TORSO_TWIST_RATE);
-		Xeno_LeftArmMovement_Centre(sbPtr,XENO_ARM_LOCK_RATE);
-		Xeno_RightArmMovement_Centre(sbPtr,XENO_ARM_LOCK_RATE);
-		Xeno_HeadMovement_ScanLeftRight(sbPtr,XENO_HEAD_SCAN_RATE);
-		Xeno_HeadMovement_ScanUpDown(sbPtr,XENO_HEAD_SCAN_RATE+2);
-		#endif
 
 		if (sbPtr->containingModule->m_aimodule!=xenoStatusPointer->my_module) {
 			Xeno_Enter_Returning_State(sbPtr);
@@ -4011,11 +3910,6 @@ void Execute_Xeno_ActiveWait_Far(STRATEGYBLOCK *sbPtr)
 			} else {
 				EnforceXenoborgShapeAnimSequence_Core(sbPtr,HMSQT_Xenoborg,XBSS_Turn_Left,XENO_TURNING_ANIM_SPEED,(ONE_FIXED>>2));
 			}
-			#if FAR_XENO_ACTIVITY
-			if (xenoStatusPointer->soundHandle1==SOUND_NOACTIVEINDEX) {
-				Sound_Play(SID_LOADMOVE,"del",&sbPtr->DynPtr->Position,&xenoStatusPointer->soundHandle1);
-			}
-			#endif
 		} else {
 
 			/* Otherwise just wait? */
@@ -4045,16 +3939,6 @@ void Execute_Xeno_ActiveWait_Far(STRATEGYBLOCK *sbPtr)
 		return;
 	}
 
-	#if FAR_XENO_ACTIVITY
-	Xeno_TurnAndTarget(sbPtr,&anglex,&angley);
-
-	if ((anglex>(((XENO_HEADPAN_GIMBALL)*7)/8))
-		||(anglex<-(((XENO_HEADPAN_GIMBALL)*7)/8))) {
-
-		Xeno_Enter_TurnToFace_State(sbPtr);
-
-	}
-	#endif
 
 	if (ShowXenoStats) {
 		PrintDebuggingText("Targets in module....\n");
@@ -4112,9 +3996,6 @@ void Execute_Xeno_TurnToFace_Far(STRATEGYBLOCK *sbPtr)
 		/* Spin FAST. */		
 	}
 
-	#if FAR_XENO_ACTIVITY
-	Xeno_TurnAndTarget(sbPtr,&anglex,&angley);
-	#endif
 
 	if (correctlyOrientated) {
 		Xeno_Enter_ActiveWait_State(sbPtr);
@@ -4139,10 +4020,6 @@ void Execute_Xeno_Follow_Far(STRATEGYBLOCK *sbPtr)
 
 	if (xenoStatusPointer->Target==NULL) {
 		/* Let's wave the head around. */
-		#if FAR_XENO_ACTIVITY
-		Xeno_HeadMovement_ScanLeftRight(sbPtr,XENO_HEAD_SCAN_RATE);
-		Xeno_HeadMovement_ScanUpDown(sbPtr,XENO_HEAD_SCAN_RATE+2);
-		#endif
 		/* And return to my module. */
 		Xeno_Enter_Returning_State(sbPtr);
 		return;
@@ -4153,9 +4030,6 @@ void Execute_Xeno_Follow_Far(STRATEGYBLOCK *sbPtr)
 	/* check if far state timer has timed-out. If so, it is time 
 	to do something. Otherwise just return. */
 	if(xenoStatusPointer->stateTimer < XENO_FAR_MOVE_TIME) {
-		#if FAR_XENO_ACTIVITY
-		Xeno_TurnAndTarget(sbPtr,&anglex,&angley);
-		#endif
 		return;
 	}
 
@@ -4208,22 +4082,8 @@ void Execute_Xeno_Follow_Far(STRATEGYBLOCK *sbPtr)
 
 	xenoStatusPointer->stateTimer=0;
 
-	#if 0
-	EnforceXenoborgShapeAnimSequence_Core(sbPtr,HMSQT_Xenoborg,XBSS_Walking,XENO_WALKING_ANIM_SPEED,(ONE_FIXED>>2));
-	#else
 	XenoborgHandleMovingAnimation(sbPtr);
-	#endif
 	
-	#if FAR_XENO_ACTIVITY
-	if (xenoStatusPointer->targetSightTest==0) {
-		Xeno_TorsoMovement_Centre(sbPtr,XENO_TORSO_TWIST_RATE);
-		Xeno_LeftArmMovement_Centre(sbPtr,XENO_ARM_LOCK_RATE);
-		Xeno_RightArmMovement_Centre(sbPtr,XENO_ARM_LOCK_RATE);
-		Xeno_HeadMovement_ScanLeftRight(sbPtr,XENO_HEAD_SCAN_RATE);
-	} else {
-		Xeno_TurnAndTarget(sbPtr,&anglex,&angley);
-	}
-	#endif
 
 }
 
@@ -4253,12 +4113,6 @@ void Execute_Xeno_Return_Far(STRATEGYBLOCK *sbPtr)
 	/* check if far state timer has timed-out. If so, it is time 
 	to do something. Otherwise just return. */
 	if(xenoStatusPointer->stateTimer < XENO_FAR_MOVE_TIME) {
-		#if FAR_XENO_ACTIVITY
-		Xeno_HeadMovement_ScanLeftRight(sbPtr,XENO_HEAD_SCAN_RATE);
-		Xeno_TorsoMovement_Centre(sbPtr,XENO_TORSO_TWIST_RATE);
-		Xeno_LeftArmMovement_Centre(sbPtr,XENO_ARM_LOCK_RATE);
-		Xeno_RightArmMovement_Centre(sbPtr,XENO_ARM_LOCK_RATE);
-		#endif
 		return;
 	}
 
@@ -4302,18 +4156,8 @@ void Execute_Xeno_Return_Far(STRATEGYBLOCK *sbPtr)
 
 	xenoStatusPointer->stateTimer=0;
 
-	#if 0
-	EnforceXenoborgShapeAnimSequence_Core(sbPtr,HMSQT_Xenoborg,XBSS_Walking,XENO_WALKING_ANIM_SPEED,(ONE_FIXED>>2));
-	#else
 	XenoborgHandleMovingAnimation(sbPtr);
-	#endif
 	
-	#if FAR_XENO_ACTIVITY
-	Xeno_TorsoMovement_Centre(sbPtr,XENO_TORSO_TWIST_RATE);
-	Xeno_LeftArmMovement_Centre(sbPtr,XENO_ARM_LOCK_RATE);
-	Xeno_RightArmMovement_Centre(sbPtr,XENO_ARM_LOCK_RATE);
-	Xeno_HeadMovement_ScanLeftRight(sbPtr,XENO_HEAD_SCAN_RATE);
-	#endif
 
 }
 
@@ -4331,22 +4175,8 @@ void Execute_Xeno_Avoidance_Far(STRATEGYBLOCK *sbPtr)
 	}
 
 	/* Sequences... */
-	#if 0
-	EnforceXenoborgShapeAnimSequence_Core(sbPtr,HMSQT_Xenoborg,XBSS_Walking,XENO_WALKING_ANIM_SPEED,(ONE_FIXED>>2));
-	#else
 	XenoborgHandleMovingAnimation(sbPtr);
-	#endif
 	
-	#if FAR_XENO_ACTIVITY
-	if (xenoStatusPointer->targetSightTest==0) {
-		Xeno_TorsoMovement_Centre(sbPtr,XENO_TORSO_TWIST_RATE);
-		Xeno_LeftArmMovement_Centre(sbPtr,XENO_ARM_LOCK_RATE);
-		Xeno_RightArmMovement_Centre(sbPtr,XENO_ARM_LOCK_RATE);
-		Xeno_HeadMovement_ScanLeftRight(sbPtr,XENO_HEAD_SCAN_RATE);
-	} else {
-		Xeno_TurnAndTarget(sbPtr,&anglex,&angley);
-	}
-	#endif
 
 	{
 		
@@ -4402,34 +4232,6 @@ void Xenoborg_MaintainLeftGun(STRATEGYBLOCK *sbPtr)
 
 	multiple=FIRING_RATE_LEFT*NormalFrameTime;
 	
-	#if 0
-	LOS_Lambda = NPC_MAX_VIEWRANGE;
-	LOS_ObjectHitPtr = 0;
-	LOS_HModel_Section=NULL;
-	{
-	   	extern int NumActiveBlocks;
-		extern DISPLAYBLOCK* ActiveBlockList[];
-	   	int numberOfObjects = NumActiveBlocks;
-		
-	   	while (numberOfObjects--)
-		{
-			DISPLAYBLOCK* objectPtr = ActiveBlockList[numberOfObjects];
-			
-			alpha = left_dum->World_Offset;
-
-			beta.vx=left_dum->SecMat.mat31;
-			beta.vy=left_dum->SecMat.mat32;
-			beta.vz=left_dum->SecMat.mat33;
-
-			GLOBALASSERT(objectPtr);
-
-			if (objectPtr!=sbPtr->SBdptr) {
-				/* Can't hit self. */
-				CheckForVectorIntersectionWith3dObject(objectPtr, &alpha, &beta,1);
-			}
-		}
-	}
-	#else
 	{
 		alpha = left_dum->World_Offset;
 
@@ -4438,7 +4240,6 @@ void Xenoborg_MaintainLeftGun(STRATEGYBLOCK *sbPtr)
 		beta.vz=left_dum->SecMat.mat33;
 		FindPolygonInLineOfSight(&beta,&alpha,0,sbPtr->SBdptr);
 	}
-	#endif
 	
 	/* Now deal with LOS_ObjectHitPtr. */
 	if (LOS_ObjectHitPtr) {
@@ -4514,34 +4315,6 @@ void Xenoborg_MaintainRightGun(STRATEGYBLOCK *sbPtr)
 
 	multiple=FIRING_RATE_RIGHT*NormalFrameTime;
 
-	#if 0
-	LOS_Lambda = NPC_MAX_VIEWRANGE;
-	LOS_ObjectHitPtr = 0;
-	LOS_HModel_Section=NULL;
-	{
-	   	extern int NumActiveBlocks;
-		extern DISPLAYBLOCK* ActiveBlockList[];
-	   	int numberOfObjects = NumActiveBlocks;
-		
-	   	while (numberOfObjects--)
-		{
-			DISPLAYBLOCK* objectPtr = ActiveBlockList[numberOfObjects];
-			
-			alpha = right_dum->World_Offset;
-
-			beta.vx=right_dum->SecMat.mat31;
-			beta.vy=right_dum->SecMat.mat32;
-			beta.vz=right_dum->SecMat.mat33;
-
-			GLOBALASSERT(objectPtr);
-
-			if (objectPtr!=sbPtr->SBdptr) {
-				/* Can't hit self. */
-				CheckForVectorIntersectionWith3dObject(objectPtr, &alpha, &beta,1);
-			}
-		}
-	}
-	#else
 	{
 		alpha = right_dum->World_Offset;
 
@@ -4550,7 +4323,6 @@ void Xenoborg_MaintainRightGun(STRATEGYBLOCK *sbPtr)
 		beta.vz=right_dum->SecMat.mat33;
 		FindPolygonInLineOfSight(&beta,&alpha,0,sbPtr->SBdptr);
 	}
-	#endif
 	/* Now deal with LOS_ObjectHitPtr. */
 	if (LOS_ObjectHitPtr) {
 		if (LOS_HModel_Section) {
@@ -4661,14 +4433,12 @@ void Xeno_MaintainLasers(STRATEGYBLOCK *sbPtr) {
 	xenoStatusPointer->LALaserOnTarget=0;
 	xenoStatusPointer->RALaserOnTarget=0;
 
-	#if (FAR_XENO_ACTIVITY==0)
 	if (xenoStatusPointer->IAmFar) {
 		xenoStatusPointer->TargetingLaser[0].BeamIsOn=0;
 		xenoStatusPointer->TargetingLaser[1].BeamIsOn=0;
 		xenoStatusPointer->TargetingLaser[2].BeamIsOn=0;
 		return;
 	}
-	#endif
 
 	for (a=0; a<3; a++) {
 

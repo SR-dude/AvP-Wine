@@ -7,35 +7,24 @@ extern "C" {
 #include "3dc.h"
 #include "module.h"
 #include "inline.h"
-
 #include "dxlog.h"
-
 #include "stratdef.h"
 #include "gamedef.h"
 #include "gameplat.h"
-
 #include "equipmnt.h"
-
 #include "huddefs.h"
 #include "hudgfx.h"
-
 #include "font.h"
-
 #include "kshape.h"
 #include "krender.h"
 #include "chnktexi.h"
 #include "awtexld.h"
 #include "ffstdio.h"
-
-
-
 #include "d3d_hud.h"
-
 extern "C++" 
 {
 #include "r2base.h"
 #include "indexfnt.hpp"
-
 #include "projload.hpp" // c++ header which ignores class definitions/member functions if __cplusplus is not defined ?
 #include "chnkload.hpp" // c++ header which ignores class definitions/member functions if __cplusplus is not defined ?
 #include "pcmenus.h"
@@ -48,8 +37,6 @@ extern int ZBufferMode;
 extern int sine[],cosine[];
 extern IMAGEHEADER ImageHeaderArray[];
 int BackdropImage;
-//#define UseLocalAssert Yes
-//#include "ourasert.h"
 
 
 int UsingDataBase = 0;
@@ -84,38 +71,25 @@ static struct DDGraphicTag E3FontDDInfo;
 ****************************************************************************************KJL*/
 void PlatformSpecificInitMarineHUD(void);
 void PlatformSpecificInitPredatorHUD(void);
-
 void PlatformSpecificExitingHUD(void);
 void PlatformSpecificEnteringHUD(void);
-
 void BLTMotionTrackerToHUD(int scanLineSize);
 void BLTMotionTrackerBlipToHUD(int x, int y, int brightness);
-
 static void BLTDigitToHUD(char digit, int x, int y, int font);
-
 void BLTGunSightToScreen(int screenX, int screenY, enum GUNSIGHT_SHAPE gunsightShape);
 void BLTWeaponToHUD(PLAYER_WEAPON_DATA* weaponPtr);
 int CueWeaponFrameFromSequence(struct WeaponFrameTag *weaponFramePtr, int timeOutCounter, int weaponIDNumber);
-
-
-
 void BLTPredatorOverlayToHUD(void);
 void BLTPredatorNumericsToHUD(void);
 static void BLTPredatorDigitToHUD(char digit, int x, int y, int font);
-
 void LoadDDGraphic(struct DDGraphicTag *DDGfxPtr, char *Filename);
-
-
 static void DrawMotionTrackerPoly(void);
 static void SetupScanlinePoly(char const *filenamePtr, int width);
-
-
 extern void D3D_InitialiseMarineHUD(void);
 extern void D3D_BLTMotionTrackerToHUD(int scanLineSize);
 extern void D3D_BLTMotionTrackerBlipToHUD(int x, int y, int brightness);
 extern void D3D_BLTDigitToHUD(char digit, int x, int y, int font);
 extern void D3D_BLTGunSightToHUD(int screenX, int screenY, enum GUNSIGHT_SHAPE gunsightShape);
-
 extern void LoadCommonTextures(void);
 /*KJL****************************************************************************************
 *                                     F U N C T I O N S	                                    *
@@ -131,12 +105,9 @@ void PlatformSpecificInitMarineHUD(void)
 	{
 		D3D_InitialiseMarineHUD();
 		LoadCommonTextures();
-//		ChromeImageNumber = CL_LoadImageOnce("Common\\chromelike.RIM",LIO_D3DTEXTURE|LIO_RELATIVEPATH|LIO_RESTORABLE);
 		return;
 	}
 	
-	//SelectGenTexDirectory(ITI_TEXTURE);
-
 	extern unsigned char *ScreenBuffer;
 
 	/* set game mode: different, though for multiplayer game */
@@ -145,11 +116,6 @@ void PlatformSpecificInitMarineHUD(void)
 	else
 		cl_pszGameMode = "multip";
 
-	//	SetCurrentImageGroup(0);
-
-	//	load_rif("avp_huds\\marine.rif");
-
-	//	copy_chunks_from_environment(0);
 	
 	/* load HUD gfx */
 	int gfxID = NO_OF_MARINE_HUD_GFX;
@@ -306,7 +272,6 @@ void PlatformSpecificInitPredatorHUD(void)
 
 void PlatformSpecificInitAlienHUD(void)
 {
-	//SelectGenTexDirectory(ITI_TEXTURE);
 	/* set game mode: different, though for multiplayer game */
 	if(AvP.Network==I_No_Network)
 	{
@@ -487,38 +452,19 @@ void PlatformSpecificKillAlienHUD(void)
 /*********************/
 
 void PlatformSpecificExitingHUD(void)
-{
-#if 0
-	/* KJL 11:37:19 06/14/97 - draw whatever is in the execute buffer */
-	if (ScanDrawMode != ScanDrawDirectDraw)
-	{
-		WriteEndCodeToExecuteBuffer();
-		UnlockExecuteBufferAndPrepareForUse();
-		ExecuteBuffer();
-		EndD3DScene();
-	}
-#endif
+{ // adj stub
+
 }
 
 void PlatformSpecificEnteringHUD(void)
 {
-	/* JH 13/5/97 */
 	/* Flush the ZBuffer so the weapons don't sink into the wall! */
-	#if SupportZBuffering
 	if ((ScanDrawMode != ScanDrawDirectDraw) && (ZBufferMode != ZBufferOff))
 	{
-		//		FlushD3DZBuffer();
 	}
-	#endif
 
-#if 0
-	/* KJL 11:37:49 06/14/97 - reinit execute buffer */
-	if (ScanDrawMode != ScanDrawDirectDraw)
-	{
-		BeginD3DScene();
-		LockExecuteBuffer();
-	}
-#endif
+// adj stub
+
 }
 
 /*KJL**********************
@@ -526,7 +472,6 @@ void PlatformSpecificEnteringHUD(void)
 **********************KJL*/
 void BLTMotionTrackerToHUD(int scanLineSize)
 {
- //	if (VideoModeType_8 != VideoModeTypeScreen) return;
 	if ((ScanDrawMode != ScanDrawDirectDraw) && (ZBufferOn==ZBufferMode))
 	{
 		D3D_BLTMotionTrackerToHUD(scanLineSize);
@@ -1079,12 +1024,6 @@ void ReleaseHUDGraphic(HUDGRAPHIC* hgptr)
 }
 
 
-
-/*
-	Windows externs. See win_func
-*/
-
-
 void BLTGraphicToScreen(HUDGRAPHIC* hgptr)
 {
 	/*
@@ -1106,15 +1045,6 @@ void BLTGraphicToScreen(HUDGRAPHIC* hgptr)
 	GLOBALASSERT(hgptr->srcRect->top < hgptr->srcRect->bottom);
 	GLOBALASSERT(hgptr->srcRect->left < hgptr->srcRect->right);
 
-#if 0
-	textprint("%d TOP %d BOTTOM\n", hgptr->srcRect->top , hgptr->srcRect->bottom); 
-	textprint("%d LEFT %d RIGHT\n", hgptr->srcRect->left , hgptr->srcRect->right); 
-
-	textprint("/n%d TOP %d BOTTOM\n", screenRect.top , screenRect.bottom); 
-	textprint("%d LEFT %d RIGHT\n", screenRect.left , screenRect.right); 
-
-	WaitForReturn();
-#endif
 
 
 	if((hgptr->width == 0) || (hgptr->height == 0))
@@ -1150,9 +1080,6 @@ void BLTGraphicToScreen(HUDGRAPHIC* hgptr)
 /************************** FONTS *************************/
 /**********************************************************/
 /**********************************************************/
-
-//static int BLTFontCharToHUD(PFFONT* font , int xdest, int ydest, char todraw);
-
 LPDIRECTDRAWSURFACE FontLPDDS[NUM_FONTS];
 
 PFFONT AvpFonts[] =
@@ -1367,13 +1294,6 @@ int BLTFontOffsetToHUD(PFFONT* font , int xdest, int ydest, int offset)
 
 
 
-
-
-
-
-
-
-#if 1
 void YClipMotionTrackerVertices(struct VertexTag *v1, struct VertexTag *v2);
 void XClipMotionTrackerVertices(struct VertexTag *v1, struct VertexTag *v2);
 
@@ -1431,13 +1351,6 @@ static void DrawMotionTrackerPoly(void)
 	vertex[1].Y += MotionTrackerCentreY;
 	vertex[2].Y += MotionTrackerCentreY;
 	vertex[3].Y += MotionTrackerCentreY;
-	#if 0
-	textprint("%d %d   %d %d\n%d %d   %d %d\n%d %d   %d %d\n%d %d   %d %d\n",
-		vertex[0].X,vertex[0].Y,vertex[0].U,vertex[0].V,
-		vertex[1].X,vertex[1].Y,vertex[1].U,vertex[1].V,
-		vertex[2].X,vertex[2].Y,vertex[2].U,vertex[2].V,
-		vertex[3].X,vertex[3].Y,vertex[3].U,vertex[3].V);
-	#endif
 	
 	/* dodgy offset 'cos I'm not x clipping */
 	if (vertex[0].X==-1) vertex[0].X = 0;
@@ -1575,8 +1488,6 @@ static void SetupScanlinePoly(char const *filenamePtr, int width)
 }
 
 
-
-#endif
 
 #define MAX_MESSAGE_LENGTH 50
 #define MESSAGE_FONT_WIDTH 5

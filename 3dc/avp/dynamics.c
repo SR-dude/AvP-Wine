@@ -39,12 +39,9 @@ you should have seen the previous versions. */
 #define FLOOR_THRESHOLD 30000
 #define NEARLYFLATFLOOR_THRESHOLD 60000
 
-#if 0
-	extern int GlobalFrameCounter;
-	#define LogInfo LOGDXFMT
-#else
-	#define LogInfo(args) (void)0
-#endif
+
+#define LogInfo(args) (void)0
+
 
 extern MORPHDISPLAY MorphDisplay;
 extern VECTORCH MorphedPts[];
@@ -275,8 +272,6 @@ extern void ObjectDynamics(void)
 	Player->ObStrategyBlock->DynPtr->LinImpulse.vy,
 	Player->ObStrategyBlock->DynPtr->LinImpulse.vz);
  */	
-//	if (TICKERTAPE_CHEATMODE)
-//		PlayerPheromoneTrail();
 
 	if (FREEFALL_CHEATMODE)
 	{
@@ -316,12 +311,6 @@ extern void ObjectDynamics(void)
 		      	   
 		if (dynPtr->IsNetGhost || (dynPtr->IsPickupObject && !dynPtr->GravityOn))
 		{
-			#if 0
-			dynPtr->Position.vx += MUL_FIXED(dynPtr->LinVelocity.vx, NormalFrameTime);
-		    dynPtr->Position.vy += MUL_FIXED(dynPtr->LinVelocity.vy, NormalFrameTime);
-		    dynPtr->Position.vz += MUL_FIXED(dynPtr->LinVelocity.vz, NormalFrameTime);
-			AlignObjectToStandardGravityDirection(dynPtr);
-			#endif
 			UpdateDisplayBlockData(sbPtr);
 			continue;
 		}
@@ -351,20 +340,7 @@ extern void ObjectDynamics(void)
 		}
 		if ((sbPtr->SBdptr == Player) && dynPtr->RequestsToStandUp)
 			TestForValidPlayerStandUp(sbPtr); 
-#if 0
-		if (dynPtr->OnlyCollideWithObjects) 
-		{
-			/* initialise near polygons array */	
-			CollisionPolysPtr = &CollisionPolysArray[0];
-		    NumberOfCollisionPolys=0;
-		}
-		else
-		{
-			/* find which landscape polygons occupy the space
-		   	through which the object wishes to move */
-			FindLandscapePolygonsInObjectsPath(sbPtr);
-		}
-#endif
+
 		if (dynPtr->OnlyCollideWithObjects)
 		{
 			/* initialise near polygons array */	
@@ -457,16 +433,6 @@ extern void ObjectDynamics(void)
 		}
 			
 		/* friction */
-		#if 0
-		if (dynPtr->IsInContactWithFloor)
-		{
-			int scale = NormalFrameTime<<1;
-			if(scale>ONE_FIXED) scale = ONE_FIXED;
-			scale = ONE_FIXED;
-	   		dynPtr->LinImpulse.vx -= MUL_FIXED(scale,dynPtr->LinImpulse.vx);
-	   		dynPtr->LinImpulse.vz -= MUL_FIXED(scale,dynPtr->LinImpulse.vz);
-		}
-		#else
 		if (dynPtr->IsInContactWithFloor)
 		{
 			int k = NormalFrameTime<<1;
@@ -495,21 +461,9 @@ extern void ObjectDynamics(void)
 	   		dynPtr->LinImpulse.vy -= MUL_FIXED(k,linPerp.vy);
 	   		dynPtr->LinImpulse.vz -= MUL_FIXED(k,linPerp.vz);
 		}
-		#endif
 
-		#if 0
-		if( (dynPtr->Position.vx != dynPtr->PrevPosition.vx)
-		  ||(dynPtr->Position.vy != dynPtr->PrevPosition.vy)
-		  ||(dynPtr->Position.vz != dynPtr->PrevPosition.vz))
-		#endif
-		{				
-// 	 		FindObjectsToRelocateAgainst(sbPtr);					
-//			TestForValidMovement(sbPtr);
-		}
-  //		RelocatedDueToFallout(dynPtr);
-		UpdateDisplayBlockData(sbPtr);
+ 		UpdateDisplayBlockData(sbPtr);
 	}
-	#if TELEPORT_IF_OUTSIDE_ENV
 	{
 		extern MODULE *playerPherModule;
 		DYNAMICSBLOCK *dynPtr = Player->ObStrategyBlock->DynPtr;
@@ -519,22 +473,6 @@ extern void ObjectDynamics(void)
 		if (!newModule)
 		{
 			/* hmm, player isn't in a module */
-			#if 0
-			if (playerPherModule)
-			{
-				dynPtr->Position.vx = playerPherModule->m_world.vx;
-				dynPtr->Position.vy = playerPherModule->m_world.vy;
-				dynPtr->Position.vz = playerPherModule->m_world.vz;
-				PlayersMaxHeightWhilstNotInContactWithGround=dynPtr->Position.vy;
-				
-				dynPtr->PrevPosition = dynPtr->Position;
-				dynPtr->LinImpulse.vx = 0;
-				dynPtr->LinImpulse.vy = 0;
-				dynPtr->LinImpulse.vz = 0;
-				UpdateDisplayBlockData(Player->ObStrategyBlock);
-			}
-			else
-			#endif
 			{
 				if (playerPherModule)
 				{
@@ -555,44 +493,16 @@ extern void ObjectDynamics(void)
 				dynPtr->LinImpulse.vy = 0;
 				dynPtr->LinImpulse.vz = 0;
 				UpdateDisplayBlockData(Player->ObStrategyBlock);
-	   			//NewOnScreenMessage("Relocated Player");
 			}
 
 		}
 	}
-	#endif
 	/* KJL 18:50:17 10/11/98 - Falling Damage */
 	if (AvP.PlayerType==I_Marine)
 	{
 		DYNAMICSBLOCK *dynPtr = Player->ObStrategyBlock->DynPtr;
 		if(dynPtr->IsInContactWithFloor)
 		{
-			#if 0
-			int damage = (PlayersFallingSpeed-15000)*160;
-			if (damage>0)
-			{
-				CauseDamageToObject(Player->ObStrategyBlock,&FallingDamage,damage,NULL);
-			
-			}
-			//falling damage may be turned off in network games
-			BOOL fallingDamageDisabled = (!netGameData.fallingDamage && AvP.Network!=I_No_Network);
-			int damage = ((dynPtr->Position.vy - PlayersMaxHeightWhilstNotInContactWithGround - 4000))*256
-			;
-			if (damage>0 && !fallingDamageDisabled)
-			{
-				CauseDamageToObject(Player->ObStrategyBlock,&FallingDamage,damage,NULL);
-			}
-			/* CDF 8/4/99 - end of jump sound... */
-			{
-				int distanceFallen = (dynPtr->Position.vy - PlayersMaxHeightWhilstNotInContactWithGround);
-
-				if ((distanceFallen>500)&&(distanceFallen<4000 || fallingDamageDisabled)) {
-					/* Make a sound. */
-	   				Sound_Play(SID_MARINE_SMALLLANDING,"h");
-					if(AvP.Network!=I_No_Network) netGameData.landingNoise=1;
-				}
-			}
-			#endif
 			BOOL fallingDamageDisabled = (!netGameData.fallingDamage && AvP.Network!=I_No_Network);
 			int damage = (PlayersFallingSpeed-15000)*256;
 			int distanceFallen = (dynPtr->Position.vy - PlayersMaxHeightWhilstNotInContactWithGround);
@@ -659,7 +569,6 @@ extern void ObjectDynamics(void)
 	    while(i--)    
 		{
 			STRATEGYBLOCK *obstaclePtr = DynamicObjectsList[i];
-//		  	if((obstaclePtr->I_SBtype == I_BehaviourHierarchicalFragment)||(obstaclePtr->DynPtr->IsPickupObject))
 		  	if(obstaclePtr->DynPtr->IsPickupObject)
 			{
 				VECTORCH disp;
@@ -681,40 +590,6 @@ extern void ObjectDynamics(void)
 			}
 		}
 	}
-	#if 0
-	{
-		COLLISIONREPORT *reportPtr = Player->ObStrategyBlock->DynPtr->CollisionReportPtr;
-
-		if (ShowDebuggingText.Dynamics) PrintDebuggingText("Player Impulse:%d,%d,%d\n",
-		Player->ObStrategyBlock->DynPtr->LinImpulse.vx,
-		Player->ObStrategyBlock->DynPtr->LinImpulse.vy,
-		Player->ObStrategyBlock->DynPtr->LinImpulse.vz);
-
-		if (ShowDebuggingText.Dynamics) PrintDebuggingText("Player Position:%d,%d,%d\n",
-		Player->ObStrategyBlock->DynPtr->Position.vx,
-		Player->ObStrategyBlock->DynPtr->Position.vy,
-		Player->ObStrategyBlock->DynPtr->Position.vz);
-
-		if (ShowDebuggingText.Dynamics) PrintDebuggingText("InContactWithFloor %d\n",Player->ObStrategyBlock->DynPtr->IsInContactWithFloor);
-		if (ShowDebuggingText.Dynamics) PrintDebuggingText("Player Gravity Direction:%d,%d,%d\n",
-			Player->ObStrategyBlock->DynPtr->GravityDirection.vx,
-			Player->ObStrategyBlock->DynPtr->GravityDirection.vy,
-			Player->ObStrategyBlock->DynPtr->GravityDirection.vz);
-
-		while (reportPtr) /* while there is a valid report */
-		{
-			if (ShowDebuggingText.Dynamics) PrintDebuggingText("Col Normal %d %d %d\n",reportPtr->ObstacleNormal.vx,reportPtr->ObstacleNormal.vy,reportPtr->ObstacleNormal.vz);
-			if (ShowDebuggingText.Dynamics) PrintDebuggingText("strategy ptr %p\n",reportPtr->ObstacleSBPtr);
-							 
-			/* skip to next report */
-			reportPtr = reportPtr->NextCollisionReportPtr;
-		}
-		PrintDebuggingText("\80\81\82\83 \A9\B8\E4\n");
-		if(!Player->ObStrategyBlock->DynPtr->IsInContactWithFloor)
-			NewOnScreenMessage("\80\81\82\83 word \A9\B8\E4 word \80\81\82\83 word \B8\E4 word\n");
-	}
-	#endif
-	//NewTrailPoint(Player->ObStrategyBlock->DynPtr);
 }
 
 static void InitialiseDynamicObjectsList(void)
@@ -745,7 +620,6 @@ static void InitialiseDynamicObjectsList(void)
 				if(dynPtr->IsStatic)
 				{
 					UpdateDisplayBlockData(sbPtr);
-// 		 			CreateNRBBForObject(sbPtr);
 				}
 				/* should object simply move? */
   				else if (dynPtr->DynamicsType == DYN_TYPE_NO_COLLISIONS)
@@ -768,7 +642,6 @@ static void InitialiseDynamicObjectsList(void)
 		   	  		ApplyGravity(dynPtr);
 					AddEffectsOfForceGenerators(&dynPtr->Position,&dynPtr->LinImpulse,dynPtr->Mass);
 					/* create a bb that surrounds the object */
-		 //			CreateExtentCuboidForObject(sbPtr); 
 		 			switch(dynPtr->DynamicsType)
 					{
 						case DYN_TYPE_SPHERE_COLLISIONS:
@@ -780,15 +653,6 @@ static void InitialiseDynamicObjectsList(void)
 						}
 						case DYN_TYPE_NRBB_COLLISIONS:
 						{
-						#if 0
-							textprint
-							(
-								"%d %d, %d %d, %d %d\n"
-								,sbPtr->SBdptr->ObMaxX,sbPtr->SBdptr->ObMinX
-								,sbPtr->SBdptr->ObMaxY,sbPtr->SBdptr->ObMinY
-								,sbPtr->SBdptr->ObMaxZ,sbPtr->SBdptr->ObMinZ
-							);
-						#endif
 				 			CreateNRBBForObject(sbPtr);
 							break;
 						}
@@ -804,7 +668,6 @@ static void InitialiseDynamicObjectsList(void)
 					{
 						/* set previous position datum */
 						dynPtr->PrevPosition = dynPtr->Position;
-						//dynPtr->PrevOrientMat = dynPtr->OrientMat;
 
 						/* reset floor contact flag */
 						dynPtr->IsInContactWithFloor = 0;
@@ -849,33 +712,6 @@ static void InitialiseDynamicObjectsList(void)
 								}
 							}
 							
-							/* KJL 12:00:29 25/11/98 - resolve against last frames normals */
-							#if 0
-							{
-								COLLISIONREPORT *reportPtr = dynPtr->CollisionReportPtr;
-								while (reportPtr)
-								{
-									int magOfPerpVel;
-//									if (! ((reportPtr->ObstacleNormal.vx < 100 && reportPtr->ObstacleNormal.vx > -100)
-//   										 &&(reportPtr->ObstacleNormal.vz < 100 && reportPtr->ObstacleNormal.vz > -100) ))
-									if(reportPtr->ObstaclePoint.vx == 0x7fffffff &&
-									   reportPtr->ObstaclePoint.vy == 0x7fffffff &&
-									   reportPtr->ObstaclePoint.vz == 0x7fffffff)
-									{
-
-//										reportPtr->ObstacleNormal.vy = 0;
-//										Normalise(&reportPtr->ObstacleNormal);
-										magOfPerpVel = MUL_FIXED(66000,DotProduct(&reportPtr->ObstacleNormal,&(dynPtr->Displacement)));
-
-	//									SubScaledVectorFromVector(reportPtr->ObstacleNormal, magOfPerpVel, (dynPtr->Displacement));
-										dynPtr->Displacement.vx -= MUL_FIXED(reportPtr->ObstacleNormal.vx,magOfPerpVel);
-										dynPtr->Displacement.vy -= MUL_FIXED(reportPtr->ObstacleNormal.vy,magOfPerpVel);
-										dynPtr->Displacement.vz -= MUL_FIXED(reportPtr->ObstacleNormal.vz,magOfPerpVel);
-									}
-									reportPtr = reportPtr->NextCollisionReportPtr;
-								}
-							}
-							#endif
 							
 						}    
 
@@ -996,7 +832,6 @@ static void ApplyGravity(DYNAMICSBLOCK *dynPtr)
 					AlignObjectToStandardGravityDirection(dynPtr);
 				}
 			}
-			/* else if (RadialGravityModel) */
 			else
 			{
 				extern int CloakingPhase;
@@ -1021,7 +856,6 @@ static void ApplyGravity(DYNAMICSBLOCK *dynPtr)
 				{
 					while (reportPtr) /* while there is a valid report */
 					{
-			//			if (reportPtr->ObstacleSBPtr == 0)
 						{
 							averageNormal.vx -= reportPtr->ObstacleNormal.vx;
 							averageNormal.vy -= reportPtr->ObstacleNormal.vy;
@@ -1034,9 +868,6 @@ static void ApplyGravity(DYNAMICSBLOCK *dynPtr)
 				}
 				if (normalsFound)
 				{
-		  	  	  //averageNormal.vx /= normalsFound;
-		  		  //averageNormal.vy /= normalsFound;
-		 		  //averageNormal.vz /= normalsFound;
 					if (averageNormal.vx==0 && averageNormal.vy==0 && averageNormal.vz==0)
 					{
 						// down boy down
@@ -1059,7 +890,6 @@ static void ApplyGravity(DYNAMICSBLOCK *dynPtr)
 							dynPtr->GravityDirection.vy = 65536;
 							dynPtr->GravityDirection.vz = 0;
 						}
-						/* else if (RadialGravityModel) */
 						else
 						{
 							dynPtr->GravityDirection.vx = -dynPtr->Position.vx;
@@ -1072,14 +902,10 @@ static void ApplyGravity(DYNAMICSBLOCK *dynPtr)
 					{
 						if (dynPtr->LinVelocity.vx==0 && dynPtr->LinVelocity.vy==0 && dynPtr->LinVelocity.vz==0)
 						{
-//							dynPtr->GravityDirection.vx = 0;
-//							dynPtr->GravityDirection.vy = 65536;
-//							dynPtr->GravityDirection.vz = 0;
 						}
 						else
 						{
 							/* code to enable going round 270 degree corners */
-							#if 1
 							Normalise(&dynPtr->LinVelocity);
 							dynPtr->GravityDirection.vx -= (dynPtr->LinVelocity.vx*3)/4;
 							dynPtr->GravityDirection.vy -= (dynPtr->LinVelocity.vy*3)/4;
@@ -1088,7 +914,6 @@ static void ApplyGravity(DYNAMICSBLOCK *dynPtr)
 							dynPtr->LinVelocity.vx = 0;
 							dynPtr->LinVelocity.vy = 0;
 							dynPtr->LinVelocity.vz = 0;
-							#endif
 						}
 					}
 					dynPtr->TimeNotInContactWithFloor-=NormalFrameTime;
@@ -1293,7 +1118,6 @@ static void VectorHomingForSurfaceAlign(VECTORCH *currentPtr, VECTORCH *targetPt
 		
 	{
   		int a1 = MUL_FIXED(cos*8,NormalFrameTime);
-//		int a1 = NormalFrameTime*4;
 		if (a1>ONE_FIXED) a1=ONE_FIXED;
 		else if (a1<1024) a1=1024; 
 		
@@ -1437,7 +1261,6 @@ static int MoveObject(STRATEGYBLOCK *sbPtr)
 			{
 				objectCentre.vx = (dynPtr->ObjectVertices[0].vx+dynPtr->ObjectVertices[7].vx)/2;
 			}
-			#if 1
 			if (DirectionOfTravel.vy>0)
 			{
 				objectCentre.vy = dynPtr->ObjectVertices[0].vy-COLLISION_GRANULARITY;
@@ -1447,7 +1270,6 @@ static int MoveObject(STRATEGYBLOCK *sbPtr)
 				objectCentre.vy = dynPtr->ObjectVertices[7].vy+COLLISION_GRANULARITY;
 			}
 			else
-			#endif
 			{
 				objectCentre.vy = (dynPtr->ObjectVertices[0].vy+dynPtr->ObjectVertices[7].vy)/2;
 			}
@@ -1465,12 +1287,8 @@ static int MoveObject(STRATEGYBLOCK *sbPtr)
 			}
 
 		}
-		#if 0
-		PrintDebuggingText("Test point %d,%d,%d\n",objectCentre.vx,objectCentre.vy,objectCentre.vz);
-		#endif
 		while(n--)
 		{	
-			#if 1
 			VECTORCH r;
 			int d;
 
@@ -1488,34 +1306,8 @@ static int MoveObject(STRATEGYBLOCK *sbPtr)
 					polygonPtr = &InterferencePolygons[n];
 				}
 			}
-			#else
-			VECTORCH r;
-			int d;
-
-			d = DotProduct(&DirectionOfTravel,&InterferencePolygons[n].PolyNormal);
-
-			if (d<0)
-			{
-				if (d<leastSoFar)
-				{
-					obstacleNormal = InterferencePolygons[n].PolyNormal;
-					leastSoFar = d;
-					polygonPtr = &InterferencePolygons[n];
-				}
-			}
-			#endif
 
 		}
-		#if 0
-		if (obstacleNormal.vx==0 && obstacleNormal.vy==0 && obstacleNormal.vz==0)
-		{
-			obstacleNormal.vy = -ONE_FIXED;
-		}
-		else
-		{
-			Normalise(&obstacleNormal);
-		}
-		#endif
 		if(!polygonPtr)
 		{	
 			dynPtr->DistanceLeftToMove = 0;
@@ -1524,13 +1316,6 @@ static int MoveObject(STRATEGYBLOCK *sbPtr)
 		}
 		else 
 		{
-			#if 0
-			PrintDebuggingText("POLY NORMAL IS %d %d %d\n",(polygonPtr->PolyNormal).vx,(polygonPtr->PolyNormal).vy,(polygonPtr->PolyNormal).vz);
-			PrintDebuggingText("POLY NO OF VERTICES %d\n",(polygonPtr->NumberOfVertices));
-			PrintDebuggingText("POLY POINT[0] IS %d %d %d\n",(polygonPtr->PolyPoint[0]).vx,(polygonPtr->PolyPoint[0]).vy,(polygonPtr->PolyPoint[0]).vz);
-			PrintDebuggingText("POLY POINT[1] IS %d %d %d\n",(polygonPtr->PolyPoint[1]).vx,(polygonPtr->PolyPoint[1]).vy,(polygonPtr->PolyPoint[1]).vz);
-			PrintDebuggingText("POLY POINT[2] IS %d %d %d\n",(polygonPtr->PolyPoint[2]).vx,(polygonPtr->PolyPoint[2]).vy,(polygonPtr->PolyPoint[2]).vz);
-			#endif
 		}
 		/* test for a 'step' in front of object */
     	if ( (dynPtr->CanClimbStairs)
@@ -1553,21 +1338,10 @@ static int MoveObject(STRATEGYBLOCK *sbPtr)
 			}
 
 	        heightOfStep = dynPtr->ObjectVertices[0].vy - topOfStep;  /* y-axis is +ve downwards, remember */
-	 		//textprint("found step %d\n",heightOfStep);
 	        if (heightOfStep>0 && heightOfStep < MAXIMUM_STEP_HEIGHT) /* we've hit a 'step' - move player upwards */
 	        {
 		   		DistanceToStepUp=heightOfStep+COLLISION_GRANULARITY;
 	         	wentUpStep = SteppingUpIsValid(sbPtr);
-				#if 0
-				if (wentUpStep)
-				{
-					PrintDebuggingText("Found a valid step.\n");
-				}
-				else
-				{
-					PrintDebuggingText("Found a step but couldn't go up it.\n");
-				}
-				#endif
 
 			}
 		} 
@@ -1591,7 +1365,6 @@ static int MoveObject(STRATEGYBLOCK *sbPtr)
         	/* resolve player's movement vector against the collision plane */
 			/* awkward problem here to do with non-exact normals */
 			{
-		   //     int magOfPerpVel = DotProduct(&obstacleNormal,&(dynPtr->Displacement));
 		        int magOfPerpVel = MUL_FIXED(66000,DotProduct(&obstacleNormal,&(dynPtr->Displacement)));
 		   		SubScaledVectorFromVector(obstacleNormal, magOfPerpVel, (dynPtr->Displacement));
 			}
@@ -1805,7 +1578,6 @@ static void MovePlatformLift(STRATEGYBLOCK *sbPtr)
 		MakeDynamicBoundingBoxForObject(sbPtr, &zero);
 	}
 
-//	textprint("polys on lift %d\n",NumberOfCollisionPolys);
     DirectionOfTravel.vx = -DirectionOfTravel.vx;
     DirectionOfTravel.vy = -DirectionOfTravel.vy;
     DirectionOfTravel.vz = -DirectionOfTravel.vz;
@@ -1829,7 +1601,6 @@ static void MovePlatformLift(STRATEGYBLOCK *sbPtr)
 				}
 			}
 
-			//textprint("found an object\n");
 
 			polysLeft = NumberOfCollisionPolys;
 			nearPolysPtr = CollisionPolysArray;
@@ -1859,10 +1630,8 @@ static void MovePlatformLift(STRATEGYBLOCK *sbPtr)
 				if (dynPtr->Displacement.vy<0)
 				{
 					VECTORCH displacement;
-//					displacement.vx = -MUL_FIXED(DirectionOfTravel.vx, dynPtr->DistanceLeftToMove-distanceToMove+COLLISION_GRANULARITY);
 					displacement.vx = displacement.vz = 0;
 					displacement.vy = -(dynPtr->DistanceLeftToMove-distanceToMove+COLLISION_GRANULARITY);
-//					displacement.vz = -MUL_FIXED(DirectionOfTravel.vz, dynPtr->DistanceLeftToMove-distanceToMove+COLLISION_GRANULARITY);
 					AddVectorToVector(displacement, obstaclePtr->DynPtr->Position);
 					obstaclePtr->DynPtr->PrevPosition = obstaclePtr->DynPtr->Position;
 					{
@@ -1949,7 +1718,7 @@ static void MovePlatformLift(STRATEGYBLOCK *sbPtr)
 						reportPtr->ObstacleNormal.vz = -obstacleNormal.vz;
 					}
 				}
-				if (obstacleSBPtr) //&& !(obstacleSBPtr->DynPtr->StopOnCollision))
+				if (obstacleSBPtr) 
 				 /* give obstacle a report too */
 				{
 					COLLISIONREPORT *reportPtr = AllocateCollisionReport(obstacleSBPtr->DynPtr);
@@ -1987,11 +1756,8 @@ static void MovePlatformLift(STRATEGYBLOCK *sbPtr)
 				}
 			}
 	   	}
-//   	textprint("moving %d out of %d\n",distanceToMove,dynPtr->DistanceLeftToMove);
 
    	/* move object */
-
- //		textprint("disp %d %d %d\n",displacement.vx,displacement.vy,displacement.vz);
 
     }	
 	if (dynPtr->Displacement.vy>0 && dynPtr->CollisionReportPtr)
@@ -2002,43 +1768,7 @@ static void MovePlatformLift(STRATEGYBLOCK *sbPtr)
 		AddVectorToVector(dynPtr->Displacement, dynPtr->Position);
 	}
 
-	#if 0
-    if (distanceToMove!=dynPtr->DistanceLeftToMove)
-    {
-		/* create a report about the collision */
-		{
-			COLLISIONREPORT *reportPtr = AllocateCollisionReport(dynPtr);
-			
-			if (reportPtr)
-			{
-				reportPtr->ObstacleSBPtr = obstacleSBPtr;
-				reportPtr->ObstacleNormal.vx = -obstacleNormal.vx;
-				reportPtr->ObstacleNormal.vy = -obstacleNormal.vy;
-				reportPtr->ObstacleNormal.vz = -obstacleNormal.vz;
-			}
-		}
-		
-		if (obstacleSBPtr) //&& !(obstacleSBPtr->DynPtr->StopOnCollision))
-		 /* give obstacle a report too */
-		{
-			COLLISIONREPORT *reportPtr = AllocateCollisionReport(obstacleSBPtr->DynPtr);
-			
-			if (reportPtr)
-			{
-				reportPtr->ObstacleSBPtr = sbPtr;
-				reportPtr->ObstacleNormal.vx = obstacleNormal.vx;
-				reportPtr->ObstacleNormal.vy = obstacleNormal.vy;
-				reportPtr->ObstacleNormal.vz = obstacleNormal.vz;
-			}
-		}
-	}
-	#endif
-	
-
 }
-
-
-
 
 
 static void TestForValidPlayerStandUp(STRATEGYBLOCK *sbPtr)
@@ -2220,22 +1950,8 @@ static int SteppingUpIsValid(STRATEGYBLOCK *sbPtr)
 		{
 	        if(DoesPolygonIntersectNRBB(polyPtr,dynPtr->ObjectVertices))
 	        {
-		   		#if 0
-		   		int greatestDistance;
-
-		    	{
-		    		VECTORCH vertex = dynPtr->ObjectVertices[WhichNRBBVertex(dynPtr,&(polyPtr->PolyNormal))];
-					vertex.vx -= polyPtr->PolyPoint[0].vx;
-					vertex.vy -= polyPtr->PolyPoint[0].vy;
-					vertex.vz -= polyPtr->PolyPoint[0].vz;
-					greatestDistance = -DotProduct(&vertex,&(polyPtr->PolyNormal));
-				}
-
-				if (greatestDistance>0)
-				#endif
 				{
 					/* sorry, there's a polygon in the way */
-					//textprint("no step %d\n",greatestDistance);
 					{
 						int i=8;
 						VECTORCH *vertexPtr = dynPtr->ObjectVertices;
@@ -2262,7 +1978,6 @@ static int SteppingUpIsValid(STRATEGYBLOCK *sbPtr)
 
 	/* steping up is ok */ 
 	{
-		//textprint("step ok\n");
 		return 1;
 	}											
 
@@ -2439,36 +2154,6 @@ static void FindObjectPolygonsInObjectsPath(STRATEGYBLOCK *sbPtr)
 							}
 						}
 
-						#if 0
-						polyDistance = DistanceMovedBeforeObjectHitsPolygon(dynPtr,&poly,distanceToMove);
-						if (polyDistance>=0)
-				        {
-							/* If the player moves into a weapon/ammo/etc, report the collision but
-							don't stop the player. (ie. let him walk through it) */
-							if( (sbPtr->SBdptr==Player)
-							  &&( (obstaclePtr->I_SBtype == I_BehaviourHierarchicalFragment)
-							    ||(obstaclePtr->DynPtr->IsPickupObject))
-							  )
-							{
-								/* create a report about the collision */
-								COLLISIONREPORT *reportPtr = AllocateCollisionReport(dynPtr);
-								if (reportPtr)
-								{
-									reportPtr->ObstacleSBPtr = obstaclePtr;
-									reportPtr->ObstacleNormal = poly.PolyNormal;
-								}
-							}
-							else
-							{
-					       	   	distanceToMove = polyDistance;
-							   	obstacleNormal = poly.PolyNormal;
-								obstaclePoint = poly.PolyPoint[0];
-								obstacleSBPtr =	obstaclePtr;
-								LOCALASSERT(obstaclePtr);
-								topOfStep = -2000000000;
-							}
-						}
-						#endif
 						*CollisionPolysPtr = poly;
 
 						CollisionPolysPtr++;
@@ -3060,8 +2745,7 @@ static void TestShapeWithStaticBoundingBox(DISPLAYBLOCK *objectPtr)
   	while(numberOfItems--)
 	{
 		AccessNextPolygon();
-        
-  //      if (PolygonFlag & iflag_notvis) continue;
+       
 		
 		GetPolygonVertices(CollisionPolysPtr);
     	if (needToRotate)
@@ -3143,7 +2827,6 @@ static void TestObjectWithStaticBoundingBox(DISPLAYBLOCK *objectPtr)
 {
     
 	DYNAMICSBLOCK *dynPtr = objectPtr->ObStrategyBlock->DynPtr;
-//	VECTORCH *objectPositionPtr = &(dynPtr->Position);
     /* if the bounding box does not intersect with the object at all just return */
 	VECTORCH *objectVerticesPtr = dynPtr->ObjectVertices;
 
@@ -3488,7 +3171,6 @@ static int AxisToIgnore(VECTORCH *normal)
    
 static void TestForValidMovement(STRATEGYBLOCK *sbPtr)
 {
-	#if 1
 	DYNAMICSBLOCK *dynPtr = sbPtr->DynPtr;
 
 	/* I'm a platform lift - leave me alone */
@@ -3502,13 +3184,11 @@ static void TestForValidMovement(STRATEGYBLOCK *sbPtr)
 	else
 	{
 		/* cancel movement */
-		//PrintDebuggingText("Relocate!");
 		dynPtr->Position=dynPtr->PrevPosition;
 		dynPtr->LinVelocity.vx = 0;
 		dynPtr->LinVelocity.vy = 0;
 		dynPtr->LinVelocity.vz = 0;
 	}
-	#endif
 }   
 
 static int RelocateSphere(STRATEGYBLOCK *sbPtr)
@@ -3690,41 +3370,16 @@ static int RelocateNRBB(STRATEGYBLOCK *sbPtr)
 
 			if ((greatestDistance>0) && DoesPolygonIntersectNRBB(polyPtr,objectVertices))
 			{
-				#if 0
-				VECTORCH displacement;
-
-				displacement.vx = MUL_FIXED(planeNormal.vx,greatestDistance+RELOCATION_GRANULARITY);
-				displacement.vy = MUL_FIXED(planeNormal.vy,greatestDistance+RELOCATION_GRANULARITY);
-				displacement.vz = MUL_FIXED(planeNormal.vz,greatestDistance+RELOCATION_GRANULARITY);
-				
-				AddVectorToVector(displacement,objectPosition);
-		    	{
-		        	int vertexNum=8;
-		    		VECTORCH *vertexPtr = objectVertices;
-
-		            do
-		            {
-						vertexPtr->vx += displacement.vx;
-						vertexPtr->vy += displacement.vy;
-						vertexPtr->vz += displacement.vz;
-						vertexPtr++;
-				    }
-		            while(--vertexNum);
-				}
-				#endif
 				/* create a report about the collision */
 				{
 					COLLISIONREPORT *reportPtr = AllocateCollisionReport(dynPtr);
 					
 					if (reportPtr)
 					{
-						reportPtr->ObstacleSBPtr = 0;//obstacleSBPtr;
+						reportPtr->ObstacleSBPtr = 0;
 						reportPtr->ObstacleNormal = planeNormal;
 
 						reportPtr->ObstaclePoint = pointOnPlane;
-					   //	reportPtr->ObstaclePoint.vx = 0x7fffffff;
-					   //	reportPtr->ObstaclePoint.vy = 0x7fffffff;
-					   //	reportPtr->ObstaclePoint.vz = 0x7fffffff;
 					}
 				}
 	   			noProblems = 0;
@@ -3734,58 +3389,6 @@ static int RelocateNRBB(STRATEGYBLOCK *sbPtr)
         polyPtr++;
 		polysLeft--;
 	}
-	#if 0
-	/* did we move at all? */
-	if ( (objectPosition.vx == dynPtr->Position.vx)
-	   &&(objectPosition.vy == dynPtr->Position.vy)
-	   &&(objectPosition.vz == dynPtr->Position.vz) )
-	   return noProblems;
-
-
- 	/* pass test if okay */
-    polysLeft = NumberOfCollisionPolys;
-    polyPtr = CollisionPolysArray;
-
-	{
-		while(polysLeft)
-		{
-	        if(DoesPolygonIntersectNRBB(polyPtr,objectVertices))
-	        {
-			   	VECTORCH planeNormal = polyPtr->PolyNormal;
-		        VECTORCH pointOnPlane = polyPtr->PolyPoint[0];
-				int greatestDistance;
-
-		    	{
-		    		VECTORCH vertex = objectVertices[WhichNRBBVertex(dynPtr,&planeNormal)];
-					vertex.vx -= pointOnPlane.vx;
-					vertex.vy -= pointOnPlane.vy;
-					vertex.vz -= pointOnPlane.vz;
-					greatestDistance = -DotProduct(&vertex,&planeNormal);
-				}
-
-				if (greatestDistance>0)
-				{
-					/* still intersecting something */
-					return noProblems;
-				}
-	        }
-	        polyPtr++;
-			polysLeft--;
-		}
-		
-		{
-	    	int vertexNum=8;
-			do
-	        {
-				vertexNum--;
-				dynPtr->ObjectVertices[vertexNum] = objectVertices[vertexNum];			
-		    }
-	        while(vertexNum);
-			dynPtr->Position = objectPosition;
-			return 1;
-		}
-	}
-	#endif
 	if (!noProblems) PrintDebuggingText("RECOMMEND RELOCATE\n");
 	return noProblems;
 }
@@ -4074,25 +3677,14 @@ static int DoesPolygonIntersectNRBB(struct ColPolyTag *polyPtr,VECTORCH *objectV
 		}
 
 		dottedNormals = DotProduct(&(polyPtr->PolyNormal),&beta);
-		#if 1//debug
 		if (!dottedNormals)
 		{
-			#if 0
-			char buffer[200];
-			sprintf(buffer,"POLY NORMAL IS %d %d %d\n",(polyPtr->PolyNormal).vx,(polyPtr->PolyNormal).vy,(polyPtr->PolyNormal).vz);
-			NewOnScreenMessage(buffer);
-			sprintf(buffer,"POLY NO OF VERTICES %d\n",(polyPtr->NumberOfVertices));
-			NewOnScreenMessage(buffer);
-			sprintf(buffer,"POLY POINT IS %d %d %d\n",(polyPtr->PolyPoint[0]).vx,(polyPtr->PolyPoint[0]).vy,(polyPtr->PolyPoint[0]).vz);
-			NewOnScreenMessage(buffer);
-			#endif
 			LOGDXFMT(( "POLY NORMAL IS %d %d %d\n",(polyPtr->PolyNormal).vx,(polyPtr->PolyNormal).vy,(polyPtr->PolyNormal).vz));
 			LOGDXFMT(( "POLY NO OF VERTICES %d\n",polyPtr->NumberOfVertices));
 			LOGDXFMT(( "POLY POINT IS %d %d %d\n",(polyPtr->PolyPoint[0]).vx,(polyPtr->PolyPoint[0]).vy,(polyPtr->PolyPoint[0]).vz ));
 			LOCALASSERT("Found normal which may be incorrect"==0);
 			return 0;
 		}
-		#endif
 		{
 			VECTORCH cornerToPlane;
 			cornerToPlane.vx = vertices[0].vx - alpha.vx;
@@ -4280,21 +3872,6 @@ static signed int DistanceMovedBeforeSphereHitsPolygon(DYNAMICSBLOCK *dynPtr, st
 	/* reject if polygon is 'behind' sphere */
 	if (sphereToPolyDist<0)
 	{
-		#if 0
-		if (sphereToPolyDist>-dynPtr->CollisionRadius)
-		{
-			VECTORCH projectedPosition;
-			
-		   	projectedPosition.vx = dynPtr->Position.vx + MUL_FIXED(sphereToPolyDist,polyPtr->PolyNormal.vx);
-		   	projectedPosition.vy = dynPtr->Position.vy + MUL_FIXED(sphereToPolyDist,polyPtr->PolyNormal.vy);
-		   	projectedPosition.vz = dynPtr->Position.vz + MUL_FIXED(sphereToPolyDist,polyPtr->PolyNormal.vz);
-
-		 	if (DoesSphereProjectOntoPoly(dynPtr, polyPtr, &projectedPosition))
-			{
-		  		textprint("RELOCATION CASE\n");
-			}
-		}
-		#endif
 		return -2;
 	}
 	
@@ -4403,7 +3980,6 @@ static int SphereProjectOntoPoly(DYNAMICSBLOCK *dynPtr, struct ColPolyTag *polyP
         if (projectedPosition->vy+dynPtr->CollisionRadius < polyMin || projectedPosition->vy-dynPtr->CollisionRadius > polyMax)
         	return 0;
 
-		#if 1
     	/* test for a 'step' in front of object */
         {
 	        int heightOfStep = projectedPosition->vy+dynPtr->CollisionRadius - polyMin;  /* y-axis is +ve downwards, remember */
@@ -4413,7 +3989,6 @@ static int SphereProjectOntoPoly(DYNAMICSBLOCK *dynPtr, struct ColPolyTag *polyP
 		        LOCALASSERT(heightOfStep>0);
 	        }
 		}
-		#endif   
     }
     
     
@@ -4431,21 +4006,6 @@ static signed int DistanceMovedBeforeNRBBHitsPolygon(DYNAMICSBLOCK *dynPtr, stru
 	LOCALASSERT(polyPtr);
 	
 	polyNormal = polyPtr->PolyNormal;	  
-
-	#if 0
-	if (polyNormal.vy<=-65500)
-		return DistanceMovedBeforeNRBBHitsNegYPolygon(dynPtr, polyPtr, distanceToMove);
-	else if (polyNormal.vy>=65500)
-		return DistanceMovedBeforeNRBBHitsPosYPolygon(dynPtr, polyPtr, distanceToMove);
-	else if (polyNormal.vx>=65500)
-		return DistanceMovedBeforeNRBBHitsPosXPolygon(dynPtr, polyPtr, distanceToMove);
-	else if (polyNormal.vx<=-65500)
-		return DistanceMovedBeforeNRBBHitsNegXPolygon(dynPtr, polyPtr, distanceToMove);
-	else if (polyNormal.vz>=65500)
-		return DistanceMovedBeforeNRBBHitsPosZPolygon(dynPtr, polyPtr, distanceToMove);
-	else if (polyNormal.vz<=-65500)
-		return DistanceMovedBeforeNRBBHitsNegZPolygon(dynPtr, polyPtr, distanceToMove);
-	#endif
 
     dottedNormals = -DotProduct(&DirectionOfTravel,&polyNormal);
 	if (dottedNormals<=0) return -1; /* reject poly */
@@ -4497,348 +4057,9 @@ static signed int DistanceMovedBeforeNRBBHitsPolygon(DYNAMICSBLOCK *dynPtr, stru
 
 	return -3;
 }
-#if 0
-static signed int DistanceMovedBeforeNRBBHitsNegYPolygon(DYNAMICSBLOCK *dynPtr, struct ColPolyTag *polyPtr, int distanceToMove)
-{
-    int dottedNormals;
-	int obstacleDistance= 0x7fffffff;
-    int vertexToPlaneDist[8];
 
-	LOCALASSERT(polyPtr);
 
-    dottedNormals = DirectionOfTravel.vy;
-	if (dottedNormals<=0) return -1; /* reject poly */
 
-    /* calculate distance each vertex is from poly's plane along direction of motion */
-    {
-	    int originToPlaneDist = -polyPtr->PolyPoint[0].vy;
-
-    	{
-        	int vertexNum=8;
-            do
-            {
-            	vertexNum--;
-
-	        	vertexToPlaneDist[vertexNum] = -dynPtr->ObjectVertices[vertexNum].vy - originToPlaneDist;
-
-				if (vertexToPlaneDist[vertexNum] < 0)
-				{
-					return -1;
-				}
-	        }
-			while(vertexNum);
-	    }    
-
-		
-		{
-        	int vertexNum=8;
-			int *distancePtr = vertexToPlaneDist;
-            do
-            {
-				*distancePtr = DIV_FIXED(*distancePtr,dottedNormals);
-	
-				if(*distancePtr < obstacleDistance)
-					obstacleDistance = *distancePtr;
-		    	
-				distancePtr++;
-		    }
-            while(--vertexNum);
-
-		}
-	}
-	if (obstacleDistance>=distanceToMove)
-		return -2;
-
-	/* test if any vertices projected paths intersect polygons */
-	if (NRBBProjectsOntoPolygon(dynPtr,vertexToPlaneDist,polyPtr,&DirectionOfTravel))
-	{
-		return obstacleDistance;
-	}
-
-	return -3;
-}
-
-static signed int DistanceMovedBeforeNRBBHitsPosYPolygon(DYNAMICSBLOCK *dynPtr, struct ColPolyTag *polyPtr, int distanceToMove)
-{
-    int dottedNormals;
-	int obstacleDistance= 0x7fffffff;
-    int vertexToPlaneDist[8];
-
-	LOCALASSERT(polyPtr);
-
-    dottedNormals = -DirectionOfTravel.vy;
-	if (dottedNormals<=0) return -1; /* reject poly */
-
-    /* calculate distance each vertex is from poly's plane along direction of motion */
-    {
-	    int originToPlaneDist = polyPtr->PolyPoint[0].vy;
-    	
-    	{
-        	int vertexNum=8;
-            do
-            {
-            	vertexNum--;
-
-	        	vertexToPlaneDist[vertexNum] = dynPtr->ObjectVertices[vertexNum].vy - originToPlaneDist;
-
-				if (vertexToPlaneDist[vertexNum] < 0)
-				{
-					return -1;
-				}
-	        }
-			while(vertexNum);
-	    }    
-
-		{
-        	int vertexNum=8;
-			int *distancePtr = vertexToPlaneDist;
-            do
-            {
-				*distancePtr = DIV_FIXED(*distancePtr,dottedNormals);
-	
-				if(*distancePtr < obstacleDistance)
-					obstacleDistance = *distancePtr;
-		    	
-				distancePtr++;
-		    }
-            while(--vertexNum);
-
-		}
-	}
-	if (obstacleDistance>=distanceToMove)
-		return -2;
-
-	/* test if any vertices projected paths intersect polygons */
-	if (NRBBProjectsOntoPolygon(dynPtr,vertexToPlaneDist,polyPtr,&DirectionOfTravel))
-	{
-		return obstacleDistance;
-	}
-
-	return -3;
-}
-static signed int DistanceMovedBeforeNRBBHitsPosXPolygon(DYNAMICSBLOCK *dynPtr, struct ColPolyTag *polyPtr, int distanceToMove)
-{
-    int dottedNormals;
-	int obstacleDistance= 0x7fffffff;
-    int vertexToPlaneDist[8];
-
-	LOCALASSERT(polyPtr);
-
-    dottedNormals = -DirectionOfTravel.vx;
-	if (dottedNormals<=0) return -1; /* reject poly */
-
-    /* calculate distance each vertex is from poly's plane along direction of motion */
-    {
-	    int originToPlaneDist = polyPtr->PolyPoint[0].vx;
-    	
-    	{
-        	int vertexNum=8;
-            do
-            {
-            	vertexNum--;
-
-	        	vertexToPlaneDist[vertexNum] = dynPtr->ObjectVertices[vertexNum].vx - originToPlaneDist;
-
-				if (vertexToPlaneDist[vertexNum] < 0) return -1;
-	        }
-			while(vertexNum);
-	    }    
-
-		
-		{
-        	int vertexNum=8;
-			int *distancePtr = vertexToPlaneDist;
-            do
-            {
-				*distancePtr = DIV_FIXED(*distancePtr,dottedNormals);
-	
-				if(*distancePtr < obstacleDistance)
-					obstacleDistance = *distancePtr;
-		    	
-				distancePtr++;
-		    }
-            while(--vertexNum);
-
-		}
-	}
-	if (obstacleDistance>=distanceToMove)
-		return -2;
-
-	/* test if any vertices projected paths intersect polygons */
-	if (NRBBProjectsOntoPolygon(dynPtr,vertexToPlaneDist,polyPtr,&DirectionOfTravel))
-	{
-		return obstacleDistance;
-	}
-
-	return -3;
-}
-static signed int DistanceMovedBeforeNRBBHitsNegXPolygon(DYNAMICSBLOCK *dynPtr, struct ColPolyTag *polyPtr, int distanceToMove)
-{
-    int dottedNormals;
-	int obstacleDistance= 0x7fffffff;
-    int vertexToPlaneDist[8];
-
-	LOCALASSERT(polyPtr);
-
-    dottedNormals = DirectionOfTravel.vx;
-	if (dottedNormals<=0) return -1; /* reject poly */
-
-    /* calculate distance each vertex is from poly's plane along direction of motion */
-    {
-	    int originToPlaneDist = -polyPtr->PolyPoint[0].vx;
-    	
-    	{
-        	int vertexNum=8;
-            do
-            {
-            	vertexNum--;
-
-	        	vertexToPlaneDist[vertexNum] = -dynPtr->ObjectVertices[vertexNum].vx - originToPlaneDist;
-
-				if (vertexToPlaneDist[vertexNum] < 0) return -1;
-	        }
-			while(vertexNum);
-	    }    
-
-		{
-        	int vertexNum=8;
-			int *distancePtr = vertexToPlaneDist;
-            do
-            {
-				*distancePtr = DIV_FIXED(*distancePtr,dottedNormals);
-	
-				if(*distancePtr < obstacleDistance)
-					obstacleDistance = *distancePtr;
-		    	
-				distancePtr++;
-		    }
-            while(--vertexNum);
-
-		}
-	}
-	if (obstacleDistance>=distanceToMove)
-		return -2;
-
-	/* test if any vertices projected paths intersect polygons */
-	if (NRBBProjectsOntoPolygon(dynPtr,vertexToPlaneDist,polyPtr,&DirectionOfTravel))
-	{
-		return obstacleDistance;
-	}
-
-	return -3;
-}
-static signed int DistanceMovedBeforeNRBBHitsPosZPolygon(DYNAMICSBLOCK *dynPtr, struct ColPolyTag *polyPtr, int distanceToMove)
-{
-    int dottedNormals;
-	int obstacleDistance= 0x7fffffff;
-    int vertexToPlaneDist[8];
-
-	LOCALASSERT(polyPtr);
-
-    dottedNormals = -DirectionOfTravel.vz;
-	if (dottedNormals<=0) return -1; /* reject poly */
-
-    /* calculate distance each vertex is from poly's plane along direction of motion */
-    {
-	    int originToPlaneDist = polyPtr->PolyPoint[0].vz;
-    	
-    	{
-        	int vertexNum=8;
-            do
-            {
-            	vertexNum--;
-
-	        	vertexToPlaneDist[vertexNum] = dynPtr->ObjectVertices[vertexNum].vz - originToPlaneDist;
-
-				if (vertexToPlaneDist[vertexNum] < 0) return -1;
-	        }
-			while(vertexNum);
-	    }    
-
-		{
-        	int vertexNum=8;
-			int *distancePtr = vertexToPlaneDist;
-            do
-            {
-				*distancePtr = DIV_FIXED(*distancePtr,dottedNormals);
-	
-				if(*distancePtr < obstacleDistance)
-					obstacleDistance = *distancePtr;
-		    	
-				distancePtr++;
-		    }
-            while(--vertexNum);
-
-		}
-	}
-	if (obstacleDistance>=distanceToMove)
-		return -2;
-
-	/* test if any vertices projected paths intersect polygons */
-	if (NRBBProjectsOntoPolygon(dynPtr,vertexToPlaneDist,polyPtr,&DirectionOfTravel))
-	{
-		return obstacleDistance;
-	}
-
-	return -3;
-}
-static signed int DistanceMovedBeforeNRBBHitsNegZPolygon(DYNAMICSBLOCK *dynPtr, struct ColPolyTag *polyPtr, int distanceToMove)
-{
-    int dottedNormals;
-	int obstacleDistance= 0x7fffffff;
-    int vertexToPlaneDist[8];
-
-	LOCALASSERT(polyPtr);
-
-    dottedNormals = DirectionOfTravel.vz;
-	if (dottedNormals<=0) return -1; /* reject poly */
-
-    /* calculate distance each vertex is from poly's plane along direction of motion */
-    {
-	    int originToPlaneDist = -polyPtr->PolyPoint[0].vz;
-    	
-    	{
-        	int vertexNum=8;
-            do
-            {
-            	vertexNum--;
-
-	        	vertexToPlaneDist[vertexNum] = -dynPtr->ObjectVertices[vertexNum].vz - originToPlaneDist;
-
-				if (vertexToPlaneDist[vertexNum] < 0) return -1;
-	        }
-			while(vertexNum);
-	    }    
-
-		
-		{
-        	int vertexNum=8;
-			int *distancePtr = vertexToPlaneDist;
-            do
-            {
-				*distancePtr = DIV_FIXED(*distancePtr,dottedNormals);
-	
-				if(*distancePtr < obstacleDistance)
-					obstacleDistance = *distancePtr;
-		    	
-				distancePtr++;
-		    }
-            while(--vertexNum);
-
-		}
-	}
-	if (obstacleDistance>=distanceToMove)
-		return -2;
-
-	/* test if any vertices projected paths intersect polygons */
-	if (NRBBProjectsOntoPolygon(dynPtr,vertexToPlaneDist,polyPtr,&DirectionOfTravel))
-	{
-		return obstacleDistance;
-	}
-
-	return -3;
-}
-#endif
 static int NRBBProjectsOntoPolygon(DYNAMICSBLOCK *dynPtr, int vertexToPlaneDist[], struct ColPolyTag *polyPtr, VECTORCH *projectionDirPtr)
 {
 	/* decide which 2d plane to project onto */
@@ -5416,7 +4637,6 @@ static void CreateNRBBForObject(const STRATEGYBLOCK *sbPtr)
 
 			sbPtr->SBdptr->ObRadius = 2000;
 			extentsPtr = &CollisionExtents[CE_PREDATOR];
-//			dynPtr->CollisionRadius = extentsPtr->CollisionRadius;
 			break;
 		}
 		case I_BehaviourMarine:
@@ -5426,7 +4646,6 @@ static void CreateNRBBForObject(const STRATEGYBLOCK *sbPtr)
 			
 			sbPtr->SBdptr->ObRadius = 2000;
 			extentsPtr = &CollisionExtents[CE_MARINE];
-//			dynPtr->CollisionRadius = extentsPtr->CollisionRadius;
 			break;
 		}
 		case I_BehaviourFaceHugger:
@@ -5489,10 +4708,6 @@ static void CreateNRBBForObject(const STRATEGYBLOCK *sbPtr)
 
 		   		case I_BehaviourAlien:
 				{
-					#if 0
-					ALIEN_STATUS_BLOCK *alienStatusPtr = (ALIEN_STATUS_BLOCK *)sbPtr->SBdataptr;
-					objectIsCrouching = alienStatusPtr->IAmCrouched;
-					#endif
 					extentsPtr = &CollisionExtents[CE_ALIEN];
 					dynPtr->CollisionRadius = extentsPtr->CollisionRadius;
 					sbPtr->SBdptr->ObRadius = 2000;
@@ -5684,89 +4899,6 @@ static void CreateSphereBBForObject(const STRATEGYBLOCK *sbPtr)
 	}
 }
 
-
-
-
-#if 0
-static int RelocatedDueToFallout(DYNAMICSBLOCK *dynPtr)
-{
-	/* If the object is outside ALL of the modules in the
-	ActiveBlockList, move it back to its previous position. */	
-	
-	{
-		extern int NumActiveBlocks;
-	    extern DISPLAYBLOCK *ActiveBlockList[];
-
-	   	/* scan through modules and stop if object is inside any of them */
-		{
-			int objectInsideSomething = 0;
-		   	
-		   	int numberOfObjects = NumActiveBlocks;
-		   	while(numberOfObjects)
-		   	{
-		   		DISPLAYBLOCK* objectPtr = ActiveBlockList[--numberOfObjects];
-		   		GLOBALASSERT(objectPtr);
-		   		if (objectPtr->ObMyModule) /* is object a module ? */
-		    	{
-					VECTORCH position = dynPtr->Position;
-					position.vx -= objectPtr->ObWorld.vx;
-					position.vy -= objectPtr->ObWorld.vy;
-					position.vz -= objectPtr->ObWorld.vz;
-
-					if (position.vx >= objectPtr->ObMinX) 
-				    	if (position.vx <= objectPtr->ObMaxX) 
-						    if (position.vz >= objectPtr->ObMinZ) 
-							    if (position.vz <= objectPtr->ObMaxZ) 
-								    if (position.vy >= objectPtr->ObMinY) 
-									    if (position.vy <= objectPtr->ObMaxY)
-										{
-											objectInsideSomething = 1;
-											break;
-										}
-		        }
-		    }
-
-			if (!objectInsideSomething)
-			{
-				dynPtr->Position=dynPtr->PrevPosition;
-//				NewOnScreenMessage("DEBUG: WENT OUTSIDE ENV");
-			}
-
-			return !objectInsideSomething;
-	  	}
-	}   
-
-}
-#endif
-
-
-
-
-
-
-/* KJL 10:43:28 8/20/97 - stuff to add to bh_near.c */
-#if 0
-
-	textprint("alien vel %d %d %d\n",sbPtr->DynPtr->LinVelocity.vx,sbPtr->DynPtr->LinVelocity.vy,sbPtr->DynPtr->LinVelocity.vz);
-	#if 1
-	if(alienStatusPtr->IAmCrouched)
-	{
-		DYNAMICSBLOCK *dynPtr = sbPtr->DynPtr;
-		LOCALASSERT(dynPtr);
-
-		dynPtr->DynamicsType = DYN_TYPE_SPHERE_COLLISIONS;
-	}
-	else
-	{
-		DYNAMICSBLOCK *dynPtr = sbPtr->DynPtr;
-		LOCALASSERT(dynPtr);
-
-		dynPtr->DynamicsType = DYN_TYPE_NRBB_COLLISIONS;
-	}
-	#endif
-#endif
-
-#if 1
 
 static signed int DistanceMovedBeforeParticleHitsPolygon(PARTICLE *particlePtr, struct ColPolyTag *polyPtr, int distanceToMove);
 /*KJL****************
@@ -6365,12 +5497,9 @@ void AddEffectsOfForceGenerators(VECTORCH *positionPtr, VECTORCH *impulsePtr, in
 				impulsePtr->vy += MUL_FIXED(fanPtr->fan_wind_direction.vy,mag);
 				impulsePtr->vz += MUL_FIXED(fanPtr->fan_wind_direction.vz,mag);
 			}
-//			PrintDebuggingText("Fan acting upon object %d\n",fanPtr->wind_speed);
 		}
 	}
 }
-
-#endif
 
 
  

@@ -8,8 +8,6 @@
 #include "gameplat.h"
 #define UseLocalAssert Yes
 #include "ourasert.h"
-
-/* patrick 5/12/96 */
 #include "bh_far.h"
 #include "pheromon.h"
 #include "huddefs.h"
@@ -24,46 +22,34 @@
 #include "ffstdio.h" // fast file stdio
 #include "avp_menus.h"
 
-/*------------Patrick 1/6/97---------------
-New sound system 
--------------------------------------------*/
+/* New sound system */
 #include "psndplat.h"
+
 #include "progress_bar.h"
 #include "bh_rubberduck.h"
 #include "game_statistics.h"
 #include "cdtrackselection.h"
 
 
-// EXTERNS
-
-
-
 extern int WindowMode;
 extern int VideoMode;
-
 extern SCREENDESCRIPTORBLOCK ScreenDescriptorBlock;
-
 extern SHAPEHEADER** mainshapelist;
-
 extern int NumActiveBlocks;
 extern int NumOnScreenBlocks;
 extern DISPLAYBLOCK *ActiveBlockList[];
-
 extern MODULEMAPBLOCK AvpCompiledMaps[];
 extern MAPHEADER TestMap[];
 extern MAPHEADER Map[];
 extern MAPHEADER * staticmaplist[];
 extern MAPBLOCK8 Player_and_Camera_Type8[];
-
 extern SCENEMODULE **Global_ModulePtr;
 extern SCENEMODULE *MainSceneArray[];
-
 extern void (*SetVideoMode[]) (void);
 extern int HWAccel;
 extern int Resolution;
 extern void SetupVision(void);
 extern void ReInitHUD(void);
-extern void CheckCDStatus(void);
 
 extern void DeallocateSoundsAndPoolAllocatedMemory();
 
@@ -78,9 +64,6 @@ int SoftwareScanDrawRequestMode;
 int DXMemoryRequestMode;
 WINSCALEXY TopLeftSubWindow;
 WINSCALEXY ExtentXYSubWindow;
-
-
-// static 
 
 int ReadModuleMapList(MODULEMAPBLOCK *mmbptr);
 RIFFHANDLE env_rif = INVALID_RIFFHANDLE;
@@ -126,19 +109,12 @@ void InitialVideoMode(void)
 		extents, set in floating point in a range of
 		0.0-1.0 THIS CODE IS INTENDED FOR PENTIUM TARGETS
 		ONLY, AND THEREFORE USES FLOATING PT.  IT MUST
-		NOT
-		 LEAK.
+		NOT  LEAK.
 	*/
 
-    /*
-	  Note this is now only a request mode.
-	*/
+    /*  Note this is now only a request mode.	*/
 
-    #if 1
     WindowRequestMode = WindowModeFullScreen;
-	#else
-    WindowRequestMode = WindowModeSubWindow;
-	#endif
 
     TopLeftSubWindow.x = 0.3;
 	TopLeftSubWindow.y = 0.3;
@@ -153,8 +129,8 @@ void InitialVideoMode(void)
 	/*VideoRequestMode = VideoMode_DX_640x480x8;  for menus - is this guaranteed? */
 	VideoRequestMode = AvP.MenuVideoRequestMode;
 	
-	/* JH 20/5/97
-		begin in minmal h/w configuration - for menus
+
+		/* begin in minmal h/w configuration - for menus
 		- don't need any h/w 3d, but do need to know
 		about h/w direct draw and what video modes
 		will be available */
@@ -252,9 +228,9 @@ int AVP_ChangeDisplayMode
 		  ChangeWindow = Yes;
 		}
 
-    /* JH 30/5/97 - added this line back in so that d3d is cleaned up properly when the
+    /* added this line back in so that d3d is cleaned up properly when the
 	   display is changed back to 8-but for the menus */
-	/* JH 3/6/97 - don't quit kill off the images - still keep buffers in system memory
+	/* don't quit kill off the images - still keep buffers in system memory
 	   that are not linked to direct draw */
     MinimizeAllImages();
 	MinimizeAllDDGraphics();
@@ -321,12 +297,6 @@ int AVP_ChangeDisplayMode
 }
 
 
-//void ReleaseDirect3DNotDDOrImages(void)
-//{
-//    RELEASE(d3d.lpD3DViewport);
-//    RELEASE(d3d.lpD3DDevice);
-//    RELEASE(d3d.lpD3D);
-//}
 
 
 //empty functions for hooks
@@ -341,7 +311,7 @@ void ProjectSpecificBufferFlipPostProcessing(void){;}
 /*******************************************************************************************/
 /*******************************************************************************************/
 
-/***************						GAME AND ENIVROMENT CONTROL 					**************************/
+/*************** GAME AND ENIVROMENT CONTROL **************************/
 
 
 
@@ -376,12 +346,7 @@ void InitCharacter()
 		avp_undo_rif_load(predator_weapon_rif);
 	}
 	
-	#if MaxImageGroups==1
 	InitialiseTextures();
-	#else
-	SetCurrentImageGroup(0);
-	DeallocateCurrentImages();
-	#endif
 	
 	Start_Progress_Bar();
 
@@ -414,15 +379,9 @@ void InitCharacter()
 
 					case I_Alien:
 						{
-							#if ALIEN_DEMO
-							alien_weapon_rif = avp_load_rif("alienavp_huds\\alien_hud.rif");
-							Set_Progress_Bar_Position(PBAR_HUD_START+PBAR_HUD_INTERVAL*.25);
-							player_rif = avp_load_rif("alienavp_huds\\alien.rif");
-							#else
 							alien_weapon_rif = avp_load_rif("avp_huds\\alien_hud.rif");
 							Set_Progress_Bar_Position(PBAR_HUD_START+PBAR_HUD_INTERVAL*.25);
 							player_rif = avp_load_rif("avp_huds\\alien.rif");
-							#endif
 							break;
 						}
 					default:
@@ -450,9 +409,6 @@ void InitCharacter()
 	}
 	Set_Progress_Bar_Position(PBAR_HUD_START+PBAR_HUD_INTERVAL*.5);
 
-	#if MaxImageGroups>1
-	SetCurrentImageGroup(0);
-	#endif
 	copy_rif_data(player_rif,CCF_IMAGEGROUPSET,PBAR_HUD_START+PBAR_HUD_INTERVAL*.5,PBAR_HUD_INTERVAL*.25);
 	
 	Set_Progress_Bar_Position(PBAR_HUD_START+PBAR_HUD_INTERVAL*.75);
@@ -468,13 +424,11 @@ void InitCharacter()
 		copy_rif_data(predator_weapon_rif,CCF_LOAD_AS_HIERARCHY_IF_EXISTS|CCF_IMAGEGROUPSET+CCF_DONT_INITIALISE_TEXTURES,PBAR_HUD_START+PBAR_HUD_INTERVAL*.5,PBAR_HUD_INTERVAL*.25);
 
 	Set_Progress_Bar_Position(PBAR_HUD_START+PBAR_HUD_INTERVAL);
-	//copy_chunks_from_environment(0);
 
 	/*KJL*************************************
 	*   Setup generic data for weapons etc   *
 	*************************************KJL*/
 
- 	InitialiseEquipment();
 	InitHUD();
 	
 }
@@ -530,9 +484,6 @@ void RestartLevel()
  	
  	//start reinitialising stuff
  	
-// 	InitialiseEquipment();
-//	InitHUD();
-	
 	ProcessSystemObjects();
 	
 	create_strategies_from_list ();
@@ -544,8 +495,8 @@ void RestartLevel()
 	InitHive();
 	InitSquad();
 	
-	/* KJL 14:22:41 17/11/98 - reset HUD data, such as where the crosshair is,
-	whether the Alien jaw is on-screen, and so on */
+	/* reset HUD data, such as where the crosshair is,
+	   whether the Alien jaw is on-screen, and so on */
 	ReInitHUD();
 	
 	InitialiseParticleSystem();
@@ -554,7 +505,6 @@ void RestartLevel()
 	CreateRubberDucks();
 	InitialiseTriggeredFMVs();
 
-	CheckCDStatus();
 
 	/*Make sure we don't get a slow frame when we restart , since this can cause problems*/
 	ResetFrameCounter();
@@ -620,7 +570,6 @@ ELO	Dm10 = {"DM10"};
  // Modified by Edmond for Mplayer Demo
  ELO* Env_List[I_Num_Environments] = 
  {
- #ifndef MPLAYER_DEMO
  	&Gen1,		&Gen2,
  	&Gen3,		&Gen4,
  	&Medlab, 	&Cmc1,
@@ -638,7 +587,6 @@ ELO	Dm10 = {"DM10"};
  	&Dm5,		&Dm6,	// 30
  	&Dm7, 		&Dm8,
  	&Dm9,
- #endif
  				&Dm10
   };
 
@@ -669,24 +617,13 @@ void ProcessSystemObjects()
 	*/	
 
 
-	#if TestRiffLoaders
 	ReadMap(Map);							 /* for chunck loader*/
 	ReadModuleMapList(mmbptr);
-	#else
-	#if SupportModules
-	ReadModuleMapList(mmbptr);
-	#endif /*SupportModules*/
-	ReadMap(Map);	
-	#endif
 
-	/*HACK HACK*/
 
-	sbptr = AttachNewStratBlock((MODULE*)NULL,
-															(MODULEMAPBLOCK*)&Player_and_Camera_Type8[0],
-															Player);
+	sbptr = AttachNewStratBlock((MODULE*)NULL, (MODULEMAPBLOCK*)&Player_and_Camera_Type8[0], Player);
 	AssignRunTimeBehaviours(sbptr);
 
-	#if SupportModules
 
 	Global_ModulePtr = MainSceneArray;
 	PreprocessAllModules();
@@ -694,9 +631,6 @@ void ProcessSystemObjects()
 	if(i == No) textprint("GetModuleVisArrays() failed\n");
 
 
-	/*WaitForReturn();*/
-
-	#endif
 }
 
 int ReadModuleMapList(MODULEMAPBLOCK *mmbptr)
@@ -741,8 +675,8 @@ void ChangeEnvironmentToEnv(I_AVP_ENVIRONMENTS env_to_load)
 	GLOBALASSERT(Env_List[env_to_load]);
 
 	Destroy_CurrentEnvironment(); 
-	/* Patrick: 26/6/97
-	Stop and remove all sounds here */	
+
+	/* Stop and remove all sounds here */	
 	SoundSys_StopAll();
 	SoundSys_RemoveAll(); 
 	CDDA_Stop();
@@ -779,13 +713,12 @@ void IntegrateNewEnvironment()
 
 	AssignAllSBNames();
 
-	/* KJL 20:54:55 05/15/97 - setup player vision (alien wideangle, etc) */
+	/* setup player vision (alien wideangle, etc) */
 	SetupVision();
 
 	UnloadRifFile();//deletes environment File_Chunk since it is no longer needed
 
-	/* Patrick: 26/6/97
-	Load our sounds for the new env */	
+	/* Load our sounds for the new env */	
 	LoadSounds("PLAYER");
 
 	/* remove resident loaded 'fast' files */
@@ -831,16 +764,8 @@ void LoadRifFile()
 				
 	  };
 
-//	#ifdef __WATCOMC__
-//	#pragma message("Note: use copy_chunks_from_envronment(CCF_ENVIRONMENT) iff a character rif is loaded")
-//	#endif
 
-	#if MaxImageGroups>1
-	SetCurrentImageGroup(2); // FOR ENV
-	#endif
 	copy_rif_data(env_rif,CCF_ENVIRONMENT,PBAR_LEVEL_START+PBAR_LEVEL_INTERVAL*.4,PBAR_LEVEL_INTERVAL*.6);
-	//setup_shading_tables();
-	//LoadBackdropImage();
 }
 int Destroy_CurrentEnvironment(void)
 {
@@ -849,11 +774,7 @@ int Destroy_CurrentEnvironment(void)
 	// function to change environment when we 
 	// are playing a game	- environmnet reset
 	
-	// this stores all info we need
 
-	TimeStampedMessage("Beginning Destroy_CurrentEnvironment");
-	//CreateLevelMetablocks(AvP.CurrentEnv);
-	TimeStampedMessage("After CreateLevelMetablocks");
 
 	/*----------------------Patrick 14/3/97-----------------------
 	  Clean up AI systems at end of level
@@ -872,45 +793,30 @@ int Destroy_CurrentEnvironment(void)
 		while(i --)
 			ActiveBlockList[i] = NULL;
 	}
-	TimeStampedMessage("After object blocks");
 	
 	//Get rid of all sounds
 	//Deallocate memory for all shapes and hierarchy animations
 	DeallocateSoundsAndPoolAllocatedMemory();
 	
 	KillFarModuleLocs();
-	TimeStampedMessage("After KillFarModuleLocs");
 	CleanUpPheromoneSystem();
-	TimeStampedMessage("After CleanUpPheromoneSystem");
-	
-	#if MaxImageGroups>1
-	SetCurrentImageGroup(2); // FOR ENV
-	TimeStampedMessage("After SetCurrentImageGroup");
 
-	DeallocateCurrentImages();
-	TimeStampedMessage("After DeallocateCurrentImages");
-	#endif
 	// now deasllocate the module vis array
 	DeallocateModuleVisArrays();
-	TimeStampedMessage("After DeallocateModuleVisArrays");
 
 		
 
 	/* destroy the VDB list */	
 	InitialiseVDBs();
-	TimeStampedMessage("After InitialiseVDBs");
 
 	
 	InitialiseTxAnimBlocks(); // RUN THE npcS ON OUR OWN
-	TimeStampedMessage("After InitialiseTxAnimBlocks");
 
 
 	/* frees the memory from the env load*/
 	DeallocateModules();
-	TimeStampedMessage("After DeallocateModules");
 
 	avp_undo_rif_load(env_rif);
-	TimeStampedMessage("After avp_undo_rif_load");
 
 
 	// set the Onscreenbloock lsit to zero
@@ -920,89 +826,6 @@ int Destroy_CurrentEnvironment(void)
 }
 
 
-
-#if 0
-void InitEnvironmentFromLoad(void) 
-{
-	// in DB menus - we only destroy the current environment
-	// after we have selected a leve, to load - WE could
-	// be going TO ANY ENV or CHARACTER here (ughh) 
-
-	// this is an entire game destroy (with no save) killing
-	// both the env and the character followed by a complete
-	// game restart 
-	
-	// environment clean up - sets up the load info
-	Destroy_CurrentEnvironment();
-	// then the REST
-	DestroyAllStrategyBlocks();
-	#if MaxImageGroups>1
-	SetCurrentImageGroup(0); // FOR ENV
-	DeallocateCurrentImages();
-	#endif
-	/* Patrick: 26/6/97
-	Stop and remove all sounds here */	
-	SoundSys_StopAll();
-	SoundSys_RemoveAll(); 
-	CDDA_Stop();
-
-	// start the loading - we load the player
-	InitCharacter();	// intis the char
-	LoadRifFile();    // env
-
-	// do all the ness processing
-	// start games calles FormatSaveBuffer and
-	// Process System Objects
-
-	AssignAllSBNames();
-	
-	// Set the timer, or we have just taken
-	// 10 secs for the frame
-
-	/***** No need to do frame counter stuff in a computer! *****/
-
-	/* Patrick: 26/6/97
-	Load our sounds for the new env */	
-	LoadSounds("PLAYER");
-}
-
-
-
-/************************ SAVE AND LOAD **********************/
-
-
-
-
-
-
-
-
-void LoadGameFromFile(void)
-{
-	// now we right to a file
-	char * savename = "slot1.AvP";
-	FILE* fp = fopen(savename, "rb");
-	if(fp == NULL)
-		return;
-	fread(&AvP, sizeof(AVP_GAME_DESC), 1, fp);
-	fread(&save_game_buffer, SAVEBUFFERSIZE, 1, fp);
-	UnpackSaveBuffer();
-	fclose(fp);
-}
-
-
-void SaveGameToFile(void)
-{
-	char * savename = "slot1.AvP";
-	FILE* fp = fopen(savename, "wb");
-	CreateLevelMetablocks(AvP.CurrentEnv);
-	PackSaveBuffer();
-	fwrite(&AvP, sizeof(AVP_GAME_DESC), 1, fp);
-	fwrite(&save_game_buffer, SAVEBUFFERSIZE, 1, fp);
-	fclose(fp);
-}
-
-#endif
 
 // project spec game exit
 void ExitGame(void)
@@ -1029,8 +852,8 @@ void ExitGame(void)
 		avp_undo_rif_load(predator_weapon_rif);
 		predator_weapon_rif=INVALID_RIFFHANDLE;
 	}
-	#if MaxImageGroups>1
-	SetCurrentImageGroup(0);
-	DeallocateCurrentImages();
-	#endif
+
 }
+
+
+

@@ -36,8 +36,6 @@
 #include "dxlog.h"
 #include <math.h>
 
-#define AUTODETECT 1
-#define ADD_ELEVATION_OFFSETS 1
 #define SPARKS_FOR_A_SPRAY 15
 
 int Simplify_HModel_Rendering=0;
@@ -131,22 +129,12 @@ SEQUENCE *GetSequencePointer(int sequence_type,int sub_sequence,SECTION *this_se
 	}
 	
 	if (a==this_section->num_sequences) {
-		//textprint("Unknown HModel sequence! %d,%d\n",sequence_type,sub_sequence);
 		return(&(this_section->sequence_array[0]));
-		//GLOBALASSERT(0);
-		//return(NULL);
 	}
 
 	return(sequence_pointer);
 
 }
-#if 0
-void Preprocess_Keyframe(KEYFRAME_DATA *this_keyframe, KEYFRAME_DATA *next_keyframe,int one) {
-{
-	
-	New_Preprocess_Keyframe(this_keyframe,next_keyframe,one);		
-}
-#endif
 int QDot(QUAT *this_quat, QUAT *next_quat) {
 
 	int qdot;
@@ -170,11 +158,6 @@ void New_Preprocess_Keyframe(KEYFRAME_DATA *this_keyframe, KEYFRAME_DATA *next_k
 	this_quat=&this_keyframe->QOrient;
 	next_quat=&next_keyframe->QOrient;
 
-	//QNormalise(this_quat);
-	//QNormalise(next_quat);
-
-	
-	//cosom=QDot(this_quat,next_quat);
 	cosom=( (MUL_FIXED((int)this_quat->quatx,(int)next_quat->quatx)) +
 		 	(MUL_FIXED((int)this_quat->quaty,(int)next_quat->quaty)) +
 		 	(MUL_FIXED((int)this_quat->quatz,(int)next_quat->quatz)) +
@@ -452,12 +435,8 @@ SECTION_DATA *Create_New_Section(SECTION *this_section) {
 
 	/* Init shape animations... */
 
-	#if AUTODETECT
 	if (this_section->Shape) {
 		if (this_section->Shape->animation_header) {
-	#else
-		if (this_section->flags&section_has_shape_animation) {
-	#endif
 
 			GLOBALASSERT(this_section->Shape->animation_header);
 			
@@ -466,9 +445,7 @@ SECTION_DATA *Create_New_Section(SECTION *this_section) {
 			InitShapeAnimationController (this_section_data->sac_ptr, this_section->Shape);
 	
 		}
-	#if AUTODETECT
 	}
-	#endif
 
 	/* Init texture animations. */
 	this_section_data->tac_ptr=0;
@@ -953,42 +930,6 @@ void New_Analyse_Keyframe_Data(HMODELCONTROLLER *controller,SECTION_DATA *this_s
 	GLOBALASSERT(input_frame);
 
 	/* Check the input is in a sensible place. */
-	#if 0 //this can't occur anymore with the new way of storing offsets
-	if ( !(	(input_frame->Offset.vx<1000000 && input_frame->Offset.vx>-1000000)
-		 &&	(input_frame->Offset.vy<1000000 && input_frame->Offset.vy>-1000000)
-		 &&	(input_frame->Offset.vz<1000000 && input_frame->Offset.vz>-1000000) 
-		 ) ) {
-	
-		LOGDXFMT(("First Tests in NEW_ANALYSE_KEYFRAME_DATA.\n"));
-		if (Global_HModel_Sptr) {
-			LOGDXFMT(("Misplaced object is of type %d\n",Global_HModel_Sptr->I_SBtype));
-			if (Global_HModel_Sptr->SBdptr) {
-				LOGDXFMT(("Object is Near.\n"));
-			} else {
-				LOGDXFMT(("Object is Far.\n"));
-			}
-		} else {
-			LOGDXFMT(("Misplaced object has no SBptr.\n"));
-		}
-		LOGDXFMT(("Name of section: %s\n",this_section_data->sempai->Section_Name));
-		LOGDXFMT(("It was playing sequence: %d,%d\n",controller->Sequence_Type,controller->Sub_Sequence));
-		LOGDXFMT(("Sequence Timer = %d\n",controller->sequence_timer));
-		LOGDXFMT(("Tweening flags %d\n",controller->Tweening));
-
-		if (this_section_data->My_Parent) {
-			LOGDXFMT(("Parent Position %d,%d,%d\n",this_section_data->My_Parent->World_Offset.vx,this_section_data->My_Parent->World_Offset.vy,this_section_data->My_Parent->World_Offset.vz));
-		} else {
-			LOGDXFMT(("No parent.\n"));
-		}
-		LOGDXFMT(("This Position %d,%d,%d\n",this_section_data->World_Offset.vx,this_section_data->World_Offset.vy,this_section_data->World_Offset.vz));
-		LOGDXFMT(("This Keyframe Position %d,%d,%d\n",input_frame->Offset.vx,input_frame->Offset.vy,input_frame->Offset.vz));
-
-		LOCALASSERT(input_frame->Offset.vx<1000000 && input_frame->Offset.vx>-1000000);
-		LOCALASSERT(input_frame->Offset.vy<1000000 && input_frame->Offset.vy>-1000000);
-		LOCALASSERT(input_frame->Offset.vz<1000000 && input_frame->Offset.vz>-1000000);
-		
-	}
-	#endif
 
 	/* First find the current frame. */
 
@@ -1467,7 +1408,6 @@ void Process_Section(HMODELCONTROLLER *controller,SECTION_DATA *this_section_dat
 			dummy_displayblock.SpecialFXFlags|=SFXFLAG_ISAFFECTEDBYHEAT;
 		}
 	   
-		#if 1
 		if (PIPECLEANER_CHEATMODE)
 		if (Global_HModel_Sptr)
 		if (Global_HModel_Sptr->SBdptr)
@@ -1494,7 +1434,6 @@ void Process_Section(HMODELCONTROLLER *controller,SECTION_DATA *this_section_dat
 			D3D_DecalSystem_End();
 				
 		}	
-		#endif
 		
 		RenderThisHierarchicalDisplayblock(&dummy_displayblock);						  
 
@@ -2024,9 +1963,6 @@ static void HMTimer_Kernel(HMODELCONTROLLER *controller) {
 		
 		if (reversed) {
 			controller->Reversed=1;
-			#if 0
-			controller->sequence_timer=(ONE_FIXED-1);
-			#endif
 		}
 		
 		/* This should now always be set, though InitHModelSequence zeros it (D'oh!). */
@@ -2947,13 +2883,11 @@ void MatToQuat (MATRIXCH *m, QUAT *quat)
 
 	int const nxt[3] = 
 	{
-		//Y,Z,X
 		1,2,0
 	};
 	
 	// we could try transposing the matrix here
 
-//	TransposeMatrixCH(m);
 	
 	mat[0][0] = (double) m->mat11 / ONE_FIXED;
 	mat[1][0] = (double) m->mat21 / ONE_FIXED;
@@ -3188,21 +3122,6 @@ void ReSnap(HMODELCONTROLLER *controller,SECTION_DATA *this_section_data, int el
 
 	sequence_ptr=GetSequencePointer(controller->After_Tweening_Sequence_Type,controller->After_Tweening_Sub_Sequence,this_section_data->sempai);
 
-	#if 0
-	if (controller->Reversed) {
-		/* We're in a backwards tween. */
-		KEYFRAME_DATA *current_frame;
-		/* Deduce last frame. */
-		current_frame=sequence_ptr->last_frame;
-	
-		/* Must now have the last frame. */
-		this_section_data->target_offset=current_frame->Offset;
-		CopyShortQuatToInt(&current_frame->QOrient,&this_section_data->target_quat);
-	} else {
-		this_section_data->target_offset=sequence_ptr->first_frame->Offset;
-		CopyShortQuatToInt(&sequence_ptr->first_frame->QOrient,&this_section_data->target_quat);
-	}
-	#else
 	/* Now, irritatingly, we have to put our faith in AT_sequence_timer. */
 	if (controller->AT_sequence_timer==(ONE_FIXED-1)) {
 		/* We're in a backwards tween. */
@@ -3272,7 +3191,6 @@ void ReSnap(HMODELCONTROLLER *controller,SECTION_DATA *this_section_data, int el
 		Slerp(this_frame,lerp,&this_section_data->target_quat);
 
 	}
-	#endif
 
 	if (elevation) {
 

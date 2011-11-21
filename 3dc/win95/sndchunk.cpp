@@ -4,9 +4,6 @@
 #include "obchunk.hpp"
 #include "md5.h"
 
-#ifdef cencon
-#define new my_new
-#endif
 //macro for helping to force inclusion of chunks when using libraries
 FORCE_CHUNK_INCLUDE_IMPLEMENT(sndchunk)
 
@@ -311,41 +308,4 @@ size_t Indexed_Sound_Chunk::size_chunk()
 	return chunk_size;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
-/*
-Sound_Collection_Chunk::Sound_Collection_Chunk(Chunk_With_Children* parent,const char* data,const size_t)
-:Chunk(parent,"SOUNDCOL")
-{
-	CHUNK_EXTRACT(index,int)
-	CHUNK_EXTRACT_ARRAY(num_sounds,sounds,ChunkSoundWeighting)
-	CHUNK_EXTRACT(spare,int)
-}
 
-Sound_Collection_Chunk::Sound_Collection_Chunk(Chunk_With_Children* parent)
-:Chunk(parent,"SOUNDCOL")
-{
-	index=-1;
-	num_sounds=0;
-	sounds=0;
-	spare=0;
-}
-
-Sound_Collection_Chunk::~Sound_Collection_Chunk()
-{
-	if(sounds) delete [] sounds;
-}
-
-void Sound_Collection_Chunk::fill_data_block(char* data)
-{
-	CHUNK_FILL_START	
-	CHUNK_FILL(index,int)
-	CHUNK_FILL_ARRAY(num_sounds,sounds,ChunkSoundWeighting)
-	CHUNK_FILL(spare,int)
-}
-
-size_t Sound_Collection_Chunk::size_chunk()
-{
-	chunk_size=12+12+num_sounds*sizeof(ChunkSoundWeighting);
-	return chunk_size;
-}
-*/

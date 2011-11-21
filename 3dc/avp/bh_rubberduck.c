@@ -4,15 +4,10 @@
 
 #include "stratdef.h"
 #include "gamedef.h"
-
 #include "bh_types.h"
-//#include "comp_shp.h"
 #include "dynblock.h"
 #include "dynamics.h"
-//#include "lighting.h"
-
 #include "pfarlocs.h"
-
 #include "pvisible.h"
 #include "load_shp.h"
 #include "particle.h"
@@ -74,7 +69,7 @@ void CreateRubberDuck(VECTORCH *positionPtr)
 		return;
 	}
 
-	sbPtr->shapeIndex = GetLoadedShapeMSL("ciggies");//Duck");
+	sbPtr->shapeIndex = GetLoadedShapeMSL("ciggies");
 
 	sbPtr->maintainVisibility = 1;
 	sbPtr->containingModule = ModuleFromPosition(&(sbPtr->DynPtr->Position), 0);
@@ -94,7 +89,6 @@ void RubberDuckBehaviour(STRATEGYBLOCK *sbPtr)
 	int newLevel;
 
 	if (!sbPtr->SBdptr) return;
-	#if 1
 	newLevel = EffectOfRipples(&(dynPtr->Position));
 	{
 		int minusDeltaX,plusDeltaX,minusDeltaZ,plusDeltaZ;
@@ -178,28 +172,6 @@ void RubberDuckBehaviour(STRATEGYBLOCK *sbPtr)
 	if (dynPtr->AngVelocity.EulerY > 8192) dynPtr->AngVelocity.EulerY = 8192;
 	else if (dynPtr->AngVelocity.EulerY < -8192) dynPtr->AngVelocity.EulerY = -8192;
 	DynamicallyRotateObject(dynPtr);
-	#else
-	{
-		VECTORCH dir;
-		dynPtr->GravityOn = 1;
-		dynPtr->IsFloating = 0;
-		dynPtr->CanClimbStairs = 0;
-		sbPtr->SBdptr->ObFlags3 |= ObFlag3_DynamicModuleObject;
-
-		if (BestDirectionOfTravel(&(Player->ObStrategyBlock->DynPtr->Position), &(dynPtr->Position), &dir))
-		{
-			dynPtr->LinVelocity.vx = MUL_FIXED(4000,dir.vx);
-			dynPtr->LinVelocity.vy = 0;
-			dynPtr->LinVelocity.vz = MUL_FIXED(4000,dir.vz);
-		}
-		else
-		{
-			dynPtr->LinVelocity.vx = 0;
-			dynPtr->LinVelocity.vy = 0;
-			dynPtr->LinVelocity.vz = 0;
-		}
-	}
-	#endif
 
 }
 
@@ -280,9 +252,7 @@ extern void CreateFlamingDebris(VECTORCH *positionPtr, VECTORCH *dirPtr)
 		tempModule.m_lightarray = (struct lightblock *)0;
 		tempModule.m_extraitemdata = (struct extraitemdata *)0;
 		tempModule.m_dptr = NULL; /* this is important */
-		#if SupportWIndows95
 		tempModule.name = NULL; /* this is important */
-		#endif
 		AllocateModuleObject(&tempModule); 
 		dPtr = tempModule.m_dptr;		
 		if(dPtr==NULL)
@@ -309,22 +279,6 @@ extern void CreateFlamingDebris(VECTORCH *positionPtr, VECTORCH *dirPtr)
 void CreateRubberDucks(void)
 {
 	extern char LevelName[];
-	#if 0
-	if ( (!stricmp(LevelName,"e3demo")) || (!stricmp(LevelName,"e3demosp")) )
-	{
-		int i = 6;
-
-		do
-		{
-			VECTORCH pos = {1023,3400,27536};
-			pos.vx += (FastRandom()&4095)-2048;
-			pos.vz += (FastRandom()&4095)-2048;
-			CreateRubberDuck(&pos);
-		}
-		while(--i);
-	}
-	else 
-	#endif
 	if ( (!stricmp(LevelName,"invasion_a")) )
 	{
 		int i = 6;

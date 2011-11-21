@@ -23,7 +23,7 @@ extern char MP_Config_Description[];
 
 #define MP_CONFIG_DIR "MPConfig"
 #define MP_CONFIG_WILDCARD "MPConfig\\*.cfg"
-
+/*adj*/
 #define SKIRMISH_CONFIG_WILDCARD "MPConfig\\*.skirmish_cfg"
 
 static List<char*> ConfigurationFilenameList;
@@ -302,14 +302,12 @@ void LoadMultiplayerConfiguration(const char* name)
 	fread(&netGameData.preDestroyLights,sizeof(BOOL),1,file);
 	fread(&netGameData.disableFriendlyFire,sizeof(BOOL),1,file);
 	fread(&netGameData.fallingDamage,sizeof(BOOL),1,file);
-	#if LOAD_NEW_MPCONFIG_ENTRIES
 	fread(&netGameData.maxMarineSmartDisc,sizeof(int),1,file);
 	fread(&netGameData.maxMarinePistols,sizeof(int),1,file);
 	fread(&netGameData.allowSmartDisc,sizeof(BOOL),1,file);
 	fread(&netGameData.allowPistols,sizeof(BOOL),1,file);
 	fread(&netGameData.pistolInfiniteAmmo,sizeof(BOOL),1,file);
 	fread(&netGameData.specialistPistols,sizeof(BOOL),1,file);
-	#endif
 
 	//read the custom level name
 	int length=0;
@@ -410,14 +408,12 @@ void SaveMultiplayerConfiguration(const char* name)
 	fwrite(&netGameData.preDestroyLights,sizeof(BOOL),1,file);
 	fwrite(&netGameData.disableFriendlyFire,sizeof(BOOL),1,file);
 	fwrite(&netGameData.fallingDamage,sizeof(BOOL),1,file);
-	#if SAVE_NEW_MPCONFIG_ENTRIES
 	fwrite(&netGameData.maxMarineSmartDisc,sizeof(int),1,file);
 	fwrite(&netGameData.maxMarinePistols,sizeof(int),1,file);
 	fwrite(&netGameData.allowSmartDisc,sizeof(BOOL),1,file);
 	fwrite(&netGameData.allowPistols,sizeof(BOOL),1,file);
 	fwrite(&netGameData.pistolInfiniteAmmo,sizeof(BOOL),1,file);
 	fwrite(&netGameData.specialistPistols,sizeof(BOOL),1,file);
-	#endif
 
 	//write the custom level name (if relevant)
 	//first the length

@@ -33,11 +33,7 @@
 
 #include "psnd.h"
 #include "savegame.h"
-
-#if SupportWindows95
-/* for win95 net game support */
 #include "pldghost.h"
-#endif
 
 
 extern int NormalFrameTime;

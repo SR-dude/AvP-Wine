@@ -1,35 +1,15 @@
 #include <windows.h>
 #include <string.h>
 #include <string.hpp>
-#ifndef DB_LEVEL
-	#define DB_LEVEL 4
-#endif
 #include "db.h"
 #include "awtexld.h"
 #include "chnkload.hpp"
 #include "chunkpal.hpp"
-
-#ifndef CL_SUPPORT_FASTFILE
-	#error "Please #define CL_SUPPORT_FASTFILE to 0 or 1 in projload.hpp"
-#endif
-#if CL_SUPPORT_FASTFILE
-	#include "ffstdio.h"
-#endif
-
-#ifndef CL_SUPPORT_ALTTAB
-	#error "Please #define CL_SUPPORT_ALTTAB to 0 or 1 in projload.hpp"
-#endif
-#if CL_SUPPORT_ALTTAB
-	#include "alt_tab.h"
-#endif
-
+#include "ffstdio.h"
+#include "alt_tab.h"
 #include "chnktexi.h"
+//#include <typeinfo.h>
 
-#if !defined(NDEBUG) && defined(_CPPRTTI)
-	#include <typeinfo.h>
-#else
-	#define dynamic_cast static_cast
-#endif
 	
 char const * cl_pszGameMode = NULL;
 
@@ -93,13 +73,12 @@ static char * RiffBasename(Chunk_With_Children * pEnvDataChunk)
 	return pszBaseName;
 }
 
-#if CL_SUPPORT_FASTFILE
 static inline bool IsFileInFastFile(char const * pszFileName)
 {
 	unsigned nLen;
 	return ffreadbuf(pszFileName,&nLen) ? true : false;
 }
-#endif
+
 
 static bool DoesFileExist(char const * pszFileName)
 {
@@ -255,14 +234,10 @@ char * CL_GetImageFileName(char * pszDestBuf, unsigned nBufSize, char const * ps
 								return NULL; /* fail because the buffer isnt big enough */ \
 				}	}	}	}
 				
-			#if CL_SUPPORT_FASTFILE
 			_GET_RELATIVE_PATH(FirstTex_Directory,IsFileInFastFile)
 			_GET_RELATIVE_PATH(SecondTex_Directory,IsFileInFastFile)
-			#endif
-			#if !defined(CL_SUPPORTONLY_FASTFILE) || !CL_SUPPORTONLY_FASTFILE
 			_GET_RELATIVE_PATH(FirstTex_Directory,DoesFileExist)
 			_GET_RELATIVE_PATH(SecondTex_Directory,DoesFileExist)
-			#endif
 			db_log1("CL_LoadImageOnce(): ERROR: file not found in relative path");
 			return NULL;
 		case LIO_RIFFPATH:
@@ -704,7 +679,6 @@ int CL_LoadImageOnce(char const * pszFileName, unsigned fFlagsEtc)
 		}
 		case LIO_DDSURFACE:
 		{
-			#if CL_SUPPORT_FASTFILE
 			unsigned nFastFileLen;
 			void const * pFastFileData = ffreadbuf(szBuf,&nFastFileLen);
 			if (pFastFileData)
@@ -735,18 +709,12 @@ int CL_LoadImageOnce(char const * pszFileName, unsigned fFlagsEtc)
 					pImageHdr->DDSurface = pSurface;
 					pImageHdr->hBackup = hBackup;
 					db_logf4(("\tloaded to image number %d",NumImages-1));
-					#if CL_SUPPORT_ALTTAB
 						if (fFlagsEtc & LIO_RESTORABLE)
-						#ifdef NDEBUG
-							ATIncludeSurface(pSurface,hBackup);
-						#else
 						{
 							char szDbInf[512];
 							sprintf(szDbInf,"Name \"%s\" Number %d",szBuf,NumImages-1);
 							ATIncludeSurfaceDb(pSurface,hBackup,szDbInf);
 						}
-						#endif
-					#endif // CL_SUPPORT_ALTTAB
 					return NumImages-1;
 				}
 				else
@@ -756,9 +724,7 @@ int CL_LoadImageOnce(char const * pszFileName, unsigned fFlagsEtc)
 				}
 			}
 			else
-			#endif // CL_SUPPORT_FASTFILE
 			{
-				#if !defined(CL_SUPPORTONLY_FASTFILE) || !CL_SUPPORTONLY_FASTFILE
 				db_log4("\tloading the actual file");
 				unsigned nWidth, nHeight;
 				AW_BACKUPTEXTUREHANDLE hBackup = NULL;
@@ -785,18 +751,12 @@ int CL_LoadImageOnce(char const * pszFileName, unsigned fFlagsEtc)
 					pImageHdr->hBackup = hBackup;
 					db_logf4(("\tloaded to image number %d",NumImages-1));
 					db_logf4(("\t\tsurface:%p",pSurface));
-					#if CL_SUPPORT_ALTTAB
 						if (fFlagsEtc & LIO_RESTORABLE)
-						#ifdef NDEBUG
-							ATIncludeSurface(pSurface,hBackup);
-						#else
 						{
 							char szDbInf[512];
 							sprintf(szDbInf,"Name \"%s\" Number %d",szBuf,NumImages-1);
 							ATIncludeSurfaceDb(pSurface,hBackup,szDbInf);
 						}
-						#endif
-					#endif // CL_SUPPORT_ALTTAB
 					return NumImages-1;
 				}
 				else
@@ -804,16 +764,11 @@ int CL_LoadImageOnce(char const * pszFileName, unsigned fFlagsEtc)
 					db_log1("CL_LoadImageOnce(): ERROR copying data to surface");
 					return GEI_NOTLOADED;
 				}
-				#elif !CL_SUPPORT_FASTFILE
-					#error "CL_SUPPORTONLY_FASTFILE set but CL_SUPPORT_FASTFILE not set"
-				#endif // !CL_SUPPORTONLY_FASTFILE
 			}
-			//db_msg1("THIS CODE SHOULD BE UNREACHABLE");
 		}
 		case LIO_D3DTEXTURE:
 		{
 			fAwLoad |= AW_TLF_COMPRESS; // required on some cards!!
-			#if CL_SUPPORT_FASTFILE
 			unsigned nFastFileLen;
 			void const * pFastFileData = ffreadbuf(szBuf,&nFastFileLen);
 			if (pFastFileData)
@@ -851,18 +806,12 @@ int CL_LoadImageOnce(char const * pszFileName, unsigned fFlagsEtc)
 						db_assert1(gotTextureHandle==TRUE);
 					}
 					
-					#if CL_SUPPORT_ALTTAB
 						if (fFlagsEtc & LIO_RESTORABLE)
-						#ifdef NDEBUG
-							ATIncludeTexture(pTexture,hBackup);
-						#else
 						{
 							char szDbInf[512];
 							sprintf(szDbInf,"Name \"%s\" Number %d",szBuf,NumImages-1);
 							ATIncludeTextureDb(pTexture,hBackup,szDbInf);
 						}
-						#endif
-					#endif // CL_SUPPORT_ALTTAB
 					return NumImages-1;
 				}
 				else
@@ -872,9 +821,7 @@ int CL_LoadImageOnce(char const * pszFileName, unsigned fFlagsEtc)
 				}
 			}
 			else
-			#endif // CL_SUPPORT_FASTFILE
 			{
-				#if !defined(CL_SUPPORTONLY_FASTFILE) || !CL_SUPPORTONLY_FASTFILE
 				db_log4("\tloading the actual file");
 				unsigned nWidth, nHeight;
 				AW_BACKUPTEXTUREHANDLE hBackup = NULL;
@@ -907,18 +854,12 @@ int CL_LoadImageOnce(char const * pszFileName, unsigned fFlagsEtc)
 						db_assert1(gotTextureHandle==TRUE);
 					}
 
-					#if CL_SUPPORT_ALTTAB
 						if (fFlagsEtc & LIO_RESTORABLE)
-						#ifdef NDEBUG
-							ATIncludeTexture(pTexture,hBackup);
-						#else
 						{
 							char szDbInf[512];
 							sprintf(szDbInf,"Name \"%s\" Number %d",szBuf,NumImages-1);
 							ATIncludeTextureDb(pTexture,hBackup,szDbInf);
 						}
-						#endif
-					#endif // CL_SUPPORT_ALTTAB
 					return NumImages-1;
 				}
 				else
@@ -926,11 +867,7 @@ int CL_LoadImageOnce(char const * pszFileName, unsigned fFlagsEtc)
 					db_log1("CL_LoadImageOnce(): ERROR copying data to texture");
 					return GEI_NOTLOADED;
 				}
-				#elif !CL_SUPPORT_FASTFILE
-					#error "CL_SUPPORTONLY_FASTFILE set but CL_SUPPORT_FASTFILE not set"
-				#endif // !CL_SUPPORTONLY_FASTFILE
 			}
-			//db_msg1("THIS CODE SHOULD BE UNREACHABLE");
 		}
 		default:
 			db_log1("CL_LoadImageOnce(): ERROR: Invalid destination surface specification");

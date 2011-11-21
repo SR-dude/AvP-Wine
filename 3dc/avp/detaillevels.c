@@ -8,20 +8,6 @@ extern int GlobalLevelOfDetail_Hierarchical;
 
 extern void SetToDefaultDetailLevels(void)
 {
-#if 0
-	LocalDetailLevels.BloodCollidesWithEnvironment=1;
-	LocalDetailLevels.DrawLightCoronas=1;
-	LocalDetailLevels.DrawHierarchicalDecals=1;
-	LocalDetailLevels.ExplosionsDeformToEnvironment=1;
-	LocalDetailLevels.GhostFlameThrowerCollisions=0;
-
-	LocalDetailLevels.MaximumAllowedNumberOfDecals = 1024;
-	LocalDetailLevels.AlienEnergyViewThreshold = 0;
-	LocalDetailLevels.NumberOfSmokeParticlesFromLargeExplosion=10;
-	LocalDetailLevels.NumberOfSmokeParticlesFromSmallExplosion=5;
-	
-	GlobalLevelOfDetail_Hierarchical = 65536;
-#endif
 
 	MenuDetailLevelOptions.DecalNumber = 3;
 	MenuDetailLevelOptions.LightCoronas = 1;
@@ -34,20 +20,6 @@ extern void SetToDefaultDetailLevels(void)
 
 extern void SetToMinimalDetailLevels(void)
 {
-#if 0
-	LocalDetailLevels.BloodCollidesWithEnvironment=0;
-	LocalDetailLevels.DrawLightCoronas=0;
-	LocalDetailLevels.DrawHierarchicalDecals=0;
-	LocalDetailLevels.ExplosionsDeformToEnvironment=0;
-	LocalDetailLevels.GhostFlameThrowerCollisions=0;
-
-	LocalDetailLevels.MaximumAllowedNumberOfDecals = 16;
-	LocalDetailLevels.AlienEnergyViewThreshold = 450;
-	LocalDetailLevels.NumberOfSmokeParticlesFromLargeExplosion=5;
-	LocalDetailLevels.NumberOfSmokeParticlesFromSmallExplosion=2;
-
-	GlobalLevelOfDetail_Hierarchical = 128*65536;
-#endif
 
 	MenuDetailLevelOptions.DecalNumber = 0;
 	MenuDetailLevelOptions.LightCoronas = 0;
@@ -139,24 +111,5 @@ extern void SetDetailLevelsFromMenu(void)
 	}
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

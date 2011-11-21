@@ -28,8 +28,6 @@
 #define UseLocalAssert Yes
 #include "ourasert.h"
 
-/*This allows ai not to go for the shortest all the time*/
-#define ALLOW_USE_OF_LONGER_PATHS Yes
 
 int NPC_Waypoints;
 int Num_Target_Waypoints;
@@ -207,7 +205,6 @@ int NPCGetWaypointDirection(WAYPOINT_HEADER *waypoints, STRATEGYBLOCK *sbPtr, VE
 		manager->current_container=Global_Route.start;
 		manager->current_link=Global_Route.first_link;
 		/* Actually, no need to change the target... is there? */
-		#if ALLOW_USE_OF_LONGER_PATHS
 		//make it cost to enter this waypoint volume 
 		//(encouraging ai to use other routes)
 		Global_Route.start->weighting++;
@@ -224,12 +221,10 @@ int NPCGetWaypointDirection(WAYPOINT_HEADER *waypoints, STRATEGYBLOCK *sbPtr, VE
 				}
 			}
 		}
-		#endif
 	} else {
 		/* Er, well done. */
 	}
 
-	//targetDirection=dest_waypoint->centre;
 	targetDirection=manager->current_target_point;
 
 	targetDirection.vx+=Global_Module_Offset.vx;
@@ -722,11 +717,7 @@ int NewFindThisRoute(WAYPOINT_HEADER *waypoints, WAYPOINT_ROUTE *thisroute,WAYPO
 
 	/* Start with the end point. Look down all the links,
 	add all the waypoints there to the queue. */
-	#if ALLOW_USE_OF_LONGER_PATHS
 		#define STARTING_DEPTH 5000
-	#else
-		#define STARTING_DEPTH waypoints->num_waypoints
-	#endif
 
 	Waypoint_Route_Queue[0].depth=STARTING_DEPTH;
 	Waypoint_Route_Queue[0].wayvolume=endwaypoint;
@@ -784,7 +775,6 @@ int NewFindThisRoute(WAYPOINT_HEADER *waypoints, WAYPOINT_ROUTE *thisroute,WAYPO
 					thisroute->first_link=link_to_next;
 					terminate=1;
 					textprint("Got a route.\n");
-				#if ALLOW_USE_OF_LONGER_PATHS
 				}else if (next_waypoint->workspace+next_waypoint->weighting<this_waypoint->workspace) {
 					/* Add to queue. */
 					Waypoint_Route_Queue[Queue_End].wayvolume=next_waypoint;
@@ -828,23 +818,6 @@ int NewFindThisRoute(WAYPOINT_HEADER *waypoints, WAYPOINT_ROUTE *thisroute,WAYPO
 					LOCALASSERT(Queue_End!=Queue_Exec); //if this happens the queue probably needs to be longer
 
 				}
-				#else
-				}else if (next_waypoint->workspace<this_waypoint->workspace) {
-					/* Add to queue. */
-					Waypoint_Route_Queue[Queue_End].wayvolume=next_waypoint;
-					Waypoint_Route_Queue[Queue_End].depth=Waypoint_Route_Queue[Queue_Exec].depth-1;
-					next_waypoint->workspace=Waypoint_Route_Queue[Queue_End].depth;
-					
-					Queue_End++;
-					if (Queue_End>=WAYVOLUME_QUEUE_LENGTH) {
-						Queue_End=0;
-						textprint("Wrapping Waypoint Queue!\n");
-					}
-					Waypoint_Route_Queue[Queue_End].wayvolume=NULL;
-					LOCALASSERT(Queue_End!=Queue_Exec); //if this happens the queue probably needs to be longer
-
-				}
-				#endif
 	
 			}
 	
@@ -868,7 +841,6 @@ int NewFindThisRoute(WAYPOINT_HEADER *waypoints, WAYPOINT_ROUTE *thisroute,WAYPO
 		thisroute->second=endwaypoint;
 		thisroute->last=endwaypoint;
 		thisroute->first_link=NULL;
-		/* |(&(*$*&"^)(*!*&%&%!!!!! */
 		return(0);
 	}
 
@@ -878,17 +850,6 @@ int NewFindThisRoute(WAYPOINT_HEADER *waypoints, WAYPOINT_ROUTE *thisroute,WAYPO
 extern int AlienIsEncouragedToCrawl(void) {
 
 	if (Global_Route.first_link==NULL) {
-		#if 0
-		if (Global_Route.start!=NULL) {
-			if (Global_Route.second!=NULL) {
-				if (Global_Route.start->flags&wayflag_cancrawl) {
-					if (Global_Route.second->flags&wayflag_cancrawl) {
-						return(1);
-					}
-				}
-			}
-		}
-		#endif
 		return(0);
 	} else {
 		/* Look at this link. */

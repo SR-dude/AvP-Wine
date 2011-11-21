@@ -1,39 +1,10 @@
-
-#if PSX
-#include <kernel.h>
-#include <sys/types.h>		   	  
-#include <libetc.h>
-#include <libgte.h>		
-#include <libgpu.h>
-#include <stdlib.h>					 
-#include <inline_c.h>
-#include <gtemac.h>
-#endif
-
 #include "3dc.h"
 #include "inline.h"
 
-#define UseTimsPinp Yes
 
-#define trip_debugger No
-
-#if trip_debugger
-int testa = 0;
-int testb = 100;
-int testc = 0;
-#endif
-
-
-/*
-
- externs for commonly used global variables and arrays
-
-*/
-
-	#if platform_pc
+//  externs for commonly used global variables and arrays
 	extern int sine[];
 	extern int cosine[];
-	#endif
 
 	extern short ArcCosTable[];
 	extern short ArcSineTable[];
@@ -42,17 +13,7 @@ int testc = 0;
 	extern LONGLONGCH ll_zero;
 
 	extern int NormalFrameTime;
-
-
-#if PSX
-extern unsigned long *scratchp;
-#endif
-
-/*
-
- Globals
-
-*/
+// Globals 
 
 	MATRIXCH IdentityMatrix = {
 
@@ -62,45 +23,7 @@ extern unsigned long *scratchp;
 
 	};
 
-
-
-/*
-
- Maths functions used by the system
-
-*/
-
-
-
-#if PSX
-inline void ch2psx(MATRIXCH *chm, MATRIX *psxm)
-{
-  psxm->m[0][0] = chm->mat11 >> 4;
-  psxm->m[0][1] = chm->mat21 >> 4;
-  psxm->m[0][2] = chm->mat31 >> 4;
-  psxm->m[1][0] = chm->mat12 >> 4;
-  psxm->m[1][1] = chm->mat22 >> 4;
-  psxm->m[1][2] = chm->mat32 >> 4;
-  psxm->m[2][0] = chm->mat13 >> 4;
-  psxm->m[2][1] = chm->mat23 >> 4;
-  psxm->m[2][2] = chm->mat33 >> 4;
-}
-
-inline void psx2ch(MATRIX *psxm, MATRIXCH *chm)
-{
-  
-  chm->mat11 = psxm->m[0][0] << 4;
-  chm->mat21 = psxm->m[0][1] << 4;
-  chm->mat31 = psxm->m[0][2] << 4;
-  chm->mat12 = psxm->m[1][0] << 4;
-  chm->mat22 = psxm->m[1][1] << 4;
-  chm->mat32 = psxm->m[1][2] << 4;
-  chm->mat13 = psxm->m[2][0] << 4;
-  chm->mat23 = psxm->m[2][1] << 4;
-  chm->mat33 = psxm->m[2][2] << 4;
-}
-
-#endif
+//  Maths functions used by the system 
 
 /* One over sin functions - CDF 4/2/98 */
 
@@ -171,11 +94,7 @@ int DotProduct2d(VECTOR2D *vptr1, VECTOR2D *vptr2)
 }
 
 
-/*
-
- This function returns the distance between two vectors
-
-*/
+// This function returns the distance between two vectors 
 
 int VectorDistance(VECTORCH *v1, VECTORCH *v2)
 
@@ -287,18 +206,7 @@ void Renormalise(VECTORCH *nvector)
 }
 
 
-
-
-
-
-
-
-
-/*
-
- Return the shift value required to get one value LTE the other value
-
-*/
+//  Return the shift value required to get one value LTE the other value
 
 int FindShift32(int value, int limit)
 
@@ -306,19 +214,10 @@ int FindShift32(int value, int limit)
 
 	int shift = 0;
 
-
-	/*if(limit == 0) exit(0xfa11fa11);*/
-
-
 	if(value < 0) value = -value;
 
 	while(value > limit) {
 
-		#if trip_debugger
-		if(shift > 32) {
-			testa = testb / testc;
-		}
-		#endif
 
 		shift++;
 
@@ -331,11 +230,7 @@ int FindShift32(int value, int limit)
 }
 
 
-/*
-
- Return the largest value of an int array
-
-*/
+// Return the largest value of an int array
 
 int MaxInt(int *iarray, int iarraysize)
 
@@ -357,12 +252,7 @@ int MaxInt(int *iarray, int iarraysize)
 }
 
 
-/*
-
- Return the smallest value of an int array
-
-*/
-
+// Return the smallest value of an int array
 int MinInt(int *iarray, int iarraysize)
 
 {
@@ -407,19 +297,6 @@ void CreateEulerMatrix(e, m1)
 
 {
 
-#if 0
-
-	SVECTOR eulers;
-
-	eulers.vx=(e->EulerX)&4095;
-	eulers.vy=(e->EulerY)&4095;
-	eulers.vz=(e->EulerZ)&4095;
-
-	RotMatrix(&eulers,(MATRIX *)scratchp);
-
-	psx2ch((MATRIX *)scratchp,m1);
-
-#else
 
 	int t, sx, sy, sz, cx, cy, cz;
 
@@ -433,11 +310,6 @@ void CreateEulerMatrix(e, m1)
 	cz = GetCos(e->EulerZ);
 
 
-	#if 0
-	textprint("Euler Matrix Sines & Cosines\n");
-	textprint("%d, %d, %d\n", sx, sy, sz);
-	textprint("%d, %d, %d\n", cx, cy, cz);
-	#endif
 
 
 /* m11 = cy*cz + sx*sy*sz */
@@ -496,17 +368,12 @@ void CreateEulerMatrix(e, m1)
 
 	m1->mat33=MUL_FIXED(cx,cy);
 
-#endif
+
 
 }
 
 
-/*
-
- Create a Unit Vector from three Euler Angles
-
-*/
-
+// Create a Unit Vector from three Euler Angles
 void CreateEulerVector(EULER *e, VECTORCH *v)
 
 {
@@ -586,20 +453,6 @@ void MatrixMultiply(m1, m2, m3)
 
 {
   
-	#if 0
- 		
-	PushMatrix();
-
-	ch2psx(m1,(MATRIX *)scratchp);
-	ch2psx(m2,(MATRIX *)(scratchp+(sizeof(MATRIX))));
-
-	MulMatrix0((MATRIX *)scratchp,(MATRIX *)(scratchp+(sizeof(MATRIX))),(MATRIX *)(scratchp+((sizeof(MATRIX)<<1))));
-
-	psx2ch((MATRIX *)(scratchp+((sizeof(MATRIX)<<1))),m3);
-
- 	PopMatrix();
-		
-	#else
 		 
 	MATRIXCH TmpMat;
 	 
@@ -661,7 +514,6 @@ void MatrixMultiply(m1, m2, m3)
 
 	CopyMatrix(&TmpMat, m3);
 
-	#endif
 
 }
 
@@ -736,14 +588,6 @@ void PSXAccurateMatrixMultiply(m1, m2, m3)
 
 
 
-
-
-/*
-
- Transpose Matrix
-
-*/
-
 void TransposeMatrixCH(m1)
 
 	MATRIXCH *m1;
@@ -767,11 +611,7 @@ void TransposeMatrixCH(m1)
 }
 
 
-/*
 
- Copy Vector
-
-*/
 
 void CopyVector(VECTORCH *v1, VECTORCH *v2)
 
@@ -786,11 +626,6 @@ void CopyVector(VECTORCH *v1, VECTORCH *v2)
 }
 
 
-/*
-
- Copy Location
-
-*/
 
 void CopyLocation(VECTORCH *v1, VECTORCH *v2)
 
@@ -805,15 +640,6 @@ void CopyLocation(VECTORCH *v1, VECTORCH *v2)
 }
 
 
-
-
-
-/*
-
- Copy Euler
-
-*/
-
 void CopyEuler(EULER *e1, EULER *e2)
 
 {
@@ -826,12 +652,6 @@ void CopyEuler(EULER *e1, EULER *e2)
 
 }
 
-
-/*
-
- Copy Matrix
-
-*/
 
 void CopyMatrix(MATRIXCH *m1, MATRIXCH *m2)
 
@@ -853,15 +673,8 @@ void CopyMatrix(MATRIXCH *m1, MATRIXCH *m2)
 
 }
 
-
-/*
-
- Make a Vector.
-
- v3 = v1 - v2
-
-*/
-
+// Make a Vector.
+// v3 = v1 - v2
 void MakeVector(VECTORCH *v1, VECTORCH *v2, VECTORCH *v3)
 
 {
@@ -873,14 +686,10 @@ void MakeVector(VECTORCH *v1, VECTORCH *v2, VECTORCH *v3)
 }
 
 
-/*
 
- Add a Vector.
 
- v2 = v2 + v1
-
-*/
-
+// Add a Vector.
+// v2 = v2 + v1
 void AddVector(VECTORCH *v1, VECTORCH *v2)
 
 {
@@ -892,14 +701,8 @@ void AddVector(VECTORCH *v1, VECTORCH *v2)
 }
 
 
-/*
-
- Subtract a Vector.
-
- v2 = v2 - v1
-
-*/
-
+// Subtract a Vector.
+// v2 = v2 - v1
 void SubVector(VECTORCH *v1, VECTORCH *v2)
 
 {
@@ -1016,8 +819,6 @@ void _RotateAndCopyVector(v1, v2, m)
 #define ONE_FIXED_S ((ONE_FIXED >> m2e_scale) - 1)
 #define m2e_shift 14
 
-#define j_and_r_change Yes
-
 
 void MatrixToEuler(MATRIXCH *m, EULER *e)
 
@@ -1029,32 +830,16 @@ void MatrixToEuler(MATRIXCH *m, EULER *e)
 	int CosMatrixPitch, CosMatrixYaw, CosMatrixRoll;
 
 
-
-
-	#if 0
-	textprint("CosMatrixPitch = %d\n", CosMatrixPitch);
-	/* WaitForReturn(); */
-	#endif
-
-
 	if(m->mat32 >-65500 && m->mat32<65500)
 	{
 			/* Yaw */
 
 		/* Pitch */
 
-		#if j_and_r_change
 		SineMatrixPitch = -m->mat32;
-		#else
-		SineMatrixPitch = -m->mat23;
-		#endif
 
 		SineMatrixPitch >>= m2e_scale;
 
-		#if 0
-		textprint("SineMatrixPitch = %d\n", SineMatrixPitch);
-		/* WaitForReturn(); */
-		#endif
 
 		CosMatrixPitch = SineMatrixPitch * SineMatrixPitch;
 		CosMatrixPitch >>= m2e_shift;
@@ -1074,47 +859,23 @@ void MatrixToEuler(MATRIXCH *m, EULER *e)
 		else CosMatrixPitch = 1;
 	
 		SineMatrixYaw = WideMulNarrowDiv(
-			#if j_and_r_change
 			m->mat31 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
-			#else
-			m->mat13 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
-			#endif
 
-		#if 0
-		textprint("SineMatrixYaw = %d\n", SineMatrixYaw);
-		/* WaitForReturn(); */
-		#endif
 
 		CosMatrixYaw = WideMulNarrowDiv(
 			m->mat33 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
 
-		#if 0
-		textprint("CosMatrixYaw = %d\n", CosMatrixYaw);
-		/* WaitForReturn(); */
-		#endif
 
 
 		/* Roll */
 
 		SineMatrixRoll = WideMulNarrowDiv(
-			#if j_and_r_change
 			m->mat12 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
-			#else
-			m->mat21 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
-			#endif
 
-		#if 0
-		textprint("SineMatrixRoll = %d\n", SineMatrixRoll);
-		/* WaitForReturn(); */
-		#endif
 
 		CosMatrixRoll = WideMulNarrowDiv(
 			m->mat22 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
 
-		#if 0
-		textprint("CosMatrixRoll = %d\n", CosMatrixRoll);
-		/* WaitForReturn(); */
-		#endif
 	
 		/* Tables are for values +- 2^16 */
 
@@ -1126,11 +887,6 @@ void MatrixToEuler(MATRIXCH *m, EULER *e)
 		cosy = CosMatrixYaw   << m2e_scale;
 		cosz = CosMatrixRoll  << m2e_scale;
 
-		#if 0
-		textprint("sines = %d, %d, %d\n", sinx, siny, sinz);
-		textprint("cos's = %d, %d, %d\n", cosx, cosy, cosz);
-		/* WaitForReturn(); */
-		#endif
 
 		/* Absolute Cosines */
 
@@ -1167,10 +923,6 @@ void MatrixToEuler(MATRIXCH *m, EULER *e)
 			}
 		}
 
-		#if (j_and_r_change == No)
-		x = -x;
-		x &= wrap360;
-		#endif
 
 		e->EulerX = x;
 
@@ -1200,10 +952,6 @@ void MatrixToEuler(MATRIXCH *m, EULER *e)
 
 		}
 
-		#if (j_and_r_change == No)
-		x = -x;
-		x &= wrap360;
-		#endif
 
 		e->EulerY = x;
 
@@ -1231,10 +979,6 @@ void MatrixToEuler(MATRIXCH *m, EULER *e)
 			}
 		}
 
-		#if (j_and_r_change == No)
-		x =  -x;
-		x &= wrap360;
-		#endif
 
 		e->EulerZ = x;
 	}
@@ -1283,37 +1027,14 @@ void MatrixToEuler(MATRIXCH *m, EULER *e)
 
 		}
 
-		#if (j_and_r_change == No)
-		x = -x;
-		x &= wrap360;
-		#endif
 
 		e->EulerY = x;
 
 	}
 
 
-
-
-	#if 0
-	textprint("\nEuler from VDB Matrix is:\n%d\n%d\n%d\n",
-	e->EulerX,
-	e->EulerY,
-	e->EulerZ
-	);
-	/* WaitForReturn(); */
-	#endif
-
 }
 
-
-
-#if 1
-
-
-
-
-#define j_and_r_change_2 Yes
 
 void MatrixToEuler2(MATRIXCH *m, EULER *e)
 
@@ -1327,18 +1048,9 @@ void MatrixToEuler2(MATRIXCH *m, EULER *e)
 
 	/* Pitch */
 
-	#if j_and_r_change_2
 	SineMatrixPitch = -m->mat32;
-	#else
-	SineMatrixPitch = -m->mat23;
-	#endif
-
 	SineMatrixPitch >>= m2e_scale;
 
-	#if 0
-	textprint("SineMatrixPitch = %d\n", SineMatrixPitch);
-	/* WaitForReturn(); */
-	#endif
 
 	CosMatrixPitch = SineMatrixPitch * SineMatrixPitch;
 	CosMatrixPitch >>= m2e_shift;
@@ -1358,56 +1070,26 @@ void MatrixToEuler2(MATRIXCH *m, EULER *e)
 	else CosMatrixPitch = 1;
 
 
-	#if 0
-	textprint("CosMatrixPitch = %d\n", CosMatrixPitch);
-	/* WaitForReturn(); */
-	#endif
 
 
 	/* Yaw */
 
 	SineMatrixYaw = WideMulNarrowDiv(
-		#if j_and_r_change_2
 		m->mat31 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
-		#else
-		m->mat13 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
-		#endif
 
-	#if 0
-	textprint("SineMatrixYaw = %d\n", SineMatrixYaw);
-	/* WaitForReturn(); */
-	#endif
 
 	CosMatrixYaw = WideMulNarrowDiv(
 		m->mat33 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
 
-	#if 0
-	textprint("CosMatrixYaw = %d\n", CosMatrixYaw);
-	/* WaitForReturn(); */
-	#endif
 
 
 	/* Roll */
 
 	SineMatrixRoll = WideMulNarrowDiv(
-		#if j_and_r_change_2
 		m->mat12 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
-		#else
-		m->mat21 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
-		#endif
-
-	#if 0
-	textprint("SineMatrixRoll = %d\n", SineMatrixRoll);
-	/* WaitForReturn(); */
-	#endif
 
 	CosMatrixRoll = WideMulNarrowDiv(
 		m->mat22 >> m2e_scale, ONE_FIXED_S, CosMatrixPitch);
-
-	#if 0
-	textprint("CosMatrixRoll = %d\n", CosMatrixRoll);
-	/* WaitForReturn(); */
-	#endif
 
 
 	/* Tables are for values +- 2^16 */
@@ -1420,11 +1102,6 @@ void MatrixToEuler2(MATRIXCH *m, EULER *e)
 	cosy = CosMatrixYaw   << m2e_scale;
 	cosz = CosMatrixRoll  << m2e_scale;
 
-	#if 0
-	textprint("sines = %d, %d, %d\n", sinx, siny, sinz);
-	textprint("cos's = %d, %d, %d\n", cosx, cosy, cosz);
-	/* WaitForReturn(); */
-	#endif
 
 	/* Absolute Cosines */
 
@@ -1461,10 +1138,6 @@ void MatrixToEuler2(MATRIXCH *m, EULER *e)
 		}
 	}
 
-	#if (j_and_r_change_2 == No)
-	x = -x;
-	x &= wrap360;
-	#endif
 
 	e->EulerX = x;
 
@@ -1494,10 +1167,6 @@ void MatrixToEuler2(MATRIXCH *m, EULER *e)
 
 	}
 
-	#if (j_and_r_change_2 == No)
-	x = -x;
-	x &= wrap360;
-	#endif
 
 	e->EulerY = x;
 
@@ -1525,37 +1194,19 @@ void MatrixToEuler2(MATRIXCH *m, EULER *e)
 		}
 	}
 
-	#if (j_and_r_change_2 == No)
-	x =  -x;
-	x &= wrap360;
-	#endif
 
 	e->EulerZ = x;
 
 
-	#if 0
-	textprint("\nEuler from VDB Matrix is:\n%d\n%d\n%d\n",
-	e->EulerX,
-	e->EulerY,
-	e->EulerZ
-	);
-	/* WaitForReturn(); */
-	#endif
 
 }
-
-
-
-#endif
-
-
 
 /*
 
  Normalise a Matrix
 
  Dot the three vectors together (XY, XZ, YZ) and take the two nearest to
- 90ø from each other. Cross them to create a new third vector, then cross
+ 90 degrees from each other. Cross them to create a new third vector, then cross
  the first and third to create a new second.
 
 */
@@ -1577,48 +1228,12 @@ void MNormalise(MATRIXCH *m)
 	VECTORCH zero = {0, 0, 0};
 
 
-	#if 0
-	textprint("dotxy = %d\n", dotxy);
-	textprint("dotxz = %d\n", dotxz);
-	textprint("dotyz = %d\n", dotyz);
-	#endif
-
-	#if 0
-	/* TEST */
-	dotxy = 0;
-	dotxz = 0;
-	dotyz = 1;
-	#endif
-
-
-	#if 0
-	textprint("%d	%d	%d\n",
-		x->vx,
-		x->vy,
-		x->vz
-	);
-
-	textprint("%d	%d	%d\n",
-		y->vx,
-		y->vy,
-		y->vz
-	);
-
-	textprint("%d	%d	%d\n",
-		z->vx,
-		z->vy,
-		z->vz
-	);
-	#endif
-
-
-	/* Find the two vectors nearest 90ø */
+	/* Find the two vectors nearest 90  degrees */
 
 	if(dotxy > dotxz && dotxy > dotyz) {
 
-		/* xy are the closest to 90ø */
+		/* xy are the closest to 90  degrees */
 
-		/*textprint("xy\n");*/
 
 		s = x;
 		t = y;
@@ -1637,9 +1252,8 @@ void MNormalise(MATRIXCH *m)
 
 	else if(dotxz > dotxy && dotxz > dotyz) {
 
-		/* xz are the closest to 90ø */
+		/* xz are the closest to 90 degrees */
 
-		/*textprint("xz\n");*/
 
 		s = x;
 		t = z;
@@ -1658,9 +1272,8 @@ void MNormalise(MATRIXCH *m)
 
 	else {
 
-		/* yz are the closest to 90ø */
+		/* yz are the closest to 90 degrees */
 
-		/*textprint("yz\n");*/
 
 		s = y;
 		t = z;
@@ -1676,36 +1289,6 @@ void MNormalise(MATRIXCH *m)
 		CopyVector(&v, z);
 
 	}
-
-
-	#if 0
-	textprint("%d	%d	%d\n",
-		x->vx,
-		x->vy,
-		x->vz
-	);
-
-	textprint("%d	%d	%d\n",
-		y->vx,
-		y->vy,
-		y->vz
-	);
-
-	textprint("%d	%d	%d\n",
-		z->vx,
-		z->vy,
-		z->vz
-	);
-	#endif
-
-	#if 0
-	textprint("mag. x = %d\n", Magnitude(x));
-	textprint("mag. y = %d\n", Magnitude(y));
-	textprint("mag. z = %d\n", Magnitude(z));
-	#endif
-
-	/*WaitForReturn();*/
-
 
 }
 
@@ -1727,9 +1310,9 @@ void MNormalise(MATRIXCH *m)
  ArcSin(x) = ArcTan ( x, sqr ( 1-x*x ) )
  ArcCos(x) = ArcTan ( sqr ( 1-x*x ), x)
 
- -65,536 = 180 Degrees
- 0	  = 90 Degrees
- +65,536 = 0 Degrees
+ -65,536 = 180  degrees
+ 0	  = 90  degrees
+ +65,536 = 0  degrees
 
  The table has 4,096 entries.
 
@@ -1744,10 +1327,6 @@ int ArcCos(int c)
 	if(c < (-(ONE_FIXED - 1))) c = -(ONE_FIXED - 1);
 	else if(c > (ONE_FIXED - 1)) c = ONE_FIXED - 1;
 
-	#if 0
-	c =  c >> 5;		/* -64k -> +64k becomes -2k -> +2k */
-	c += 2048;			/* -2k -> +2k becomes 0 -> 4k */
-	#endif
 
 	acos = ArcCosTable[(c >> 5) + 2048];
 
@@ -1771,9 +1350,9 @@ int ArcCos(int c)
  ArcSin(x) = ArcTan ( x, sqr ( 1-x*x ) )
  ArcCos(x) = ArcTan ( sqr ( 1-x*x ), x)
 
- -65,536 = 270 Degrees
- 0	  = 0 Degrees
- +65,536 = 90 Degrees
+ -65,536 = 270  degrees
+ 0	  = 0  degrees
+ +65,536 = 90  degrees
 
  The table has 4,096 entries.
 
@@ -1789,10 +1368,6 @@ int ArcSin(int s)
 	if(s < (-(ONE_FIXED - 1))) s = -(ONE_FIXED - 1);
 	else if(s > (ONE_FIXED - 1)) s = ONE_FIXED - 1;
 
-	#if 0
-	s =  s >> 5;		/* -64k -> +64k becomes -2k -> +2k */
-	s += 2048;			/* -2k -> +2k becomes 0 -> 4k */
-	#endif
 
 	asin = ArcSineTable[(s >> 5) + 2048];
 
@@ -1809,10 +1384,10 @@ int ArcSin(int s)
 
  And ATN(x/z) is returned such that:
 
- 000ø is Map North
- 090ø is Map East
- 180ø is Map South
- 270ø is Map West
+ 000 degrees is Map North
+ 090 degrees is Map East
+ 180 degrees is Map South
+ 270 degrees is Map West
 
 */
 
@@ -1837,13 +1412,11 @@ int ArcTan(height_x, width_z)
 	abs_width_z=width_z;
 	if(abs_width_z<0) abs_width_z=-abs_width_z;
 
-/*
 
- Find ATN
+// Find ATN
 
-*/
 
-	if(width_z==0) angle=-deg90;
+ 	if(width_z==0) angle=-deg90;
 
 	else if(abs_width_z==abs_height_x)
 		angle=deg45;
@@ -1859,16 +1432,7 @@ int ArcTan(height_x, width_z)
 
 		if(abs_height_x!=0)
 
-			/* angle = (abs_width_z << 8) / abs_height_x; */
-
-
-
 			angle = DIV_INT((abs_width_z << 8), abs_height_x);
-
-
-
-
-
 		else
 			angle=deg22pt5;
 
@@ -1892,11 +1456,6 @@ int ArcTan(height_x, width_z)
 }
 
 
-/*
-
- Matrix from Z-Vector
-
-*/
 
 void MatrixFromZVector(VECTORCH *v, MATRIXCH *m)
 
@@ -1934,17 +1493,7 @@ void MatrixFromZVector(VECTORCH *v, MATRIXCH *m)
 
 
 
-
-
-
-
-
-/*
-
- Distance Functions
-
-*/
-
+// Distance Functions
 
 /*
 
@@ -2103,12 +1652,12 @@ void MakeVectorLocal(VECTORCH *v1, VECTORCH *v2, VECTORCH *v3, MATRIXCH *m)
  ----								------------------
 
  I_Polygon							2
- I_GouraudPolygon					3
- I_2dTexturedPolygon				4
- I_3dTexturedPolygon,			5
- I_Gouraud2dTexturedPolygon	5
- I_Polygon_ZBuffer				3
- I_GouraudPolygon_ZBuffer		4
+ I_GouraudPolygon						3
+ I_2dTexturedPolygon						4
+ I_3dTexturedPolygon,						5
+ I_Gouraud2dTexturedPolygon					5
+ I_Polygon_ZBuffer						3
+ I_GouraudPolygon_ZBuffer					4
 
 
  PASS ONLY POSITIVE COORDINATES!
@@ -2118,13 +1667,7 @@ void MakeVectorLocal(VECTORCH *v1, VECTORCH *v2, VECTORCH *v3, MATRIXCH *m)
 int PointInPolygon(int *point, int *polygon, int c, int ppsize)
 
 {
-
-
-	#if UseTimsPinp
-
-
-  /* Tim's New Point In Polygon test-- hopefully much faster, */
-  /* certainly much smaller. */
+  /* Tim's New Point In Polygon test */
   /* Uses Half-Line test for point-in-2D-polygon test */
   /* Tests the half-line going from the point in the direction of positive z */
 
@@ -2243,269 +1786,12 @@ int PointInPolygon(int *point, int *polygon, int c, int ppsize)
   }
 
 
-
-#else
-
-
-	int i;
-	int si, ti;
-	int s0, t0;
-	int s1, t1;
-	int *v0;
-	int *v1;
-	int ivdot, ivdotcnt, sgn_currivdot, sgn_ivdot, ivstate;
-	int ns, nt;
-	int x_scale, y_scale;
-	int DotNudge;
-
-	int x, z;
-	LONGLONGCH xx;
-	LONGLONGCH zz;
-	LONGLONGCH xx_tmp;
-	LONGLONGCH zz_tmp;
-	VECTORCH PolyAvgPt;
-
-
-	/* Reject points and lines */
-
-	if(c < 3) return No;
-
-
-	/* Find the average point */
-
-	v0 = polygon;
-
-	EQUALS_LL(&xx, &ll_zero);
-	EQUALS_LL(&zz, &ll_zero);
-
-	for(i = c; i!=0; i--) {
-
-		x = v0[0];
-		z = v0[1];
-
-		IntToLL(&xx_tmp, &x);		/* xx_tmp = (long long)x */
-		IntToLL(&zz_tmp, &z);		/* zz_tmp = (long long)z */
-
-		ADD_LL_PP(&xx, &xx_tmp);	/* xx += xx_tmp */
-		ADD_LL_PP(&zz, &zz_tmp);	/* zz += zz_tmp */
-
-		v0 += ppsize;
-
-	}
-
-	PolyAvgPt.vx = NarrowDivide(&xx, c);
-	PolyAvgPt.vz = NarrowDivide(&zz, c);
-
-
-	/* Centre the polygon */
-
-	v0 = polygon;
-
-	for(i = c; i!=0; i--) {
-
-		v0[0] -= PolyAvgPt.vx;
-		v0[1] -= PolyAvgPt.vz;
-
-		v0 += ppsize;
-
-	}
-
-
-	/* Centre the test point */
-
-	point[0] -= PolyAvgPt.vx;
-	point[1] -= PolyAvgPt.vz;
-
-
-	/* Scale to avoid maths overflow */
-
-	v0 = polygon;
-
-	s0 = 0;
-	t0 = 0;
-
-	for(i = c; i!=0; i--) {
-
-		si = v0[0]; if(si < 0) si = -si;
-		if(si > s0) s0 = si;
-
-		ti = v0[1]; if(ti < 0) ti = -ti;
-		if(ti > t0) t0 = ti;
-
-		v0 += ppsize;
-
-	}
-
-	si = point[ix]; if(si < 0) si = -si;
-	if(si > s0) s0 = si;
-
-	ti = point[iy]; if(ti < 0) ti = -ti;
-	if(ti > t0) t0 = ti;
-
-
-	#if 0
-	textprint("\nmax x = %d\n", s0);
-	textprint("max y = %d\n", t0);
-	#endif
-
-
-	x_scale = FindShift32(s0, 16383);
-	y_scale = FindShift32(t0, 16383);
-
-
-	#if 0
-	textprint("scales = %d, %d\n", x_scale, y_scale);
-	#endif
-
-
-	v0 = polygon;
-
-	for(i = c; i!=0; i--) {
-
-		v0[0] >>= x_scale;
-		v0[1] >>= y_scale;
-
-		/*textprint("(%d, %d)\n", v0[0], v0[1]);*/
-
-		v0 += ppsize;
-
-	}
-
-	point[ix] >>= x_scale;
-	point[iy] >>= y_scale;
-
-
-
-
-#if 1
-
-	/* Clockwise or Anti-Clockwise? */
-
-	ns = -(polygon[iy + ppsize] - polygon[iy]);
-	nt =  (polygon[ix + ppsize] - polygon[ix]);
-
-	si = polygon[(ppsize*2) + ix] - polygon[ix];
-	ti = polygon[(ppsize*2) + iy] - polygon[iy];
-
-	ivdot = (ns * si) + (nt * ti);
-
-	if(ivdot < 0) DotNudge = -1;
-	else DotNudge = 1;
-
-#endif
-
-
-
-	#if 0
-	if(ivdot < 0) textprint("Clockwise\n");
-	WaitForReturn();
-	#endif
-
-
-	/* Point to test */
-
-	si = point[ix];
-	ti = point[iy];
-
-
-	#if 0
-	textprint("p_test %d, %d\n", si, ti);
-	#endif
-
-
-	/* Polygon Vector pointers */
-
-	v0 = polygon;
-	v1 = v0 + ppsize;
-
-
-	/* Dot result monitor */
-
-	ivdotcnt = 0;
-	ivstate  = Yes;			/* assume inside */
-
-
-	/* Test v(s, t) against the vectors */
-
-	for(i = c; i!=0 && ivstate == Yes; i--) {
-
-
-		/* second vector pointer wraps once */
-
-		if(i == 1) v1 = polygon;
-
-
-		/* get the vector */
-
-		s0 = v0[ix];
-		t0 = v0[iy];
-
-		s1 = v1[ix];
-		t1 = v1[iy];
-
-
-		#if 0
-		textprint("%d,%d; %d,%d\n", s0, t0, s1, t1);
-		#endif
-
-
-		/* get the vector normal */
-
-		ns = -(t1 - t0);		/* s -> -t */
-		nt = s1 - s0;			/* t -> s  */
-
-
-		/* Dot with intersection point */
-
-		ivdot = (ns * (si - s0)) + (nt * (ti - t0));
-
-
-		/* TEST */
-		ivdot += DotNudge;
-
-
-		sgn_ivdot = 1;
-		if(ivdot < 0) sgn_ivdot = -1;
-
-
-		/* only continue if current dot is same as last, else quit */
-
-		if(ivdotcnt == 0) sgn_currivdot = sgn_ivdot;
-
-		else {
-
-			if(sgn_ivdot != sgn_currivdot) ivstate = No;
-			sgn_currivdot = sgn_ivdot;
-
-		}
-
-		v0 += ppsize;
-		v1 += ppsize;
-
-		ivdotcnt++;
-
-	}
-
-	if(ivstate) return Yes;
-	else return No;
-
-
-#endif
-
-
 }
 
 
-
-
-
-
-
 /*
-
  #defines and statics required for Jamie's Most Excellent 
  random number generator
-
 */
 
 #define DEG_3	31
@@ -2699,14 +1985,10 @@ void SetSeededFastRandom(int seed)
 
 }
 
-#if StandardShapeLanguage
 
-/*
 
- Calculate the average point on this polygon
 
-*/
-
+// Calculate the average point on this polygon
 void PolyAveragePoint(POLYHEADER *pheader, int *spts, VECTORCH *apt)
 
 {
@@ -2754,12 +2036,6 @@ void PolyAveragePoint(POLYHEADER *pheader, int *spts, VECTORCH *apt)
 	apt->vz = NarrowDivide(&zz, numpolypts);
 
 }
-
-#endif	/* StandardShapeLanguage */
-
-
-
-
 
 
 /* KJL 15:07:39 01/08/97 - Returns the magnitude of the 

@@ -11,20 +11,11 @@
 /* Includes ********************************************************/
 #include "3dc.h"
 #include "rootgadg.hpp"
+#include "hudgadg.hpp"
+#define UseLocalAssert Yes
+#include "ourasert.h"
 
-#if UseGadgets
-	#include "hudgadg.hpp"
-		
-	#define UseLocalAssert Yes
-	#include "ourasert.h"
 
-/* Version settings ************************************************/
-
-/* Constants *******************************************************/
-
-/* Macros **********************************************************/
-
-/* Imported function prototypes ************************************/
 
 /* Imported data ***************************************************/
 #ifdef __cplusplus
@@ -32,21 +23,8 @@
 	{
 #endif
 		extern signed int HUDTranslucencyLevel;
-			// ranges from 0 to 255 inclusive ; convert to fixed point...
+		// ranges from 0 to 255 inclusive ; convert to fixed point...
 
-
-		#if 0
-		extern OurBool			DaveDebugOn;
-		extern FDIEXTENSIONTAG	FDIET_Dummy;
-		extern IFEXTENSIONTAG	IFET_Dummy;
-		extern FDIQUAD			FDIQuad_WholeScreen;
-		extern FDIPOS			FDIPos_Origin;
-		extern FDIPOS			FDIPos_ScreenCentre;
-		extern IFOBJECTLOCATION IFObjLoc_Origin;
-		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
-		extern IFCOLOUR			IFColour_Dummy;
- 		extern IFVECTOR			IFVec_Zero;
-		#endif
 #ifdef __cplusplus
 	};
 #endif
@@ -54,15 +32,8 @@
 
 
 /* Exported globals ************************************************/
-
-	// private:
-	/*static*/ RootGadget* RootGadget :: pSingleton = NULL;
-
-/* Internal type definitions ***************************************/
-
-/* Internal function prototypes ************************************/
-
-/* Internal globals ************************************************/
+// private:
+RootGadget* RootGadget :: pSingleton = NULL;
 
 /* Exported function definitions ***********************************/
 // class RootGadget : public Gadget
@@ -79,25 +50,9 @@ void RootGadget :: Render
 	int FixP_Alpha
 )
 {
-	/* PRECONDITION */
-	{
-	}
 
 	/* CODE */
 	{
-		#if 0
-		textprint
-		(
-			"RootGadget :: Render at (%i,%i) clipped (%i,%i,%i,%i) alpha=%i\n",
-			R2Pos . x,
-			R2Pos . y,
-			R2Rect_Clip . x0,
-			R2Rect_Clip . y0,
-			R2Rect_Clip . x1,
-			R2Rect_Clip . y1,
-			FixP_Alpha
-		);
-		#endif
 
 		if ( pHUDGadg )
 		{
@@ -118,9 +73,6 @@ void RootGadget :: Render
 
 void RootGadget :: RefreshHUD(void)
 {
-	/* PRECONDITION */
-	{
-	}
 
 	/* CODE */
 	{
@@ -158,9 +110,7 @@ RootGadget :: RootGadget
 (
 ) : Gadget
 	(
-		#if debug
 		"RootGadget"
-		#endif
 	)		
 {
 	/* PRECONDITION */
@@ -196,8 +146,3 @@ RootGadget :: ~RootGadget()
 
 
 
-/* Internal function definitions ***********************************/
-
-
-
-#endif // UseGadgets

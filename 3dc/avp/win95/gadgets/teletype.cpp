@@ -14,56 +14,19 @@
 #include "daemon.h"
 #include "inline.h"
 #include "trepgadg.hpp"
+#define UseLocalAssert Yes
+#include "ourasert.h"
+#include "indexfnt.hpp"
+#include "psnd.h"
+#include "psndproj.h"
 
-	#define UseLocalAssert Yes
-	#include "ourasert.h"
-
-/* Version settings ************************************************/
-    #define SupportTeletypeSound    Yes
-
-    #if UseGadgets
-		#include "indexfnt.hpp"
-
-        #if SupportTeletypeSound
-            #include "psnd.h"
-            #include "psndproj.h"
-        #endif
-    #endif
 
 /* Constants *******************************************************/
-	#define FIXP_PIXELS_PER_SECOND	(ONE_FIXED * 768 * 16)
+#define FIXP_PIXELS_PER_SECOND	(ONE_FIXED * 768 * 16)
 
-/* Macros **********************************************************/
-
-/* Imported function prototypes ************************************/
-
-/* Imported data ***************************************************/
-#ifdef __cplusplus
-	extern "C"
-	{
-#endif
-		#if 0
-		extern OurBool			DaveDebugOn;
-		extern FDIEXTENSIONTAG	FDIET_Dummy;
-		extern IFEXTENSIONTAG	IFET_Dummy;
-		extern FDIQUAD			FDIQuad_WholeScreen;
-		extern FDIPOS			FDIPos_Origin;
-		extern FDIPOS			FDIPos_ScreenCentre;
-		extern IFOBJECTLOCATION IFObjLoc_Origin;
-		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
-		extern IFCOLOUR			IFColour_Dummy;
- 		extern IFVECTOR			IFVec_Zero;
-		#endif
-#ifdef __cplusplus
-	};
-#endif
-
-
-
-/* Exported globals ************************************************/
 
 /* Internal type definitions ***************************************/
-#if UseGadgets
+
 class TeletypeDaemon : public Daemon
 {
 public:
@@ -89,9 +52,8 @@ private:
 	int FixP_PixelsCovered;
 		// pixels covered so far; also equals the x-offset of the cursor.
 
-    #if SupportTeletypeSound
     int SoundHandle;
-    #endif
+
 
 };
 // Inline functions:
@@ -115,14 +77,9 @@ namespace TeletypeCursor
 	);
 };
 
-#endif // UseGadgets
 
-/* Internal function prototypes ************************************/
-
-/* Internal globals ************************************************/
 
 /* Exported function definitions ***********************************/
-#if UseGadgets
 // class TeletypeGadget : public Gadget
 // public:
 void TeletypeGadget :: Render
@@ -132,21 +89,6 @@ void TeletypeGadget :: Render
 	int FixP_Alpha
 )
 {
-	#if 0
-	Render_Report
-	(
-		R2Pos,
-		R2Rect_Clip,
-		FixP_Alpha		
-	);
-	#endif
-	#if 0
-	textprint
-	(
-		"Teletype:\"%s\"\n",
-		pSCString_Val -> pProjCh()
-	);
-    #endif
 
     GLOBALASSERT( p666 );
     int Int_CursorXOffset = p666 -> CursorXOffset();
@@ -199,9 +141,8 @@ TeletypeGadget :: TeletypeGadget
 	SCString* pSCString
 ) : Gadget
 	(
-		#if debug
 		"TeletypeGadget"
-		#endif
+
 	)
 {
 	/* PRECONDITION */
@@ -274,12 +215,7 @@ void TeletypeGadget :: DirectRenderCursor
 }
 
 
-// private:
-
-#endif // UseGadgets
-
 /* Internal function definitions ***********************************/
-#if UseGadgets
 // class TeletypeDaemon : public CoordinateWithStrategy
 // public:
 TeletypeDaemon :: TeletypeDaemon
@@ -297,7 +233,6 @@ TeletypeDaemon :: TeletypeDaemon
 	fFinished_Val = No;
 
 	FixP_TotalPixels = 
-	#if 1
 	OUR_INT_TO_FIXED
 	(
 		pTeletypeGadg -> GetStringWithoutReference() -> CalcSize
@@ -305,19 +240,9 @@ TeletypeDaemon :: TeletypeDaemon
 			I_Font_TeletypeLettering
 		) . w
 	);
-	#else
-	OUR_INT_TO_FIXED
-	(
-		10
-		*		
-		pTeletypeGadg -> GetStringWithoutReference() -> GetNumChars()
-		
-	);
-	#endif
 
 	FixP_PixelsCovered = 0;
 
-    #if SupportTeletypeSound
     // Try to start looping teletype sound:
     Sound_Play
     (
@@ -326,12 +251,12 @@ TeletypeDaemon :: TeletypeDaemon
         &SoundHandle
     );
         // SOUND_NOACTIVEINDEX used as error value
-    #endif //SupportTeletypeSound
+
 }
 
 TeletypeDaemon :: ~TeletypeDaemon()
 {
-    #if SupportTeletypeSound
+
     if ( SoundHandle != SOUND_NOACTIVEINDEX )
     {
         Sound_Stop
@@ -341,28 +266,14 @@ TeletypeDaemon :: ~TeletypeDaemon()
 
         SoundHandle = SOUND_NOACTIVEINDEX;
     }
-    #endif // SupportTeletypeSound
+
 }
 
 ACTIVITY_RETURN_TYPE TeletypeDaemon :: Activity(ACTIVITY_INPUT)
 {
-	#if 0
-	textprint("TeletypeDaemon :: Activity(%i)\n",FixP_Time);
-    #endif
 
 	int FixP_PixelsThisFrame = MUL_FIXED(FIXP_PIXELS_PER_SECOND,FixP_Time);
 
-	#if 0
-	textprint
-	(
-		"FixP_PixelsToPrint = %i\n",FixP_PixelsThisFrame
-	);
-
-	textprint
-	(
-		"FixP_TotalPixels = %i\n",FixP_TotalPixels
-	);
-    #endif
 
 	FixP_PixelsCovered += FixP_PixelsThisFrame;
 
@@ -380,7 +291,7 @@ ACTIVITY_RETURN_TYPE TeletypeDaemon :: Activity(ACTIVITY_INPUT)
 		
 		Stop();
 
-        #if SupportTeletypeSound
+
         if ( SoundHandle != SOUND_NOACTIVEINDEX )
         {
             Sound_Stop
@@ -389,7 +300,6 @@ ACTIVITY_RETURN_TYPE TeletypeDaemon :: Activity(ACTIVITY_INPUT)
             );
             SoundHandle = SOUND_NOACTIVEINDEX;
         }
-        #endif // SupportTeletypeSound
 
 		// Tell text report line that it can trigger next string in the queue
 		// (if there is one):
@@ -410,7 +320,6 @@ void TeletypeCursor :: Render
 	int FixP_Alpha
 )
 {
-	#if 1
 		#define TELETYPE_CURSOR_WIDTH (10)
 	IndexedFont* pLetterFont = IndexedFont :: GetFont( I_Font_TeletypeLettering );
 	GLOBALASSERT( pLetterFont );	
@@ -432,16 +341,6 @@ void TeletypeCursor :: Render
 		R2Rect_Area . bHasArea()
 	)
 	{
-		#if 0
-		textprint
-		(
-			"TeletypeCursor R2Rect_Area = (%i,%i,%i,%i)\n",
-			R2Rect_Area . x0,
-			R2Rect_Area . y0,
-			R2Rect_Area . x1,
-			R2Rect_Area . y1
-		);
-		#endif
 
 		R2Rect_Area . AlphaFill
 		(
@@ -451,7 +350,7 @@ void TeletypeCursor :: Render
 			(FixP_Alpha/256) // unsigned char translucency
 		);
 	}
-	#endif
+
 }
 
-#endif // UseGadgets
+

@@ -23,20 +23,12 @@
 
 #define PRED_PISTOL_PITCH_CHANGE 300
 
-#define CDDA_TEST 			No
-#define CD_VOLUME_TEST 	No
-#define SOUND_TEST_3D 	No
+/* adj */
+/*Rebellion has this so that when compiling a debug version...
+ LOAD_USING_FASTFILES
+will be set to false */
 
-#define LOAD_SOUND_FROM_FAST_FILE 	   Yes
-#if 1
-//allow loading from outside of fastfiles to help with custom levels
-#define LOAD_SOUND_FROM_FAST_FILE_ONLY No
-#else
-#define LOAD_SOUND_FROM_FAST_FILE_ONLY (LOAD_USING_FASTFILES)
-#endif
-
-#define USE_REBSND_LOADERS  (LOAD_USING_FASTFILES||PREDATOR_DEMO||MARINE_DEMO||ALIEN_DEMO||DEATHMATCH_DEMO)
-#define USE_COMMON_FLL_FILE  (LOAD_USING_FASTFILES||PREDATOR_DEMO||MARINE_DEMO||ALIEN_DEMO||DEATHMATCH_DEMO)
+#define USE_REBSND_LOADERS  LOAD_USING_FASTFILES
 
 
 /* Andy 9/6/97 ----------------------------------------------------------------
@@ -51,13 +43,7 @@ static int backgroundHandle = SOUND_NOACTIVEINDEX;
 static int playOneShotWS = 1;
 static int oldRandomValue = -1;
 
-#if SOUND_TEST_3D
-static int testLoop = SOUND_NOACTIVEINDEX;
-#endif
 
-#if CDDA_TEST
-static int doneCDDA = 0;
-#endif
 			
 static unsigned int playerZone = -1;
 static VECTORCH backgroundSoundPos={0,0,0};
@@ -95,57 +81,7 @@ void DoPlayerSounds(void)
 	PLAYER_WEAPON_DATA *weaponPtr;
 	VECTORCH *playerPos;
 
-	#if CDDA_TEST
-	if (doneCDDA == 0)
-	{
-		CDDA_SwitchOn();
-
-		doneCDDA = 1;
-
-		if (AvP.PlayerType == I_Marine) 				CDDA_Play(CDTrack1);
-		else if (AvP.PlayerType == I_Predator)	CDDA_Play(CDTrack3);
-		else if (AvP.PlayerType == I_Alien) 		CDDA_Play(CDTrack2);
-
-	}
-	#endif
  
- 	#if CD_VOLUME_TEST
-	{
-		extern unsigned char KeyboardInput[];
-		static int CDVolume = CDDA_VOLUME_DEFAULT;
-
-		if(!CDDA_IsPlaying()) CDDA_Play(CDTrack1);
-		if(KeyboardInput[KEY_L])
-		{
-			CDVolume++;
-			CDDA_ChangeVolume(CDVolume);
-		}
-		else if(KeyboardInput[KEY_K])
-		{
-			CDVolume--;
-			CDDA_ChangeVolume(CDVolume);
-		}
-
-		{
-			int currentSetting = CDDA_GetCurrentVolumeSetting();
-			textprint("CD VOL: %d \n",currentSetting);
-		}
-	}
-	#endif
-
-	#if SOUND_TEST_3D
-	if(testLoop == SOUND_NOACTIVEINDEX)
-	{
-		VECTORCH zeroLoc = {0,0,0};
-		Sound_Play(SID_VISION_LOOP,"del",&zeroLoc,&testLoop);
-	}
-	#endif
-
-	#if 0
-	/* sort out background sounds */	
-	if(AvP.PlayerType == I_Predator) DoPredatorBackgroundLoop();              	
-	else DoBackgroundSound();
-	#endif
 		
 	/* do weapon sound */
 	    
@@ -166,49 +102,7 @@ void DoPlayerSounds(void)
 		}
  	}
                            
- 	/* Handle weapon reloading */
- 	#if 0
- 	if (weaponPtr->CurrentState == WEAPONSTATE_RELOAD_PRIMARY)
- 	{
- 		if (weaponReloading == 0)
- 		{
-   		weaponReloading = 1;
-   	
-   		switch (weaponPtr->WeaponIDNumber)
-   		{
-   			case WEAPON_SADAR:
-   				sadarReloadTimer = ONE_FIXED;
-   				break;
-				case WEAPON_GRENADELAUNCHER:
-   				Sound_Play(SID_NADELOAD,"h");
-				playerNoise=1;
-   				break;
-   			case WEAPON_FLAMETHROWER:
-   				/* Flame thrower reload? */
-   				break;
-   			case WEAPON_SMARTGUN:
-   				Sound_Play(SID_LONGLOAD,"h");
-				playerNoise=1;
-   				break;
-   			case WEAPON_FRISBEE_LAUNCHER:
-   				sadarReloadTimer = ONE_FIXED;
-   				break;
-				case WEAPON_GRENADELAUNCHER:
-   				Sound_Play(SID_NADELOAD,"h");
-				playerNoise=1;
-   				break;
-   			default:
-   				Sound_Play(SID_SHRTLOAD,"h");
-				playerNoise=1;
-   				break;
-		 	}
- 		}
-	}
-	else
-	{
-  	weaponReloading = 0;
-	}          
-	#endif
+
 
 	switch(weaponPtr->WeaponIDNumber)
 	{			
@@ -218,32 +112,9 @@ void DoPlayerSounds(void)
 			{
 		 		if(weaponHandle == SOUND_NOACTIVEINDEX) 
 				{
-		 		  //Sound_Play(SID_PULSE_START,"hp",-PRED_PISTOL_PITCH_CHANGE);	  
-				  //Sound_Play(SID_PULSE_LOOP,"elhp",&weaponHandle,-PRED_PISTOL_PITCH_CHANGE);					
-			   	  //weaponPitchTimer=ONE_FIXED>>3;
 				  Sound_Play(SID_PRED_PISTOL,"h");					
 					playerNoise=1;
 			  	}
-				else
-				{
-					//weaponPitchTimer-=NormalFrameTime;
-					//if (weaponPitchTimer<=0)
-					//{
-					//	weaponPitchTimer=ONE_FIXED>>3;
-					//	Sound_ChangePitch(weaponHandle,(FastRandom()&63)-(32+PRED_PISTOL_PITCH_CHANGE));
-					//}
-				}
-			}
-	   		else
-			{
-				//if(weaponHandle != SOUND_NOACTIVEINDEX)
-				//{
-		          //if (ActiveSounds[weaponHandle].soundIndex == SID_PULSE_LOOP)
-		          //{
-			      //    Sound_Play(SID_PULSE_END,"hp",-PRED_PISTOL_PITCH_CHANGE);
-				  //	  Sound_Stop(weaponHandle);
-			 	  //}
-			 	//}
 			}
   		break;
    	}
@@ -313,23 +184,6 @@ void DoPlayerSounds(void)
 
    	case (WEAPON_MINIGUN):
    	{
-		#if 0
-     	if(weaponPtr->CurrentState == WEAPONSTATE_FIRING_PRIMARY)		
-     	{
-     		if(weaponHandle == SOUND_NOACTIVEINDEX) {
-     			Sound_Play(SID_MINIGUN_LOOP,"elh",&weaponHandle);
-				playerNoise=1;
-			}
-	   	}
-     	else
-     	{
-     		if(weaponHandle != SOUND_NOACTIVEINDEX)
-     		{
-       		Sound_Play(SID_MINIGUN_END,"h");
-       		Sound_Stop(weaponHandle);
-     		}
-     	}
-		#else
         if (PlayerStatusPtr->IsAlive==0) {
      		if(weaponHandle != SOUND_NOACTIVEINDEX)
      		{
@@ -337,7 +191,6 @@ void DoPlayerSounds(void)
        		Sound_Stop(weaponHandle);
      		}
 		}
-		#endif
      	break;
    	}  
 
@@ -451,139 +304,17 @@ void DoPlayerSounds(void)
 
 		case(WEAPON_PRED_WRISTBLADE):
 		{
-			#if 0
-			if(weaponPtr->CurrentState == WEAPONSTATE_FIRING_PRIMARY)			
-			{	
-				if(playOneShotWS) 
-				{
-		        	unsigned int rand=FastRandom() % 6;
-		        	if (rand == oldRandomValue) rand = (rand + 1) % 6;
-	     			oldRandomValue = rand;
-				  	switch (rand)
-		        	{
-		         		case 0:
-		        		{
-			          		Sound_Play(SID_SWIPE,"ehp",&weaponHandle,(FastRandom()&255)-128);					
-			          		break;
-			          	}
-			          	case 1:
-			          	{
-			          		Sound_Play(SID_SWIPE2,"ehp",&weaponHandle,(FastRandom()&255)-128);					
-			          		break;
-			          	}
-			          	case 2:
-			          	{
-			  	       		Sound_Play(SID_SWIPE3,"ehp",&weaponHandle,(FastRandom()&255)-128);					
-				         		break;
-			           	}
-						case 3:
-			          	{
-			          		Sound_Play(SID_SWIPE4,"ehp",&weaponHandle,(FastRandom()&255)-128);					
-			         		break;
-			         	}
-						case 4:
-			         	{
-			         		Sound_Play(SID_PRED_SLASH,"ehp",&weaponHandle,(FastRandom()&255)-128);					
-			        		break;
-			         	}
-						case 5:
-			         	{
-			        		Sound_Play(SID_RIP,"ehp",&weaponHandle,(FastRandom()&255)-128);					
-				       		break;
-			         	}
-					 	default:
-					 	{
-					 		break;
-					 	}
-				 	}
-					playOneShotWS = 0;
-				}
-			}
-			else playOneShotWS = 1;				
-			#endif
+
 			break;
 		}
 	
 		case(WEAPON_ALIEN_CLAW):
 		{
-			#if 0
-			if(weaponPtr->CurrentState == WEAPONSTATE_FIRING_PRIMARY)			
-			{	
-				if(playOneShotWS) 
-				{
-	       			unsigned int rand=FastRandom() & 3;
-        			if (rand == oldRandomValue) rand=(rand + 1) & 3;
-				   
-				   	oldRandomValue = rand;
-        			switch (rand)
-        			{
-         				case 0:
-         				{
-          					Sound_Play(SID_SWIPE,"ehp",&weaponHandle,(FastRandom()&255)-128);					
-          					break;
-          				}
-          				case 1:
-          				{
-          					Sound_Play(SID_SWIPE2,"ehp",&weaponHandle,(FastRandom()&255)-128);					
-          					break;
-          				}
-          				case 2:
-          				{
-          					Sound_Play(SID_SWIPE3,"ehp",&weaponHandle,(FastRandom()&255)-128);					
-          					break;
-           				}
-						case 3:
-          				{
-          					Sound_Play(SID_SWIPE4,"ehp",&weaponHandle,(FastRandom()&255)-128);					
-          					break;
-           				}
-						default:
-						{
-							break;
-						}
-					}
-			 		playOneShotWS = 0;
-				}
-			} else {
-				playOneShotWS = 1;
-			}
-			#endif
 			break;
 		}
 
 		case(WEAPON_ALIEN_GRAB):
 		{
-			#if 0
-			if(weaponPtr->CurrentState == WEAPONSTATE_FIRING_PRIMARY)			
-			{
-				if(playOneShotWS) 
-				{
-			  	unsigned int rand=FastRandom() & 1;
-       		if (rand == oldRandomValue) rand=(rand + 1) & 1;
-					oldRandomValue = rand;
-			   	switch (rand)
-        	{
-         		case 0:
-         		{
-          		Sound_Play(SID_SWISH,"ehp",&weaponHandle,(FastRandom()&255)-128);					
-          		break;
-          	}
-          	case 1:
-          	{
-          		Sound_Play(SID_TAIL,"ehp",&weaponHandle,(FastRandom()&255)-128);					
-          		break;
-          	}
-          
-					 	default:
-					 	{
-					 		break;
-					 	}
-				 	}
-			 		playOneShotWS = 0;
-				}
-			}
-			else playOneShotWS = 1;
-			#endif
 			break;
 		}
 
@@ -608,7 +339,6 @@ void DoPlayerSounds(void)
 			{
 				if(playOneShotWS) 
 				{
-					//Sound_Play(SID_PRED_LAUNCHER,"hp",(FastRandom()&255)-128);
 					playOneShotWS = 0;
 				}
 			}
@@ -673,9 +403,6 @@ void PlayWeaponClickingNoise(enum WEAPON_ID weaponIDNumber)
 		}
 		case WEAPON_MINIGUN:
 		{
-			#if 0
-			Sound_Play(SID_MINIGUN_EMPTY,"eh",&SpotEffectWeaponHandle);
-			#endif
 			break;
 		}
 		// Predator weapons
@@ -716,42 +443,8 @@ void MakeRicochetSound(VECTORCH *position)
 
 void PlayAlienSwipeSound(void) {
 
-	#if 0
-	 unsigned int rand=FastRandom() & 3;
-     if (rand == oldRandomValue) rand=(rand + 1) & 3;
-	 
-	 oldRandomValue = rand;
-     switch (rand)
-     {
-     	case 0:
-     	{
-     		Sound_Play(SID_SWIPE,"ehp",&weaponHandle,(FastRandom()&255)-128);					
-     		break;
-     	}
-     	case 1:
-     	{
-     		Sound_Play(SID_SWIPE2,"ehp",&weaponHandle,(FastRandom()&255)-128);					
-     		break;
-     	}
-     	case 2:
-     	{
-     		Sound_Play(SID_SWIPE3,"ehp",&weaponHandle,(FastRandom()&255)-128);					
-     		break;
-     	}
-	 	case 3:
-     	{
-     		Sound_Play(SID_SWIPE4,"ehp",&weaponHandle,(FastRandom()&255)-128);
-     		break;
-     	}
-	 	default:
-	 	{
-	 		break;
-	 	}
-	 }
-	#else
 	PlayAlienSound(0,ASC_Swipe,((FastRandom()&255)-128),
 		&weaponHandle,NULL);
-	#endif
 }
 
 void PlayAlienTailSound(void) {
@@ -763,51 +456,9 @@ void PlayAlienTailSound(void) {
 	
 void PlayPredSlashSound(void) {
 
-	#if 0
-	unsigned int rand=FastRandom() % 6;
-	if (rand == oldRandomValue) rand = (rand + 1) % 6;
-	oldRandomValue = rand;
-	switch (rand)
-	{
-		case 0:
-		{
-	  		Sound_Play(SID_SWIPE,"ehp",&weaponHandle,(FastRandom()&255)-128);					
-	  		break;
-	  	}
-	  	case 1:
-	  	{
-	  		Sound_Play(SID_SWIPE2,"ehp",&weaponHandle,(FastRandom()&255)-128);					
-	  		break;
-	  	}
-	  	case 2:
-	  	{
-	   		Sound_Play(SID_SWIPE3,"ehp",&weaponHandle,(FastRandom()&255)-128);					
-	     		break;
-	   	}
-		case 3:
-	  	{
-	  		Sound_Play(SID_SWIPE4,"ehp",&weaponHandle,(FastRandom()&255)-128);					
-	 		break;
-	 	}
-		case 4:
-	 	{
-	   		Sound_Play(SID_SWIPE3,"ehp",&weaponHandle,(FastRandom()&255)-128);					
-			break;
-	 	}
-		case 5:
-	 	{
-	  		Sound_Play(SID_SWIPE2,"ehp",&weaponHandle,(FastRandom()&255)-128);					
-	   		break;
-	 	}
-	 	default:
-	 	{
-	 		break;
-	 	}
-	}
-	#else
 	PlayPredatorSound(0,PSC_Swipe,((FastRandom()&255)-128),
 		&weaponHandle,NULL);
-	#endif
+
 }
 
 void PlayCudgelSound(void) {
@@ -855,7 +506,6 @@ int FindAndLoadWavFile(int soundNum,char* wavFileName)
 	static char sound_name[200];
 	sprintf (sound_name, "%s%s", FirstSoundDir,wavFileName);
 
-#if LOAD_SOUND_FROM_FAST_FILE
 	//first look in fast file
 	{
 		unsigned nLen;
@@ -864,9 +514,7 @@ int FindAndLoadWavFile(int soundNum,char* wavFileName)
 			return LoadWavFromFastFile(soundNum,sound_name);
 		}
 	}
-#endif
 
-#if !LOAD_SOUND_FROM_FAST_FILE_ONLY
 	//look for sound locally
 	{
 	
@@ -892,10 +540,7 @@ int FindAndLoadWavFile(int soundNum,char* wavFileName)
 
 		return LoadWavFile(soundNum,sound_name) ;
 	}
-#else
-	LOGDXFMT(("Failed to find %s\n",wavFileName));	
-	return 0;
-#endif
+
 }
 
 
@@ -960,15 +605,9 @@ void LoadSounds(char *soundDirectory)
 	/* load RebSnd file into a (big) buffer	*/
 	{
 		char filename[64];
-		#if ALIEN_DEMO
-		strcpy(filename, ".\\alienfastfile");//CommonSoundDirectory);
-		#else
-		strcpy(filename, ".\\fastfile");//CommonSoundDirectory);
-		#endif
-//		strcat(filename, soundDirectory);
+/*adj*/
+		strcpy(filename, ".\\fastfile");
 		strcat(filename, "\\");
-//		strcat(filename, soundDirectory);
-//		strcat(filename, ".RebSnd");
 		strcat(filename, "common.ffl");
 
 		rebSndBuffer = LoadRebSndFile(filename);
@@ -1029,9 +668,6 @@ void LoadSounds(char *soundDirectory)
 	if(!SoundSys_IsOn()) return;	
 	
 	/* construct the sound list file name, and load it */
- //	strcpy((char*)&soundFileName, gameSoundDirectory);
- //	strcat((char*)&soundFileName, soundDirectory);
- //	strcat((char*)&soundFileName, "\\");
 	strcpy((char*)&soundFileName, CommonSoundDirectory);
 	strcat((char*)&soundFileName, soundDirectory);
 	strcat((char*)&soundFileName, ".SL");
@@ -1045,6 +681,7 @@ void LoadSounds(char *soundDirectory)
 	while(fgets((char*)fileLine,128,myFile))
 	{
 		char wavFileName[128];
+/*adj*/
 		if(!strncmp((char*)fileLine,"//",2)) continue; /* comment */
 		if(strlen((char*)fileLine) < 4) continue; /* blank line, or something */
 

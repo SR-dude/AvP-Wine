@@ -1,23 +1,11 @@
 #include "chunkpal.hpp"
 #include "mishchnk.hpp"
 
-#if engine
-
 #ifndef UseLocalAssert
 #define UseLocalAssert 1
-#endif
 #include "ourasert.h"
-#define assert(x) GLOBALASSERT(x)
-
-#else
-
-#if cencon
-#include "ccassert.h"
-#else
-#include <assert.h>
 #endif
 
-#endif
 //macro for helping to force inclusion of chunks when using libraries
 FORCE_CHUNK_INCLUDE_IMPLEMENT(chunkpal)
 
@@ -437,7 +425,7 @@ TLT_Config_Chunk::TLT_Config_Chunk (Chunk_With_Children * parent, const char * s
 	}
 	
 	// hmm, size_chunk was wrong so allow sizes which were wrong in that way to pass
-	assert (ssize + 12 == size_chunk() || ssize + 12 + (44+strlen(srcrifname)+4&~3) - (44+strlen(srcrifname)+4&~4) == size_chunk());
+	GLOBALASSERT (ssize + 12 == size_chunk() || ssize + 12 + (44+strlen(srcrifname)+4&~3) - (44+strlen(srcrifname)+4&~4) == size_chunk());
 }
 
 size_t TLT_Config_Chunk::size_chunk()

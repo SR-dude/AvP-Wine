@@ -17,7 +17,7 @@
    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
 /* Written by Ulrich Drepper <drepper@gnu.ai.mit.edu>.  */
-#define STDC_HEADERS 1
+
 
 #include "advwin32.h"
 
@@ -26,25 +26,12 @@
 #endif
 
 #include <sys/types.h>
-
-#if STDC_HEADERS
 # include <stdlib.h>
 # include <string.h>
-#else
-# ifndef HAVE_MEMCPY
-#  define memcpy(d, s, n) bcopy ((s), (d), (n))
-# endif
-#endif
-
 #include "md5.h"
 
-#ifdef WORDS_BIGENDIAN
-# define SWAP(n)							\
-    (((n) << 24) | (((n) & 0xff00) << 8) | (((n) >> 8) & 0xff00) | ((n) >> 24))
-#else
 # define SWAP(n) (n)
-#endif
-
+/* adj */
 
 /* This array contains the bytes used to pad the buffer to the next
    64-byte boundary.  (RFC 1321, 3.1: Step 1)  */
@@ -157,9 +144,6 @@ int md5_stream(FILE *stream, void *resblock)
   md5_read_ctx (&ctx, resblock);
   return 0;
 }
-#ifdef _MSC_VER
-#pragma warning(default: 4701)
-#endif
 
 /* Compute MD5 message digest for LEN bytes beginning at BUFFER.  The
    result is always in little endian byte order, so that a byte-wise

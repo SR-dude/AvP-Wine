@@ -2187,11 +2187,6 @@ void ObjectQuatAndMat(DISPLAYBLOCK *dblockptr);
 void MapBlockInit(DISPLAYBLOCK *dblockptr);
 void MapSetVDB(DISPLAYBLOCK *dptr, MAPSETVDB *mapvdbdata);
 
-#if ProjectSpecificVDBs
-void ProjectSpecificVDBDestroy(VIEWDESCRIPTORBLOCK *vdb);
-void ProjectSpecificVDBInit(VIEWDESCRIPTORBLOCK *vdb);
-#endif
-
 
 void UpdateGame(void);
 

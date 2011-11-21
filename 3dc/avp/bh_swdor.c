@@ -160,7 +160,6 @@ void SwitchDoorBehaviour(STRATEGYBLOCK* sbPtr)
 	{
 		case I_door_opening:
 		{	
-			/* LOCALASSERT(linkedDoorIsClosed);	*/
 			/* check if we've got a close request */
 			if(doorBehaviour->requestClose && !AnythingInMyModule(sbPtr->SBmoptr)) 
 			{
@@ -186,7 +185,6 @@ void SwitchDoorBehaviour(STRATEGYBLOCK* sbPtr)
 		}		
 		case I_door_closing:
 		{
-			/* LOCALASSERT(linkedDoorIsClosed);	*/
 			/* check if we've got an open request, or anything has jumped in */
 			if((doorBehaviour->requestOpen)||(AnythingInMyModule(sbPtr->SBmoptr)))
 			{

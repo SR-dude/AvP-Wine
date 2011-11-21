@@ -20,40 +20,28 @@
 #include "showcmds.h"
 #include "pldghost.h"
 
-#if 1
+
 static unsigned int *Pher_Player1;
 static unsigned int *Pher_Player2;
 static unsigned char *Pher_Ai1;
-#else
-#define	MaxModules	300
-static unsigned int Pher_Player1[MaxModules];
-static unsigned int Pher_Player2[MaxModules];	  
-static unsigned char Pher_Ai1[MaxModules];
-#endif
 
 /* these pointers indicate the current read from and write to
 buffers for the player and ai pheromone systems */
 unsigned int *PherPl_ReadBuf;
 unsigned int *PherPl_WriteBuf;
 unsigned char *PherAi_Buf;
-
-#if SUPER_PHEROMONE_SYSTEM
 static unsigned int *Pher_Aliens1;
 static unsigned int *Pher_Aliens2;
-
 unsigned int *PherAls_ReadBuf;
 unsigned int *PherAls_WriteBuf;
-
 unsigned int AlienPheromoneScale;
 
 /* Marine pheromones: a pathfinding system only. */
 static unsigned int *Pher_Marines1;
 static unsigned int *Pher_Marines2;
-
 unsigned int *PherMars_ReadBuf;
 unsigned int *PherMars_WriteBuf;
 
-#endif
 
 /* This global is used to store	the current player phermone intensity */
 unsigned int PlayerSmell = 3;
@@ -62,14 +50,6 @@ MODULE *playerPherModule = (MODULE *)0;
 /* external globals */
 extern int AIModuleArraySize;
 
-/* this define enables diagnostic text 'dump' for pheromone system */
-#define logPheromoneDiagnostics 0
-
-#if logPheromoneDiagnostics
-static void LogPlayerPherValues(void);
-static void LogModuleAdjacencies(void);
-int printModAdj = 1;
-#endif
 
 /*----------------------Patrick 12/11/96--------------------------- 
 Initialises pheromone systems
@@ -78,7 +58,6 @@ void InitPheromoneSystem(void)
 {
 	int i;
 	
-	#if 1
 	/* allocate	the pheromone buffers */
 	Pher_Player1 = (unsigned int *)AllocateMem((AIModuleArraySize+1)*sizeof(unsigned int));
 	if(!Pher_Player1) 
@@ -98,9 +77,7 @@ void InitPheromoneSystem(void)
 		memoryInitialisationFailure = 1;
 		return;
 	}
-	#endif
 
-	#if SUPER_PHEROMONE_SYSTEM
 	Pher_Aliens1 = (unsigned int *)AllocateMem((AIModuleArraySize+1)*sizeof(unsigned int));
 	if(!Pher_Aliens1) 
 	{
@@ -128,7 +105,6 @@ void InitPheromoneSystem(void)
 		memoryInitialisationFailure = 1;
 		return;
 	}
-	#endif
 
 	/* init the player phermone system */
 	for(i=0;i<AIModuleArraySize;i++) 
@@ -148,7 +124,6 @@ void InitPheromoneSystem(void)
 	}		
 	PherAi_Buf = &Pher_Ai1[0]; 
 
-	#if SUPER_PHEROMONE_SYSTEM
 
 	for(i=0;i<AIModuleArraySize;i++) 
 	{
@@ -168,12 +143,6 @@ void InitPheromoneSystem(void)
 	PherMars_ReadBuf = &Pher_Marines1[0]; 
 	PherMars_WriteBuf = &Pher_Marines2[0]; 
 
-	#endif
-
-	#if logPheromoneDiagnostics
-	printModAdj = 1;
-	#endif
-	
 }
 
 /*----------------------Patrick 14/3/96--------------------------- 
@@ -181,18 +150,14 @@ End of level clean up for pheromone system
 -------------------------------------------------------------------*/
 void CleanUpPheromoneSystem(void)
 {
-	#if 1
 	if (Pher_Player1) DeallocateMem(Pher_Player1);
 	if (Pher_Player2) DeallocateMem(Pher_Player2);
 	if (Pher_Ai1) DeallocateMem(Pher_Ai1);
-	#endif
-	
-	#if SUPER_PHEROMONE_SYSTEM
+
 	if (Pher_Aliens1) DeallocateMem(Pher_Aliens1);
 	if (Pher_Aliens2) DeallocateMem(Pher_Aliens2);
 	if (Pher_Marines1) DeallocateMem(Pher_Marines1);
 	if (Pher_Marines2) DeallocateMem(Pher_Marines2);
-	#endif
 }
 
 
@@ -268,7 +233,6 @@ int AIModuleAdmitsPheromones(AIMODULE *targetModule) {
 
 }
 
-#if SUPER_PHEROMONE_SYSTEM
 void AddMarinePheromones(AIMODULE *targetModule) {
 
 	int ThisModuleIndex;	
@@ -289,7 +253,6 @@ void MaintainMarineTargetZone(AIMODULE *targetModule) {
 
 }
 
-#endif
 
 /*----------------------Patrick 12/11/96--------------------------- 
 Updates the player pheromone system:
@@ -305,14 +268,6 @@ void PlayerPheromoneSystem(void)
 	int AdjModuleIndex;
 
 		
-	#if logPheromoneDiagnostics	
-		if(printModAdj)
-		{
-			printModAdj = 0;
-			LogModuleAdjacencies();
-		}
-	#endif
-
 	
 	/* get a pointer to the global array of pointers to the modules
 	in the environment (interfaces'r'us).  
@@ -372,7 +327,6 @@ void PlayerPheromoneSystem(void)
 						if(PherPl_ReadBuf[AdjModuleIndex] > PherPl_WriteBuf[ThisModuleIndex])
 							PherPl_WriteBuf[ThisModuleIndex] = (PherPl_ReadBuf[AdjModuleIndex] - 1);
 				
-						#if SUPER_PHEROMONE_SYSTEM
 						if(PherAls_ReadBuf[AdjModuleIndex] > PherAls_WriteBuf[ThisModuleIndex]) {
 							PherAls_WriteBuf[ThisModuleIndex] = (PherAls_ReadBuf[AdjModuleIndex] - 1);
 						}
@@ -382,14 +336,12 @@ void PlayerPheromoneSystem(void)
 								PherMars_WriteBuf[ThisModuleIndex] = (PherMars_ReadBuf[AdjModuleIndex] - 1);
 							}
 						}
-						#endif
 
 						/* next adjacent module reference pointer */
 						AdjModuleRefPtr++;
 					}
 				}
 			}
-			#if SUPER_PHEROMONE_SYSTEM
 			/* Decay pheromones. */
 			if (PherAls_WriteBuf[ThisModuleIndex]>0) {
 				PherAls_WriteBuf[ThisModuleIndex]--;
@@ -398,7 +350,6 @@ void PlayerPheromoneSystem(void)
 			if (PherMars_WriteBuf[ThisModuleIndex]>0) {
 				PherMars_WriteBuf[ThisModuleIndex]--;
 			}
-			#endif
 		}
 	}
 
@@ -442,7 +393,6 @@ void PlayerPheromoneSystem(void)
    			if(playerStatusPtr->IsAlive)
 			{
    				PherPl_WriteBuf[playerPherModule->m_aimodule->m_index] = PlayerSmell;
-				#if SupportWindows95 
 				if(playerPherModule->name)
 				{
 					if (ShowDebuggingText.Module)
@@ -450,7 +400,6 @@ void PlayerPheromoneSystem(void)
 						ReleasePrintDebuggingText("Player Module: %d '%s'\n", playerPherModule->m_index,playerPherModule->name);
 						ReleasePrintDebuggingText("Player Module Coords: %d %d %d\n",playerPherModule->m_world.vx,playerPherModule->m_world.vy,playerPherModule->m_world.vz);
 					}
-					#if SUPER_PHEROMONE_SYSTEM
 					AlienPheromoneScale+=3;
 					if (AlienPheromoneScale==0) AlienPheromoneScale=1;
 					{
@@ -458,16 +407,13 @@ void PlayerPheromoneSystem(void)
 						textprint("Alien readable pheromones in Player Module: %d\n",prop);
 					}
 					/* No scale for 'marine' pheromones, the player will never see it. */
-					#endif
 				}
-				#endif
 			}
 		}
 	}
 
 	PlayerSmell++;
 
-	#if SUPER_PHEROMONE_SYSTEM
 	/* Note that marines should add pheromones at the AI level... */
 	{
 		unsigned int *tempBufPointer = PherAls_ReadBuf;
@@ -480,7 +426,6 @@ void PlayerPheromoneSystem(void)
 		PherMars_ReadBuf = PherMars_WriteBuf;
 		PherMars_WriteBuf= tempBufPointer;
   	}
-	#endif
 	
 	/* swap the read and write buffers:
 	   behaviours access most recent data thro' the read buffer */
@@ -489,10 +434,6 @@ void PlayerPheromoneSystem(void)
 		PherPl_ReadBuf = PherPl_WriteBuf;
 		PherPl_WriteBuf	= tempBufPointer;
   	}
-
-	#if logPheromoneDiagnostics
-	LogPlayerPherValues();
-	#endif
 
 
 }
@@ -534,115 +475,4 @@ void AiPheromoneSystem(void)
 
 
 
-#if logPheromoneDiagnostics 
 
-	/* write out a list of module ajacencies */
-
-static void LogModuleAdjacencies(void)
-{
-	extern SCENE Global_Scene;
-	extern SCENEMODULE **Global_ModulePtr;
-
-	GLOBALASSERT(0);
-
-	/* This function does not use AI modules yet! */
-		
-	FILE *logFile;
-	int i;
-	SCENEMODULE *ScenePtr;
-	MODULE **ModuleListPointer;	
-	MODULE *ThisModulePtr;
-	int ThisModuleIndex;	
-	MREF *AdjModuleRefPtr;
-	int AdjModuleIndex;
-	
-	LOCALASSERT(Global_ModulePtr != 0);
-	
-	ScenePtr = Global_ModulePtr[Global_Scene];
-	ModuleListPointer = ScenePtr->sm_marray;
-
-	logFile = fopen("D:/PATRICK/MODADJ.TXT","w");
-
-	if(logFile)
-	{
-	
-		LOCALASSERT(ModuleArraySize);
-		
-		for(i = 0; i < ModuleArraySize; i++)
-		{
-			ThisModulePtr = ModuleListPointer[i]; 
-			LOCALASSERT(ThisModulePtr);
-		
-			/* get it's index */
-			ThisModuleIndex = ThisModulePtr->m_index;
-				
-			LOCALASSERT(ThisModuleIndex >= 0);
-			LOCALASSERT(ThisModuleIndex < ModuleArraySize);
-		
-			fprintf(logFile, "Module %d Adjoing modules: ", ThisModuleIndex);
-
-			/* get a pointer to the list of physically adjacent modules
-			and traverse them */
-			AdjModuleRefPtr = ThisModulePtr->m_link_ptrs;
-			if(AdjModuleRefPtr == 0)
-			{
-				fprintf(logFile, " None/n");
-			}
-			else
-			{
-				while(AdjModuleRefPtr->mref_ptr != 0)
-				{
-					/* get the index */
-					AdjModuleIndex = (AdjModuleRefPtr->mref_ptr)->m_index;
-
-					fprintf(logFile, " %d,", AdjModuleIndex);
-
-					/* next adjacent module reference pointer */
-					AdjModuleRefPtr++;
-				}
-
-				fprintf(logFile, "\n");
-			}
-
-		}
-
-		fclose(logFile);
-	
-	
-	}
-
-	/* also, initialise pheromone value file */
-
-	logFile = fopen("D:/PATRICK/MODPPHER.TXT","w");
-	
-	if(logFile) 
-	{
-		fprintf(logFile, "PLAYER PHEROMONE VALUES \n");
-		fclose(logFile);
-	}
-
-
-}
-	
-
-/* Log the player pheromone values */
-static void LogPlayerPherValues(void)
-{
-	FILE *logFile;
-	int i;
-
-	logFile = fopen("D:/PATRICK/MODPPHER.TXT","a");
-	if (!logFile) return;
-
-	fprintf(logFile, "\n ***************************** \n");
-
-	for(i=0;i<AIModuleArraySize;i++) 
-	{
-		if(i%7 == 0) fprintf(logFile, "\n");
-		fprintf(logFile, "%5d", PherPl_ReadBuf[i]);	
-	}	
-
-	fclose(logFile);
-}
-	
-#endif

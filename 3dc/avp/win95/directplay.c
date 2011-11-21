@@ -132,7 +132,6 @@ int DirectPlay_HostGame(char *playerName, char *sessionName,int species,int game
 
 			
 			/* Get TCPIP connection */
-			//if (!GetTCPIPConnection()) return 0;
 			if (!InitialiseConnection()) return 0;
 	
 			/* create session */
@@ -147,7 +146,6 @@ int DirectPlay_HostGame(char *playerName, char *sessionName,int species,int game
 				}
 				else
 				{
- //					static TCHAR sessionName[] = "AvP test session";
 					if ((DPlayCreateSession(sessionName,maxPlayers,AVP_MULTIPLAYER_VERSION,(gamestyle<<8)|level)) != DP_OK) return 0;
 				}
 			}
@@ -190,7 +188,6 @@ int DirectPlay_JoinGame(void)
 	CoCreateInstance(&CLSID_DirectPlayLobby, NULL, CLSCTX_INPROC_SERVER, &IID_IDirectPlayLobby3, (LPVOID*)&lpDPlayLobby);
 
 	/* Get TCPIP connection */
-//	if (!GetTCPIPConnection()) return 0;
 	if (!InitialiseConnection()) return 0;
 	
 
@@ -301,59 +298,7 @@ int DirectPlay_InitLobbiedGame()
 }
 
 
-#if 0
-int DirectPlay_ConnectToLobbiedGame(char *playerName)
-{
-	extern unsigned char DebouncedKeyboardInput[];
-	
-	InitAVPNetGameForJoin();
 
-	/*
-	Wait until there is at least one player in the game (this will be the host).
-	This way we can avoid joining until the host is ready
-	*/
-	while(!DirectPlay_CountPlayersInCurrentSession())
-	{
-		//see if the player has got bored of waiting
-		CheckForWindowsMessages();
-		ReadUserInput();
-		if(DebouncedKeyboardInput[KEY_ESCAPE])
-		{
-			//abort attempt to join game
-			AvP.Network = I_No_Network;	
-			return 0;
-		}
-	}
-	
-	
-	//create our player
-	if(!DirectPlay_CreatePlayer(playerName,playerName))
-	{
-		LOGDXFMT(("Failed to create player"));	
-		
-		return 0;
-	}
-		
-	//wait for the game description from the host
-	while(netGameData.needGameDescription)
-	{
-		MinimalNetCollectMessages();
-		
-		//see if the player has got bored of waiting
-		CheckForWindowsMessages();
-		ReadUserInput();
-		if(DebouncedKeyboardInput[KEY_ESCAPE])
-		{
-			//abort attempt to join game
-			IDirectPlayX_DestroyPlayer(glpDP, AVPDPNetID);
-			AVPDPNetID = NULL;
-			AvP.Network = I_No_Network;	
-			return 0;
-		}
-	}
-	return 1;
-}
-#else
 int DirectPlay_ConnectingToLobbiedGame(char* playerName)
 {
 	extern unsigned char DebouncedKeyboardInput[];
@@ -441,7 +386,7 @@ int DirectPlay_ConnectingToLobbiedGame(char* playerName)
 	return 1;
 }
 
-#endif
+
 
 int DirectPlay_Disconnect(void)
 {
@@ -793,50 +738,6 @@ static BOOL DirectPlay_CreatePlayer(char* FormalName,char* FriendlyName)
 }
 
 
-
-
-#if 0
-void DirectPlay_ExitLobbiedGame()
-{
-	HRESULT hres = IDirectPlayX_DestroyPlayer(glpDP, AVPDPNetID);
-
-	if(AvP.Network == I_Host)
-	{
-		int i;
-		int numPlayersLeft=0;
-		for(i=0;i<NET_MAXPLAYERS;i++)
-		{
-			if(netGameData.playerData[i].playerId)
-			{
-				extern LPDIRECTPLAYLOBBY3 lpDPlayLobby;
-				HRESULT hr;
-
-				DPlayClose();
-
-				CoCreateInstance(&CLSID_DirectPlayLobby, NULL, CLSCTX_INPROC_SERVER, &IID_IDirectPlayLobby3A, (LPVOID*)&lpDPlayLobby);
-			    hr = IDirectPlayLobby_ConnectEx(lpDPlayLobby,0,&IID_IDirectPlay4A, &glpDP, NULL);
-				if(hr!=DP_OK)
-				{
-					LOGDXFMT(("Connect Ex : %x",hr));	
-				}
-								
-				//now been demoted to a client
-				LobbiedGame=LobbiedGame_Client;
-
-//				DirectPlay_Disconnect();
-//				DirectPlay_InitLobbiedGame();
-			
-//				DPlayCreate(NULL);
-				
-			
-				break;
-			}
-		}
-
-	}
-	AVPDPNetID = NULL;
-}
-#endif
 
 
 BOOL DirectPlay_UpdateSessionList(int * SelectedItem)

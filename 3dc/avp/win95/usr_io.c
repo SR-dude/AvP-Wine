@@ -60,7 +60,7 @@ PLAYER_INPUT_CONFIGURATION AlienInputPrimaryConfig;
 PLAYER_INPUT_CONFIGURATION AlienInputSecondaryConfig;
 
 
-#if 1 // English
+// English
 PLAYER_INPUT_CONFIGURATION DefaultMarineInputPrimaryConfig =
 {
 	KEY_UP,				// Forward;
@@ -170,447 +170,7 @@ PLAYER_INPUT_CONFIGURATION DefaultAlienInputPrimaryConfig =
 	KEY_F12,
 	KEY_TAB,
 };
-#elif 0	// Dutch
-PLAYER_INPUT_CONFIGURATION DefaultMarineInputPrimaryConfig =
-{
-	KEY_UP,				// Forward;
-	KEY_DOWN,			// Backward;
-	KEY_NUMPAD4, 		// Left;
-	KEY_NUMPAD6, 		// Right;
 
-	KEY_RIGHTALT,		// Strafe;
-	KEY_LEFT,	 		// StrafeLeft;
-	KEY_RIGHT,	 		// StrafeRight;
-
-	KEY_Q, 				// LookUp;
-	KEY_Z, 				// LookDown;
-	KEY_A,				// CentreView;
-
-	KEY_LEFTSHIFT,		// Walk;
-	KEY_RIGHTCTRL, 		// Crouch;
-	KEY_RIGHTSHIFT,		// Jump;
-
-	KEY_SPACE,			// Operate;
-
-	KEY_LMOUSE, 		// FirePrimaryWeapon;
-	KEY_RMOUSE, 		// FireSecondaryWeapon;
-
-	KEY_ASTERISK,		// NextWeapon;
-	KEY_DIACRITIC_UMLAUT,// PreviousWeapon;
-	KEY_BACKSPACE,		// FlashbackWeapon;
-
-	KEY_MINUS,	  		// ImageIntensifier;
-	KEY_FSTOP,    		// ThrowFlare;
-	KEY_DIACRITIC_ACUTE,	  	// Jetpack;
-	KEY_PLUS,		// Taunt
-	KEY_F1,
-	KEY_F11,
-	KEY_F12,
-	KEY_TAB,
-};
-PLAYER_INPUT_CONFIGURATION DefaultPredatorInputPrimaryConfig =
-{
-	KEY_UP,				// Forward;
-	KEY_DOWN,			// Backward;
-	KEY_NUMPAD4, 		// Left;
-	KEY_NUMPAD6, 		// Right;
-
-	KEY_RIGHTALT,		// Strafe;
-	KEY_LEFT,	 		// StrafeLeft;
-	KEY_RIGHT,	 		// StrafeRight;
-
-	KEY_Q, 				// LookUp;
-	KEY_Z, 				// LookDown;
-	KEY_A,				// CentreView;
-
-	KEY_LEFTSHIFT,		// Walk;
-	KEY_RIGHTCTRL, 		// Crouch;
-	KEY_RIGHTSHIFT,		// Jump;
-
-	KEY_SPACE,			// Operate;
-
-	KEY_LMOUSE, 		// FirePrimaryWeapon;
-	KEY_RMOUSE, 		// FireSecondaryWeapon;
-	
-	KEY_ASTERISK,		// NextWeapon;
-	KEY_DIACRITIC_UMLAUT,// PreviousWeapon;
-	KEY_BACKSPACE,		// FlashbackWeapon;
-	
-	KEY_FSTOP,	 		// Cloak;
-	KEY_MINUS,	 		// CycleVisionMode;
-	KEY_PAGEUP,			// ZoomIn;
-	KEY_PAGEDOWN,		// ZoomOut;
-	KEY_DIACRITIC_ACUTE,	  	// GrapplingHook
-	KEY_COMMA,			// RecallDisk
-	KEY_PLUS,		// Taunt
-	KEY_F1,
-	KEY_F11,
-	KEY_F12,
-	KEY_TAB,
-};
-
-PLAYER_INPUT_CONFIGURATION DefaultAlienInputPrimaryConfig =
-{
-	KEY_UP,				// Forward;
-	KEY_DOWN,			// Backward;
-	KEY_NUMPAD4, 		// Left;
-	KEY_NUMPAD6, 		// Right;
-
-	KEY_RIGHTALT,		// Strafe;
-	KEY_LEFT,	 		// StrafeLeft;
-	KEY_RIGHT,	 		// StrafeRight;
-
-	KEY_Q, 				// LookUp;
-	KEY_Z, 				// LookDown;
-	KEY_A,				// CentreView;
-
-	KEY_LEFTSHIFT,		// Walk;
-	KEY_RIGHTCTRL, 		// Crouch;
-	KEY_RIGHTSHIFT,		// Jump;
-
-	KEY_SPACE,			// Operate;
-
-	KEY_LMOUSE, 		// FirePrimaryWeapon;
-	KEY_RMOUSE, 		// FireSecondaryWeapon;
-
-	KEY_MINUS,			// AlternateVision;
-	KEY_FSTOP,				// Taunt;
-	KEY_F1,
-	KEY_F11,
-	KEY_F12,
-	KEY_TAB,
-};
-#elif 0	// French
-PLAYER_INPUT_CONFIGURATION DefaultMarineInputPrimaryConfig =
-{
-	KEY_UP,				// Forward;
-	KEY_DOWN,			// Backward;
-	KEY_NUMPAD4, 		// Left;
-	KEY_NUMPAD6, 		// Right;
-
-	KEY_RIGHTALT,		// Strafe;
-	KEY_LEFT,	 		// StrafeLeft;
-	KEY_RIGHT,	 		// StrafeRight;
-
-	KEY_A, 				// LookUp;
-	KEY_W, 				// LookDown;
-	KEY_Q,				// CentreView;
-
-	KEY_LEFTSHIFT,		// Walk;
-	KEY_RIGHTCTRL, 		// Crouch;
-	KEY_RIGHTSHIFT,		// Jump;
-
-	KEY_SPACE,			// Operate;
-
-	KEY_LMOUSE, 		// FirePrimaryWeapon;
-	KEY_RMOUSE, 		// FireSecondaryWeapon;
-
-	KEY_DOLLAR,  		// NextWeapon;
-	KEY_DIACRITIC_CARET,  		// PreviousWeapon;
-	KEY_BACKSPACE,		// FlashbackWeapon;
-
-	KEY_EXCLAMATION,	  		// ImageIntensifier;
-	KEY_COLON,    		// ThrowFlare;
-	KEY_U_GRAVE,	  	// Jetpack;
-	KEY_M,		// Taunt
-	KEY_F1,
-	KEY_F11,
-	KEY_F12,
-	KEY_TAB,
-};
-PLAYER_INPUT_CONFIGURATION DefaultPredatorInputPrimaryConfig =
-{
-	KEY_UP,				// Forward;
-	KEY_DOWN,			// Backward;
-	KEY_NUMPAD4, 		// Left;
-	KEY_NUMPAD6, 		// Right;
-
-	KEY_RIGHTALT,		// Strafe;
-	KEY_LEFT,	 		// StrafeLeft;
-	KEY_RIGHT,	 		// StrafeRight;
-
-	KEY_A, 				// LookUp;
-	KEY_W, 				// LookDown;
-	KEY_Q,				// CentreView;
-
-	KEY_LEFTSHIFT,		// Walk;
-	KEY_RIGHTCTRL, 		// Crouch;
-	KEY_RIGHTSHIFT,		// Jump;
-
-	KEY_SPACE,			// Operate;
-
-	KEY_LMOUSE, 		// FirePrimaryWeapon;
-	KEY_RMOUSE, 		// FireSecondaryWeapon;
-	
-	KEY_DOLLAR,		// NextWeapon;
-	KEY_DIACRITIC_CARET, 			// PreviousWeapon;
-	KEY_BACKSPACE,		// FlashbackWeapon;
-	
-	KEY_COLON,	 		// Cloak;
-	KEY_EXCLAMATION,	 		// CycleVisionMode;
-	KEY_PAGEUP,			// ZoomIn;
-	KEY_PAGEDOWN,		// ZoomOut;
-	KEY_U_GRAVE,	  	// GrapplingHook
-	KEY_SEMICOLON,			// RecallDisk
-	KEY_M,		// Taunt
-	KEY_F1,
-	KEY_F11,
-	KEY_F12,
-	KEY_TAB,
-};
-
-PLAYER_INPUT_CONFIGURATION DefaultAlienInputPrimaryConfig =
-{
-	KEY_UP,				// Forward;
-	KEY_DOWN,			// Backward;
-	KEY_NUMPAD4, 		// Left;
-	KEY_NUMPAD6, 		// Right;
-
-	KEY_RIGHTALT,		// Strafe;
-	KEY_LEFT,	 		// StrafeLeft;
-	KEY_RIGHT,	 		// StrafeRight;
-
-	KEY_A, 				// LookUp;
-	KEY_W, 				// LookDown;
-	KEY_Q,				// CentreView;
-
-	KEY_LEFTSHIFT,		// Walk;
-	KEY_RIGHTCTRL, 		// Crouch;
-	KEY_RIGHTSHIFT,		// Jump;
-
-	KEY_SPACE,			// Operate;
-
-	KEY_LMOUSE, 		// FirePrimaryWeapon;
-	KEY_RMOUSE, 		// FireSecondaryWeapon;
-
-	KEY_EXCLAMATION,			// AlternateVision;
-	KEY_SEMICOLON,				// Taunt;
-	KEY_F1,
-	KEY_F11,
-	KEY_F12,
-	KEY_TAB,
-};
-#elif 0	 // German
-PLAYER_INPUT_CONFIGURATION DefaultMarineInputPrimaryConfig =
-{
-	KEY_UP,				// Forward;
-	KEY_DOWN,			// Backward;
-	KEY_NUMPAD4, 		// Left;
-	KEY_NUMPAD6, 		// Right;
-
-	KEY_RIGHTALT,		// Strafe;
-	KEY_LEFT,	 		// StrafeLeft;
-	KEY_RIGHT,	 		// StrafeRight;
-
-	KEY_Q, 				// LookUp;
-	KEY_Y, 				// LookDown;
-	KEY_A,				// CentreView;
-
-	KEY_LEFTSHIFT,		// Walk;
-	KEY_RIGHTCTRL, 		// Crouch;
-	KEY_RIGHTSHIFT,		// Jump;
-
-	KEY_SPACE,			// Operate;
-
-	KEY_LMOUSE, 		// FirePrimaryWeapon;
-	KEY_RMOUSE, 		// FireSecondaryWeapon;
-
-	KEY_PLUS,  		// NextWeapon;
-	KEY_U_UMLAUT,  		// PreviousWeapon;
-	KEY_BACKSPACE,		// FlashbackWeapon;
-
-	KEY_MINUS,	  		// ImageIntensifier;
-	KEY_FSTOP,    		// ThrowFlare;
-	KEY_A_UMLAUT,	  	// Jetpack;
-	KEY_O_UMLAUT,		// Taunt
-	KEY_F1,
-	KEY_F11,
-	KEY_F12,
-	KEY_TAB,
-};
-PLAYER_INPUT_CONFIGURATION DefaultPredatorInputPrimaryConfig =
-{
-	KEY_UP,				// Forward;
-	KEY_DOWN,			// Backward;
-	KEY_NUMPAD4, 		// Left;
-	KEY_NUMPAD6, 		// Right;
-
-	KEY_RIGHTALT,		// Strafe;
-	KEY_LEFT,	 		// StrafeLeft;
-	KEY_RIGHT,	 		// StrafeRight;
-
-	KEY_Q, 				// LookUp;
-	KEY_Y, 				// LookDown;
-	KEY_A,				// CentreView;
-
-	KEY_LEFTSHIFT,		// Walk;
-	KEY_RIGHTCTRL, 		// Crouch;
-	KEY_RIGHTSHIFT,		// Jump;
-
-	KEY_SPACE,			// Operate;
-
-	KEY_LMOUSE, 		// FirePrimaryWeapon;
-	KEY_RMOUSE, 		// FireSecondaryWeapon;
-	
-	KEY_PLUS,		// NextWeapon;
-	KEY_U_UMLAUT, 			// PreviousWeapon;
-	KEY_BACKSPACE,		// FlashbackWeapon;
-	
-	KEY_FSTOP,	 		// Cloak;
-	KEY_MINUS,	 		// CycleVisionMode;
-	KEY_PAGEUP,			// ZoomIn;
-	KEY_PAGEDOWN,		// ZoomOut;
-	KEY_A_UMLAUT,	  	// GrapplingHook
-	KEY_COMMA,			// RecallDisk
-	KEY_O_UMLAUT,		// Taunt
-	KEY_F1,
-	KEY_F11,
-	KEY_F12,
-	KEY_TAB,
-};
-
-PLAYER_INPUT_CONFIGURATION DefaultAlienInputPrimaryConfig =
-{
-	KEY_UP,				// Forward;
-	KEY_DOWN,			// Backward;
-	KEY_NUMPAD4, 		// Left;
-	KEY_NUMPAD6, 		// Right;
-
-	KEY_RIGHTALT,		// Strafe;
-	KEY_LEFT,	 		// StrafeLeft;
-	KEY_RIGHT,	 		// StrafeRight;
-
-	KEY_Q, 				// LookUp;
-	KEY_Y, 				// LookDown;
-	KEY_A,				// CentreView;
-
-	KEY_LEFTSHIFT,		// Walk;
-	KEY_RIGHTCTRL, 		// Crouch;
-	KEY_RIGHTSHIFT,		// Jump;
-
-	KEY_SPACE,			// Operate;
-
-	KEY_LMOUSE, 		// FirePrimaryWeapon;
-	KEY_RMOUSE, 		// FireSecondaryWeapon;
-
-	KEY_MINUS,			// AlternateVision;
-	KEY_FSTOP,				// Taunt;
-	KEY_F1,
-	KEY_F11,
-	KEY_F12,
-	KEY_TAB,
-};
-#elif 0	// Spanish
-PLAYER_INPUT_CONFIGURATION DefaultMarineInputPrimaryConfig =
-{
-	KEY_UP,				// Forward;
-	KEY_DOWN,			// Backward;
-	KEY_NUMPAD4, 		// Left;
-	KEY_NUMPAD6, 		// Right;
-
-	KEY_RIGHTALT,		// Strafe;
-	KEY_LEFT,	 		// StrafeLeft;
-	KEY_RIGHT,	 		// StrafeRight;
-
-	KEY_Q, 				// LookUp;
-	KEY_Z, 				// LookDown;
-	KEY_A,				// CentreView;
-
-	KEY_LEFTSHIFT,		// Walk;
-	KEY_RIGHTCTRL, 		// Crouch;
-	KEY_RIGHTSHIFT,		// Jump;
-
-	KEY_SPACE,			// Operate;
-
-	KEY_LMOUSE, 		// FirePrimaryWeapon;
-	KEY_RMOUSE, 		// FireSecondaryWeapon;
-
-	KEY_PLUS,  		// NextWeapon;
-	KEY_DIACRITIC_GRAVE,  		// PreviousWeapon;
-	KEY_BACKSPACE,		// FlashbackWeapon;
-
-	KEY_MINUS,	  		// ImageIntensifier;
-	KEY_FSTOP,    		// ThrowFlare;
-	KEY_DIACRITIC_ACUTE,	  	// Jetpack;
-	KEY_N_TILDE,		// Taunt
-	KEY_F1,
-	KEY_F11,
-	KEY_F12,
-	KEY_TAB,
-};
-PLAYER_INPUT_CONFIGURATION DefaultPredatorInputPrimaryConfig =
-{
-	KEY_UP,				// Forward;
-	KEY_DOWN,			// Backward;
-	KEY_NUMPAD4, 		// Left;
-	KEY_NUMPAD6, 		// Right;
-
-	KEY_RIGHTALT,		// Strafe;
-	KEY_LEFT,	 		// StrafeLeft;
-	KEY_RIGHT,	 		// StrafeRight;
-
-	KEY_Q, 				// LookUp;
-	KEY_Z, 				// LookDown;
-	KEY_A,				// CentreView;
-
-	KEY_LEFTSHIFT,		// Walk;
-	KEY_RIGHTCTRL, 		// Crouch;
-	KEY_RIGHTSHIFT,		// Jump;
-
-	KEY_SPACE,			// Operate;
-
-	KEY_LMOUSE, 		// FirePrimaryWeapon;
-	KEY_RMOUSE, 		// FireSecondaryWeapon;
-	
-	KEY_PLUS,		// NextWeapon;
-	KEY_DIACRITIC_GRAVE, 			// PreviousWeapon;
-	KEY_BACKSPACE,		// FlashbackWeapon;
-	
-	KEY_FSTOP,	 		// Cloak;
-	KEY_MINUS,	 		// CycleVisionMode;
-	KEY_PAGEUP,			// ZoomIn;
-	KEY_PAGEDOWN,		// ZoomOut;
-	KEY_DIACRITIC_ACUTE,	  	// GrapplingHook
-	KEY_COMMA,			// RecallDisk
-	KEY_N_TILDE,		// Taunt
-	KEY_F1,
-	KEY_F11,
-	KEY_F12,
-	KEY_TAB,
-};
-
-PLAYER_INPUT_CONFIGURATION DefaultAlienInputPrimaryConfig =
-{
-	KEY_UP,				// Forward;
-	KEY_DOWN,			// Backward;
-	KEY_NUMPAD4, 		// Left;
-	KEY_NUMPAD6, 		// Right;
-
-	KEY_RIGHTALT,		// Strafe;
-	KEY_LEFT,	 		// StrafeLeft;
-	KEY_RIGHT,	 		// StrafeRight;
-
-	KEY_Q, 				// LookUp;
-	KEY_Z, 				// LookDown;
-	KEY_A,				// CentreView;
-
-	KEY_LEFTSHIFT,		// Walk;
-	KEY_RIGHTCTRL, 		// Crouch;
-	KEY_RIGHTSHIFT,		// Jump;
-
-	KEY_SPACE,			// Operate;
-
-	KEY_LMOUSE, 		// FirePrimaryWeapon;
-	KEY_RMOUSE, 		// FireSecondaryWeapon;
-
-	KEY_MINUS,			// AlternateVision;
-	KEY_FSTOP,				// Taunt;
-	KEY_F1,
-	KEY_F11,
-	KEY_F12,
-	KEY_TAB,
-};
-#endif
 PLAYER_INPUT_CONFIGURATION DefaultMarineInputSecondaryConfig =
 {
 	KEY_VOID,			// Forward;
@@ -951,11 +511,9 @@ void ReadPlayerGameInput(STRATEGYBLOCK* sbPtr)
 				 ||DebouncedKeyboardInput[secondaryInput->ThrowFlare])
 					ThrowAFlare();
 
-				#if !(MARINE_DEMO||DEATHMATCH_DEMO)
 				if(KeyboardInput[primaryInput->Jetpack]
 				 ||KeyboardInput[secondaryInput->Jetpack])
 					playerStatusPtr->Mvt_InputRequests.Flags.Rqst_Jetpack = 1;
-				#endif
 				
 				if(KeyboardInput[primaryInput->MarineTaunt]
 				 ||KeyboardInput[secondaryInput->MarineTaunt])
@@ -992,11 +550,9 @@ void ReadPlayerGameInput(STRATEGYBLOCK* sbPtr)
 				 ||DebouncedKeyboardInput[secondaryInput->CycleVisionMode])
 					playerStatusPtr->Mvt_InputRequests.Flags.Rqst_CycleVisionMode = 1;
 
-				#if !(PREDATOR_DEMO||DEATHMATCH_DEMO)
 				if(DebouncedKeyboardInput[primaryInput->GrapplingHook]
 				 ||DebouncedKeyboardInput[secondaryInput->GrapplingHook])
 					playerStatusPtr->Mvt_InputRequests.Flags.Rqst_GrapplingHook = 1;
-				#endif
 
 				if(DebouncedKeyboardInput[primaryInput->ZoomIn]
 				 ||DebouncedKeyboardInput[secondaryInput->ZoomIn])
@@ -1070,8 +626,6 @@ void ReadPlayerGameInput(STRATEGYBLOCK* sbPtr)
 		
 		if(DebouncedKeyboardInput[FixedInputConfig.PauseGame])
 			AvP_TriggerInGameMenus();
-	//		playerStatusPtr->Mvt_InputRequests.Flags.Rqst_QuitGame = 1;
-//			playerStatusPtr->Mvt_InputRequests.Flags.Rqst_PauseGame = 1;
 
 		if(!PaintBallMode.IsOn)
 		{
@@ -1121,39 +675,20 @@ void ReadPlayerGameInput(STRATEGYBLOCK* sbPtr)
 			if(KeyboardInput[FixedInputConfig.Weapon1])
 				playerStatusPtr->Mvt_InputRequests.Flags.Rqst_WeaponNo = 1;
 			
-			#if !PREDATOR_DEMO
 		  	if(KeyboardInput[FixedInputConfig.Weapon2])
 				playerStatusPtr->Mvt_InputRequests.Flags.Rqst_WeaponNo = 2;
-			#else
-		  	if(DebouncedKeyboardInput[FixedInputConfig.Weapon2])
-				playerStatusPtr->Mvt_InputRequests.Flags.Rqst_WeaponNo = 2;
-			#endif
+
 			if(KeyboardInput[FixedInputConfig.Weapon3])
 				playerStatusPtr->Mvt_InputRequests.Flags.Rqst_WeaponNo = 3;
 			
-			#if !(MARINE_DEMO)
 			if(KeyboardInput[FixedInputConfig.Weapon4])
 				playerStatusPtr->Mvt_InputRequests.Flags.Rqst_WeaponNo = 4;
-			#else
-			if(DebouncedKeyboardInput[FixedInputConfig.Weapon4])
-				playerStatusPtr->Mvt_InputRequests.Flags.Rqst_WeaponNo = 4;
-			#endif
 			
-			#if !(PREDATOR_DEMO||MARINE_DEMO)
 			if(KeyboardInput[FixedInputConfig.Weapon5])
 				playerStatusPtr->Mvt_InputRequests.Flags.Rqst_WeaponNo = 5;
-			#else
-		  	if(DebouncedKeyboardInput[FixedInputConfig.Weapon5])
-				playerStatusPtr->Mvt_InputRequests.Flags.Rqst_WeaponNo = 5;
-			#endif
 
-			#if !(MARINE_DEMO)
 			if(KeyboardInput[FixedInputConfig.Weapon6])
 				playerStatusPtr->Mvt_InputRequests.Flags.Rqst_WeaponNo = 6;
-			#else
-			if(DebouncedKeyboardInput[FixedInputConfig.Weapon6])
-				playerStatusPtr->Mvt_InputRequests.Flags.Rqst_WeaponNo = 6;
-			#endif
 			
 			if(KeyboardInput[FixedInputConfig.Weapon7])
 				playerStatusPtr->Mvt_InputRequests.Flags.Rqst_WeaponNo = 7;
@@ -1169,7 +704,6 @@ void ReadPlayerGameInput(STRATEGYBLOCK* sbPtr)
 			
 		 
 		}
-		#if !(PREDATOR_DEMO||MARINE_DEMO||ALIEN_DEMO||DEATHMATCH_DEMO)
 		else // Cool - paintball mode				`
 		{
 			if(DebouncedKeyboardInput[primaryInput->NextWeapon]
@@ -1241,7 +775,6 @@ void ReadPlayerGameInput(STRATEGYBLOCK* sbPtr)
 			}
 			
 		}
-		#endif
 	}
 	/* end of block conditional on input focus */
 
@@ -1458,17 +991,6 @@ void ReadPlayerGameInput(STRATEGYBLOCK* sbPtr)
 			}
 		}
 
-		/* check joystick buttons */
-		#if 0 
-		if(JoystickData.dwButtons & JOY_BUTTON1)
-			playerStatusPtr->Mvt_InputRequests.Flags.Rqst_FirePrimaryWeapon = 1;
-		else if(JoystickData.dwButtons & JOY_BUTTON2)
-			playerStatusPtr->Mvt_InputRequests.Flags.Rqst_FireSecondaryWeapon = 1;
-		else if(JoystickData.dwButtons & JOY_BUTTON3)
-			playerStatusPtr->Mvt_InputRequests.Flags.Rqst_NextWeapon = 1;
-		else if(JoystickData.dwButtons & JOY_BUTTON4)
-			playerStatusPtr->Mvt_InputRequests.Flags.Rqst_PreviousWeapon = 1;
-		#endif
 
 		/* Point Of View Hat */
 		if (JoystickData.dwPOV<36000)
@@ -1576,7 +1098,6 @@ void ReadPlayerGameInput(STRATEGYBLOCK* sbPtr)
 
 		}
 					   
-		#if 1
 		textprint("%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n",
 			JoystickData.dwXpos,
 			JoystickData.dwYpos,
@@ -1586,132 +1107,12 @@ void ReadPlayerGameInput(STRATEGYBLOCK* sbPtr)
 			JoystickData.dwVpos,
 			JoystickData.dwButtons,
 			JoystickData.dwPOV);
-		#endif
 	}
 
-	/* KJL 16:03:06 05/11/97 - Handle map options */
-	#if 0
-	if(KeyboardInput[KEY_NUMPADADD])
-		HUDMapOn();
-	else if(KeyboardInput[KEY_NUMPADSUB])
-		HUDMapOff();
-	if(KeyboardInput[KEY_NUMPAD7])
-		HUDMapZoomIn();
-	else if(KeyboardInput[KEY_NUMPAD9])
-		HUDMapZoomOut();
-	if(KeyboardInput[KEY_NUMPAD1])
-		HUDMapSmaller();
-	else if(KeyboardInput[KEY_NUMPAD3])
-		HUDMapLarger();
-	if(KeyboardInput[KEY_NUMPAD4])
-		HUDMapLeft();
-	else if(KeyboardInput[KEY_NUMPAD6])
-		HUDMapRight();
-	if(KeyboardInput[KEY_NUMPAD8])
-		HUDMapUp();
-	else if(KeyboardInput[KEY_NUMPAD2])
-		HUDMapDown();
-	#endif
-		
-	/* KJL 10:55:22 10/9/97 - HUD transparency */
-	#if 0
-	{
-		extern signed int HUDTranslucencyLevel;
-
-		if (KeyboardInput[KEY_F1])
-		{
-			HUDTranslucencyLevel-=NormalFrameTime>>9;
-			if (HUDTranslucencyLevel<0) HUDTranslucencyLevel=0;
-		}
-		else if (KeyboardInput[KEY_F2])
-		{
-			HUDTranslucencyLevel+=NormalFrameTime>>9;
-			if (HUDTranslucencyLevel>255) HUDTranslucencyLevel=255;
-		}
-	}
-	#endif
-	/* KJL 10:55:32 10/9/97 - screen size */
-	#if 0
-	if(KeyboardInput[KEY_F3])
-		MakeViewingWindowLarger();
-	else if(KeyboardInput[KEY_F4])
-		MakeViewingWindowSmaller();
-	#endif
-	#if 0
-	if (DebouncedKeyboardInput[KEY_F3])
-	{
-		MessageHistory_DisplayPrevious();
-	}
-	#endif
 	if (DebouncedKeyboardInput[KEY_GRAVE]) IOFOCUS_Toggle();
 }
 
-void LoadKeyConfiguration(void)
-{
-	#if ALIEN_DEMO
-	LoadAKeyConfiguration("alienavpkey.cfg");
-	#else
-	LoadAKeyConfiguration("avpkey.cfg");
-	#endif
 
-}
-
-void SaveKeyConfiguration(void)
-{
-	#if ALIEN_DEMO
-	SaveAKeyConfiguration("alienavpkey.cfg");
-	#else
-	SaveAKeyConfiguration("avpkey.cfg");
-	#endif
-}
-
-void LoadAKeyConfiguration(char* Filename)
-{
-	#if 0
-	FILE* file=fopen(Filename,"rb");
-	if(!file)
-	{
-		MarineInputPrimaryConfig = DefaultMarineInputPrimaryConfig;
-		MarineInputSecondaryConfig = DefaultMarineInputSecondaryConfig;
-		PredatorInputPrimaryConfig = DefaultPredatorInputPrimaryConfig;
-		PredatorInputSecondaryConfig = DefaultPredatorInputSecondaryConfig;
-		AlienInputPrimaryConfig = DefaultAlienInputPrimaryConfig;
-		AlienInputSecondaryConfig = DefaultAlienInputSecondaryConfig;
-		return;
-	}
-	fread(&MarineInputPrimaryConfig,sizeof(PLAYER_INPUT_CONFIGURATION),1,file);
-	fread(&MarineInputSecondaryConfig,sizeof(PLAYER_INPUT_CONFIGURATION),1,file);
-	fread(&PredatorInputPrimaryConfig,sizeof(PLAYER_INPUT_CONFIGURATION),1,file);
-	fread(&PredatorInputSecondaryConfig,sizeof(PLAYER_INPUT_CONFIGURATION),1,file);
-	fread(&AlienInputPrimaryConfig,sizeof(PLAYER_INPUT_CONFIGURATION),1,file);
-	fread(&AlienInputSecondaryConfig,sizeof(PLAYER_INPUT_CONFIGURATION),1,file);
-
-	fread(&ControlMethods,sizeof(CONTROL_METHODS),1,file);
-	fread(&JoystickControlMethods,sizeof(JOYSTICK_CONTROL_METHODS),1,file);
-	
-	fclose(file);
-	#endif
-}
-
-void SaveAKeyConfiguration(char* Filename)
-{
-	#if 0
-	FILE* file=fopen(Filename,"wb");
-	if(!file) return;
-
-	fwrite(&MarineInputPrimaryConfig,sizeof(PLAYER_INPUT_CONFIGURATION),1,file);
-	fwrite(&MarineInputSecondaryConfig,sizeof(PLAYER_INPUT_CONFIGURATION),1,file);
-	fwrite(&PredatorInputPrimaryConfig,sizeof(PLAYER_INPUT_CONFIGURATION),1,file);
-	fwrite(&PredatorInputSecondaryConfig,sizeof(PLAYER_INPUT_CONFIGURATION),1,file);
-	fwrite(&AlienInputPrimaryConfig,sizeof(PLAYER_INPUT_CONFIGURATION),1,file);
-	fwrite(&AlienInputSecondaryConfig,sizeof(PLAYER_INPUT_CONFIGURATION),1,file);
-
-	fwrite(&ControlMethods,sizeof(CONTROL_METHODS),1,file);
-	fwrite(&JoystickControlMethods,sizeof(JOYSTICK_CONTROL_METHODS),1,file);
-
-	fclose(file);
-	#endif
-}
 
 void SaveDefaultPrimaryConfigs(void)
 {

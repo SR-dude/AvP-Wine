@@ -10,33 +10,16 @@
 
 /* Includes ********************************************************/
 #include "3dc.h"
+#include "db.h"
+#include "dxlog.h"
+#include "tallfont.hpp"
+#include "awtexld.h"
+#include "alt_tab.h"
+#include "ffstdio.h"
 
-	#include "db.h"
-	#include "dxlog.h"
-
-	#include "tallfont.hpp"
-
-	#include "awtexld.h"
-	#include "alt_tab.h"
-
-	#include "ffstdio.h"
-	
-	#define UseLocalAssert Yes
-	#include "ourasert.h"
-
-/* Version settings ************************************************/
-	#define UseSoftwareAlphaRendering Yes
-		// an option which assumes you're in a 16-bit graphic mode...
-
-		#if UseSoftwareAlphaRendering
-			#include "inline.h"
-		#endif
-
-/* Constants *******************************************************/
-
-/* Macros **********************************************************/
-
-/* Imported function prototypes ************************************/
+#define UseLocalAssert Yes
+#include "ourasert.h"
+#include "inline.h"
 
 /* Imported data ***************************************************/
 #ifdef __cplusplus
@@ -51,31 +34,10 @@
 		extern int CloudTable[128][128];
 		extern int CloakingPhase;
 
-		#if 0
-		extern OurBool			DaveDebugOn;
-		extern FDIEXTENSIONTAG	FDIET_Dummy;
-		extern IFEXTENSIONTAG	IFET_Dummy;
-		extern FDIQUAD			FDIQuad_WholeScreen;
-		extern FDIPOS			FDIPos_Origin;
-		extern FDIPOS			FDIPos_ScreenCentre;
-		extern IFOBJECTLOCATION IFObjLoc_Origin;
-		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
-		extern IFCOLOUR			IFColour_Dummy;
- 		extern IFVECTOR			IFVec_Zero;
-		#endif
 #ifdef __cplusplus
 	};
 #endif
 
-
-
-/* Exported globals ************************************************/
-
-/* Internal type definitions ***************************************/
-
-/* Internal function prototypes ************************************/
-
-/* Internal globals ************************************************/
 
 /* Exported function definitions ***********************************/
 // class IndexedFont_Proportional_Column : public IndexedFont_Proportional
@@ -122,7 +84,6 @@ IndexedFont_Proportional_Column :: RenderChar_Unclipped
 	ProjChar ProjCh
 ) const
 {
-	#if 1
 	unsigned int theOffset;
 
 	if (ProjCh == ' ')
@@ -158,15 +119,6 @@ IndexedFont_Proportional_Column :: RenderChar_Unclipped
 
 			RECT tempnonConstRECTSoThatItCanWorkWithMicrosoft = WindowsRectForOffset[ theOffset ];
 
-			#if 0
-			DDBLTFX tempDDBltFx;
-
-			memset(&tempDDBltFx,0,sizeof(DDBLTFX));
-			tempDDBltFx . dwSize = sizeof(DDBLTFX);
-
-			tempDDBltFx . ddckSrcColorkey . dwColorSpaceLowValue = 0;
-			tempDDBltFx . ddckSrcColorkey . dwColorSpaceHighValue = 0;
-			#endif
 
 			HRESULT ddrval = lpDDSBack->Blt
 			(
@@ -175,46 +127,17 @@ IndexedFont_Proportional_Column :: RenderChar_Unclipped
 				&tempnonConstRECTSoThatItCanWorkWithMicrosoft,
 				(
 					DDBLT_WAIT
-					#if 1
 					| DDBLT_KEYSRC
-					#else
-					| DDBLT_KEYSRCOVERRIDE
-					#endif
 
-					#if 0
-					| DDBLT_ALPHADEST
-					#endif
 				),
 				NULL
 				// &tempDDBltFx // LPDDBLTFX lpDDBltFx 
 			);
 
 
-			#if 0
-				// or even:
-				ddrval = lpDDSBack->BltFast(x, y,
-						 lpDDDbgFont, &source, 
-						 DDBLTFAST_WAIT | DDBLTFAST_SRCCOLORKEY);
-			#endif
 
-			#if 0
-			if(ddrval != DD_OK)
-			{
-				ReleaseDirect3D();
-				exit(0x666009);
-			}
-			#endif
 		}
 	}
-	#else
-	textprintXY
-	(
-		R2Pos_Cursor . x,
-		R2Pos_Cursor . y,
-		"%c",
-		ProjCh
-	);
-	#endif
 }
 
 int
@@ -328,14 +251,7 @@ IndexedFont_Proportional_Column :: IndexedFont_Proportional_Column
 				pFastFileData,
 				fastFileLength,
 				(
-					#if 1
 					0
-					#else
-					AW_TLF_TRANSP
-					#endif
-					#if 0
-					| AW_TLF_CHROMAKEY
-					#endif
 				),
 				&nWidth,
 				&nHeight,
@@ -350,14 +266,7 @@ IndexedFont_Proportional_Column :: IndexedFont_Proportional_Column
 				"sfXYB",
 				Filename,
 				(
-					#if 1
 					0
-					#else
-					AW_TLF_TRANSP
-					#endif
-					#if 0
-					| AW_TLF_CHROMAKEY
-					#endif
 				),
 				&nWidth,
 				&nHeight,
@@ -394,12 +303,12 @@ IndexedFont_Proportional_Column :: IndexedFont_Proportional_Column
 		LOGDXERR(hrSetColorKey);
 	}
 	 
-#if 0
+#if 0 /* adj */
 
 typedef struct _DDCOLORKEY{ 
     DWORD dwColorSpaceLowValue; 
     DWORD dwColorSpaceHighValue; 
-} DDCOLORKEY,FAR* LPDDCOLORKEY; 
+} DDCOLORKEY,FAR* LPDDCOLORKEY;  /*adj*/
 
 	Parameters
 
@@ -450,7 +359,6 @@ IndexedFont_Proportional_Column :: UpdateWidths(void)
 
 	// Test: read the surface:
 	{
-		// LPDIRECTDRAWSURFACE image_ptr;
 
 		DDSURFACEDESC tempDDSurfaceDesc;
 
@@ -463,10 +371,6 @@ IndexedFont_Proportional_Column :: UpdateWidths(void)
 			(
 				DDLOCK_READONLY
 				| DDLOCK_SURFACEMEMORYPTR
-				#if 0
-				| DDLOCK_WAIT
-				| DDLOCK_NOSYSLOCK
-				#endif
 			), // DWORD dwFlags,
 			NULL // HANDLE hEvent
 		);
@@ -486,9 +390,6 @@ IndexedFont_Proportional_Column :: UpdateWidths(void)
 				int y = iOffset * HeightPerChar_Val;
 				int x = ( R2Size_OverallImage . w - 1);
 
-				#if 0
-				db_logf1(("Character offset %i",iOffset));
-				#endif
 
 				while (x>0)
 				{
@@ -548,18 +449,11 @@ IndexedFont_Proportional_Column :: bAnyNonTransparentPixelsInColumn
 
 	int BytesPerRow =
 	(
-		#if 0
-		(BytesPerPixel * lpDDSurfaceDesc -> dwWidth)
-		+
-		#endif
 		lpDDSurfaceDesc -> lPitch
 	);
 
 	int y = R2Pos_TopOfColumn . y;
 
-	#if 0
-	db_logf1(("x=%i",R2Pos_TopOfColumn . x));
-	#endif
 
 	while ( y < R2Pos_TopOfColumn . y + HeightOfColumn )
 	{
@@ -579,42 +473,17 @@ IndexedFont_Proportional_Column :: bAnyNonTransparentPixelsInColumn
 		int G = Pixel & lpDDSurfaceDesc -> ddpfPixelFormat . dwGBitMask;
 		int B = Pixel & lpDDSurfaceDesc -> ddpfPixelFormat . dwBBitMask;
 
-		#if 0
-		db_logf1(("y=%i",y));
-		db_logf1(("Pixel=0x%x",Pixel));
-		db_logf1(("R=0x%x",R));
-		db_logf1(("G=0x%x",G));
-		db_logf1(("B=0x%x",B));
-		#endif
 
-		#if 1
 		if (Pixel > 0 )
 		{
 			return Yes;
 		}
-		#else
-		if
-		(
-			(R > 32)
-			||
-			(G > 32)
-			||
-			(B > 32)
-		)
-		{
-			// nasty hack to get it working...
-			return Yes;
-		}
-		#endif
 
 		y++;
 	}
 
 	return No;
 }
-
-
-
 
 
 
@@ -698,9 +567,6 @@ IndexedFont_Kerned_Column :: RenderChar_Clipped
 						for (int xCount=FullWidthForOffset[theOffset]; xCount>0;xCount--)
 						{
 							int r = CloudTable[(xCount+R2Pos_Cursor.x+CloakingPhase/64)&127][(screenY+CloakingPhase/128)&127];
-//							b += CloudTable[((xCount+R2Pos_Cursor.x)/2-CloakingPhase/96)&127][((yCount+R2Pos_Cursor.y)/4+CloakingPhase/64)&127]/4;
-//							b += CloudTable[((xCount+R2Pos_Cursor.x+10)/4-CloakingPhase/64)&127][((yCount+R2Pos_Cursor.y-50)/8+CloakingPhase/32)&127]/8;
-//							if (b>ONE_FIXED) b = ONE_FIXED;
 							r = MUL_FIXED(FixP_Alpha,r);
 							if (*fontimagePtr)
 							{
@@ -819,9 +685,6 @@ IndexedFont_Kerned_Column :: RenderChar_Unclipped
 						for (int xCount=FullWidthForOffset[theOffset]; xCount>0;xCount--)
 						{
 							int r = CloudTable[(xCount+xIndex)&127][yIndex];
-//							b += CloudTable[((xCount+R2Pos_Cursor.x)/2-CloakingPhase/96)&127][((yCount+R2Pos_Cursor.y)/4+CloakingPhase/64)&127]/4;
-//							b += CloudTable[((xCount+R2Pos_Cursor.x+10)/4-CloakingPhase/64)&127][((yCount+R2Pos_Cursor.y-50)/8+CloakingPhase/32)&127]/8;
-//							if (b>ONE_FIXED) b = ONE_FIXED;
 							r = MUL_FIXED(FixP_Alpha,r);
 							if (*fontimagePtr)
 							{
@@ -907,7 +770,6 @@ IndexedFont_Kerned_Column :: GetXInc
 ) const
 {
 	GLOBALASSERT(currentProjCh!='\0');
-		// LOCALISEME
 
 	if (currentProjCh == ' ')
 	{
@@ -1031,14 +893,7 @@ IndexedFont_Kerned_Column :: IndexedFont_Kerned_Column
 				pFastFileData,
 				fastFileLength,
 				(
-					#if 1
 					0
-					#else
-					AW_TLF_TRANSP
-					#endif
-					#if 0
-					| AW_TLF_CHROMAKEY
-					#endif
 				),
 				&nWidth,
 				&nHeight,
@@ -1053,14 +908,7 @@ IndexedFont_Kerned_Column :: IndexedFont_Kerned_Column
 				"sfXYB",
 				Filename,
 				(
-					#if 1
 					0
-					#else
-					AW_TLF_TRANSP
-					#endif
-					#if 0
-					| AW_TLF_CHROMAKEY
-					#endif
 				),
 				&nWidth,
 				&nHeight,
@@ -1098,12 +946,13 @@ IndexedFont_Kerned_Column :: IndexedFont_Kerned_Column
 		LOGDXERR(hrSetColorKey);
 	}
 	 
-#if 0
+
+#if 0 /* adj */
 
 typedef struct _DDCOLORKEY{ 
     DWORD dwColorSpaceLowValue; 
     DWORD dwColorSpaceHighValue; 
-} DDCOLORKEY,FAR* LPDDCOLORKEY; 
+} DDCOLORKEY,FAR* LPDDCOLORKEY;  /*adj*/
 
 	Parameters
 
@@ -1167,10 +1016,6 @@ IndexedFont_Kerned_Column :: UpdateWidths(void)
 			(
 				DDLOCK_READONLY
 				| DDLOCK_SURFACEMEMORYPTR
-				#if 0
-				| DDLOCK_WAIT
-				| DDLOCK_NOSYSLOCK
-				#endif
 			), // DWORD dwFlags,
 			NULL // HANDLE hEvent
 		);
@@ -1190,9 +1035,6 @@ IndexedFont_Kerned_Column :: UpdateWidths(void)
 				int y = iOffset * HeightPerChar_Val;
 				int x = ( R2Size_OverallImage . w - 1);
 
-				#if 0
-				db_logf1(("Character offset %i",iOffset));
-				#endif
 
 				while (x>0)
 				{
@@ -1248,10 +1090,6 @@ IndexedFont_Kerned_Column :: UpdateXIncs(void)
 		(
 			DDLOCK_READONLY
 			| DDLOCK_SURFACEMEMORYPTR
-			#if 0
-			| DDLOCK_WAIT
-			| DDLOCK_NOSYSLOCK
-			#endif
 		), // DWORD dwFlags,
 		NULL // HANDLE hEvent
 	);
@@ -1371,9 +1209,6 @@ IndexedFont_Kerned_Column :: UpdateXIncs(void)
 				);
 				
 				GLOBALASSERT(XInc>=0);
-				#if 0
-				GLOBALASSERT(XInc<=GetMaxWidth());
-				#endif
 
 				XIncForOffset[i][j] =XInc;
 			}		
@@ -1412,9 +1247,6 @@ IndexedFont_Kerned_Column :: bAnyNonTransparentPixelsInColumn
 
 	int y = R2Pos_TopOfColumn . y;
 
-	#if 0
-	db_logf1(("x=%i",R2Pos_TopOfColumn . x));
-	#endif
 
 	while ( y < R2Pos_TopOfColumn . y + HeightOfColumn )
 	{
@@ -1434,33 +1266,10 @@ IndexedFont_Kerned_Column :: bAnyNonTransparentPixelsInColumn
 		int G = Pixel & lpDDSurfaceDesc -> ddpfPixelFormat . dwGBitMask;
 		int B = Pixel & lpDDSurfaceDesc -> ddpfPixelFormat . dwBBitMask;
 
-		#if 0
-		db_logf1(("y=%i",y));
-		db_logf1(("Pixel=0x%x",Pixel));
-		db_logf1(("R=0x%x",R));
-		db_logf1(("G=0x%x",G));
-		db_logf1(("B=0x%x",B));
-		#endif
-
-		#if 1
 		if (Pixel > 0 )
 		{
 			return Yes;
 		}
-		#else
-		if
-		(
-			(R > 32)
-			||
-			(G > 32)
-			||
-			(B > 32)
-		)
-		{
-			// nasty hack to get it working...
-			return Yes;
-		}
-		#endif
 
 		y++;
 	}
@@ -1495,7 +1304,6 @@ IndexedFont_Kerned_Column :: CalcXInc
 	// for each row, and maintaining what is the biggest "smallest X-inc"
 	// you have so far.  This will be the return value.
 
-	#if 1
 	{
 		int Biggest_MinXInc = 0;
 		for (int Row=0;Row<GetHeight();Row++)
@@ -1517,9 +1325,6 @@ IndexedFont_Kerned_Column :: CalcXInc
 
 		return Biggest_MinXInc;
 	}
-	#else
-	return FullWidthForOffset[currentOffset];
-	#endif
 }
 
 OurBool
@@ -1534,7 +1339,6 @@ IndexedFont_Kerned_Column :: OverlapOnRow
 	GLOBALASSERT(currentOffset<NumChars);
 	GLOBALASSERT(nextOffset<NumChars);
 	
-	#if 1
 	{
 		DDSURFACEDESC tempDDSurfaceDesc;
 
@@ -1547,10 +1351,6 @@ IndexedFont_Kerned_Column :: OverlapOnRow
 			(
 				DDLOCK_READONLY
 				| DDLOCK_SURFACEMEMORYPTR
-				#if 0
-				| DDLOCK_WAIT
-				| DDLOCK_NOSYSLOCK
-				#endif
 			), // DWORD dwFlags,
 			NULL // HANDLE hEvent
 		);
@@ -1611,10 +1411,6 @@ IndexedFont_Kerned_Column :: OverlapOnRow
 			);
 		}
 	}
-	#else
-	return Yes;
-		// for now
-	#endif
 }
 
 int
@@ -1690,20 +1486,3 @@ IndexedFont_Kerned_Column :: bOpaque
 	return (Pixel != 0 );
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* Internal function definitions ***********************************/

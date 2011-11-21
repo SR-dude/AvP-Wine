@@ -192,10 +192,6 @@ void* BinarySwitchBehaveInit(void* bhdata, STRATEGYBLOCK* sbptr)
 		}
 	}
 
-#if !Saturn
-// 	GLOBALASSERT(bs_bhv->bs_dtype != binswitch_no_display);
-#endif
-
 	// fill in the rest ourselves
 
 	bs_bhv->request = 0;

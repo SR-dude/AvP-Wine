@@ -13,12 +13,9 @@
 #include "avp_menus.h"
 
 
-#if ALIEN_DEMO
-#define DIRECTORY_FOR_RIFS "alienavp_huds\\"
-#else
+// adj 
 #define DIRECTORY_FOR_RIFS "avp_huds\\"
-#endif
-#define FIRST_FREE_IMAGE_GROUP 3 // 0 for char,1 for weapon rif ,2 for env
+
 
 #if debug
 extern "C"
@@ -220,13 +217,6 @@ void LoadedNPC::Load(int progress_start,int progress_interval)
 		npc_rif = avp_load_rif_non_env(filename);
 		if (INVALID_RIFFHANDLE != npc_rif)
 		{
-			#if MaxImageGroups>1
-			for (img_group=FIRST_FREE_IMAGE_GROUP; image_groups.contains(img_group); ++img_group)
-				;
-			GLOBALASSERT(img_group<MaxImageGroups);
-			image_groups.add_entry(img_group);
-			SetCurrentImageGroup(img_group); // PROBLEM AT PRESENT, copy_rif_data changes this
-			#endif
 			Set_Progress_Bar_Position(progress_start+progress_interval/2);
 			copy_rif_data(npc_rif,CCF_IMAGEGROUPSET + CCF_LOAD_AS_HIERARCHY_IF_EXISTS,progress_start+progress_interval/2,progress_interval/2);
 			unload_rif(npc_rif); // doesnt destroy copied data
@@ -238,11 +228,6 @@ void LoadedNPC::Unload()
 {
 	if (INVALID_RIFFHANDLE != npc_rif)
 	{
-		#if MaxImageGroups>1
-		image_groups.delete_entry(img_group);
-		SetCurrentImageGroup(img_group);
-		DeallocateCurrentImages();
-		#endif
 		avp_undo_rif_load(npc_rif); // destroys copied shapes
 	}
 	npc_rif = INVALID_RIFFHANDLE;
@@ -291,7 +276,6 @@ void InitNPCs(RIFFHANDLE h)
 		Load_HNPC[i]=FALSE;
 	}
 
-	#if debug
 	if(ForceLoad_Alien)Load_HNPC[HNPC_Alien]=TRUE;
 	if(ForceLoad_Marine)Load_HNPC[HNPC_Marine]=TRUE;
 	if(ForceLoad_Predator)Load_HNPC[HNPC_Predator]=TRUE;
@@ -302,7 +286,6 @@ void InitNPCs(RIFFHANDLE h)
 	if(ForceLoad_Xenoborg)Load_HNPC[HNPC_Xenoborg]=TRUE;
 	if(ForceLoad_Pretorian)Load_HNPC[HNPC_Pretorian]=TRUE;
 	if(ForceLoad_SentryGun)Load_HNPC[HNPC_SentryGun]=TRUE;
-	#endif
 	
 	HNPC_Files DefaultGeneratorEnemy;
 	
@@ -359,15 +342,6 @@ void InitNPCs(RIFFHANDLE h)
 	}
 	
 	
-	/* KJL 16:31:03 06/05/98 - Force all characters to be loaded 
-	for testing of 'bots etc. */
-	
-	#if 0 //characters can now be loaded with command line options
-	Load_HNPC[HNPC_Alien]=TRUE;
-	Load_HNPC[HNPC_Predator]=TRUE;
-	Load_HNPC[HNPC_Marine]=TRUE;
-	Load_HNPC[HNPC_PredAlien] =TRUE;
-	#endif
 
 	Special_Objects_Chunk * soc = 0;
  	soc = (Special_Objects_Chunk *)((Chunk_With_Children*)h->envd)->lookup_single_child ("SPECLOBJ");
@@ -382,11 +356,6 @@ void InitNPCs(RIFFHANDLE h)
 		
 			if (agc->type)
 			{
-				#if 0 //forget about game mode settings for generators / badguys
-				if(AvP.PlayerType==I_Alien && (agc->flags & AVPGENFLAG_AVPGAMEMODEALIEN)||
-				   AvP.PlayerType==I_Marine && (agc->flags & AVPGENFLAG_AVPGAMEMODEMARINE)||
-				   AvP.PlayerType==I_Predator && (agc->flags & AVPGENFLAG_AVPGAMEMODEPREDATOR))
-				#endif
 				{
 					switch (agc->type)
 					{
@@ -556,7 +525,6 @@ void InitNPCs(RIFFHANDLE h)
 			}
 		}
 	}
-	#if 1
 	if(AvP.PlayerType==I_Predator || Load_HNPC[HNPC_Predator])
 	{
 		//need to load the disk hierarchy
@@ -578,7 +546,6 @@ void InitNPCs(RIFFHANDLE h)
 		}
 
 	}
-	#endif
 	
 	
 	// see what we already have, unloading what we don't need, and ensuring we don't load a npc twice

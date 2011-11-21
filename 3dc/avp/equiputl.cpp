@@ -28,35 +28,14 @@
 	extern "C"
 	{
 #endif
-		#if 0
-		extern OurBool			DaveDebugOn;
-		extern FDIEXTENSIONTAG	FDIET_Dummy;
-		extern IFEXTENSIONTAG	IFET_Dummy;
-		extern FDIQUAD			FDIQuad_WholeScreen;
-		extern FDIPOS			FDIPos_Origin;
-		extern FDIPOS			FDIPos_ScreenCentre;
-		extern IFOBJECTLOCATION IFObjLoc_Origin;
-		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
-		extern IFCOLOUR			IFColour_Dummy;
- 		extern IFVECTOR			IFVec_Zero;
-		#endif
+
+
 #ifdef __cplusplus
 	};
 #endif
 
 
 
-/* Exported globals ************************************************/
-
-/* Internal type definitions ***************************************/
-
-/* Internal function prototypes ************************************/
-
-/* Internal globals ************************************************/
-
-/* Exported function definitions ***********************************/
-
-// namespace EquipmentUtil
 
 // Functions to get the ID for the text string "ROUNDS" and "MAGAZINES"
 // Mostly returns TEXTSTRING_ROUNDS and TEXTSTRING_MAGAZINES,
@@ -89,8 +68,7 @@ enum TEXTSTRING_ID EquipmentUtil :: GetTextID_Magazines
 }
 
 
+// Mostly returns TEXTSTRING_ROUNDS and TEXTSTRING_MAGAZINES,
+// but some weapons have different strings
 
-		// Mostly returns TEXTSTRING_ROUNDS and TEXTSTRING_MAGAZINES,
-		// but some weapons have different strings
 
-/* Internal function definitions ***********************************/

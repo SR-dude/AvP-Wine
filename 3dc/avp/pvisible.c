@@ -32,18 +32,12 @@
 #include "bh_dummy.h"
 #include "bh_videoscreen.h"
 #include "bh_plift.h"
-
-#if SupportWindows95
-/* for win95 net game support */
 #include "pldghost.h"
-#endif
-
 #include "pfarlocs.h"
 
 #define UseLocalAssert Yes
 #include "ourasert.h"
 
-#define HMODEL_HACK 0
 
 /* prototypes... */
 static int WorldPointIsInModule(MODULE* thisModule, VECTORCH* thisPoint);
@@ -75,34 +69,15 @@ MODULEMAPBLOCK VisibilityDefaultObjectMap =
         I_ShapeCube, /* this is a default value */
     0,0,0,
         0,0,0,
-        #if StandardStrategyAndCollisions
-        ObFlag_Dynamic|ObFlag_NewtonMovement|ObFlag_MatMul,
-        #else
-        0,
-        #endif
         0,
         0,
-        #if StandardStrategyAndCollisions
-        StrategyI_Null,
-        0,                                                                      
-    GameCollStrat_Default,              
-        ShapeCStrat_DoubleExtentEllipsoid,      
-        0,                                                      
-        #endif
+        0,
         0,                                                      
         0,                                                      
         0,      
-        #if StandardStrategyAndCollisions                                               
-        0,                                                      
-        0,0,0,                                  
-        #endif
         0,0,0,                                  
         0,                                               
         0,                                               
-        #if StandardStrategyAndCollisions
-        0,                                               
-        0,
-        #endif                                           
         0,0,0,                                  
 };
 
@@ -343,7 +318,6 @@ void DoObjectVisibility(STRATEGYBLOCK *sbPtr)
                                 case(I_BehaviourPredatorAlien):
                                 {
                                         GLOBALASSERT(0);
-                                        //MakePAQNear(sbPtr);                                   
                                         break;          
                                 }
                                 case(I_BehaviourFaceHugger):
@@ -468,14 +442,14 @@ void DoObjectVisibility(STRATEGYBLOCK *sbPtr)
                                 }
                                 case(I_BehaviourPlatform):
                                 {
-										PLATFORMLIFT_BEHAVIOUR_BLOCK *platformliftdata = (PLATFORMLIFT_BEHAVIOUR_BLOCK *)sbPtr->SBdataptr;
-										//don't make platform lift far if it is currently moving
-										//(otherwise the lift won't be able to move)
-										if(platformliftdata->state!=PLBS_GoingUp &&
-										   platformliftdata->state!=PLBS_GoingDown)
-										{	
-											MakeObjectFar(sbPtr);
-										}
+					PLATFORMLIFT_BEHAVIOUR_BLOCK *platformliftdata = (PLATFORMLIFT_BEHAVIOUR_BLOCK *)sbPtr->SBdataptr;
+					//don't make platform lift far if it is currently moving
+					//(otherwise the lift won't be able to move)
+					if(platformliftdata->state!=PLBS_GoingUp &&
+					   platformliftdata->state!=PLBS_GoingDown)
+					{	
+						MakeObjectFar(sbPtr);
+					}
                                         break;          
                                 }                               
                                 case(I_BehaviourBinarySwitch):
@@ -510,7 +484,6 @@ void DoObjectVisibility(STRATEGYBLOCK *sbPtr)
                                 }
                                 case(I_BehaviourPredatorAlien):
                                 {
-                                        //MakePAQFar(sbPtr); 
                                         GLOBALASSERT(0);
                                         /* Should be BehaviourAlien! */
                                         break;          
@@ -532,11 +505,7 @@ void DoObjectVisibility(STRATEGYBLOCK *sbPtr)
                                 }
                                 case(I_BehaviourNetGhost):
                                 {
-                                        #if PSX
-                                                GLOBALASSERT(1==2);
-                                        #else
                                                 MakeGhostFar(sbPtr); 
-                                        #endif
                                         break;          
                                 }
                                 case(I_BehaviourTrackObject):
@@ -602,9 +571,7 @@ void MakeObjectNear(STRATEGYBLOCK *sbPtr)
         tempModule.m_lightarray = (struct lightblock *)0;
         tempModule.m_extraitemdata = (struct extraitemdata *)0;
         tempModule.m_dptr = NULL; /* this is important */
-        #if SupportWIndows95
         tempModule.name = NULL; /* this is important */
-        #endif
         AllocateModuleObject(&tempModule); 
         dPtr = tempModule.m_dptr;               
         if(dPtr==NULL) return; /* cannot create displayblock, so leave object "far" */
@@ -621,31 +588,6 @@ void MakeObjectNear(STRATEGYBLOCK *sbPtr)
         dPtr->ObWorld = dynPtr->Position;
         dPtr->ObEuler = dynPtr->OrientEuler;
         dPtr->ObMat = dynPtr->OrientMat;
-        
-        #if HMODEL_HACK
-
-        if (dPtr->ObShape==GetLoadedShapeMSL("computer")) {
-
-                extern SECTION Chest;
-                SECTION *Test_Section;
-
-                extern SECTION *GetHierarchyFromLibrary(const char *rif_name);
-                
-                Test_Section=GetHierarchyFromLibrary("hnpcalien");
-
-                //Preprocess_HModel(Test_Section);
-                Create_HModel(&DropShipHModelController,Test_Section);
-                InitHModelSequence(&DropShipHModelController,3,3,ONE_FIXED<<1);
-                dPtr->HModelControlBlock=&DropShipHModelController;
-
-
-                //dPtr->HModelControlBlock->Playing=1;
-                dPtr->HModelControlBlock->Looped=1;
-
-        }       
-        
-        #endif
-
 
 }
 
@@ -653,13 +595,6 @@ void MakeObjectFar(STRATEGYBLOCK *sbPtr)
 {
         int i;
 
-        #if HMODEL_HACK
-           
-        if (sbPtr->SBdptr->ObShape==GetLoadedShapeMSL("chest")) {
-                Dispel_HModel(&DropShipHModelController);
-        }
-
-        #endif
 
         LOCALASSERT(sbPtr->SBdptr != NULL);
 
@@ -723,7 +658,6 @@ static int EmergencyRelocateObject(STRATEGYBLOCK *sbPtr)
                 
                 AIMODULE *targetModule = 0;
                 int targetModuleDistance = 0;
-                //SCENEMODULE *ScenePtr;
                 AIMODULE *moduleListPointer;    
                 int moduleCounter;
 
@@ -731,8 +665,6 @@ static int EmergencyRelocateObject(STRATEGYBLOCK *sbPtr)
                 LOCALASSERT(Global_ModulePtr);
                 LOCALASSERT(FALLP_EntryPoints); /* NB should never get here in a net game, so the codition should be true */
 
-                //ScenePtr = Global_ModulePtr[Global_Scene];
-                //moduleListPointer = ScenePtr->sm_marray;
                 {
                         extern AIMODULE *AIModuleArray;
                         moduleListPointer = AIModuleArray;
@@ -741,7 +673,6 @@ static int EmergencyRelocateObject(STRATEGYBLOCK *sbPtr)
                 for(moduleCounter = 0; moduleCounter < AIModuleArraySize; moduleCounter++)
                 {
                         AIMODULE *thisModule = &(moduleListPointer[moduleCounter]); 
-                        //MODULE* thisModule = moduleListPointer[moduleCounter]; 
         
                         if(     (!(ModuleCurrVisArray[thisModule->m_index]))&&
                                 (FALLP_EntryPoints[thisModule->m_index].numEntryPoints != 0)
@@ -766,7 +697,6 @@ static int EmergencyRelocateObject(STRATEGYBLOCK *sbPtr)
                         //Therefore if the object has a previous containing module , use it.
                         //Otherwise get rid of it.
 
-                        //LOCALASSERT(1==0);
                         if(sbPtr->containingModule) 
                         {
         
@@ -783,12 +713,10 @@ static int EmergencyRelocateObject(STRATEGYBLOCK *sbPtr)
                 
                 EmergencyPlaceObjectInModule(sbPtr, targetModule);
                 
-                #if debug
                 if (!sbPtr->containingModule)
                 {
                         textprint("WARNING!! EmgcyPlcObInMod failed\n");
                 }
-                #endif
                 
                 
                 return sbPtr->containingModule ? 1 : 0;
@@ -1087,14 +1015,8 @@ void InitInanimateObject(void* bhdata, STRATEGYBLOCK *sbPtr)
         NB some objects are always static, and initialised using
         the static dynamics template directly
         NB2 PSX: all objects are static */
-        #if SupportWindows95
-//      if(AvP.Network==I_No_Network) inanimateDynamicsInitialiser = DYNAMICS_TEMPLATE_INANIMATE;
-//      else inanimateDynamicsInitialiser = DYNAMICS_TEMPLATE_STATIC;
         inanimateDynamicsInitialiser = DYNAMICS_TEMPLATE_INANIMATE;
-        #else
-        inanimateDynamicsInitialiser = DYNAMICS_TEMPLATE_STATIC;
-        #endif
-        
+         
         /* Initialise object's stats */
         {
                 NPC_DATA *NpcData;
@@ -1538,7 +1460,6 @@ void InanimateObjectIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int 
         INANIMATEOBJECT_STATUSBLOCK* objectstatusptr = sbPtr->SBdataptr;
         LOCALASSERT(objectstatusptr);
 
-        #if SupportWindows95
         if((AvP.Network==I_Peer)&&(!InanimateDamageFromNetHost))
         {
                 /* this means that the damage was generated locally in a net-game:
@@ -1551,7 +1472,6 @@ void InanimateObjectIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int 
                 /* if we're the host, inform everyone that the object is dead */
                 if(sbPtr->SBDamageBlock.Health <= 0) AddNetMsg_InanimateObjectDestroyed(sbPtr);
         }
-        #endif
 
 		if(sbPtr->SBflags.please_destroy_me)
 		{

@@ -11,93 +11,40 @@
 /* Includes ********************************************************/
 #include "3dc.h"
 #include "textin.hpp"
-
-	#if SupportCompletion
-		#include "conssym.hpp"
-	#endif
-
-	#if LimitedLineLength
-		#include "strutil.h"
-	#endif
-
-	#define UseLocalAssert Yes
-	#include "ourasert.h"
-
-/* Version settings ************************************************/
-
-/* Constants *******************************************************/
-
-/* Macros **********************************************************/
-
-/* Imported function prototypes ************************************/
-
-/* Imported data ***************************************************/
-#ifdef __cplusplus
-	extern "C"
-	{
-#endif
-		#if 0
-		extern OurBool			DaveDebugOn;
-		extern FDIEXTENSIONTAG	FDIET_Dummy;
-		extern IFEXTENSIONTAG	IFET_Dummy;
-		extern FDIQUAD			FDIQuad_WholeScreen;
-		extern FDIPOS			FDIPos_Origin;
-		extern FDIPOS			FDIPos_ScreenCentre;
-		extern IFOBJECTLOCATION IFObjLoc_Origin;
-		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
-		extern IFCOLOUR			IFColour_Dummy;
- 		extern IFVECTOR			IFVec_Zero;
-		#endif
-#ifdef __cplusplus
-	};
-#endif
+#include "conssym.hpp"
+#include "strutil.h"
+#define UseLocalAssert Yes
+#include "ourasert.h"
 
 
 
 /* Exported globals ************************************************/
-	/*static*/ OurBool TextInputState :: bOverwrite_Val = No;
+OurBool TextInputState :: bOverwrite_Val = No;
 
-/* Internal type definitions ***************************************/
 
-/* Internal function prototypes ************************************/
-
-/* Internal globals ************************************************/
 
 /* Exported function definitions ***********************************/
 TextInputState :: ~TextInputState()
 {
-	#if SupportHistory
 	while ( List_pSCString_History. size() > 0)
 	{
 		List_pSCString_History . first_entry() -> R_Release();
 
 		List_pSCString_History . delete_first_entry();		
 	}
-	#endif
+
 }
 
 SCString& TextInputState :: GetCurrentState(void)
 {
 	// returns a ref to a copy of the "string under construction" in its current state
 
-	#if LimitedLineLength
 	return
 	(
 		*(
 			new SCString( &ProjCh[0] )
 		)
 	);
-	#else
-	return 
-	(
-		*(
-			new SCString
-			(
-				List_ProjChar
-			)
-		)
-	);
-	#endif
 }
 
 void TextInputState :: CharTyped
@@ -109,7 +56,6 @@ void TextInputState :: CharTyped
 	// Need to spot special characters...
 	// Convert to ProjChars???
 
-	// LOCALISEME();
 
 	if ( Ch == '\r' )
 	{
@@ -118,29 +64,8 @@ void TextInputState :: CharTyped
 		return;
 	}
 
-	// Reject certain characters using <CTYPE.H>:
-	#if 0
-	if
-	(
-		( !isgraph(Ch) )
-		&&
-		( Ch != ' ' )
-	)
-	{
-		return;
-	}
 
-	// Should only be printable characters, with only SPACE accepted
-	// for marking space (i.e. no tabs, carriage returns etc.)
-
-	// Potentially convert to upper case:
-	if ( bForceUpperCase_Val )
-	{
-		Ch = toupper(Ch);
-	}
-	#endif
 	if (Ch<32) return;
-	// LOCALISEME();
 	// we assume ProjChar == char at about this point...
 
 	// It also ought not to be a null character:
@@ -158,7 +83,6 @@ void TextInputState :: CharTyped
 
 	
 	// add to list at cursor point...
-	#if LimitedLineLength
 	{
 		GLOBALASSERT( CursorPos >= 0 );
 		GLOBALASSERT( CursorPos <= NumChars );
@@ -206,99 +130,7 @@ void TextInputState :: CharTyped
 				TextEntryError();			
 			}
 		}
-		#if 0
-		if ( CursorPos == NumChars )
-		{
-			GLOBALASSERT( 0 == ProjCh[ CursorPos ] );
-
-			// insert character at the end if you can:
-			if ( NumChars < MAX_LENGTH_INPUT )
-			{
-				NumChars++;
-				ProjCh[ CursorPos++ ] = Ch;
-				ProjCh[ CursorPos ] = 0;
-			}
-			else
-			{
-				// can't insert; the line is full
-				// some kind of error beep?
-				TextEntryError();
-			}
-		}
-		else
-		{
-			GLOBALASSERT( 0 != ProjCh[ CursorPos ] );
-
-			if ( bOverwrite )
-			{
-				// overwrite character at this point in the list
-				// and move cursor to the right
-				ProjCh[ CursorPos++ ] = Ch;
-			}
-			else
-			{
-				// Try to insert the character within the string; is there space?
-				if ( NumChars < MAX_LENGTH_INPUT )
-				{
-					// Advance all to the right of the cursor, starting with the final
-					// character in the string:
-					
-					for
-					(
-						int i=NumChars;
-						i>=CursorPos;
-						i--
-					)
-					{
-						ProjCh[ i + 1 ] = ProjCh[ i ];
-					}
-
-					ProjCh[ CursorPos++ ] = Ch;
-					NumChars++;
-				}
-				else
-				{
-					// can't insert; the line is full
-					// some kind of error beep?
-					TextEntryError();
-				}
-			}
-		}
-		#endif
 	}
-	#else // LimitedLineLength
-	{
-		GLOBALASSERT( CursorPos <= List_ProjChar . size() );
-
-		if ( CursorPos ==  List_ProjChar . size() )
-		{
-			// insert character at the end
-			List_ProjChar . add_entry_end( Ch );
-
-			CursorPos++;
-		}
-		else
-		{
-			GLOBALASSERT( CursorPos < List_ProjChar . size() );
-
-			if ( bOverwrite )
-			{
-				// overwrite character at this point in the list
-				// and move cursor to the right
-			}
-			else
-			{
-				#if 0
-				// insert character inside the list
-				// and move cursor to the right
-				List_ProjChar[ CursorPos ] . 
-				
-				add_entry_end( Ch );
-				#endif
-			}
-		}
-	}
-	#endif // LimitedLineLength
 }
 
 void TextInputState :: Key_Backspace(void)
@@ -317,7 +149,6 @@ void TextInputState :: Key_Backspace(void)
 void TextInputState :: Key_End(void)
 {
 	// Put cursor to far right of input text:
-	#if LimitedLineLength
 	if (NumChars > 0)
 	{
 		CursorPos = NumChars;
@@ -327,9 +158,6 @@ void TextInputState :: Key_End(void)
 	{
 		GLOBALASSERT( CursorPos == 0);
 	}
-	#else
-	CursorPos = List_ProjChar . size();
-	#endif
 }
 void TextInputState :: Key_Home(void)
 {
@@ -347,22 +175,14 @@ void TextInputState :: Key_Left(void)
 void TextInputState :: Key_Right(void)
 {
 	// Move cursor to right, if possible:
-	#if LimitedLineLength
 	if ( CursorPos < NumChars )
 	{
 		++ CursorPos;
 
 	}
-	#else
-	if ( CursorPos < List_ProjChar . size() )
-	{
-		++ CursorPos;
-	}
-	#endif
 }
 void TextInputState :: Key_Delete(void)
 {
-	#if LimitedLineLength
 	{
 		if
 		(
@@ -379,14 +199,9 @@ void TextInputState :: Key_Delete(void)
 			TextEntryError();
 		}
 	}
-	#else
-	{
-		// empty for the moment
-	}
-	#endif
 }
 
-/*static*/ void TextInputState :: ToggleTypingMode(void)
+void TextInputState :: ToggleTypingMode(void)
 {
 	// toggles overwrite/insert mode
 	bOverwrite_Val = !bOverwrite_Val;
@@ -400,27 +215,17 @@ TextInputState :: TextInputState
 	OurBool bForceUpperCase,
 	char* pProjCh_Init
 ) :
-	#if LimitedLineLength
 	NumChars(0),
-	#else
-	List_ProjChar(),
-	#endif
-	#if SupportHistory
 	List_pSCString_History(),
 	pSCString_CurrentHistory(NULL),
-	#endif
-	#if SupportAutomation
 	ManualPos(0),
-	#endif
-	#if SupportCompletion
 	pConsoleSym_CurrentCompletion(NULL),
-	#endif
 	CursorPos(0),
 	bForceUpperCase_Val( bForceUpperCase )
 {
 	GLOBALASSERT( pProjCh_Init );
 
-	#if LimitedLineLength
+
 	{
 		STRUTIL_SC_SafeCopy
 		(
@@ -435,9 +240,7 @@ TextInputState :: TextInputState
 		NumChars = STRUTIL_SC_Strlen(&ProjCh[0]);
 		GLOBALASSERT( NumChars < MAX_LENGTH_INPUT );
 	}
-	#else
-		#error Unimplemented
-	#endif
+
 }
 
 void TextInputState :: TryToInsertAt
@@ -452,14 +255,14 @@ void TextInputState :: TryToInsertAt
 
 		GLOBALASSERT( Pos >= 0 );
 		
-		#if LimitedLineLength
+
 		GLOBALASSERT( Pos <= MAX_LENGTH_INPUT );
-		#endif
+
 	}
 
 	/* CODE */
 	{
-		#if LimitedLineLength
+
 		{
 			ProjChar* pProjCh_I = pSCString_ToInsert -> pProjCh();
 
@@ -477,11 +280,7 @@ void TextInputState :: TryToInsertAt
 				);
 			}
 		}
-		#else
-		{
-			#error Not implemented
-		}
-		#endif
+
 	}
 }
 
@@ -501,23 +300,22 @@ int TextInputState :: bOvertypeAt
 
 			GLOBALASSERT( Pos_Where >= 0 );
 			
-			#if LimitedLineLength
+
 			GLOBALASSERT( Pos_Where <= MAX_LENGTH_INPUT );
-			#endif
+
 
 		// The data-representation invariant:
-			#if LimitedLineLength
+
 			GLOBALASSERT( CursorPos >= 0 );
 			GLOBALASSERT( CursorPos <= NumChars );
 
 			GLOBALASSERT( 0 == ProjCh[ NumChars ] );
 			GLOBALASSERT( NumChars <= MAX_LENGTH_INPUT );
-			#endif
+
 	}
 
 	/* CODE */
 	{
-		#if LimitedLineLength
 		{
 			if ( Pos_Where == NumChars )
 			{
@@ -530,9 +328,7 @@ int TextInputState :: bOvertypeAt
 					ProjCh[ Pos_Where ] = ProjCh_In;
 					ProjCh[ Pos_Where+1 ] = 0;
 
-					#if SupportAutomation
 					FullyManual();
-					#endif
 
 					return Yes;
 				}
@@ -549,18 +345,12 @@ int TextInputState :: bOvertypeAt
 				// overwrite character at this point in the list
 				ProjCh[ Pos_Where ] = ProjCh_In;
 
-				#if SupportAutomation
 				FullyManual();
-				#endif
 
 				return Yes;
 			}
 		}
-		#else
-		{
-			#error Not implemented
-		}
-		#endif
+
 	}
 }
 
@@ -581,23 +371,20 @@ int TextInputState :: bInsertAt
 
 			GLOBALASSERT( Pos_Where >= 0 );
 			
-			#if LimitedLineLength
 			GLOBALASSERT( Pos_Where <= MAX_LENGTH_INPUT );
-			#endif
 
 		// The data-representation invariant:
-			#if LimitedLineLength
 			GLOBALASSERT( CursorPos >= 0 );
 			GLOBALASSERT( CursorPos <= NumChars );
 
 			GLOBALASSERT( 0 == ProjCh[ NumChars ] );
 			GLOBALASSERT( NumChars <= MAX_LENGTH_INPUT );
-			#endif
+
 	}
 
 	/* CODE */
 	{
-		#if LimitedLineLength
+
 		{
 			if ( Pos_Where == NumChars )
 			{
@@ -616,9 +403,9 @@ int TextInputState :: bInsertAt
 						CursorPos++;
 					}
 
-					#if SupportAutomation
+
 					FullyManual();
-					#endif
+
 
 					return Yes;
 				}
@@ -657,9 +444,7 @@ int TextInputState :: bInsertAt
 						CursorPos++;
 					}
 
-					#if SupportAutomation
 					FullyManual();
-					#endif
 
 					return Yes;
 				}
@@ -670,17 +455,12 @@ int TextInputState :: bInsertAt
 				}
 			}
 		}
-		#else
-		{
-			#error Not implemented
-		}
-		#endif
+
 	}
 }
 
 void TextInputState ::  DeleteAt( int Pos )
 {
-	#if LimitedLineLength
 	{
 		GLOBALASSERT( NumChars > 0 );
 		GLOBALASSERT( Pos < NumChars );
@@ -706,35 +486,24 @@ void TextInputState ::  DeleteAt( int Pos )
 			CursorPos--;
 		}		
 
-		#if SupportAutomation
+
 		FullyManual();
-		#endif
+
 
 	}
-	#else
-	{
-		#error Not implemented
-	}
-	#endif
+
 }
 
 void TextInputState :: Clear(void)
 {
-	#if LimitedLineLength
 	NumChars = 0;
 	ProjCh[0] = 0;
-	#else
-	while ( List_ProjChar . size() > 0 )
-	{
-		List_ProjChar . delete_first_entry();
-	}
-	#endif
 
 	CursorPos = 0;
 
-	#if SupportAutomation
+
 	FullyManual();
-	#endif
+
 }
 
 void TextInputState :: SetString
@@ -767,7 +536,7 @@ void TextInputState :: SetString
 	CursorPos = NumChars;
 }
 
-#if SupportHistory
+
 void TextInputState :: History_SelectNxt(void)
 {
 	textprint("TextInputState :: History_SelectNxt()\n");
@@ -806,7 +575,7 @@ void TextInputState :: History_SelectPrv(void)
 {
 	textprint("TextInputState :: History_SelectPrv()\n");
 
-#if 1
+
 	if ( List_pSCString_History . size() > 0)
 	{
 		// Iterate through until we find the next match of all the manually typed
@@ -835,43 +604,7 @@ void TextInputState :: History_SelectPrv(void)
 
 		TextEntryError();
 	}
-#else
-	if ( List_pSCString_History . size() > 0)
-	{
-		// Are we already cycling through the list of history:
-		if ( pSCString_CurrentHistory )
-		{
-			if
-			(
-				pSCString_CurrentHistory == List_pSCString_History . first_entry()
-			)
-			{
-				pSCString_CurrentHistory = List_pSCString_History . last_entry();
-			}
-			else
-			{
-				pSCString_CurrentHistory = List_pSCString_History . prev_entry( pSCString_CurrentHistory );
-			}
-		}
-		else
-		{
-			pSCString_CurrentHistory = List_pSCString_History . last_entry();
-		}
 
-		// Set to the chosen historic string:
-		SetString
-		(
-			*pSCString_CurrentHistory // SCString& SCString_ToUse
-		);
-	}
-	else
-	{
-		// No history available:
-		GLOBALASSERT( NULL == pSCString_CurrentHistory );
-
-		TextEntryError();
-	}
-#endif
 
 }
 
@@ -898,20 +631,19 @@ void TextInputState :: AddToHistory
 
 	pSCString_CurrentHistory = NULL;
 }
-#endif
 
-#if SupportAutomation
+
+
 void TextInputState :: FullyManual(void)
 {
 	ManualPos = NumChars;
 
-	#if SupportHistory
-	pSCString_CurrentHistory = NULL;
-	#endif
 
-	#if SupportCompletion
+	pSCString_CurrentHistory = NULL;
+
+
 	pConsoleSym_CurrentCompletion = NULL;
-	#endif
+
 }
 OurBool TextInputState :: bManualMatch
 (
@@ -1028,14 +760,12 @@ OurBool TextInputState :: bManualMatchInsensitive
 
 }
 
-#endif
 
-#if SupportCompletion
+
+
 void TextInputState :: Completion_SelectNxt(void)
 {
-	#if 1
 	textprint("TextInputState :: Completion_SelectNxt()\n");
-	#endif
 
 	ConsoleSymbol* pConsoleSym_Completion_New = GetNxtMatchingCompletion();
 
@@ -1056,9 +786,7 @@ void TextInputState :: Completion_SelectNxt(void)
 }
 void TextInputState :: Completion_SelectPrv(void)
 {
-	#if 1
 	textprint("TextInputState :: Completion_SelectPrv()\n");
-	#endif
 
 	ConsoleSymbol* pConsoleSym_Completion_New = GetPrvMatchingCompletion();
 
@@ -1078,10 +806,10 @@ void TextInputState :: Completion_SelectPrv(void)
 	}
 
 }
-#endif
 
 
-#if SupportHistory
+
+
 // private:
 SCString* TextInputState :: GetNxtMatchingHistory(void) const
 {
@@ -1230,9 +958,8 @@ SCString* TextInputState :: GetPrvMatchingHistory(void) const
 
 	return pSCString_Return;
 }
-#endif
 
-#if SupportCompletion
+
 // private:
 ConsoleSymbol* TextInputState :: GetNxtMatchingCompletion(void) const
 {
@@ -1323,32 +1050,7 @@ ConsoleSymbol* TextInputState :: GetPrvMatchingCompletion(void) const
 		// don't implement until you do a full rewrite with templates for circular
 		// iteration through lists...
 }
-#endif
 
 
-/* Internal function definitions ***********************************/
-#if 0
-
-		while (1)
-		{
-			// Check for match:
-			if
-			(
-				bManualMatch
-				(
-					pSCString_I -> pProjCh()
-				)
-			)
-			{
-				// acceptable
-				break;
-			}
-			else
-			{	// not acceptable; try next
-			}
-
-			// Find next:
-		}
 
 
-#endif

@@ -12,47 +12,10 @@
 /* Includes ********************************************************/
 #include "3dc.h"
 #include "trig666.hpp"
-	
-	#define UseLocalAssert Yes
-	#include "ourasert.h"
-
-/* Version settings ************************************************/
-
-/* Constants *******************************************************/
-
-/* Macros **********************************************************/
-
-/* Imported function prototypes ************************************/
-
-/* Imported data ***************************************************/
-#ifdef __cplusplus
-	extern "C"
-	{
-#endif
-		#if 0
-		extern OurBool			DaveDebugOn;
-		extern FDIEXTENSIONTAG	FDIET_Dummy;
-		extern IFEXTENSIONTAG	IFET_Dummy;
-		extern FDIQUAD			FDIQuad_WholeScreen;
-		extern FDIPOS			FDIPos_Origin;
-		extern IFOBJECTLOCATION IFObjLoc_Origin;
-		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
-		extern IFCOLOUR			IFColour_Dummy;
- 		extern IFVECTOR			IFVec_Zero;
-		#endif
-#ifdef __cplusplus
-	};
-#endif
+#define UseLocalAssert Yes
+#include "ourasert.h"
 
 
-
-/* Exported globals ************************************************/
-
-/* Internal type definitions ***************************************/
-
-/* Internal function prototypes ************************************/
-
-/* Internal globals ************************************************/
 
 /* Exported function definitions ***********************************/
 // class TriggerDaemon : public Daemon
@@ -147,14 +110,6 @@ CountdownDaemon :: ~CountdownDaemon()
 
 ACTIVITY_RETURN_TYPE CountdownDaemon :: Activity(ACTIVITY_INPUT)
 {
-	#if 0
-	textprint
-	(
-		"CountdownDaemon :: Activity(%i) with fuse %i\n",
-		 FixP_Time,
-		 FixP_TimeRemaining
-	);
-	#endif
 
 	if ( FixP_TimeRemaining > FixP_Time )
 	{
@@ -179,4 +134,4 @@ void CountdownDaemon :: SetFuse_FixP
 	FixP_TimeRemaining = FixP_Fuse;
 }
 
-/* Internal function definitions ***********************************/
+

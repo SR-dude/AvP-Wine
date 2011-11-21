@@ -82,7 +82,6 @@ void FanBehaveFun(STRATEGYBLOCK* sbptr)
 	GLOBALASSERT((f_bhv->bhvr_type == I_BehaviourFan));
 	GLOBALASSERT(f_bhv->track);
 
-//	textprint("I am a fan\n");
 	if(f_bhv->state==fan_state_go)
 	{
 		if(f_bhv->speed_mult==0)

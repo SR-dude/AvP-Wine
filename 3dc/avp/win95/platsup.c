@@ -1,9 +1,3 @@
-/*
-
-  Platform specific project specific C functions
-
-*/
-
 #include "3dc.h"
 #include "module.h"
 #include "inline.h"
@@ -16,34 +10,23 @@
 #define UseLocalAssert No
 #include "ourasert.h"
 
-/*
-	Externs from pc\io.c
-*/
-
+/* Externs from pc\io.c */
 extern int InputMode;
 extern unsigned char KeyboardInput[];
-
 extern SCREENDESCRIPTORBLOCK ScreenDescriptorBlock;
 extern void (*SetVideoMode[]) (void);
 extern unsigned char *ScreenBuffer;
-
 extern  unsigned char KeyASCII;
-
-
-/* External functions */
 
 extern void D3D_Line(VECTOR2D* LineStart, VECTOR2D* LineEnd, int LineColour);
 extern void Draw_Line_VMType_8(VECTOR2D* LineStart, VECTOR2D* LineEnd, int LineColour);
 
-// Prototypes
+
 
 int IDemandFireWeapon(void);
-
 int IDemandNextWeapon(void);
 int IDemandPreviousWeapon(void);
 
-
-// Functions
 
 
 
@@ -72,15 +55,10 @@ void catpathandextension(char* dst, char* src)
 
 
 /* game platform definition of the Mouse Mode*/
-
 int MouseMode = MouseVelocityMode;
 
-/*
 
-  Real PC control functions
-
-*/
-#if 1
+/*   Real PC control functions */
 int IDemandLookUp(void)
 {
 	return No;
@@ -234,7 +212,6 @@ int IDemandNextWeapon(void)
    	if(KeyboardInput[KEY_2]) return Yes;
     else return No;
 }
-#endif
 
 
 int IDemandChangeEnvironment()
@@ -254,110 +231,6 @@ int IDemandChangeEnvironment()
 	else
 		return(-1);
 }
-
-
-
-
-
-
-#if 0
-/*KJL***************************************
-*           HUD MAP DISPLAY CODE           *
-***************************************KJL*/
-#include "hud_map.h"
-static unsigned int GreyColour;
-static unsigned int WhiteColour;
-static unsigned int RedColour;
-extern int ScanDrawMode;
-extern int NumVertices;
-extern int ZBufferMode;
-
-void PlatformSpecificInitHUDMap(void)
-{
-	if (ScanDrawMode != ScanDrawDirectDraw)
-	{
-		GreyColour = /*GetSingleColourForPrimary(*/0x007f7f7f/*)*/;
-		WhiteColour = /*GetSingleColourForPrimary(*/0x00ffffff/*)*/;
-		RedColour =  /*GetSingleColourForPrimary(*/0x007f0000/*)*/;
-	}
-	else
-	{
-		extern unsigned char TestPalette[];
-		GreyColour = NearestColour(31,31,31, TestPalette);
-		WhiteColour = NearestColour(63,63,63, TestPalette);
-		RedColour = NearestColour(63,0,0, TestPalette);
-	}
-}
-void DrawHUDMapLine(VECTOR2D *vertex1, VECTOR2D *vertex2, enum MAP_COLOUR_ID colourID)
-{
-	unsigned int colourIndex;
-	switch(colourID)
-	{
-		default:
-		case MAP_COLOUR_WHITE:
-		{
-			colourIndex = WhiteColour;
-			break;
-		}	
-		
-		case MAP_COLOUR_GREY:
-		{
-			colourIndex = GreyColour;
-			break;
-		}	
-		
-		case MAP_COLOUR_RED:
-		{
-			colourIndex = RedColour;
-			break;
-		}	
-
-	}
-
-	if (ScanDrawMode != ScanDrawDirectDraw)
-	{
-		if (ZBufferOn!=ZBufferMode)
-		{
-			DirectWriteD3DLine(vertex1,vertex2,colourIndex);
-			/* 
-			The offset by 24 is a bodge until Microsoft work out 
-			what the fuck's going on...
-			*/ /* Neal's comment, not mine... :)  KJL */
-			if ((ScanDrawMode != ScanDrawDirectDraw) && (NumVertices > (MaxD3DVertices-24))) 
-			{
-				WriteEndCodeToExecuteBuffer();
-				UnlockExecuteBufferAndPrepareForUse();
-				ExecuteBuffer();
-				LockExecuteBuffer();
-			}
-		}
-		else D3D_Line(vertex1,vertex2,colourIndex);
-
-	}
-	else
-	{
-	  	Draw_Line_VMType_8(vertex1,vertex2,colourIndex);
-  	}
-}
-
-
-void PlatformSpecificEnteringHUDMap(void)
-{
-	/* this is here to make sure that the right colours
-	   are chosen from the palette */
-	PlatformSpecificInitHUDMap(); 
-}
-
-void PlatformSpecificExitingHUDMap(void)
-{
-}
-
-/*KJL***************************************
-*           HUD MAP DISPLAY CODE           *
-***************************************KJL*/
-#endif
-
-
 
 
 /* KJL 15:53:52 05/04/97 - 

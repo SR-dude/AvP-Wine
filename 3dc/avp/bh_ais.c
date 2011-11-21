@@ -260,7 +260,6 @@ void NPC_IsObstructed(STRATEGYBLOCK *sbPtr, NPC_MOVEMENTDATA *moveData, NPC_OBST
                         normalDotWithVelocity = DotProduct(&(nextReport->ObstacleNormal),&(normVelocity));
                 }
 
-//              if((normalDotWithVelocity < -46341)&&(!IsCharacterOrPlayer))
                 /* So aliens can break through windows, 19/5/98 CDF */
                 if((!IsCharacterOrPlayer)&&((normalDotWithVelocity < -46341)||(nextReport->ObstacleSBPtr)))
                 {
@@ -298,32 +297,7 @@ void NPC_IsObstructed(STRATEGYBLOCK *sbPtr, NPC_MOVEMENTDATA *moveData, NPC_OBST
         /* no obstructions this frame, then ... */
         moveData->numObstructiveCollisions = 0;  
 }
-
-#if 0
-int NPCIsExperiencingObstructiveCollision(STRATEGYBLOCK *sbPtr, VECTORCH *velocityDirection)
-{
-        DYNAMICSBLOCK *dynPtr;
-        struct collisionreport *nextReport;
-
-        LOCALASSERT(sbPtr);
-        dynPtr = sbPtr->DynPtr;
-        LOCALASSERT(dynPtr);
-        nextReport = dynPtr->CollisionReportPtr;
-        
-        /* check our velocity: if we haven't got one, we can't be obstructed, so just return */
-        if((velocityDirection->vx==0)&&(velocityDirection->vy==0)&&(velocityDirection->vz==0)) return 0;
-                        
-        /* walk the collision report list, looking for collisions against inanimate objects */
-        while(nextReport)
-        {               
-                if(nextReport->ObstacleNormal.vy > -46341) return 1;
-                nextReport = nextReport->NextCollisionReportPtr;
-        }
-
-        /* no collision, then ... */
-        return 0;
-}
-#endif
+//adj int NPCIsExperiencingObstructiveCollision(STRATEGYBLOCK *sbPtr, VECTORCH *velocityDirection);
 
 int NPC_CannotReachTarget(NPC_MOVEMENTDATA *moveData, VECTORCH* thisTarget, VECTORCH* thisVelocity)
 {
@@ -375,11 +349,7 @@ int NPC_CannotReachTarget(NPC_MOVEMENTDATA *moveData, VECTORCH* thisTarget, VECT
                 if(moveData->numReverses>1) 
                 {
                         moveData->numReverses = 0;
-                        #if 1
                         return 1;
-                        #else
-                        return 0;
-                        #endif
                 }
                 else return 0;  
         }
@@ -491,31 +461,7 @@ void ProjectNPCShot(STRATEGYBLOCK *sbPtr, STRATEGYBLOCK *target, VECTORCH *muzzl
         /* Normalise. */
         Normalise(&shotVector);
 
-        #if 0
-        LOS_Lambda = NPC_MAX_VIEWRANGE;
-        LOS_ObjectHitPtr = 0;
-        LOS_HModel_Section=NULL;
-        {
-                extern int NumActiveBlocks;
-                extern DISPLAYBLOCK* ActiveBlockList[];
-                int numberOfObjects = NumActiveBlocks;
-                
-                while (numberOfObjects--)
-                {
-                        DISPLAYBLOCK* objectPtr = ActiveBlockList[numberOfObjects];
-                        VECTORCH alpha = *muzzlepos;
-                        VECTORCH beta = shotVector;
-                        GLOBALASSERT(objectPtr);
-
-                        if ((objectPtr!=sbPtr->SBdptr)&&(objectPtr!=target->SBdptr)) {
-                                /* Can't hit target or self. */
-                                CheckForVectorIntersectionWith3dObject(objectPtr, &alpha, &beta,1);
-                        }
-                }
-        }
-        #else
         FindPolygonInLineOfSight_TwoIgnores(&shotVector,muzzlepos,0,sbPtr->SBdptr,target->SBdptr);
-        #endif
         /* Now deal with LOS_ObjectHitPtr. */
         if (LOS_ObjectHitPtr) {
                 if (LOS_HModel_Section) {
@@ -556,31 +502,7 @@ void CastLOSProjectile(STRATEGYBLOCK *sbPtr, VECTORCH *muzzlepos, VECTORCH *in_s
                 Normalise(&shotVector);
         }
 
-        #if 0
-        LOS_Lambda = NPC_MAX_VIEWRANGE;
-        LOS_ObjectHitPtr = 0;
-        LOS_HModel_Section=NULL;
-        {
-                extern int NumActiveBlocks;
-                extern DISPLAYBLOCK* ActiveBlockList[];
-                int numberOfObjects = NumActiveBlocks;
-                
-                while (numberOfObjects--)
-                {
-                        DISPLAYBLOCK* objectPtr = ActiveBlockList[numberOfObjects];
-                        VECTORCH alpha = *muzzlepos;
-                        VECTORCH beta = shotVector;
-                        GLOBALASSERT(objectPtr);
-
-                        if (objectPtr!=self) {
-                                /* Can't hit self. */
-                                CheckForVectorIntersectionWith3dObject(objectPtr, &alpha, &beta,1);
-                        }
-                }
-        }
-        #else
         FindPolygonInLineOfSight(&shotVector,muzzlepos,0,self);
-        #endif
         /* Now deal with LOS_ObjectHitPtr. */
         if (LOS_ObjectHitPtr) {
                 if (LOS_HModel_Section) {
@@ -916,7 +838,6 @@ int NPCOrientateToVector(STRATEGYBLOCK *sbPtr, VECTORCH *zAxisVector,int turnspe
         RotateVector(&localZAxisVector, &toLocal);      
         Normalise(&localZAxisVector);
 
-//      maxTurnThisFrame = WideMulNarrowDiv(NormalFrameTime,4096,NPC_TURNRATE);
         maxTurnThisFrame = MUL_FIXED(NormalFrameTime,turnspeed);
         localZVecEulerY = ArcTan(localZAxisVector.vx, localZAxisVector.vz);
         LOCALASSERT((localZVecEulerY>=0)&&(localZVecEulerY<=4096));
@@ -975,23 +896,16 @@ int NPCOrientateToVector(STRATEGYBLOCK *sbPtr, VECTORCH *zAxisVector,int turnspe
 
                 if (offset) {
                         VECTORCH new_offset,delta_offset;
-                        //MATRIXCH reverse;
 
                         /* Code to attempt spinning on one foot. */
                         
                         RotateAndCopyVector(offset,&new_offset,&mat);
-                        
-                        //reverse=mat;
-                        //TransposeMatrixCH(&reverse);
-                        //
-                        //RotateAndCopyVector(offset,&new_offset,&reverse);
-
+                       
+ 
                         delta_offset.vx=(offset->vx-new_offset.vx);
                         delta_offset.vy=(offset->vy-new_offset.vy);
                         delta_offset.vz=(offset->vz-new_offset.vz);
                         /* delta_offset is in local space? */
-
-                        //RotateVector(&delta_offset,&sbPtr->DynPtr->OrientMat);
 
                         /* Now change position.  Bear in mind that many calls overwrite this change. */
 
@@ -1002,11 +916,7 @@ int NPCOrientateToVector(STRATEGYBLOCK *sbPtr, VECTORCH *zAxisVector,int turnspe
 
                 }               
 
-                #if PSX
-                PSXAccurateMatrixMultiply(&sbPtr->DynPtr->OrientMat,&mat,&sbPtr->DynPtr->OrientMat);
-                #else
                 MatrixMultiply(&sbPtr->DynPtr->OrientMat,&mat,&sbPtr->DynPtr->OrientMat);
-                #endif
                 MatrixToEuler(&sbPtr->DynPtr->OrientMat, &sbPtr->DynPtr->OrientEuler);
         }
 
@@ -1105,14 +1015,12 @@ void NPCGetMovementTarget(STRATEGYBLOCK *sbPtr, STRATEGYBLOCK *target, VECTORCH 
                         }
                 }
                 /* in same module as player, or can't find an entry point */
-                //*targetPosition = Player->ObWorld;
                 GetTargetingPointOfObject(Player, targetPosition);
                 *targetIsAirduct = 0;
         
         } else {
 
                 /* Improve this presently */
-                //*targetPosition = target->DynPtr->Position;
                 GetTargetingPointOfObject_Far(target, targetPosition);
                 *targetIsAirduct = 0;
 
@@ -1197,11 +1105,7 @@ void NPCGetMovementDirection(STRATEGYBLOCK *sbPtr, VECTORCH *velocityDirection, 
                                 
                 targetDirection.vy = 0;
         }
-        #if 1
         Normalise(&targetDirection);
-        #else
-        AlignVelocityToGravity(sbPtr,&targetDirection);
-        #endif
 
         /* first- a hack to cope with stairs and al those little polygons:
         if we're in stairs just return the target direction. This is okay aslong as we don't 
@@ -1417,9 +1321,7 @@ void NPCGetMovementDirection(STRATEGYBLOCK *sbPtr, VECTORCH *velocityDirection, 
                                         (GMD_myPolyPoints[point1].vy == GMD_myPolyPoints[point2].vy) && 
                                         (GMD_myPolyPoints[point1].vz == GMD_myPolyPoints[point2].vz))
                                         {
-                                                #if (!Saturn)
                                                 LOCALASSERT(1==0);
-                                                #endif
                                                 myPolyEdgeMoveDistances[i] = 0;
                                         }                       
                         }
@@ -1483,11 +1385,7 @@ void NPCGetMovementDirection(STRATEGYBLOCK *sbPtr, VECTORCH *velocityDirection, 
                                         textprint("intersection test\n");
                                 }
                                 
-                                #if 0
-                                *velocityDirection = myPolyEdgeDirections[i];
-                                #else
                                 NPCFindCurveToEdgePoint(sbPtr,i,velocityDirection);
-                                #endif
                                 return;
                         }
                 }
@@ -1529,11 +1427,7 @@ void NPCGetMovementDirection(STRATEGYBLOCK *sbPtr, VECTORCH *velocityDirection, 
         }
                         
         /* We have utterly failed to find a suitable direction */
-        #if 0
-                velocityDirection->vx = velocityDirection->vy = velocityDirection->vz = 0;      
-        #else 
                 *velocityDirection = targetDirection;
-        #endif
 }
 
 /* Patrick 12/6/97: This function is an auxilary function to NPCGetMovementDirection(), and
@@ -2421,12 +2315,10 @@ DEATH_DATA *GetDeathSequence(HMODELCONTROLLER *controller,SECTION *TemplateRoot,
                                 continue;
                         }
                         /* Only crouch is left! */
-                        //NewOnScreenMessage("DEATH SELECTION FAILURE!\n");
                         if (use_crouching) {
                                 use_crouching=0;
                                 continue;
                         }
-                        //NewOnScreenMessage("I REALLY MEAN IT!\n");
                         /* Here goes nothing. */
                         return(FirstDeath);
                 }
@@ -2668,7 +2560,6 @@ ATTACK_DATA *GetAttackSequence(HMODELCONTROLLER *controller,ATTACK_DATA *FirstAt
                                 /* If we're looking for a pounce, and there is none, return NULL. */
                                 return(NULL);
                         }
-                        //NewOnScreenMessage("ATTACK SELECTION FAILURE!\n");
                         /* Here goes nothing. */
                         return(FirstAttack);
                 }
@@ -2917,14 +2808,10 @@ AIMODULE *General_GetAIModuleForRetreat(STRATEGYBLOCK *sbPtr,AIMODULE *fearModul
         }
 
         /* Hmm... maybe we need to consider being in sight at some point. */
-        #if 0
         /* Firstly, are we in sight of the fear module? */
-        if (IsModuleVisibleFromModule((*fearModule->m_module_ptrs),sbPtr->containingModule)) {
-                /* Hmm, still in sight.  Try to get out of sight. */
-        } else {
-        }
-        #endif
-
+	/*adj*/        
+	/* Hmm, still in sight.  Try to get out of sight. */
+ 
         /* Step one: search down till we get to my_module, checking off modules. */
         
         if (my_module==fearModule) {
@@ -3180,13 +3067,7 @@ int New_NPC_IsObstructed(STRATEGYBLOCK *sbPtr, NPC_AVOIDANCEMANAGER *manager)
 
         normalDotWithVelocity = DotProduct(&(nextReport->ObstacleNormal),&myVelocityDirection);
 	
-		#if 0
-        if(((normalDotWithVelocity < -46341)||
-            ((nextReport->ObstacleSBPtr)&&(!SBIsEnvironment(nextReport->ObstacleSBPtr))&&(normalDotWithVelocity < -32768))))
-            /* 45 degs vs environment, 60 degs vs objects. */
-		#else
         if (normalDotWithVelocity < -32768)
-		#endif
         {
             /* If we're in FirstAvoidance already, might want to disregard the same collision again. */
             if (manager->substate==AvSS_FirstAvoidance) {
@@ -3571,23 +3452,6 @@ int GetAvoidanceDirection(STRATEGYBLOCK *sbPtr, NPC_AVOIDANCEMANAGER *manager)
 		CreateEulerMatrix( &euler, &matrix );
 		RotateVector( &newDirection2, &matrix );
 
-#if 0                
-        /* construct the direction(s)... 
-        start with object's local x unit vector (from local coo-ord system in world space) */
-        newDirection1.vx = sbPtr->DynPtr->OrientMat.mat11;
-        newDirection1.vy = sbPtr->DynPtr->OrientMat.mat12;
-        newDirection1.vz = sbPtr->DynPtr->OrientMat.mat13;
-        newDirection2.vx = -newDirection1.vx;
-        newDirection2.vy = -newDirection1.vy;
-        newDirection2.vz = -newDirection1.vz;
-        /* ...and add on 1/4 of the -z direction...*/
-        newDirection1.vx -= (sbPtr->DynPtr->OrientMat.mat31/4);
-        newDirection1.vy -= (sbPtr->DynPtr->OrientMat.mat32/4);
-        newDirection1.vz -= (sbPtr->DynPtr->OrientMat.mat33/4);
-        newDirection2.vx -= (sbPtr->DynPtr->OrientMat.mat31/4);
-        newDirection2.vy -= (sbPtr->DynPtr->OrientMat.mat32/4);
-        newDirection2.vz -= (sbPtr->DynPtr->OrientMat.mat33/4);
-#endif
 
         Normalise(&newDirection1);
         Normalise(&newDirection2);
@@ -3724,7 +3588,6 @@ void AlignVelocityToGravity(STRATEGYBLOCK *sbPtr,VECTORCH *velocity) {
 
 		if ((velocity->vx==0)&&(velocity->vy==0)&&(velocity->vz==0)) {
 			/* That can't be good.  Can it? */
-			//velocity->vx=ONE_FIXED;
 			return;
 		}
         
@@ -3844,9 +3707,6 @@ int ExecuteThirdAvoidance(STRATEGYBLOCK *sbPtr,NPC_AVOIDANCEMANAGER *manager) {
                         LOS_Lambda = NPC_MAX_VIEWRANGE;
                         CheckForVectorIntersectionWith3dObject(sbPtr->containingModule->m_dptr,&manager->basePoint,&testDirn,0);
                         
-                        #if 0
-                        MakeParticle(&manager->basePoint,&testDirn,PARTICLE_PREDATOR_BLOOD);
-                        #endif
 
                         if (LOS_ObjectHitPtr) {
                                 /* Hit environment! */
@@ -3865,9 +3725,6 @@ int ExecuteThirdAvoidance(STRATEGYBLOCK *sbPtr,NPC_AVOIDANCEMANAGER *manager) {
                         LOS_Lambda = NPC_MAX_VIEWRANGE;
                         CheckForVectorIntersectionWith3dObject(sbPtr->containingModule->m_dptr,&manager->basePoint,&testDirn,0);
 
-                        #if 0
-                        MakeParticle(&manager->basePoint,&testDirn,PARTICLE_PREDATOR_BLOOD);
-                        #endif
 
                         if (LOS_ObjectHitPtr) {
                                 /* Hit environment! */
@@ -4041,8 +3898,6 @@ int SimpleEdgeDetectionTest(STRATEGYBLOCK *sbPtr, COLLISIONREPORT *vcr) {
 		offset.vz=LOS_Point.vz-sbPtr->DynPtr->Position.vz;
 
 		dot=DotProduct(&offset,&beta);
-
-		//ReleasePrintDebuggingText("Dot %d\n",dot);
 
 		if ((dot>-1000)&&(dot<1000)) {
 			return(0);

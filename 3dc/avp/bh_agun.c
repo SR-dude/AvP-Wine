@@ -54,11 +54,9 @@
 #include "bh_dummy.h"
 #include "bh_corpse.h"
 
-#if SupportWindows95
 /* for win95 net game support */
 #include "pldghost.h"
 #include "pldnet.h"
-#endif
 
 #define SENTRYGUN_DRAMA 0
 
@@ -722,7 +720,6 @@ int Autogun_TargetFilter(STRATEGYBLOCK *candidate) {
 		case I_BehaviourXenoborg:
 			return(1);
 			break;
-		#if SupportWindows95
 		case I_BehaviourNetGhost:
 			{
 				NETGHOSTDATABLOCK *dataptr;
@@ -739,7 +736,6 @@ int Autogun_TargetFilter(STRATEGYBLOCK *candidate) {
 				}
 			}
 			break;
-		#endif
 		default:
 			return(0);
 			break;
@@ -799,9 +795,6 @@ int AGunSight_FrustrumReject(VECTORCH *localOffset) {
 
 	VECTORCH fixed_offset;
 
-	#if 0
-	PrintDebuggingText("Local Offset: %d %d %d\n",localOffset->vx,localOffset->vy,localOffset->vz);
-	#endif
 
 	fixed_offset=*localOffset;
 	fixed_offset.vy-=300; /* ish */
@@ -874,7 +867,6 @@ void AutoGunBehaveFun(STRATEGYBLOCK* sbPtr) {
 	}
 
 	if (agunStatusPointer->Target==NULL) {
-		//if ((agunIsNear)||(agunStatusPointer->incidentFlag)) {
 		if (agunIsNear) {
 			/* Get new target. */
 			agunStatusPointer->Target=Autogun_GetNewTarget(sbPtr);
@@ -1291,7 +1283,6 @@ void Execute_AGun_Target(STRATEGYBLOCK *sbPtr) {
 
 		if (agunStatusPointer->OnTarget_LastFrame==0) {
 			/* Newly aquired! */
-			//Sound_Play(SID_SENTRYGUN_LOCK,"d",&sbPtr->DynPtr->Position);
 			agunStatusPointer->Drama=SENTRYGUN_DRAMA;
 		}
 

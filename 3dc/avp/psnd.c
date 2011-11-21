@@ -2,8 +2,6 @@
   AvP sound management source
   ----------------------------------------------------------------------------*/
 
-#define DB_LEVEL 1
-
 #include "3dc.h"
 #include "module.h"
 #include "inline.h"

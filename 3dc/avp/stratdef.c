@@ -57,9 +57,7 @@ void InitialiseStrategyBlocks(void)
 		{
 			FreeStBlockList[NumFreeStBlocks] = FreeBlkPtr;
 			FreeBlkPtr->SBflags.destroyed_but_preserved=0;
-			#if debug
 			FreeBlkPtr->SBIsValid = 0;
-			#endif
 			FreeBlkPtr++;
 		}
 	
@@ -122,10 +120,8 @@ STRATEGYBLOCK* CreateActiveStrategyBlock(void)
 
 	if(sb) 
   	{
-  		#if debug
   		GLOBALASSERT(sb->SBIsValid == 0);
   		sb->SBIsValid = 1;
-  		#endif
 
   		*ActiveStBlockListPtr++ = sb;
   		NumActiveStBlocks++;
@@ -520,15 +516,6 @@ void TeleportPreservedSBsToNewEnvModule(MODULE *new_pos, MODULE* old_pos, int or
 			 	MatrixToEuler(&dynptr->OrientMat, &dynptr->OrientEuler);
 			}
 
-#if 0 
-			dynptr->Position.vx = mod_offset.vx; 
-			dynptr->Position.vy = mod_offset.vy; 
-			dynptr->Position.vz = mod_offset.vz; 
-
-			dynptr->PrevPosition.vx = mod_offset.vx; 
-			dynptr->PrevPosition.vy = mod_offset.vy; 
-			dynptr->PrevPosition.vz = mod_offset.vz; 
-#endif
 
 			dynptr->Position.vx = pos_rel.vx + new_pos->m_world.vx; 
 			dynptr->Position.vy = pos_rel.vy + new_pos->m_world.vy; 

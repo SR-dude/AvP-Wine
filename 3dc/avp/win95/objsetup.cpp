@@ -1,12 +1,5 @@
-#ifdef DAVEW
-	#define DB_LEVEL 1
-#else
-	#define DB_LEVEL 1
-#endif
-
 #include <stdlib.h>
 #include <string.hpp>
-
 #include "list_tem.hpp"
 #include "chnkload.hpp"
 #include "stratdef.h"
@@ -21,7 +14,6 @@
 #include "pvisible.h"
 #include "objsetup.hpp"
 #include "hierplace.hpp"
-
 #include "bh_gener.h"
 #include "bh_swdor.h"
 #include "bh_ldoor.h"
@@ -53,11 +45,9 @@
 #include "missions.hpp"	   
 #include "track.h"
 #include "psndplat.h"
-
 #include "dxlog.h"
 #include "mempool.h"
 #include "db.h"
-
 #include "pldnet.h"
 
 extern "C" {
@@ -620,179 +610,9 @@ void deallocate_behaviour_list()
 					
 				}
 				break;
-			#if !NEW_DEALLOCATION_ORDER
-			case I_BehaviourLinkSwitch:
-				{
-					LINK_SWITCH_TOOLS_TEMPLATE* lstt=(LINK_SWITCH_TOOLS_TEMPLATE*)bbd->bhdata;
-					if(lstt->track)
-					{
-						Deallocate_Track(lstt->track);
-					}
-					#if !USE_LEVEL_MEMORY_POOL
-					DeallocateMem (lstt->targets);
-					if(lstt->switchIDs)
-					{
-						DeallocateMem (lstt->switchIDs);
-					}
-					#endif
-				}
-				break;
 
-			case I_BehaviourBinarySwitch :
-				{
-					BIN_SWITCH_TOOLS_TEMPLATE* bstt=(BIN_SWITCH_TOOLS_TEMPLATE*)bbd->bhdata;
-					#if !USE_LEVEL_MEMORY_POOL
-					DeallocateMem(bstt->target_names);
-					DeallocateMem(bstt->request_messages);	
-					#endif
-					
-					if(bstt->track)
-					{
-						Deallocate_Track(bstt->track);
-					}
-				}
-				break;
-
-			case I_BehaviourPlacedSound :
-				{
-					SOUND_TOOLS_TEMPLATE* stt=(SOUND_TOOLS_TEMPLATE*)bbd->bhdata;
-					#if !USE_LEVEL_MEMORY_POOL
-					DeallocateMem(stt->sound_name);
-					#endif
-					if(stt->sound_loaded)
-					{
-						LoseSound(stt->sound_loaded);
-					}
-				}
-				break;
-
-			case I_BehaviourTrackObject :
-				{
-					TRACK_OBJECT_TOOLS_TEMPLATE* tott=(TRACK_OBJECT_TOOLS_TEMPLATE*)bbd->bhdata;
-					if(tott->track)
-					{
-						Deallocate_Track(tott->track);
-					}	
-					#if !USE_LEVEL_MEMORY_POOL
-					if(tott->special_track_points)
-					{
-						int i;
-						for(i=0;i<tott->num_special_track_points;i++)
-						{
-							if(tott->special_track_points[i].targets)
-								DeallocateMem(tott->special_track_points[i].targets);
-						}					
-						DeallocateMem(tott->special_track_points);
-					}
-					#endif
-				}
-				break;
-
-			case I_BehaviourFan :
-				{
-					FAN_TOOLS_TEMPLATE* ftt=(FAN_TOOLS_TEMPLATE*)bbd->bhdata;
-					if(ftt->track)
-					{
-						Deallocate_Track(ftt->track);
-					}
-				}
-				break;
-
-
-			case I_BehaviourPlatform :
-				{
-					PLATFORMLIFT_TOOLS_TEMPLATE* pltt=(PLATFORMLIFT_TOOLS_TEMPLATE*)bbd->bhdata;
-					if(pltt->start_sound)
-					{
-						Deallocate_Track_Sound(pltt->start_sound);
-					}
-					if(pltt->sound)
-					{
-						Deallocate_Track_Sound(pltt->sound);
-					}
-					if(pltt->end_sound)
-					{
-						Deallocate_Track_Sound(pltt->end_sound);
-					}
-				}
-				break;
-
-			case I_BehaviourParticleGenerator :
-				{
-					PARTICLE_GENERATOR_TOOLS_TEMPLATE* pgtt=(PARTICLE_GENERATOR_TOOLS_TEMPLATE*)bbd->bhdata;
-					if(pgtt->sound)
-					{
-						Deallocate_Track_Sound(pgtt->sound);
-					}
-				}
-				break;
-
-
-			#if !USE_LEVEL_MEMORY_POOL
-			case I_BehaviourPlacedLight :
-				{
-					TOOLS_DATA_PLACEDLIGHT * pltt=(TOOLS_DATA_PLACEDLIGHT*)bbd->bhdata;
-					if(pltt->light)
-					{
-						DeallocateMem(pltt->light);
-					}
-				}
-				break;
-			#endif
-
-			case I_BehaviourPlacedHierarchy :
-				{
-					PLACED_HIERARCHY_TOOLS_TEMPLATE* phtt=(PLACED_HIERARCHY_TOOLS_TEMPLATE*)bbd->bhdata;
-					int i;
-					#if !USE_LEVEL_MEMORY_POOL
-					if(phtt->num_sequences)
-					{
-						for(i=0;i<phtt->num_sequences;i++)
-						{
-							if(phtt->sequences[i].sound_times)
-							{
-								DeallocateMem(phtt->sequences[i].sound_times);
-							}
-						}
-						DeallocateMem(phtt->sequences);
-					}
-					#endif
-					for(i=0;i<phtt->num_sounds;i++)
-					{
-						if(phtt->sounds[i].sound_loaded)
-						{
-							LoseSound(phtt->sounds[i].sound_loaded);
-						}
-					}
-					#if !USE_LEVEL_MEMORY_POOL
-					if(phtt->sounds)
-					{
-						DeallocateMem(phtt->sounds);
-					}
-
-					if(phtt->special_track_points)
-					{
-						int i;
-						for(i=0;i<phtt->num_special_track_points;i++)
-						{
-							if(phtt->special_track_points[i].targets)
-								DeallocateMem(phtt->special_track_points[i].targets);
-						}					
-						DeallocateMem(phtt->special_track_points);
-					}
-					#endif
-
-				}
-				#endif //!NEW_DEALLOCATION_ORDER
 		}
 
-		#if !USE_LEVEL_MEMORY_POOL
-		if(bbd->alt_vector) DeallocateMem(bbd->alt_vector);
-		if(bbd->alt_euler) DeallocateMem(bbd->alt_euler);
-		if(bbd->name) DeallocateMem(bbd->name);
-		DeallocateMem(bbd->bhdata);
-		DeallocateMem(bbd);
-		#endif
 		Behav_List.delete_first_entry();
 	}
 }
@@ -2315,13 +2135,6 @@ void deal_with_placed_object(Object_Chunk * ob, int shape1, int /*AnimationShape
 	}
 	else
 	{
-#if 0
-		if(AnimationShape!=-1)
-		{
-			add_simple_animation (ob, AnimationShape, 0);
-		}
-		else
-#endif		
 		{
 		 	if(obflags & OBJECT_FLAG_PCLOAD)
 			{
@@ -2345,7 +2158,6 @@ static void add_alien(AVP_Generator_Chunk * agc)
 	tda->position.vy = agc->location.y * local_scale;
 	tda->position.vz = agc->location.z * local_scale;
 	
-	//tda->shapeIndex = GetLoadedShapeMSL("Alien");
 	tda->shapeIndex = 0;
 
 	tda->start_inactive=(agc->flags & AVPGENFLAG_GENERATORINACTIVE)!=0;
@@ -2573,26 +2385,6 @@ static void add_predator(AVP_Generator_Chunk * agc)
 	tdp->position.vy = agc->location.y * local_scale;
 	tdp->position.vz = agc->location.z * local_scale;
 	
-	#if 0
-	switch (agc->textureID)
-	{
-		case 1:
-			tdp->shapeIndex = GetLoadedShapeMSL("PHead1");	
-			break;	
-		case 2:
-			tdp->shapeIndex = GetLoadedShapeMSL("PHead2");	
-			break;	
-		case 3:
-			tdp->shapeIndex = GetLoadedShapeMSL("PHead3");	
-			break;	
-		case 4:
-			tdp->shapeIndex = GetLoadedShapeMSL("PHead4");	
-			break;
-		default :
-			tdp->shapeIndex = GetLoadedShapeMSL("fred");	/* patrick 8/7/96 */
-			break;	
-	}
-	#endif
 	tdp->predator_number=agc->textureID;
 	tdp->shapeIndex = 0;
 
@@ -2983,11 +2775,6 @@ void setup_generators (Environment_Data_Chunk * envd)
 				if (agc->type)
 				{
 					
-					#if 0
-					if(AvP.PlayerType==I_Alien && (agc->flags & AVPGENFLAG_AVPGAMEMODEALIEN)||
-					   AvP.PlayerType==I_Marine && (agc->flags & AVPGENFLAG_AVPGAMEMODEMARINE)||
-					   AvP.PlayerType==I_Predator && (agc->flags & AVPGENFLAG_AVPGAMEMODEPREDATOR))
-					#endif
 					{
 						//note : only aliens can appear in a network game
 						switch (agc->type)
@@ -3038,13 +2825,6 @@ void setup_generators (Environment_Data_Chunk * envd)
 				}
 				else
 				{
-					#if 0
-					//check to see if generator is flagged for this game mode
-
-					if(AvP.PlayerType==I_Alien && (agc->flags & AVPGENFLAG_AVPGAMEMODEALIEN)||
-					   AvP.PlayerType==I_Marine && (agc->flags & AVPGENFLAG_AVPGAMEMODEMARINE)||
-					   AvP.PlayerType==I_Predator && (agc->flags & AVPGENFLAG_AVPGAMEMODEPREDATOR))
-					#endif
 					//see if generator is a multiplayer start position
 					if(agc->flags & AVPGENFLAG_MULTIPLAYERSTART)
 					{
@@ -3561,69 +3341,11 @@ void SetUpRunTimeLights ()
 		}
 	}
 }
-#if 0
-void SetupExternalLift(AVP_External_Strategy_Chunk* aesc)
-{
-	LiftStrategy* ls=(LiftStrategy*)aesc->Strategy;
 
-	ObjectID ControlID={0x7fffffff,0x7fffffff};
-	for(int i=0;i<ls->NumExternalLifts;i++)
-	{
-		if(ls->ExternalLifts[i].EnvNum==aesc->ThisEnvNum)
-		{
-	  		ControlID=Minimum(ControlID,ls->ExternalLifts[i].LiftID);
-		}
-	}
-	
-	
-	LIFT_TOOLS_TEMPLATE * ltt = new LIFT_TOOLS_TEMPLATE;
-	
-	*((ObjectID *)ltt->my_module_name) = aesc->ObjID;
-	*((ObjectID *)ltt->call_switch_name) = ls->AssocCallSwitch;
-	*((ObjectID *)ltt->lift_door_name) = ls->AssocDoor;
-	*((ObjectID *)ltt->lift_floor_switch_name) = ls->AssocFloorSwitch;
-
-	ltt->environment = aesc->ExtEnvNum-1;
-	
-	ltt->num_floor = ls->Floor;
-
-	*((ObjectID *)ltt->control_sb_name)=ControlID;
-	
-	ltt->controller = 0;
-	
-	ltt->num_stations = ls->NumAssocLifts + ls->NumExternalLifts+1;
-
-	ltt->lift_flags=ls->LiftFlags;
-	
-	*((ObjectID *)ltt->nameID) = aesc->ObjID;
-
-	ltt->orient=ls->Facing;
-	if((ls->LiftFlags & LiftFlag_Airlock) || (ls->LiftFlags & LiftFlag_ExitOtherSide))
-		ltt->orient=(ltt->orient+2) % 4;
-
-	ltt_list.add_entry(ltt);	
-}
-#endif
 
 void DealWithExternalObjectStategies (Environment_Data_Chunk * envd)
 {
 	List<Chunk*> chlist;
-	#if 0
-	envd->lookup_child("AVPEXSTR",chlist);
-	for(LIF<Chunk*> slif(&chlist);!slif.done();slif.next())
-	{
-		AVP_External_Strategy_Chunk* aesc=(AVP_External_Strategy_Chunk*) slif();
-		if(aesc->Strategy)
-		{
-			switch(aesc->Strategy->StrategyType)
-			{
-				case StratLift :
-					SetupExternalLift(aesc);
-					break;
-			}
-		}
-	}
-	#endif
 
 	Chunk * pChunk = envd->lookup_single_child("SPECLOBJ");
 	if(pChunk)

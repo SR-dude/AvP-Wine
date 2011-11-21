@@ -1,5 +1,3 @@
-#define DB_LEVEL 2
-
 /*------------------------ChrisF 17/3/98-------------------------------
   Source file for Queen AI behaviour functions.  One year 30 days after bh_paq.
   --------------------------------------------------------------------*/
@@ -544,10 +542,9 @@ void SetQueenMovement_FromFoot(STRATEGYBLOCK *sbPtr) {
 	ProveHModel(dPtr->HModelControlBlock,dPtr);
 
 	delta_offset.vx=queenStatusPointer->fixed_foot_oldpos.vx-queenStatusPointer->fixed_foot_section->World_Offset.vx;
-	delta_offset.vy=0;//queenStatusPointer->fixed_foot_oldpos.vy-queenStatusPointer->fixed_foot_section->World_Offset.vy;
+	delta_offset.vy=0;
 	delta_offset.vz=queenStatusPointer->fixed_foot_oldpos.vz-queenStatusPointer->fixed_foot_section->World_Offset.vz;
 
-	#if 1	
 	delta_offset.vx=DIV_FIXED(delta_offset.vx,NormalFrameTime);
 	delta_offset.vy=0;//DIV_FIXED(delta_offset.vy,NormalFrameTime);
 	delta_offset.vz=DIV_FIXED(delta_offset.vz,NormalFrameTime);
@@ -585,29 +582,10 @@ void SetQueenMovement_FromFoot(STRATEGYBLOCK *sbPtr) {
 		}
 		
 	}
-	#elif 1
 	sbPtr->DynPtr->Displacement.vx = delta_offset.vx;
 	sbPtr->DynPtr->Displacement.vy = delta_offset.vy;
 	sbPtr->DynPtr->Displacement.vz = delta_offset.vz;
 
-	//PrintDebuggingText("Displacement = %d %d %d\n",delta_offset.vx,delta_offset.vy,delta_offset.vz);
-	//
-	//LOGDXFMT(("New Foot Frame.\nFoot OldPos = %d %d %d.\nFoot NewPos = %d %d %d\nFoot Current Pos = %d %d %d.\nDisplacement = %d %d %d.\n\n",
-	//	queenStatusPointer->fixed_foot_oldpos.vx,queenStatusPointer->fixed_foot_oldpos.vy,queenStatusPointer->fixed_foot_oldpos.vz,
-	//	real_pos.vx,real_pos.vy,real_pos.vz,
-	//	queenStatusPointer->fixed_foot_section->World_Offset.vx,queenStatusPointer->fixed_foot_section->World_Offset.vy,
-	//	queenStatusPointer->fixed_foot_section->World_Offset.vz,delta_offset.vx,delta_offset.vy,delta_offset.vz));
-	//
-	//sbPtr->DynPtr->Displacement.vx = 0;
-	//sbPtr->DynPtr->Displacement.vy = 0;
-	//sbPtr->DynPtr->Displacement.vz = 200;
-
-	#else
-	sbPtr->DynPtr->Position.vx += delta_offset.vx;
-	sbPtr->DynPtr->Position.vy += delta_offset.vy;
-	sbPtr->DynPtr->Position.vz += delta_offset.vz;
-	
-	#endif
 }
 
 void QueenMove_Standby(STRATEGYBLOCK *sbPtr) {
@@ -815,41 +793,9 @@ void QueenMove_TurnLeft(STRATEGYBLOCK *sbPtr) {
 		left90.vy=-sbPtr->DynPtr->OrientMat.mat12;
 		left90.vz=-sbPtr->DynPtr->OrientMat.mat13;
 
-		#if 1
 		NPCOrientateToVector(sbPtr, &left90,Queen_Turn_Rate,NULL);
 
 		SetQueenMovement_FromFoot(sbPtr);
-		#else
-		{
-			VECTORCH localOffset;
-			VECTORCH version1,version2;
-			//MATRIXCH WtoL;
-	
-			ProveHModel(dPtr->HModelControlBlock,dPtr);
-
-			localOffset.vx=queenStatusPointer->fixed_foot_section->World_Offset.vx-sbPtr->DynPtr->Position.vx;
-			localOffset.vy=queenStatusPointer->fixed_foot_section->World_Offset.vy-sbPtr->DynPtr->Position.vy;
-			localOffset.vz=queenStatusPointer->fixed_foot_section->World_Offset.vz-sbPtr->DynPtr->Position.vz;
-		
-			//WtoL=sbPtr->DynPtr->OrientMat;
-			//TransposeMatrixCH(&WtoL);
-			
-			//RotateVector(&localOffset,&WtoL);
-
-			PrintDebuggingText("localOffset = %d %d %d\n",localOffset.vx,
-				localOffset.vy,localOffset.vz);
-
-			NPCOrientateToVector(sbPtr, &left90,Queen_Turn_Rate,&localOffset);
-
-			//version1=sbPtr->DynPtr->Displacement;
-			//SetQueenMovement_FromFoot(sbPtr);
-			//version2=sbPtr->DynPtr->Displacement;
-			// 
-			//LOGDXFMT(("Displacement V1 = %d %d %d\nDisplacement V2 = %d %d %d\n",
-			//	version1.vx,version1.vy,version1.vz,
-			//	version2.vx,version2.vy,version2.vz));
-		}
-		#endif
 
 	}
 
@@ -1059,7 +1005,6 @@ void QueenMove_ComeToPoint(STRATEGYBLOCK *sbPtr) {
 
 }
 
-#if 1
 void QueenMove_Walk(STRATEGYBLOCK *sbPtr) {
 
 	QUEEN_STATUS_BLOCK *queenStatusPointer;
@@ -1129,12 +1074,8 @@ void QueenMove_Walk(STRATEGYBLOCK *sbPtr) {
 		dPtr=sbPtr->SBdptr;
 		GLOBALASSERT(dPtr);
 
-		//ProveHModel(dPtr->HModelControlBlock,dPtr);
-
 		NPCOrientateToVector(sbPtr, &queenStatusPointer->VectToTarget,Queen_Turn_Rate,NULL);
 
-		//SetQueenMovement_FromFoot(sbPtr);
-		
 		if (queenStatusPointer->moveTimer!=2) 
 		{
 			if(queenStatusPointer->moveTimer==1)
@@ -1159,8 +1100,6 @@ void QueenMove_Walk(STRATEGYBLOCK *sbPtr) {
 
 				Normalise(&velocity);
 		
-				//walkSpeed=DIV_FIXED(Queen_Walk_Step_Speed,Queen_Walk_Rate);
-
 				sbPtr->DynPtr->LinVelocity.vx = MUL_FIXED(velocity.vx,QUEEN_WALK_SPEED);
 				sbPtr->DynPtr->LinVelocity.vy = MUL_FIXED(velocity.vy,QUEEN_WALK_SPEED);
 				sbPtr->DynPtr->LinVelocity.vz = MUL_FIXED(velocity.vz,QUEEN_WALK_SPEED);
@@ -1232,32 +1171,6 @@ void QueenMove_Walk(STRATEGYBLOCK *sbPtr) {
 					queenStatusPointer->moveTimer=0;
 
 				}
-				#if 0
-				else if(range<3000)
-				{
-					//come to a stop
-					/* Begin exit. */
-					int tweeiningtime=(Queen_Step_Time>>2);
-	
-					queenStatusPointer->moveTimer=2; /* It's something of a state flag here. */
-	
-					switch (queenStatusPointer->fixed_foot) {
-						case (RightFoot):
-							SetQueenShapeAnimSequence_Core(sbPtr,HMSQT_QueenRightStanceTemplate,
-								(int)QRSTSS_Standard,(Queen_Step_Time<<1),tweeiningtime);
-							break;
-						case (LeftFoot):
-							SetQueenShapeAnimSequence_Core(sbPtr,HMSQT_QueenLeftStanceTemplate,
-								(int)QLSTSS_Standard,(Queen_Step_Time<<1),tweeiningtime);
-							break;
-						default:
-							GLOBALASSERT(0);
-							break;
-					}
-			
-					queenStatusPointer->HModelController.LoopAfterTweening=0;
-				}
-				#endif
 				else if(range>10000 && queenStatusPointer->fixed_foot==LeftFoot && !PlayerInTrench)
 				{
 					//go into a charge
@@ -1290,159 +1203,7 @@ void QueenMove_Walk(STRATEGYBLOCK *sbPtr) {
 	}
 
 }
-#else
-void QueenMove_Walk(STRATEGYBLOCK *sbPtr) {
 
-	QUEEN_STATUS_BLOCK *queenStatusPointer;
-	VECTORCH vectotarget;
-
-	/* Very complex movement function... */
-
-	queenStatusPointer=(QUEEN_STATUS_BLOCK *)(sbPtr->SBdataptr);    
-
-	GLOBALASSERT(queenStatusPointer->current_move==QM_ComeToPoint);	
-
-	if (queenStatusPointer->moveTimer==0) {
-		/* Do setup. */
-		int tweeiningtime=(Queen_Step_Time>>2);
-				
-		switch (queenStatusPointer->fixed_foot) {
-			case (LeftFoot):
-				SetQueenFoot(sbPtr,LeftFoot);
-				SetQueenShapeAnimSequence_Core(sbPtr,HMSQT_QueenGeneral,
-					(int)QGSS_Walk,(Queen_Step_Time<<1),tweeiningtime);
-				queenStatusPointer->HModelController.LoopAfterTweening=1;
-				queenStatusPointer->moveTimer=1; /* It's something of a state flag here. */
-				break;
-			case (RightFoot):
-				/* Argh! Can't start from right foot! */
-				queenStatusPointer->current_move=QM_StepForward;
-				queenStatusPointer->moveTimer=0;
-				queenStatusPointer->next_move=QM_ComeToPoint;
-				return;
-				break;
-			default:
-				GLOBALASSERT(0);
-				break;
-		}
-	}
-	
-	vectotarget.vx=queenStatusPointer->TargetPos.vx-sbPtr->DynPtr->Position.vx;
-	vectotarget.vy=queenStatusPointer->TargetPos.vy-sbPtr->DynPtr->Position.vy;
-	vectotarget.vz=queenStatusPointer->TargetPos.vz-sbPtr->DynPtr->Position.vz;
-
-	/* Check for change foot? */
-
-	if (queenStatusPointer->HModelController.Tweening==Controller_NoTweening) {
-		if (queenStatusPointer->HModelController.keyframe_flags) {
-			switch (queenStatusPointer->fixed_foot) {
-				case (LeftFoot):
-					SetQueenFoot(sbPtr,RightFoot);
-					break;
-				case (RightFoot):
-					SetQueenFoot(sbPtr,LeftFoot);
-					break;
-				default:
-					GLOBALASSERT(0);
-					break;
-			}
-		}
-	}
-
-	/* Now... turn to face. */
-
-	{
-
-		DISPLAYBLOCK *dPtr;
-
-		dPtr=sbPtr->SBdptr;
-		GLOBALASSERT(dPtr);
-
-		ProveHModel(dPtr->HModelControlBlock,dPtr);
-
-		NPCOrientateToVector(sbPtr, &vectotarget,Queen_Turn_Rate,NULL);
-
-		SetQueenMovement_FromFoot(sbPtr);
-
-	}
-
-	/* Consider exit state. */
-
-	if ((queenStatusPointer->HModelController.Tweening==Controller_NoTweening)
-		&&(queenStatusPointer->moveTimer==2)) {
-		
-		/* We must have finished. */
-
-		queenStatusPointer->current_move=QM_Standby;
-
-		switch (queenStatusPointer->fixed_foot) {
-			case (LeftFoot):
-				SetQueenFoot(sbPtr,RightFoot);
-				break;
-			case (RightFoot):
-				SetQueenFoot(sbPtr,LeftFoot);
-				break;
-			default:
-				GLOBALASSERT(0);
-				break;
-		}
-
-		/* Would you believe the end's in the middle? :-) */
-
-	}
-	
-
-	{
-		int range;
-		
-		range=Approximate3dMagnitude(&vectotarget);
-
-		if ((range<5000)&&(queenStatusPointer->moveTimer!=2)) {
-			/* Begin exit. */
-			int tweeiningtime=(Queen_Step_Time>>2);
-	
-			queenStatusPointer->moveTimer=2; /* It's something of a state flag here. */
-	
-			switch (queenStatusPointer->fixed_foot) {
-				case (LeftFoot):
-					SetQueenShapeAnimSequence_Core(sbPtr,HMSQT_QueenRightStanceTemplate,
-						(int)QRSTSS_Standard,(Queen_Step_Time<<1),tweeiningtime);
-					break;
-				case (RightFoot):
-					SetQueenShapeAnimSequence_Core(sbPtr,HMSQT_QueenLeftStanceTemplate,
-						(int)QLSTSS_Standard,(Queen_Step_Time<<1),tweeiningtime);
-					break;
-				default:
-					GLOBALASSERT(0);
-					break;
-			}
-		
-			queenStatusPointer->HModelController.LoopAfterTweening=0;
-		} else if (queenStatusPointer->moveTimer!=2) {
-			queenStatusPointer->moveTimer=1; /* It's something of a state flag here. */
-		}
-	}
-
-	#if 0
-	if ((queenStatusPointer->HModelController.Tweening==Controller_NoTweening)
-		&&(queenStatusPointer->HModelController.sequence_timer==(ONE_FIXED-1))) {
-
-		int range;
-		/* Comsider next step. */
-		
-		range=Approximate3dMagnitude(&vectotarget);
-
-		if (range<5000) {
-			queenStatusPointer->current_move=QM_Standby;
-		} else {
-			queenStatusPointer->moveTimer=0;
-		}
-
-	}
-	#endif
-
-}
-#endif
 
 void QueenMove_Taunt(STRATEGYBLOCK *sbPtr) {
 
@@ -1532,29 +1293,10 @@ void QueenMove_Hiss(STRATEGYBLOCK *sbPtr) {
 		}
 	}
 	
-	/*
-	if (queenStatusPointer->HModelController.Tweening==Controller_NoTweening) 
-	{
-		GLOBALASSERT(queenStatusPointer->HModelController.Looped==0);
-	}
-	*/
-	
-
-	
 	/* Now... move forward? */
 
 	SetQueenMovement_FromFoot(sbPtr);
 
-	#if 0
-	if ((queenStatusPointer->HModelController.Tweening==Controller_NoTweening)
-		&&(queenStatusPointer->HModelController.sequence_timer==(ONE_FIXED-1))) {
-		
-		queenStatusPointer->current_move=QM_Hiss;
-		
-		/* Same foot. */
-
-	}
-	#endif
 	queenStatusPointer->moveTimer+=NormalFrameTime;
 
 }
@@ -1576,8 +1318,6 @@ void QueenMove_LeftSwipe(STRATEGYBLOCK *sbPtr) {
 		switch (queenStatusPointer->fixed_foot) {
 			case (LeftFoot):
 				SetQueenFoot(sbPtr,LeftFoot);
-				//SetQueenShapeAnimSequence_Core(sbPtr,HMSQT_QueenLeftStanceTemplate,
-				//	(int)QLSTSS_Forward_L2R,Queen_Step_Time,tweeiningtime);
 				SetQueenShapeAnimSequence_Core(sbPtr,HMSQT_QueenLeftStanceFull,
 					(int)QLSFSS_Standard_Hiss,Queen_Step_Time,tweeiningtime);
 
@@ -1588,8 +1328,6 @@ void QueenMove_LeftSwipe(STRATEGYBLOCK *sbPtr) {
 				break;
 			case (RightFoot):
 				SetQueenFoot(sbPtr,RightFoot);
-				//SetQueenShapeAnimSequence_Core(sbPtr,HMSQT_QueenRightStanceTemplate,
-				//	(int)QRSTSS_Forward_R2L,Queen_Step_Time,tweeiningtime);
 				SetQueenShapeAnimSequence_Core(sbPtr,HMSQT_QueenRightStanceFull,
 					(int)QRSFSS_Standard_Hiss,Queen_Step_Time,tweeiningtime);
 
@@ -1697,7 +1435,6 @@ void QueenMove_Charge(STRATEGYBLOCK *sbPtr) {
 	/* Charge at the player. */
 	if(!queenStatusPointer->TempTarget)
 	{
-	//	queenStatusPointer->TargetPos=Player->ObStrategyBlock->DynPtr->Position;
 		queenStatusPointer->TargetPos=queenStatusPointer->QueenTargetSB->DynPtr->Position;
 	}
 	
@@ -1779,7 +1516,6 @@ void QueenMove_Charge(STRATEGYBLOCK *sbPtr) {
 
 		ProveHModel(dPtr->HModelControlBlock,dPtr);
 
-		#if 1
 		{
 			VECTORCH v;
 			if(queenStatusPointer->QueenTargetSB==Player->ObStrategyBlock && !queenStatusPointer->TempTarget && queenStatusPointer->TargetDistance>5000)
@@ -1814,7 +1550,6 @@ void QueenMove_Charge(STRATEGYBLOCK *sbPtr) {
 			}
 			NPCOrientateToVector(sbPtr, &v,Queen_Turn_Rate,NULL);
 
-			//NPCOrientateToVector(sbPtr, &queenStatusPointer->VectToTarget,Queen_Turn_Rate,NULL);
 		}
 		/* Now, just a normal lin velocity. */
 		{
@@ -1847,10 +1582,6 @@ void QueenMove_Charge(STRATEGYBLOCK *sbPtr) {
 			}
 		}
 
-		#else
-		NPCOrientateToVector(sbPtr, &vectotarget,Queen_Turn_Rate,NULL);
-		SetQueenMovement_FromFoot(sbPtr);
-		#endif
 	}
 
 	/* Consider exit state. */
@@ -1923,28 +1654,6 @@ void QueenMove_Charge(STRATEGYBLOCK *sbPtr) {
 			}
 			queenStatusPointer->next_move=QM_Standby;
 			return;
-			#if 0
-			/* Begin exit. */
-			int tweeiningtime=(Queen_Step_Time>>2);
-	
-			queenStatusPointer->moveTimer=2; /* It's something of a state flag here. */
-	
-			switch (queenStatusPointer->fixed_foot) {
-				case (LeftFoot):
-					SetQueenShapeAnimSequence_Core(sbPtr,HMSQT_QueenGeneral,
-						(int)QGSS_Stop_To_Right,(Queen_Step_Time),tweeiningtime);
-					break;
-				case (RightFoot):
-					SetQueenShapeAnimSequence_Core(sbPtr,HMSQT_QueenGeneral,
-						(int)QGSS_Stop_To_Left,(Queen_Step_Time),tweeiningtime);
-					break;
-				default:
-					GLOBALASSERT(0);
-					break;
-			}
-		
-			queenStatusPointer->HModelController.LoopAfterTweening=0;
-			#endif
 		}
 
 		//check to see if queen should change between sprints
@@ -2035,7 +1744,6 @@ void QueenMove_ButtCharge(STRATEGYBLOCK* sbPtr)
 	GLOBALASSERT(queenStatusPointer->current_move==QM_ButtCharge);
 
 	/* Charge at the player. */
-	//queenStatusPointer->TargetPos=queenStatusPointer->QueenTargetSB->DynPtr->Position;
 
 	if (queenStatusPointer->moveTimer==0) 
 	{
@@ -2122,11 +1830,8 @@ void QueenMove_ButtCharge(STRATEGYBLOCK* sbPtr)
 				sbPtr->DynPtr->LinVelocity.vz = 0;
 				return;			
 			}
-			
 		
 			Normalise(&velocity);
-		
-			//runSpeed=DIV_FIXED(Queen_Charge_Step_Speed,Queen_ButtCharge_Rate);
 
 			sbPtr->DynPtr->LinVelocity.vx = MUL_FIXED(velocity.vx,QUEEN_BUTTCHARGE_SPEED);
 			sbPtr->DynPtr->LinVelocity.vy = MUL_FIXED(velocity.vy,QUEEN_BUTTCHARGE_SPEED);
@@ -2374,7 +2079,7 @@ void Queen_Do_Swipe(STRATEGYBLOCK *sbPtr,int side)
 
 		GetTargetingPointOfObject(Player,&targetpos);
 		vectohand.vx=targetpos.vx-hand_section->World_Offset.vx;
-		vectohand.vy=0;//targetpos.vy-hand_section->World_Offset.vy;
+		vectohand.vy=0;
 		vectohand.vz=targetpos.vz-hand_section->World_Offset.vz;
 
 		range_to_player=Approximate3dMagnitude(&vectohand);
@@ -2400,7 +2105,6 @@ void Queen_Do_Swipe(STRATEGYBLOCK *sbPtr,int side)
 					   LOS_ObjectHitPtr->ObStrategyBlock->I_SBtype==I_BehaviourTrackObject)
 					{
 						//damage the object instead of the player
-						//if(LOS_Lambda<QueenAttackRange)
 						{
 							CauseDamageToObject(LOS_ObjectHitPtr->ObStrategyBlock,&TemplateAmmo[AMMO_NPC_PAQ_CLAW].MaxDamage[AvP.Difficulty], ONE_FIXED,NULL);
 						}
@@ -2507,35 +2211,8 @@ void QueenMove_Close(STRATEGYBLOCK *sbPtr) {
 
 		NPCOrientateToVector(sbPtr,&queenStatusPointer->VectToTarget,Queen_Turn_Rate,NULL);
 
-		#if 1
 		SetQueenMovement_FromFoot(sbPtr);
 
-		#else
-		{
-			VECTORCH velocity;
-			int dotProduct;
-			int runSpeed;
-		
-			velocity.vx=sbPtr->DynPtr->OrientMat.mat31;
-			velocity.vy=0;
-			velocity.vz=sbPtr->DynPtr->OrientMat.mat33;
-
-			if ( (velocity.vx==0) && (velocity.vy==0) && (velocity.vz==0) ) {
-				sbPtr->DynPtr->LinVelocity.vx = 0;		
-				sbPtr->DynPtr->LinVelocity.vy = 0;
-				sbPtr->DynPtr->LinVelocity.vz = 0;
-				return;			
-			}
-			
-		
-			Normalise(&velocity);
-		
-
-			sbPtr->DynPtr->LinVelocity.vx = MUL_FIXED(velocity.vx,QUEEN_CLOSE_SPEED);
-			sbPtr->DynPtr->LinVelocity.vy = MUL_FIXED(velocity.vy,QUEEN_CLOSE_SPEED);
-			sbPtr->DynPtr->LinVelocity.vz = MUL_FIXED(velocity.vz,QUEEN_CLOSE_SPEED);
-		}
-		#endif
 
 	}
 
@@ -2695,7 +2372,6 @@ void KillQueen(STRATEGYBLOCK *sbPtr,DAMAGE_PROFILE *damage, int multiple,SECTION
 	RemoveAllDeltas(&queenStatusPointer->HModelController);
 
 	if (tkd>200) {
-		//SetQueenShapeAnimSequence_Core(sbPtr,HMSQT_QueenGeneral,QGSS_Explode_Death,(ONE_FIXED),(ONE_FIXED>>2));
 		/* That death doesn't work. */
 		SetQueenShapeAnimSequence_Core(sbPtr,HMSQT_QueenGeneral,QGSS_FaceDeath,(ONE_FIXED),(ONE_FIXED>>2));
 	} else {
@@ -2856,7 +2532,6 @@ BOOL CalculateTrajectory(VECTORCH* start,VECTORCH* dest,VECTORCH* velocity,int o
 	result->vz=MUL_FIXED(rotated_result.vx,normal.vz)+MUL_FIXED(rotated_result.vz,normal.vx);
 
 	//calculate required up component
-	//u=s/t - a*t/2
 	result->vy=DIV_FIXED(vertical_distance,time_to_target)-MUL_FIXED(time_to_target,GRAVITY_STRENGTH/2);
 
 	//we have a targeting solution.
@@ -3008,8 +2683,6 @@ void QueenCheckForAvoidAirlock(STRATEGYBLOCK *sbPtr)
 				if(zintercept>=AirlockMinZ && zintercept<=AirlockMaxZ)
 				{
 								
-//					textprint("Airlock Max X\n");
-//					return;
 					//head for the corner that is closest to the current target
 					queenStatusPointer->TargetPos.vx=AirlockMaxX;
 					if(abs(AirlockMinZ-tpos->vz)<abs(AirlockMaxZ-tpos->vz))
@@ -3038,8 +2711,6 @@ void QueenCheckForAvoidAirlock(STRATEGYBLOCK *sbPtr)
 
 				if(zintercept>=AirlockMinZ && zintercept<=AirlockMaxZ)
 				{
-//					textprint("Airlock Min X\n");
-//					return;
 					//head for the corner that is closest to the current target
 					queenStatusPointer->TargetPos.vx=AirlockMinX;
 					if(abs(AirlockMinZ-tpos->vz)<abs(AirlockMaxZ-tpos->vz))
@@ -3069,8 +2740,6 @@ void QueenCheckForAvoidAirlock(STRATEGYBLOCK *sbPtr)
 
 				if(xintercept>=AirlockMinX && xintercept<=AirlockMaxX)
 				{
-//					textprint("Airlock Max Z\n");
-//					return;
 					//head for the corner that is closest to the current target
 					queenStatusPointer->TargetPos.vz=AirlockMaxZ;
 					if(abs(AirlockMinX-tpos->vx)<abs(AirlockMaxX-tpos->vx))
@@ -3099,8 +2768,6 @@ void QueenCheckForAvoidAirlock(STRATEGYBLOCK *sbPtr)
 
 				if(xintercept>=AirlockMinX && xintercept<=AirlockMaxX)
 				{
-//					textprint("Airlock Min Z\n");
-//					return;
 					//head for the corner that is closest to the current target
 					queenStatusPointer->TargetPos.vz=AirlockMinZ;
 					if(abs(AirlockMinX-tpos->vx)<abs(AirlockMaxX-tpos->vx))
@@ -4183,7 +3850,6 @@ void QueenBehaviour(STRATEGYBLOCK *sbPtr)
 					queenStatusPointer->current_move=queenStatusPointer->next_move;
 					queenStatusPointer->next_move=QM_Standby;
 					queenStatusPointer->moveTimer=0;
-					//queenStatusPointer->TargetPos=Queen_Target_Point;
 				}
 				
 				break;
@@ -4202,7 +3868,6 @@ void QueenBehaviour(STRATEGYBLOCK *sbPtr)
 			{
 				textprint("Queen State: Step Forward\n");
 				/* Move function. */
-		   //		QueenMove_StepForward(sbPtr);
 				break;
 			}
 			case (QM_StepBack):
@@ -4216,14 +3881,12 @@ void QueenBehaviour(STRATEGYBLOCK *sbPtr)
 			{
 				textprint("Queen State: Turn Left\n");
 				/* Move function. */
-			//	QueenMove_TurnLeft(sbPtr);
 				break;
 			}
 			case (QM_TurnRight):
 			{
 				textprint("Queen State: Turn Right\n");
 				/* Move function. */
-			//	QueenMove_TurnRight(sbPtr);
 				break;
 			}
 			case (QM_ComeToPoint):
@@ -4264,13 +3927,11 @@ void QueenBehaviour(STRATEGYBLOCK *sbPtr)
 			case (QM_LeftSwipe):
 			{
 				textprint("Queen State: Left Swipe\n");
-			//	QueenMove_LeftSwipe(sbPtr);
 				break;
 			}
 			case (QM_RightSwipe):
 			{
 				textprint("Queen State: Right Swipe\n");
-			//	QueenMove_RightSwipe(sbPtr);
 				break;
 			}
 			
@@ -4771,15 +4432,6 @@ static BOOL TargetIsFiringFlamethrowerAtQueen(STRATEGYBLOCK *sbPtr)
 	QueenCalculateTargetInfo(sbPtr);
 
 	if(queenStatusPointer->TargetDistance>30000) return FALSE; //queen is too far away to be harmed
-	//if(queenStatusPointer->TargetDistance<3000) return FALSE; //queen close enough to attack , so she may as well go ahead
-	/*
-	if (queenStatusPointer->attack_delta->timer!=(ONE_FIXED-1) &&
-		queenStatusPointer->attack_delta->timer!=0)
-	{
-		//currently attacking
-		return FALSE;
-	} 
-	*/
 	{
 		/* Is the player firing a flamethrower? */
 		PLAYER_WEAPON_DATA *weaponPtr;

@@ -478,7 +478,6 @@ unsigned int SetOrphanedShapeAnimationSequence (SHAPEANIMATIONCONTROLLER * sac, 
 
 	sac->current.time_to_next_frame = sac->current.seconds_per_frame;
 
-	/* CopyAnimationSequenceDataToObject (sac->current.sequence, dptr); */
 
 	return(1);
 	

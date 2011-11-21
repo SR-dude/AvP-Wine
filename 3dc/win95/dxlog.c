@@ -1,7 +1,5 @@
 #include "3dc.h"
 
-#if debug
-
 #include "ourasert.h"
 #include "dxlog.h"
 #include "debuglog.h"
@@ -278,11 +276,7 @@ D3DAppErrorToString(HRESULT error)
     }
 }
 
-#ifdef __WATCOMC__
-	#define LOGFILE_NAME "dx_error.log"
-#else
-	#define LOGFILE_NAME "dx_errorM.log"
-#endif
+#define LOGFILE_NAME "dx_error.log"
 
 static LOGFILE * dxlog = 0;
 static int closed_once = 0;
@@ -386,4 +380,4 @@ void ExitFired(char* Filename, int LineNum, int ExitCode)
 
 	exit(ExitCode);
 }
-#endif
+

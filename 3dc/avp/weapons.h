@@ -52,11 +52,6 @@ extern void HandleEffectsOfExplosion(STRATEGYBLOCK *objectToIgnorePtr, VECTORCH 
 *******************************************************************************KJL*/
 
 
-extern void FireAutoGun(STRATEGYBLOCK *sbPtr);
-/*KJL********
-* bang bang *
-********KJL*/
-
 extern void MakeMatrixFromDirection(VECTORCH *directionPtr, MATRIXCH *matrixPtr);
 /*KJL******************************************************************************
 * directionPtr - is a pointer to a NORMALISED vector in world space (input)       *

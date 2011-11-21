@@ -373,9 +373,6 @@ void LoadedPlacedHierarchy::load_rif()
 	placed_rif=avp_load_rif_non_env(file_path);
 	if(placed_rif!=INVALID_RIFFHANDLE)
 	{
-		#if MaxImageGroups>1
-		SetCurrentImageGroup(2); // load into environment image group
-		#endif
 		copy_rif_data(placed_rif,CCF_IMAGEGROUPSET + CCF_LOAD_AS_HIERARCHY_IF_EXISTS+CCF_DONT_INITIALISE_TEXTURES,0,0);
 		unload_rif(placed_rif);
 	}
@@ -525,55 +522,6 @@ Global_Hierarchy_Store::Global_Hierarchy_Store (RIFFHANDLE h)
 
 Global_Hierarchy_Store::~Global_Hierarchy_Store()
 {
-	#if !USE_LEVEL_MEMORY_POOL
-	if (riffname)
-	{
-		DeallocateMem(riffname);
-	}
-	
-
-	while (hierarchy_list.size())
-	{
-		Hierarchy_Descriptor * hd = hierarchy_list.first_entry();
-		
-		
-		if (hd->hierarchy_name)
-			DeallocateMem (hd->hierarchy_name);
-		
-		if (hd->hierarchy_root)
-			delete_section (hd->hierarchy_root);
-			
-		DeallocateMem (hd);
-		
-		hierarchy_list.delete_first_entry();
-	}
-	
-	while(alternate_shape_set_list.size())
-	{
-		Hierarchy_Alternate_Shape_Set* hass=alternate_shape_set_list.first_entry();
-		HIERARCHY_SHAPE_REPLACEMENT* hsr=hass->replaced_shapes;
-		
-		while(hsr->replaced_section_name)
-		{
-			DeallocateMem (hsr->replaced_section_name);
-			hsr++;
-		}
-		
-		DeallocateMem (hass->replaced_shapes);
-		DeallocateMem (hass->shape_set_name);
-		DeallocateMem (hass);
-		alternate_shape_set_list.delete_first_entry();
-	}
-
-	if(shape_collections)
-	{
-		for(int i=0;i<num_shape_collections;i++)
-		{
-			DeallocateMem (shape_collections[i].replacements);			
-		}
-		DeallocateMem (shape_collections);
-	}
-	#else
 	while (hierarchy_list.size())
 	{
 		hierarchy_list.delete_first_entry();
@@ -582,24 +530,8 @@ Global_Hierarchy_Store::~Global_Hierarchy_Store()
 	{
 		alternate_shape_set_list.delete_first_entry();
 	}
-	#endif
 
 	//get rid of any loaded sounds
-	#if !NEW_DEALLOCATION_ORDER
-	if(sound_array)
-	{
-		for(int i=0;i<num_sounds;i++)	
-		{
-			if(sound_array[i].sound_loaded)
-			{
-				LoseSound(sound_array[i].sound_loaded);
-			}
-		}
-		#if !USE_LEVEL_MEMORY_POOL
-		DeallocateMem (sound_array);
-		#endif
-	}
-	#endif
 }
 
 void Global_Hierarchy_Store::add_hierarchy (List <Object_ShapeNum_Pair *> & osnp_lst, Object_Hierarchy_Chunk * ohc)
@@ -817,41 +749,6 @@ void Global_Hierarchy_Store::setup_alternate_shape_sets(List <Object_ShapeNum_Pa
 	}
 }
 
-void Global_Hierarchy_Store::delete_section(SECTION * s2d)
-{
-	#if !USE_LEVEL_MEMORY_POOL
-	SECTION ** csp = &s2d->Children[0];
-	if (csp)
-	{
-		while (*csp)
-		{
-			delete_section (*csp);
-			csp ++;
-		}
-		DeallocateMem ((void *)s2d->Children);
-		
-	}
-
-	for (int i=0; i<s2d->num_sequences; i++)
-	{
-		DeallocateMem (s2d->sequence_array[i].first_frame);
-	}
-	
-	DeallocateMem ((void *)s2d->sequence_array);
-
-	if (s2d->Section_Name)
-	{
-		DeallocateMem ((void *)s2d->Section_Name);
-	}
-
-	if (s2d->ShapeName)
-	{
-		DeallocateMem ((void *)s2d->ShapeName);
-	}
-	
-	DeallocateMem ((void *)s2d);
-  	#endif
-}
 
 
 SECTION * Global_Hierarchy_Store::build_hierarchy (Object_Hierarchy_Chunk * ohc,char* hierarchy_name)
@@ -1353,14 +1250,6 @@ static BOOL copy_rif_data_as_hierarchy (RIFFHANDLE h, int flags,int progress_sta
 	
 	Set_Progress_Bar_Position(progress_start);
 	
-	//SelectGenTexDirectory(ITI_TEXTURE);
-
-	#if 0 //disable the multiple image group stuff
-	if(!(flags & CCF_DONT_INITIALISE_TEXTURES))
-	{
-		InitialiseTextures();
-	}
-	#endif
 	
 	/*find this rif's sound directory*/
 	Rif_Sound_Directory=0;
@@ -1789,23 +1678,6 @@ BOOL copy_rif_data (RIFFHANDLE h, int flags,int progress_start,int progress_inte
 		ffclose_almost_all();
 	}
 
-	#if 0 //disable the multiple image group stuff
-	if (!(flags & CCF_IMAGEGROUPSET))
-	{
-		GLOBALASSERT(flags & CCF_ENVIRONMENT); //image group should be set for everything else
-		#ifdef MaxImageGroups
-		#if MaxImageGroups > 2
-		SetCurrentImageGroup(flags & CCF_ENVIRONMENT ? 2 : 0);
-		#else
-		if (flags & CCF_ENVIRONMENT)
-			GLOBALASSERT(0=="Requires MaxImageGroups to be > 2 (system.h)");
-		#endif
-		#else
-		if (flags & CCF_ENVIRONMENT)
-			GLOBALASSERT(0=="Requires MaxImageGroups to be defined > 2 (system.h)");
-		#endif
-	}
-	#endif
 	
 	if (INVALID_RIFFHANDLE == h || !h->fc) return(FALSE);
 	
@@ -1833,14 +1705,6 @@ BOOL copy_rif_data (RIFFHANDLE h, int flags,int progress_start,int progress_inte
 ** Load Textures **
 **---------------*/
 
-	//SelectGenTexDirectory(ITI_TEXTURE);
-
-	#if 0 //disable the multiple image group stuff
-	if(!(flags & CCF_DONT_INITIALISE_TEXTURES))
-	{
-		InitialiseTextures();
-	}
-	#endif
 	
 	if (flags & CCF_ENVIRONMENT)
 	{
@@ -1975,17 +1839,12 @@ BOOL copy_rif_data (RIFFHANDLE h, int flags,int progress_start,int progress_inte
 				{
 					//only create one copy of the shape for imported objects
 					
-					#if SupportMorphing && LOAD_MORPH_SHAPES
 					db_logf3(("Copying shape to shape list"));
 					CTM_ReturnType rt_temp = copy_to_mainshapelist(h,shplif(),flags,0);
 					int start_shape_no = rt_temp.start_list_pos;
 					int list_pos = rt_temp.main_list_pos;
 					db_logf3(("Shape copied to %d",list_pos));
 					MORPHCTRL * mc = rt_temp.mc;
-					#else
-					int list_pos = copy_to_mainshapelist(h,shplif(),flags,&ob->object_data);
-					int start_shape_no = list_pos;
-					#endif
 
 					int AnimationShape=-1;
 					if (shplif()->lookup_single_child("TEXTANIM"))
@@ -2013,17 +1872,12 @@ BOOL copy_rif_data (RIFFHANDLE h, int flags,int progress_start,int progress_inte
 					for(LIF<Object_Chunk*> oblif(&object_list);!oblif.done();oblif.next())
 					{
 						Object_Chunk* ob=oblif();
-						#if SupportMorphing && LOAD_MORPH_SHAPES
 						db_logf3(("Copying shape for object %s",ob->object_data.o_name));
 						CTM_ReturnType rt_temp = copy_to_mainshapelist(h,shplif(),flags,&ob->object_data);
 						int start_shape_no = rt_temp.start_list_pos;
 						int list_pos = rt_temp.main_list_pos;
 						db_logf3(("Shape copied to %d",list_pos));
 						MORPHCTRL * mc = rt_temp.mc;
-						#else
-						int list_pos = copy_to_mainshapelist(h,shplif(),flags,&ob->object_data);
-						int start_shape_no = list_pos;
-						#endif
 				
 						//see if object has prelighting data
 						Shape_Vertex_Intensities_Chunk * svic = 0;
@@ -2067,13 +1921,11 @@ BOOL copy_rif_data (RIFFHANDLE h, int flags,int progress_start,int progress_inte
 							mainshapelist[list_pos]->shapeflags |= ShapeFlag_PreLit;
 				
 						}
-						#if 1
 						int AnimationShape=-1;
 						if (shplif()->lookup_single_child("TEXTANIM"))
 						{
 							AnimationShape=list_pos;
 						}
-						#endif
 				
 						if (ob->get_header()->flags & OBJECT_FLAG_PLACED_OBJECT)
 						{
@@ -2345,9 +2197,6 @@ BOOL copy_rif_data (RIFFHANDLE h, int flags,int progress_start,int progress_inte
 						{
 							MainScene.sm_module[i].m_vmptr[vmod_no].vmod_instr = vmodi_bra_vc;
 
-							#if (StandardStrategyAndCollisions || IntermediateSSACM)
-							MainScene.sm_module[j].m_mapptr->MapStrategy = StrategyI_DoorPROX;
-							#endif //(StandardStrategyAndCollisions || IntermediateSSACM)
 						}
 						else
 						{
@@ -2607,25 +2456,6 @@ BOOL copy_rif_data (RIFFHANDLE h, int flags,int progress_start,int progress_inte
 					FALLP_EntryPoints[i].entryPointsList[adj_pos].donorIndex=ad_aim->aimodule_index;
 					FALLP_EntryPoints[i].entryPointsList[adj_pos].alien_only=ad_aim->alien_only;
 
-					#if 0
-					//test
-					{
-						VECTORCH loc=FALLP_EntryPoints[i].entryPointsList[adj_pos].position;
-
-						MODULE* mod=AIModuleArray[i].m_module_ptrs[0];
-						SHAPEHEADER* shp=mainshapelist[mod->m_mapptr->MapShape];
-
-						if(loc.vx< shp->shapeminx||
-						   loc.vy< shp->shapeminy||
-						   loc.vz< shp->shapeminz||
-						   loc.vx> shp->shapemaxx||
-						   loc.vy> shp->shapemaxy||
-						   loc.vz> shp->shapemaxz)
-						{
-							GLOBALASSERT(0=="The entry points probably need to be recalculated");
-						}
-					}
-					#endif
 					adj_pos++;
 					entry_points[i].delete_first_entry();
 					delete ad_aim;
@@ -2665,7 +2495,6 @@ BOOL copy_rif_data (RIFFHANDLE h, int flags,int progress_start,int progress_inte
 			MainScene.sm_module[0].m_vmptr[i].vmod_angle = 0;
 			MainScene.sm_module[0].m_vmptr[i].vmod_flags = 0;
 			
-		  //	MainScene.sm_module[i]->m_flags|=m_flag_gotptrs;
 		}
 
 		MainScene.sm_module[0].m_vmptr[i].vmod_type = vmtype_term;
@@ -2698,7 +2527,6 @@ BOOL copy_rif_data (RIFFHANDLE h, int flags,int progress_start,int progress_inte
 
 		setup_preplaced_decals(h->fc,h->envd);
 
-	//	create_strategies_from_list(); //now called later
 		
 		//set sky colour , and other envionmental properties
 		set_environment_properties(h->envd);
@@ -2724,7 +2552,6 @@ BOOL copy_rif_data (RIFFHANDLE h, int flags,int progress_start,int progress_inte
 
 			if ( ! tmpshp->list_assoc_objs().size() )
 			{
-		  //		ChunkShape cs = tmpshp->shape_data;
 				copy_to_mainshapelist(h,tmpshp,flags);
 			}
 			
@@ -2735,7 +2562,6 @@ BOOL copy_rif_data (RIFFHANDLE h, int flags,int progress_start,int progress_inte
 /*--------------**
 ** Load sprites **
 **--------------*/
-	//SelectGenTexDirectory(ITI_SPRITE);
 
 	Chunk * pChunk = h->fc->lookup_single_child ("RSPRITES");
 	if (pChunk)
@@ -2808,7 +2634,6 @@ BOOL copy_rif_data (RIFFHANDLE h, int flags,int progress_start,int progress_inte
 		while (random_civilian_texturings.size())random_civilian_texturings.delete_first_entry();
 		
 		ChangePalette(TestPalette);
-   		/*ConvertToDDPalette(TestPalette, LPTestPalette, palch->width, 0);*/
 	}
 
 	//reset sound diretory pointer
@@ -2920,7 +2745,6 @@ void FreeMSLPos(int pos)
 // hook to perhaps scale the uv coordinates - should return new value
 int ProcessUVCoord(RIFFHANDLE,UVCOORDTYPE uvct,int uv_value,int /*image_num*/)
 {
-//	return (int)(uv_value*GetUVScale(UVC_SPRITE_U==uvct||UVC_SPRITE_V==uvct ? ITI_SPRITE : ITI_TEXTURE));
 	return uv_value;
 }
 
@@ -2953,10 +2777,7 @@ void post_process_shape (SHAPEHEADER * shp)
 				}
 		}
 		shp->items[i][2] |= iflag_gsort_ptest | iflag_linear_s;
-		//shp->items[i][2] &= ~iflag_transparent; // this causes _translucency_ on direct 3d
-		//shp->items[i][2] &= ~iflag_drawtx3das2d;
 		
-		#if SupportZBuffering
 		if (ZBufferOn==ZBufferMode)
 		{
 			switch (shp->items[i][0])
@@ -2984,7 +2805,6 @@ void post_process_shape (SHAPEHEADER * shp)
 					break;
 			}
 		}
-		#endif
 	}
 
 	shp->shapeflags |= ShapeFlag_AugZ | ShapeFlag_AugZ_Lite;
@@ -2993,9 +2813,7 @@ void post_process_shape (SHAPEHEADER * shp)
 // your function could perform any extra tidying up you need
 void DeallocateLoadedShapeheader(SHAPEHEADER * shp)
 {
-	#if !NEW_DEALLOCATION_ORDER
-	DeallocateRifLoadedShapeheader(shp);
-	#endif
+/* adj -stub */
 }
 
 
@@ -3004,66 +2822,11 @@ void DeallocateModules()
 	
 	MODULE ** m_arrayPtr = MainScene.sm_marray;
 	
-	#if !USE_LEVEL_MEMORY_POOL
-	while (*m_arrayPtr)
-	{
-		List<Light_Chunk *> lights_for_this_module;
-		
-		MODULE * this_mod = *m_arrayPtr++;
-		
-		if(this_mod->m_mapptr) DeallocateMem(this_mod->m_mapptr);
-		this_mod->m_mapptr=0;
-		if(this_mod->name) DeallocateMem(this_mod->name);
-		this_mod->name=0;
-		if(this_mod->m_vmptr) DeallocateMem(this_mod->m_vmptr);
-		this_mod->m_vmptr=0;
-		if(this_mod->m_lightarray) DeallocateMem(this_mod->m_lightarray);
-		this_mod->m_lightarray=0;
-	}
-	if(MainScene.sm_module)DeallocateMem(MainScene.sm_module);
-	if(MainScene.sm_marray)DeallocateMem(MainScene.sm_marray);
-	#endif
 	MainScene.sm_module=0;
 	MainScene.sm_marray=0;
 
-
-	#if !USE_LEVEL_MEMORY_POOL
-	for(int i=0;i<AIModuleArraySize;i++)
-	{
-		AIMODULE* aim=&AIModuleArray[i];
-		if(aim->m_link_ptrs) DeallocateMem(aim->m_link_ptrs);
-		if(aim->m_module_ptrs) DeallocateMem(aim->m_module_ptrs);
-		if(aim->m_waypoints)
-		{
-			WAYPOINT_HEADER* wh=aim->m_waypoints;
-			for(int j=0;j<wh->num_waypoints;j++)
-			{
-				WAYPOINT_VOLUME* wv=&wh->first_waypoint[j];
-				if(wv->first_link)DeallocateMem(wv->first_link);	
-			}
-			if(wh->first_waypoint)DeallocateMem(wh->first_waypoint);
-			DeallocateMem(wh);
-  		}
-	}
-	DeallocateMem(AIModuleArray);
-	#endif
 	AIModuleArray=0;
 
-	//delete any paths
-	#if !USE_LEVEL_MEMORY_POOL
-	if(PathArray)
-	{
-		for(int i=0;i<PathArraySize;i++)
-		{
-			if(PathArray[i].modules_in_path)
-			{
-				DeallocateMem(PathArray[i].modules_in_path);
-			}
-		}
-		DeallocateMem(PathArray);
-	}
-	#endif
-	
 	PathArray=0;
 	PathArraySize=0;
 
@@ -3118,7 +2881,6 @@ RIFFHANDLE avp_load_rif_non_env (const char * fname)
 
 
 
-#if debug
 extern "C"{
  extern VIEWDESCRIPTORBLOCK *Global_VDB_Ptr;
 }
@@ -3126,6 +2888,7 @@ void LoadModuleData()
 {
  	GLOBALASSERT(env_rif);
 
+	/* adj */
  	HANDLE file = CreateFile ("avp_rifs\\module.bbb", GENERIC_WRITE, 0, 0, CREATE_ALWAYS, 
  					FILE_FLAG_RANDOM_ACCESS, 0);
 	unsigned long byteswritten;
@@ -3277,8 +3040,6 @@ void LoadModuleData()
 	CloseHandle(file);
 	DeleteFile("avp_rifs\\module.aaa");
 }
-#endif
-
 
 
 

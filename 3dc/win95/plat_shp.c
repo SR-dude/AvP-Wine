@@ -1,28 +1,14 @@
-/*RWH moved to a seperate file*/
-
-
 #include "3dc.h"
 #include "module.h"
 #include "inline.h"
-
 #include "gameplat.h"
 #include "gamedef.h"
-
-
 #include "dynblock.h"
 #include "dynamics.h"
 #define UseLocalAssert No
 #include "ourasert.h"
 
 
-/*						   *
-						   *
-						   *
-						*  *  *
-						 * * *
-						  ***
-                           *
-*/
 /*KJL***********************************************
 * Polygon Access Functions V1.0, 18:12:27 11/07/96 *
 ***********************************************KJL*/
@@ -35,10 +21,9 @@ int SetupPolygonAccessFromShapeIndex(int shapeIndex);
 
 
 /* the following are needed for morphing support */
-#if SupportMorphing
 extern MORPHDISPLAY MorphDisplay;
 extern VECTORCH MorphedPts[];
-#endif
+
 
 VECTORCH *ShapePointsPtr;
 int *ShapeNormalsPtr;
@@ -51,7 +36,6 @@ int SetupPolygonAccess(DISPLAYBLOCK *objectPtr)
 {
 	SHAPEHEADER *shape1Ptr;
 
-	#if SupportMorphing
   	if (objectPtr->ObMorphCtrl) /* morphable object? */
 	{
 		VECTORCH *shape1PointsPtr;
@@ -124,7 +108,6 @@ int SetupPolygonAccess(DISPLAYBLOCK *objectPtr)
 		ItemArrayPtr = (int **)shape1Ptr->items;
 	}
   	else /* not a morphing object */
-  	#endif
   	{
 		shape1Ptr = GetShapeData(objectPtr->ObShape);
 
@@ -209,14 +192,6 @@ void GetPolygonNormal(struct ColPolyTag *polyPtr)
      	polyPtr->PolyNormal = *(VECTORCH*)(ShapeNormalsPtr + PolyheaderPtr->PolyNormalIndex);
     	
     	/* KJL 20:55:36 05/14/97 - turned off for alpha */
-    	#if 0
-    	if(	(polyPtr->PolyNormal.vx==0)
-		  &&(polyPtr->PolyNormal.vy==0)
-		  &&(polyPtr->PolyNormal.vz==0) )
-		{
-			textprint("shape data has zero normal\n");
-		}
-		#endif
 
     }
     return;

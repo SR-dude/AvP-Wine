@@ -40,50 +40,13 @@
 #include "scream.h"
 #include "avp_userprofile.h"
 
-
-#define ALIEN_CONTACT_WEAPON 0
-#if ALIEN_CONTACT_WEAPON
-static void AlienContactWeapon(void);
-#endif
-
-#ifdef AVP_DEBUG_VERSION
-	#define FLY_MODE_CHEAT_ON 1
-#else
-	#ifdef AVP_DEBUG_FOR_FOX
-		#define FLY_MODE_CHEAT_ON 1
-	#else
-		#define FLY_MODE_CHEAT_ON 0
-	#endif
-#endif
-//!(PREDATOR_DEMO||MARINE_DEMO||ALIEN_DEMO||DEATHMATCH_DEMO)
-#if FLY_MODE_CHEAT_ON
 extern unsigned char KeyboardInput[];
-#endif
 extern int DebouncedGotAnyKey;
 
 /*KJL*****************************************************
 * If the define below is set to non-zero then the player *
 * movement values will be loaded in from movement.txt	 *
 *****************************************************KJL*/
-#define LOAD_IN_MOVEMENT_VALUES 0
-
-#if SupportWindows95 && LOAD_IN_MOVEMENT_VALUES	
-
-static int AlienForwardSpeed;
-static int AlienStrafeSpeed;
-static int AlienTurnSpeed;	
-static int AlienJumpSpeed;
-static int PredatorForwardSpeed;
-static int PredatorStrafeSpeed;
-static int PredatorTurnSpeed;	
-static int PredatorJumpSpeed;
-static int MarineForwardSpeed;
-static int MarineStrafeSpeed;
-static int MarineTurnSpeed;	
-static int MarineJumpSpeed;
-
-static void LoadInMovementValues(void);
-#endif
 
 /* Globals */
 int CrouchIsToggleKey;
@@ -98,11 +61,7 @@ extern int predHUDSoundHandle;
 extern int predOVision_SoundHandle;
 extern int TauntSoundPlayed;
 
-#if SupportWindows95
 extern unsigned char GotAnyKey;
-#else
-unsigned char GotAnyKey;
-#endif
 
 static char FlyModeOn = 0;			
 static char FlyModeDebounced = 0;
@@ -112,7 +71,6 @@ static char BonusAbilityDebounced = 0;
 extern int deathFadeLevel;
 extern VIEWDESCRIPTORBLOCK *Global_VDB_Ptr;
 
-// DISPLAYBLOCK *playerdb;
 
 extern void DeInitialisePlayer(void);
 
@@ -161,9 +119,6 @@ void InitPlayerMovementData(STRATEGYBLOCK* sbPtr)
 	
 	timeInContactWithFloor=(ONE_FIXED/10);
 
-	#if SupportWindows95 && LOAD_IN_MOVEMENT_VALUES	
-	LoadInMovementValues();
-	#endif
 
 }
 
@@ -257,28 +212,14 @@ void PlayerBehaviour(STRATEGYBLOCK* sbPtr)
 #define JUMPVELOCITY 9000
 
 #define FASTMOVESCALE 12000
-#define SLOWMOVESCALE 8000
 #define FASTTURNSCALE 2000
-#define SLOWTURNSCALE 1000
 #define FASTSTRAFESCALE 10000
-#define SLOWSTRAFESCALE 6000
 
 /* KJL 14:39:45 01/14/97 - Camera stuff */
 #define	PANRATESHIFT 6	
 #define TIMEBEFOREAUTOCENTREVIEW 16384
 
-/* patrick 9/7/97: these are for testing AI pre-calculated values... */
-#define PATTEST_EPS	0
-#define PATTEST_AUXLOCS 0
-#if (PATTEST_EPS&&PATTEST_AUXLOCS)
-	#error Cannot have both
-#endif 
-#if PATTEST_EPS
-	void EpLocationTest(void);
-#endif
-#if PATTEST_AUXLOCS
-	void AuxLocationTest(void);
-#endif
+
 
 void ExecuteFreeMovement(STRATEGYBLOCK* sbPtr)
 {
@@ -304,22 +245,6 @@ void ExecuteFreeMovement(STRATEGYBLOCK* sbPtr)
 	{
 		case I_Alien:
 			break;
-		#if 0
-		case I_Predator: /* KJL 11:08:19 10/09/98 - Grappling Hook */
-		{
-			if (playerStatusPtr->Mvt_InputRequests.Flags.Rqst_BonusAbility)
-			{
-				if(BonusAbilityDebounced)
-				{
-					ActivateGrapplingHook();
-					BonusAbilityDebounced = 0;
-				}
-			}
-			else BonusAbilityDebounced = 1;
-			
-			break;
-		}
-		#endif
 		case I_Predator: /* KJL 11:08:19 10/09/98 - Cycle Vision Mode */
 		{
 			if (playerStatusPtr->Mvt_InputRequests.Flags.Rqst_CycleVisionMode)
@@ -341,19 +266,8 @@ void ExecuteFreeMovement(STRATEGYBLOCK* sbPtr)
 	if (playerStatusPtr->Mvt_InputRequests.Flags.Rqst_Operate)
 		OperateObjectInLineOfSight();
 			
-	/* patrick 9/7/97: these are for testing AI pre-calculated values... */
-	#if PATTEST_EPS
-		EpLocationTest();
-	#endif
-	#if PATTEST_AUXLOCS
-		AuxLocationTest();
-	#endif
 	
 
-	/* Alien damages things by being in contact with them */
-	#if ALIEN_CONTACT_WEAPON
-	if (AvP.PlayerType == I_Alien) AlienContactWeapon();
-	#endif
 
 	/*------------------------------------------------------ 
 	MOVEMENT
@@ -369,31 +283,6 @@ void ExecuteFreeMovement(STRATEGYBLOCK* sbPtr)
 		int turnSpeed; 	
 		int jumpSpeed;
 
-		#if SupportWindows95 && LOAD_IN_MOVEMENT_VALUES	
-		switch (AvP.PlayerType)
-		{
-			case I_Alien:
-				forwardSpeed = AlienForwardSpeed;
-				strafeSpeed  = AlienStrafeSpeed;
-				turnSpeed    = AlienTurnSpeed;	
-				jumpSpeed    = AlienJumpSpeed;
-				break;
-			
-			case I_Predator:
-				forwardSpeed = PredatorForwardSpeed;
-				strafeSpeed  = PredatorStrafeSpeed;
-				turnSpeed    = PredatorTurnSpeed;	
-				jumpSpeed    = PredatorJumpSpeed;
-				break;
-			
-			case I_Marine:
-				forwardSpeed = MarineForwardSpeed;
-				strafeSpeed  = MarineStrafeSpeed;
-				turnSpeed    = MarineTurnSpeed;	
-				jumpSpeed    = MarineJumpSpeed;
-				break;
-		}
-		#else
 		switch (AvP.PlayerType)
 		{
 			case I_Alien:
@@ -415,7 +304,6 @@ void ExecuteFreeMovement(STRATEGYBLOCK* sbPtr)
 				jumpSpeed = JUMPVELOCITY;
 				break;
 		}
-		#endif
 
 		MaxSpeed=forwardSpeed;
 
@@ -534,41 +422,7 @@ void ExecuteFreeMovement(STRATEGYBLOCK* sbPtr)
 			}
 		}
 
-		/* inertia on turning - currently off */
-		#if 0
-		if(!turnSpeed)
-		{
-			int deltaTurn = (FASTTURNSCALE*NormalFrameTime)>>15;
-			if (playerStatusPtr->TurnInertia>0)
-			{
-				turnSpeed = playerStatusPtr->TurnInertia - deltaTurn;
-				if (turnSpeed<0) turnSpeed=0;
-			}
-			else if (playerStatusPtr->TurnInertia<0)
-			{
-				turnSpeed = playerStatusPtr->TurnInertia + deltaTurn;
-				if (turnSpeed>0) turnSpeed=0;
-			}
-		}
-		#endif
 
-		/* Hold it! Correct forwardSpeed vs. strafeSpeed? */
-
-		#if 0
-		{
-			int mag,angle;
-
-			mag=(forwardSpeed*forwardSpeed)+(strafeSpeed*strafeSpeed);
-			if (mag>(MaxSpeed*MaxSpeed)) {
-
-				angle=ArcTan(forwardSpeed,strafeSpeed);
-
-				forwardSpeed=MUL_FIXED(GetSin(angle),MaxSpeed);
-				strafeSpeed=MUL_FIXED(GetCos(angle),MaxSpeed);
-			
-			}
-		}
-		#endif
 		
 		if (playerStatusPtr->Mvt_InputRequests.Flags.Rqst_Jetpack &&
 			playerStatusPtr->JetpackEnabled)
@@ -592,7 +446,6 @@ void ExecuteFreeMovement(STRATEGYBLOCK* sbPtr)
 			}
 		}
 
-		#if FLY_MODE_CHEAT_ON
 		dynPtr->GravityOn=1;
 		if (KeyboardInput[KEY_F6]&&(!(playerStatusPtr->DemoMode)))
 		{
@@ -609,7 +462,6 @@ void ExecuteFreeMovement(STRATEGYBLOCK* sbPtr)
 			dynPtr->LinVelocity.vx = 0;
 			dynPtr->LinVelocity.vy = 0;
 			dynPtr->LinVelocity.vz = forwardSpeed;
-//			dynPtr->IsNetGhost=1;
 			if(playerStatusPtr->Mvt_InputRequests.Flags.Rqst_Strafe)
 			{
 				dynPtr->LinVelocity.vx = strafeSpeed;
@@ -632,7 +484,6 @@ void ExecuteFreeMovement(STRATEGYBLOCK* sbPtr)
 			dynPtr->LinImpulse.vz=0;
 		}
 		else
-		#endif
 		/* KJL 12:28:48 14/04/98 - if we're not in contact with the floor, but we've hit
 		something, set our velocity to zero (otherwise leave it alone) */
 		if(!dynPtr->IsInContactWithFloor)
@@ -650,7 +501,6 @@ void ExecuteFreeMovement(STRATEGYBLOCK* sbPtr)
 				{
 					dynPtr->LinVelocity.vz = forwardSpeed/4;
 				}
-	//			dynPtr->IsNetGhost=1;
 				if(playerStatusPtr->Mvt_InputRequests.Flags.Rqst_Strafe)
 				{
 					dynPtr->LinVelocity.vx = strafeSpeed/4;
@@ -747,59 +597,20 @@ void ExecuteFreeMovement(STRATEGYBLOCK* sbPtr)
 					{
 						case I_Marine:
 						{
-							#if 0
-							if (playerStatusPtr->soundHandle==SOUND_NOACTIVEINDEX) {
-								int rand=(FastRandom()%4);
-
-								switch (rand) {
-									case 0:
-										Sound_Play(SID_MARINE_JUMP_START,"he",&playerStatusPtr->soundHandle);
-										break;
-									case 1:
-										Sound_Play(SID_MARINE_JUMP_START_2,"he",&playerStatusPtr->soundHandle);
-										break;
-									case 2:
-										Sound_Play(SID_MARINE_JUMP_START_3,"he",&playerStatusPtr->soundHandle);
-										break;
-									default:
-										Sound_Play(SID_MARINE_JUMP_START_4,"he",&playerStatusPtr->soundHandle);
-										break;
-								}
-							}
-							#else
 							if (playerStatusPtr->soundHandle==SOUND_NOACTIVEINDEX) {
 								PlayMarineScream(0,SC_Jump,0,&playerStatusPtr->soundHandle,NULL);
 								if(AvP.Network!=I_No_Network) netGameData.myLastScream=SC_Jump;
 							}
-							#endif
 							break;
 						}
 						case I_Alien:
 							break;
 						case I_Predator:
 						{
-							#if 0
-							if (playerStatusPtr->soundHandle==SOUND_NOACTIVEINDEX) {
-								int rand=(FastRandom()%3);
-
-								switch (rand) {
-									case 0:
-										Sound_Play(SID_PRED_JUMP_START_1,"he",&playerStatusPtr->soundHandle);
-										break;
-									case 1:
-										Sound_Play(SID_PRED_JUMP_START_2,"he",&playerStatusPtr->soundHandle);
-										break;
-									default:
-										Sound_Play(SID_PRED_JUMP_START_3,"he",&playerStatusPtr->soundHandle);
-										break;
-								}
-							}
-							#else
 							if (playerStatusPtr->soundHandle==SOUND_NOACTIVEINDEX) {
 								PlayPredatorSound(0,PSC_Jump,0,&playerStatusPtr->soundHandle,NULL);
 								if(AvP.Network!=I_No_Network) netGameData.myLastScream=PSC_Jump;
 							}
-							#endif
 							break;
 						}
 						default:
@@ -913,12 +724,10 @@ void ExecuteFreeMovement(STRATEGYBLOCK* sbPtr)
 			AllowedLookDownAngle = 2048-128;
 		}
 
-		#if SupportWindows95
 		if (!ControlMethods.AutoCentreOnMovement)
 		{
 			timeBeenContinuouslyMoving = 0;
 		}
-		#endif
 
 		if (playerStatusPtr->Mvt_MotionIncrement == 0)
 		{
@@ -1112,19 +921,6 @@ static void MakePlayerCrouch(STRATEGYBLOCK* sbPtr)
 	return;
 }
 
-#if 0
-static void MakePlayerLieDown(STRATEGYBLOCK* sbPtr)
-{	
-	PLAYER_STATUS *playerStatusPtr= (PLAYER_STATUS *) (sbPtr->SBdataptr);
-	
-
-	/* set player state */
-	playerStatusPtr->ShapeState = PMph_Lying;
-
-	return;
-}
-#endif
-
 
 int deathFadeLevel;
 
@@ -1138,7 +934,6 @@ static void CorpseMovement(STRATEGYBLOCK *sbPtr)
 		if(deathFadeLevel>0)
 		{
 			/* fade screen to black */
-			//SetPaletteFadeLevel(deathFadeLevel);
 			deathFadeLevel-= RealFrameTime/4;
 			if (deathFadeLevel<0) deathFadeLevel = 0;
 
@@ -1176,7 +971,6 @@ static void NetPlayerDeadProcessing(STRATEGYBLOCK *sbPtr)
 {
 	SECTION *root_section;
 
-	#if SupportWindows95
 	PLAYER_STATUS *psPtr= (PLAYER_STATUS *) (sbPtr->SBdataptr);
 
 	/* call the read input function so that we can still respawn/quit, etc */
@@ -1250,7 +1044,7 @@ static void NetPlayerDeadProcessing(STRATEGYBLOCK *sbPtr)
 			
 		}
 	}
-	#endif
+	
 }
 
 extern void InitPlayerCloakingSystem(void);
@@ -1260,7 +1054,6 @@ void NetPlayerRespawn(STRATEGYBLOCK *sbPtr)
 	extern int LeanScale;
 	SECTION *root_section;
 
-	#if SupportWindows95
 	PLAYER_STATUS *psPtr= (PLAYER_STATUS *) (sbPtr->SBdataptr);
 
 
@@ -1275,8 +1068,6 @@ void NetPlayerRespawn(STRATEGYBLOCK *sbPtr)
 	/* When you're going to respawn... you might change */
 	/* character class, after all. */
 	InitialisePlayersInventory(psPtr);
-    /* psPtr->Health=STARTOFGAME_MARINE_HEALTH; */
-    /* psPtr->Armour=STARTOFGAME_MARINE_ARMOUR; */
 	psPtr->IsAlive = 1;
 	psPtr->MyFaceHugger=NULL;
     psPtr->Energy=STARTOFGAME_MARINE_ENERGY;
@@ -1305,17 +1096,6 @@ void NetPlayerRespawn(STRATEGYBLOCK *sbPtr)
 				}
 				LeanScale=ONE_FIXED;
 
-				#if 0  //this hmodel isn't being set up for the moment - Richard
-				root_section=GetNamedHierarchyFromLibrary("hnpcmarine","Template");
-				if (!root_section) {
-					GLOBALASSERT(0);
-					/* Sorry, there's just no bouncing back from this one.  Fix it. */
-					return;
-				}
-				Create_HModel(&psPtr->HModelController,root_section);
-				InitHModelSequence(&psPtr->HModelController,0,0,ONE_FIXED);
-				/* Doesn't matter what the sequence is... */
-				#endif
 				break;
 			}
 			case(I_Predator):
@@ -1337,17 +1117,6 @@ void NetPlayerRespawn(STRATEGYBLOCK *sbPtr)
 				}
 				LeanScale=ONE_FIXED;
 
-				#if 0  //this hmodel isn't being set up for the moment - Richard
-				root_section=GetNamedHierarchyFromLibrary("hnpcpredator","Template");
-				if (!root_section) {
-					GLOBALASSERT(0);
-					/* Sorry, there's just no bouncing back from this one.  Fix it. */
-					return;
-				}
-				Create_HModel(&psPtr->HModelController,root_section);
-				InitHModelSequence(&psPtr->HModelController,0,0,ONE_FIXED);
-				/* Doesn't matter what the sequence is... */
-				#endif
 				break;
 			}
 			case(I_Alien):
@@ -1369,17 +1138,6 @@ void NetPlayerRespawn(STRATEGYBLOCK *sbPtr)
 				}
 				LeanScale=ONE_FIXED*3;
 
-				#if 0  //this hmodel isn't being set up for the moment - Richard
-				root_section=GetNamedHierarchyFromLibrary("hnpcalien","alien");
-				if (!root_section) {
-					GLOBALASSERT(0);
-					/* Sorry, there's just no bouncing back from this one.  Fix it. */
-					return;
-				}
-				Create_HModel(&psPtr->HModelController,root_section);
-				InitHModelSequence(&psPtr->HModelController,0,0,ONE_FIXED);
-				/* Doesn't matter what the sequence is... */
-				#endif
 				break;
 			}
 			default:
@@ -1447,253 +1205,7 @@ void NetPlayerRespawn(STRATEGYBLOCK *sbPtr)
 	
 	//The player's dropped weapon (if there was one) can now be drawn
 	MakePlayersWeaponPickupVisible();
-#endif
 }
-
-
-/* Patrick 9/7/97 ---------------------------------------------------
-These two functions are used for testing the pre-processed AI 
-locations... (either entry points or auxilary locs)
-They teleport the player to the next location in the sequence, 
-in response to the player pressing 'unused3' (currently the U key).
---------------------------------------------------------------------*/
-#if PATTEST_EPS
-static int pF_ModuleIndex = 0;
-static int pF_EpIndex = 0;
-static int pF_HaveStarted = 0;
-static int pF_CanMove = 0;
-
-void EpLocationTest(void)
-{
-	extern SCENE Global_Scene;
-	extern SCENEMODULE **Global_ModulePtr;
-	extern int ModuleArraySize;
-
-	SCENEMODULE *ScenePtr;
-	MODULE **moduleListPointer;
-	DYNAMICSBLOCK *dynPtr = Player->ObStrategyBlock->DynPtr;
-	MODULE *thisModulePtr;
-
-	LOCALASSERT(Global_ModulePtr);
-	ScenePtr = Global_ModulePtr[Global_Scene];
-	moduleListPointer = ScenePtr->sm_marray;		
-
-	if(PlayerStatusPtr->Mvt_InputRequests.Flags.Rqst_Unused3)
-	{			
-		if(pF_CanMove == 1)
-		{
-			/* move to the next one */
-			pF_EpIndex++;
-			if(pF_EpIndex >= FALLP_EntryPoints[pF_ModuleIndex].numEntryPoints)
-			{
-				pF_EpIndex=0;
-				do
-				{
-					pF_ModuleIndex++;
-					if(pF_ModuleIndex>=ModuleArraySize) pF_ModuleIndex = 0;
-				}
-				while(FALLP_EntryPoints[pF_ModuleIndex].numEntryPoints==0);
-			}
-
-			/* now move to the new location */
-			thisModulePtr = moduleListPointer[pF_ModuleIndex];
-			dynPtr->Position = FALLP_EntryPoints[pF_ModuleIndex].entryPointsList[(pF_EpIndex)].position;
-			dynPtr->Position.vx += thisModulePtr->m_world.vx;
-			dynPtr->Position.vy += thisModulePtr->m_world.vy;
-			dynPtr->Position.vz += thisModulePtr->m_world.vz;
-
-			dynPtr->PrevPosition = dynPtr->Position;	
-			
-			pF_HaveStarted = 1;
-			pF_CanMove = 0;
-		}			
-	}
-	else pF_CanMove = 1;
-					
-	if (pF_HaveStarted)
-	{
-		textprint("CURRENT FAR MODULE %d \n", pF_ModuleIndex);
-		textprint("EP number %d from module %d \n", pF_EpIndex, FALLP_EntryPoints[pF_ModuleIndex].entryPointsList[(pF_EpIndex)].donorIndex);
-	}	
-}
-
-#endif
-#if PATTEST_AUXLOCS
-static int pF_ModuleIndex = 0;
-static int pF_AuxIndex = 0;
-static int pF_HaveStarted = 0;
-static int pF_CanMove = 0;
-
-void AuxLocationTest(void)
-{
-	extern SCENE Global_Scene;
-	extern SCENEMODULE **Global_ModulePtr;
-	extern int ModuleArraySize;
-
-	SCENEMODULE *ScenePtr;
-	MODULE **moduleListPointer;
-	DYNAMICSBLOCK *dynPtr=Player->ObStrategyBlock->DynPtr;
-	MODULE *thisModulePtr;
-
-	LOCALASSERT(Global_ModulePtr);
-	ScenePtr = Global_ModulePtr[Global_Scene];
-	moduleListPointer = ScenePtr->sm_marray;		
-
-	/* dynPtr->GravityOn = 0; */
-
-	if(PlayerStatusPtr->Mvt_InputRequests.Flags.Rqst_Unused3)
-	{			
-		if(pF_CanMove == 1)
-		{
-			/* move to the next one */
-			pF_AuxIndex++;
-			if(pF_AuxIndex >= FALLP_AuxLocs[pF_ModuleIndex].numLocations)
-			{
-				pF_AuxIndex=0;
-				do
-				{
-					pF_ModuleIndex++;
-					if(pF_ModuleIndex>=ModuleArraySize) pF_ModuleIndex = 0;
-				}
-				while(FALLP_AuxLocs[pF_ModuleIndex].numLocations==0);
-			}
-
-			/* now move to the new location */
-			thisModulePtr = moduleListPointer[pF_ModuleIndex];
-			dynPtr->Position = FALLP_AuxLocs[pF_ModuleIndex].locationsList[pF_AuxIndex];
-			dynPtr->Position.vx += thisModulePtr->m_world.vx;
-			dynPtr->Position.vy += thisModulePtr->m_world.vy;
-			dynPtr->Position.vz += thisModulePtr->m_world.vz;
-			dynPtr->Position.vy -= 1000;
-
-			dynPtr->PrevPosition = dynPtr->Position;				
-			pF_HaveStarted = 1;
-			pF_CanMove = 0;
-		}			
-	}
-	else pF_CanMove = 1;
-					
-	if (pF_HaveStarted)
-	{
-		textprint("CURRENT FAR MODULE %d \n", pF_ModuleIndex);
-		textprint("AUX number %d \n", pF_AuxIndex);
-	}	
-}
-
-#endif
-
-
-
-
-
-/* KJL 10:34:54 8/5/97 - The alien can damage things by merely touching them 
-
-   This will need work to get the values right - the damage done could be
-   scaled by the alien's experience points, the relative velocities of the
-   objects, and so on.
-*/
-#define ALIEN_CONTACT_WEAPON_DAMAGE 50
-#define ALIEN_CONTACT_WEAPON_DELAY 65536
-
-#if ALIEN_CONTACT_WEAPON
-static void AlienContactWeapon(void)
-{
-	COLLISIONREPORT *reportPtr = Player->ObStrategyBlock->DynPtr->CollisionReportPtr;
-	static int contactWeaponTimer = 0;
-
-	if (contactWeaponTimer<=0)
-	{
-		contactWeaponTimer = ALIEN_CONTACT_WEAPON_DELAY;
-
-		while (reportPtr) /* while there is a valid report */
-		{
-			if (reportPtr->ObstacleSBPtr)
-			{
-				switch(reportPtr->ObstacleSBPtr->I_SBtype)
-				{
-					case I_BehaviourMarinePlayer:
-					case I_BehaviourAlienPlayer:
-					case I_BehaviourPredatorPlayer:
-					case I_BehaviourPredator:
-					case I_BehaviourMarine:
-					case I_BehaviourSeal:
-					case I_BehaviourNetGhost:
-					{
-						/* make alienesque noise */
-						Sound_Play(SID_HIT_FLESH,"h");
-
-						/* damage unfortunate object */
-						CauseDamageToObject(reportPtr->ObstacleSBPtr,ALIEN_CONTACT_WEAPON_DAMAGE,NULL);
-						break;
-					}
-					default:
-						break;
-				}
-			}								 
-			/* skip to next report */
-			reportPtr = reportPtr->NextCollisionReportPtr;
-		}
-	}
-	else 
-	{
-		contactWeaponTimer -= NormalFrameTime;
-	}
-
-}
-#endif
-
-/* Demo code removed, CDF 28/9/98, by order of Kevin */
-
-#if SupportWindows95 && LOAD_IN_MOVEMENT_VALUES	
-static void LoadInMovementValues(void)
-{
-
-	FILE *fpInput;
-
-	fpInput = fopen("movement.txt","rb");
-
-	while(fgetc(fpInput) != '#');
-	while(fgetc(fpInput) != '#');
-	fscanf(fpInput, "%d",&AlienForwardSpeed);
-	while(fgetc(fpInput) != '#');
-	fscanf(fpInput, "%d",&AlienStrafeSpeed);
-	while(fgetc(fpInput) != '#');
-	fscanf(fpInput, "%d",&AlienTurnSpeed);
-	while(fgetc(fpInput) != '#');
-	fscanf(fpInput, "%d",&AlienJumpSpeed);
-
-	while(fgetc(fpInput) != '#');
-	fscanf(fpInput, "%d",&PredatorForwardSpeed);
-	while(fgetc(fpInput) != '#');
-	fscanf(fpInput, "%d",&PredatorStrafeSpeed);
-	while(fgetc(fpInput) != '#');
-	fscanf(fpInput, "%d",&PredatorTurnSpeed);
-	while(fgetc(fpInput) != '#');
-	fscanf(fpInput, "%d",&PredatorJumpSpeed);
-
-	while(fgetc(fpInput) != '#');
-	fscanf(fpInput, "%d",&MarineForwardSpeed);
-	while(fgetc(fpInput) != '#');
-	fscanf(fpInput, "%d",&MarineStrafeSpeed);
-	while(fgetc(fpInput) != '#');
-	fscanf(fpInput, "%d",&MarineTurnSpeed);
-	while(fgetc(fpInput) != '#');
-	fscanf(fpInput, "%d",&MarineJumpSpeed);
-
-	fclose(fpInput);
-}
-#endif
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -3,29 +3,13 @@
 #include "inline.h"
 
 
-/*
- externs for commonly used global variables and arrays
-*/
 
-	extern MORPHDISPLAY MorphDisplay;
-	extern int NormalFrameTime;
-
-
-/*
-
- Global Variables
-
-*/
+extern MORPHDISPLAY MorphDisplay;
+extern int NormalFrameTime;
 
 
 
-
-
-/*
-
- Update Morphing Animation Control Block
-
-*/
+// Update Morphing Animation Control Block
 
 void UpdateMorphing(MORPHCTRL *mcptr)
 
@@ -33,9 +17,6 @@ void UpdateMorphing(MORPHCTRL *mcptr)
 
 	MORPHHEADER *mhdr = mcptr->ObMorphHeader;
 	int UpdateRate;
-
-
-	/*textprint("UpdateMorphing\n");*/
 
 
 	if(mcptr->ObMorphFlags & mph_flag_play) {
@@ -123,11 +104,7 @@ void UpdateMorphing(MORPHCTRL *mcptr)
 
 
 
-/*
-
- Update the Morphing Animation for this object
-
-*/
+// Update the Morphing Animation for this object
 
 void UpdateMorphingDptr(DISPLAYBLOCK *dptr)
 
@@ -144,10 +121,6 @@ void UpdateMorphingDptr(DISPLAYBLOCK *dptr)
 	sptr1 = MorphDisplay.md_sptr1;
 	sptr2 = MorphDisplay.md_sptr2;
 
-	#if 0
-	textprint("sptr1->shaperadius = %d\n", sptr1->shaperadius);
-	textprint("sptr2->shaperadius = %d\n", sptr2->shaperadius);
-	#endif
 
 
 	/* Radius */
@@ -161,9 +134,9 @@ void UpdateMorphingDptr(DISPLAYBLOCK *dptr)
 	else {
 
 		dptr->ObRadius = WideMul2NarrowDiv(sptr1->shaperadius,
-													MorphDisplay.md_one_minus_lerp,
-													sptr2->shaperadius,
-													MorphDisplay.md_lerp, ONE_FIXED);
+					MorphDisplay.md_one_minus_lerp,
+		 			sptr2->shaperadius,
+					MorphDisplay.md_lerp, ONE_FIXED);
 
 	}
 
@@ -179,9 +152,9 @@ void UpdateMorphingDptr(DISPLAYBLOCK *dptr)
 	else {
 
 		dptr->ObMaxX = WideMul2NarrowDiv(sptr1->shapemaxx,
-													MorphDisplay.md_one_minus_lerp,
-													sptr2->shapemaxx,
-													MorphDisplay.md_lerp, ONE_FIXED);
+				MorphDisplay.md_one_minus_lerp,
+				sptr2->shapemaxx,
+				MorphDisplay.md_lerp, ONE_FIXED);
 
 	}
 
@@ -194,9 +167,9 @@ void UpdateMorphingDptr(DISPLAYBLOCK *dptr)
 	else {
 
 		dptr->ObMinX = WideMul2NarrowDiv(sptr1->shapeminx,
-													MorphDisplay.md_one_minus_lerp,
-													sptr2->shapeminx,
-													MorphDisplay.md_lerp, ONE_FIXED);
+					MorphDisplay.md_one_minus_lerp,
+					sptr2->shapeminx,
+					MorphDisplay.md_lerp, ONE_FIXED);
 
 	}
 
@@ -212,9 +185,9 @@ void UpdateMorphingDptr(DISPLAYBLOCK *dptr)
 	else {
 
 		dptr->ObMaxY = WideMul2NarrowDiv(sptr1->shapemaxy,
-													MorphDisplay.md_one_minus_lerp,
-													sptr2->shapemaxy,
-													MorphDisplay.md_lerp, ONE_FIXED);
+					MorphDisplay.md_one_minus_lerp,
+					sptr2->shapemaxy,
+					MorphDisplay.md_lerp, ONE_FIXED);
 
 	}
 
@@ -227,9 +200,9 @@ void UpdateMorphingDptr(DISPLAYBLOCK *dptr)
 	else {
 
 		dptr->ObMinY = WideMul2NarrowDiv(sptr1->shapeminy,
-													MorphDisplay.md_one_minus_lerp,
-													sptr2->shapeminy,
-													MorphDisplay.md_lerp, ONE_FIXED);
+					MorphDisplay.md_one_minus_lerp,
+					sptr2->shapeminy,
+					MorphDisplay.md_lerp, ONE_FIXED);
 
 	}
 
@@ -245,9 +218,9 @@ void UpdateMorphingDptr(DISPLAYBLOCK *dptr)
 	else {
 
 		dptr->ObMaxZ = WideMul2NarrowDiv(sptr1->shapemaxz,
-													MorphDisplay.md_one_minus_lerp,
-													sptr2->shapemaxz,
-													MorphDisplay.md_lerp, ONE_FIXED);
+					MorphDisplay.md_one_minus_lerp,
+					sptr2->shapemaxz,
+					MorphDisplay.md_lerp, ONE_FIXED);
 
 	}
 
@@ -260,15 +233,12 @@ void UpdateMorphingDptr(DISPLAYBLOCK *dptr)
 	else {
 
 		dptr->ObMinZ = WideMul2NarrowDiv(sptr1->shapeminz,
-													MorphDisplay.md_one_minus_lerp,
-													sptr2->shapeminz,
-													MorphDisplay.md_lerp, ONE_FIXED);
+					MorphDisplay.md_one_minus_lerp,
+					sptr2->shapeminz,
+					MorphDisplay.md_lerp, ONE_FIXED);
 
 	}
 
-	#if 0
-	textprint("dptr->ObRadius = %d\n", dptr->ObRadius);
-	#endif
 
 }
 

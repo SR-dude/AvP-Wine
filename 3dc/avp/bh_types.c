@@ -61,13 +61,8 @@
 #include "psnd.h"
 #include "plat_shp.h"
 #include "savegame.h"
-
 #include "db.h"
-
-#if SupportWindows95
-/* for win95 net game support */
 #include "pldghost.h"
-#endif
 #include "bh_corpse.h"
 
 /* 
@@ -619,71 +614,6 @@ void AssignRunTimeBehaviours(STRATEGYBLOCK* sbptr)
 
 	InitPlayer(sbptr, I_BehaviourMarinePlayer);
 }
-
-#if Saturn || PSX
-
-int SetUpDoor(int shape1, int shape2, MODULE* mptr)
-{
-	DISPLAYBLOCK* dptr = mptr->m_dptr;
-	MODULEMAPBLOCK* momptr = mptr->m_mapptr;
-	MORPHCTRL* morphctrl;	
-	MORPHHEADER* morphheader;
-	MORPHFRAME* morphframe;
-	STRATEGYBLOCK* sbptr;
-
-	GLOBALASSERT(dptr);
-	GLOBALASSERT(momptr);
-
-	sbptr =	AttachNewStratBlock(mptr, momptr, dptr);
-
-	// this code causes a memory leak
-
-	morphctrl = (MORPHCTRL*)AllocateMem(sizeof(MORPHCTRL));
-	if(!morphctrl) 
-	{
-		memoryInitialisationFailure = 1;
-		return 0;
-	}
-
-	morphheader = (MORPHHEADER*)AllocateMem(sizeof(MORPHHEADER));
-	if(!morphheader) 
-	{
-		memoryInitialisationFailure = 1;
-		return 0;
-	}
-
-	morphframe = (MORPHFRAME*)AllocateMem(sizeof(MORPHFRAME));
-	if(!morphframe) 
-	{
-		memoryInitialisationFailure = 1;
-		return 0;
-	}
-
-	#if Saturn
-	morphframe->mf_shape1 = shape2;
-	morphframe->mf_shape2 = shape1;
-	#else
-	morphframe->mf_shape1 = shape1;
-	morphframe->mf_shape2 = shape2;
-	#endif
-
-	dptr->ObShapeData = GetShapeData(shape1);
-
-	morphheader->mph_numframes = 1;
-	morphheader->mph_maxframes = ONE_FIXED;
-	morphheader->mph_frames = morphframe;
-
-	morphctrl->ObMorphCurrFrame = 0;
-	morphctrl->ObMorphFlags = 0;
-	morphctrl->ObMorphSpeed = 0;
-	morphctrl->ObMorphHeader = morphheader;
-
-	EnableBehaviourType(sbptr, I_BehaviourProximityDoor, (void*)morphctrl);
-
-	return 0;
-}
-
-#endif /*SupportSaturn*/
 
 
 
@@ -1457,9 +1387,6 @@ void ObjectBehaviours(void)
 {
 	int i;	
 
-#if SupportWindows95
-
-#ifdef AVP_DEBUG_VERSION
 	for (i=0; i<NumActiveStBlocks; i++)
 	{
 		if (ActiveStBlockList[i]->SBdptr)
@@ -1475,9 +1402,6 @@ void ObjectBehaviours(void)
 			}
 		}
 	}
-#endif
-
-#endif
 
 	RequestEnvChangeViaLift	= 0;
 
@@ -1600,7 +1524,6 @@ void ExecuteBehaviour(STRATEGYBLOCK* sbptr)
 
 		case I_BehaviourPredatorAlien:
 			GLOBALASSERT(0);
-			//PAQBehaviour(sbptr);
 			break;
 
 		case I_BehaviourMarine:
@@ -1614,17 +1537,7 @@ void ExecuteBehaviour(STRATEGYBLOCK* sbptr)
 		
 		case I_BehaviourHierarchicalFragment:
 			{
-				#if 0
-				HDEBRIS_BEHAV_BLOCK *hbbptr=(HDEBRIS_BEHAV_BLOCK *)sbptr->SBdataptr;
-				LOCALASSERT(hbbptr);
-				if (hbbptr->HModelController.Root_Section->flags&section_sprays_acid) {
-					AlienFragFun(sbptr);
-				} else {
-					OneShotBehaveFun(sbptr);
-				}
-				#else
 				HierarchicalFragmentBehaviour(sbptr);
-				#endif
 			}
 			break;
 		case I_BehaviourAlienFragment:
@@ -1672,13 +1585,11 @@ void ExecuteBehaviour(STRATEGYBLOCK* sbptr)
 			DiscBehaviour_SeekTrack(sbptr);
 			break;
 		
-		#if 0
 		/* KJL 17:07:53 02/24/97 - I've turned these off for now since they
 		always seem to cause crashes. */
-		case I_BehaviourFlameProjectile:
-			FlameProjectileFunction(sbptr);
-			break;
-		#endif
+//		case I_BehaviourFlameProjectile:
+//			FlameProjectileFunction(sbptr);
+//			break;
 		
 		case I_BehaviourDatabase:
 			/* KJL 16:30:21 03/13/97 - no behaviour required */
@@ -2087,7 +1998,6 @@ static int AnythingNearProxDoor(MODULE *doorModulePtr,PROXDOOR_BEHAV_BLOCK *door
 			(sbPtr->I_SBtype == I_BehaviourPulseGrenade)||
 			(sbPtr->I_SBtype == I_BehaviourProximityGrenade)||
 			(sbPtr->I_SBtype == I_BehaviourNetGhost)||
-//			(sbPtr->I_SBtype == I_BehaviourFlareGrenade)||
 			(sbPtr->I_SBtype == I_BehaviourFragmentationGrenade)||
 			(sbPtr->I_SBtype == I_BehaviourPredatorDisc_SeekTrack)||		
 			(sbPtr->I_SBtype == I_BehaviourNetCorpse)||
@@ -2156,7 +2066,6 @@ void RequestState(STRATEGYBLOCK* sbptr, int message, STRATEGYBLOCK * SBRequester
 	{
 		return;
 	}
-	//GLOBALASSERT(sbptr);
 
 	if(sbptr->SBflags.destroyed_but_preserved)
 	{
@@ -2164,7 +2073,6 @@ void RequestState(STRATEGYBLOCK* sbptr, int message, STRATEGYBLOCK * SBRequester
 		return;	
 	}
 
-	#if DB_LEVEL >=3
 	{
 		//add details of request to logfile
 		extern int GlobalFrameCounter;
@@ -2174,7 +2082,6 @@ void RequestState(STRATEGYBLOCK* sbptr, int message, STRATEGYBLOCK * SBRequester
 		if(SBRequester) name2=SBRequester->name;
 		db_logf3(("Frame %d  : %s sent %s message to %s%s",GlobalFrameCounter,name2, state ? "'on'" : "'off'",name1,(message>>1)? " with extra message data" : ""));
 	}
-	#endif
 
 
 	switch (sbptr->I_SBtype)
@@ -2756,7 +2663,6 @@ DISPLAYBLOCK *MakeObject(AVP_BEHAVIOUR_TYPE bhvr, VECTORCH *positionPtr)
   STRATEGYBLOCK *sptr;
   MODULEMAPBLOCK *mmbptr;
   MODULE m_temp;
-  //TXACTRLBLK *taPtr;
 	
   if (NumActiveBlocks >= maxobjects) return (DISPLAYBLOCK *)NULL;
   if (NumActiveStBlocks >= maxstblocks) return (DISPLAYBLOCK *)NULL;
@@ -2785,7 +2691,6 @@ DISPLAYBLOCK *MakeObject(AVP_BEHAVIOUR_TYPE bhvr, VECTORCH *positionPtr)
 		case I_BehaviourNPCPredatorDisc:
 		case I_BehaviourPredatorDisc_SeekTrack:
 		{
-			//CreateShapeInstance(mmbptr,"disk@hnpcpredator");
 			CreateShapeInstance(mmbptr,"Shell");
 		    break;
 		}				
@@ -2832,7 +2737,6 @@ DISPLAYBLOCK *MakeObject(AVP_BEHAVIOUR_TYPE bhvr, VECTORCH *positionPtr)
 			//uses special effect instead of a shape
     		mmbptr->MapShape = 0;
 			mmbptr->MapType = MapType_Default;
-//			CreateShapeInstance(mmbptr,"Plasbolt");
 			CreateShapeInstance(mmbptr,"Shell");
 
 			break;
@@ -2955,8 +2859,8 @@ void RemoveBehaviourStrategy(STRATEGYBLOCK* sbptr)
 	GLOBALASSERT(sbptr);
 
 	/* Andy 16/8/97  - Updated to cope with partially allocated strategy blocks 
-										 We need to check that each allocation has been completed before
-										  trying to deallocate */
+	 We need to check that each allocation has been completed before
+	  trying to deallocate */
 	
 	/* CDF 12/11/96 - Destroys ANY strategyblock. *
 	* Please maintain...                         */
@@ -3320,7 +3224,6 @@ void RemoveBehaviourStrategy(STRATEGYBLOCK* sbptr)
 		}
 		case I_BehaviourNetGhost:
 		{
-			#if SupportWindows95
 			{
 				NETGHOSTDATABLOCK *ghostData;
 				ghostData = (NETGHOSTDATABLOCK *)(sbptr->SBdataptr);    
@@ -3333,7 +3236,6 @@ void RemoveBehaviourStrategy(STRATEGYBLOCK* sbptr)
 					Dispel_HModel(&ghostData->HModelController);
 				}
 			}
-			#endif
 			break;
 		}	
 
@@ -3518,7 +3420,6 @@ void RemoveBehaviourStrategy(STRATEGYBLOCK* sbptr)
 		}
 		case I_BehaviourNetCorpse:
 		{
-			#if SupportWindows95
 			{
 				NETCORPSEDATABLOCK *corpseData;
 				corpseData = (NETCORPSEDATABLOCK *)(sbptr->SBdataptr);    
@@ -3528,7 +3429,6 @@ void RemoveBehaviourStrategy(STRATEGYBLOCK* sbptr)
 					Dispel_HModel(&corpseData->HModelController);
 				}
 			}
-			#endif
 			break;
 		}	
 
@@ -3617,12 +3517,6 @@ void RemoveBehaviourStrategy(STRATEGYBLOCK* sbptr)
 		if(sbptr->SBdataptr)
 		{
 			DeallocateMem(sbptr->SBdataptr);
-			#if debug
-			//I dont do a full initialisation with debug because
-			//we dont want to hide switch on Behaviour type bugs
-			// I just do this to trap the bastard
-			sbptr->SBdataptr = NULL; 
-			#endif
 		}
 	}
 
@@ -3636,13 +3530,6 @@ void RemoveBehaviourStrategy(STRATEGYBLOCK* sbptr)
 		DeallocateDynamicsBlock(sbptr->DynPtr);
 	}	
 
-	#if !debug
-	// ull SB init
-	if(!sbptr->SBflags.preserve_until_end_of_level)
-	{
-		InitialiseSBValues(sbptr);
-	}
-	#endif
 	/* Finally remove the StrategyBlock*/
 	DestroyActiveStrategyBlock(sbptr);
 }

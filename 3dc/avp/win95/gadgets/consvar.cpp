@@ -12,43 +12,13 @@
 #include "3dc.h"
 #include "consvar.hpp"
 #include "strutil.h"
-
-	#define UseLocalAssert Yes
-	#include "ourasert.h"
-
-/* Version settings ************************************************/
-
-/* Constants *******************************************************/
-
-/* Macros **********************************************************/
-
-/* Imported function prototypes ************************************/
-
-/* Imported data ***************************************************/
-#ifdef __cplusplus
-	extern "C"
-	{
-#endif
-		#if 0
-		extern OurBool			DaveDebugOn;
-		extern FDIEXTENSIONTAG	FDIET_Dummy;
-		extern IFEXTENSIONTAG	IFET_Dummy;
-		extern FDIQUAD			FDIQuad_WholeScreen;
-		extern FDIPOS			FDIPos_Origin;
-		extern FDIPOS			FDIPos_ScreenCentre;
-		extern IFOBJECTLOCATION IFObjLoc_Origin;
-		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
-		extern IFCOLOUR			IFColour_Dummy;
- 		extern IFVECTOR			IFVec_Zero;
-		#endif
-#ifdef __cplusplus
-	};
-#endif
+#define UseLocalAssert Yes
+#include "ourasert.h"
 
 
 
 /* Exported globals ************************************************/
-	/*static*/ List <ConsoleVariable*> ConsoleVariable :: List_pConsoleVar;
+ List <ConsoleVariable*> ConsoleVariable :: List_pConsoleVar;
 
 /* Internal type definitions ***************************************/
 	class ConsoleVariable_Simple_Int : public ConsoleVariable
@@ -111,14 +81,12 @@
 		int& theValue;
 	};
 
-/* Internal function prototypes ************************************/
 
-/* Internal globals ************************************************/
 
 /* Exported function definitions ***********************************/
 // class ConsoleVariable
 // Factory method:
-/*static*/ ConsoleVariable* ConsoleVariable :: MakeSimpleConsoleVariable_Int
+ConsoleVariable* ConsoleVariable :: MakeSimpleConsoleVariable_Int
 (
 	int& Value_ToUse,
 	ProjChar* pProjCh_Symbol_ToUse,
@@ -149,7 +117,7 @@
 	}
 }
 
-/*static*/ ConsoleVariable* ConsoleVariable :: MakeSimpleConsoleVariable_FixP
+ConsoleVariable* ConsoleVariable :: MakeSimpleConsoleVariable_FixP
 (
 	int& Value_ToUse,
 	ProjChar* pProjCh_Symbol_ToUse,
@@ -191,7 +159,7 @@ ConsoleVariable :: ~ConsoleVariable()
     );
 }
 
-/*static*/ OurBool ConsoleVariable :: Process( ProjChar* pProjCh_In )
+OurBool ConsoleVariable :: Process( ProjChar* pProjCh_In )
 {
 	// used for proccesing input text.  Could decide that the user
 	// was requesting the value of a variable, or was setting a new
@@ -271,7 +239,6 @@ ConsoleVariable :: ~ConsoleVariable()
 		)
 		{
 		
-			// LOCALISEME():
 			if
 			(
 				0 == strncmp
@@ -311,7 +278,7 @@ ConsoleVariable :: ~ConsoleVariable()
 
 }
 
-/*static*/ void ConsoleVariable :: ListAllVariables(void)
+void ConsoleVariable :: ListAllVariables(void)
 {
 	SCString* pSCString_Temp = new SCString("LIST OF ALL CONSOLE VARIABLES:");
 
@@ -350,9 +317,6 @@ ConsoleVariable :: ConsoleVariable
 	MinVal(MinVal_New),
 	MaxVal(MaxVal_New)
 {
-	/* PRECONDITION */
-	{
-	}
 
 	/* CODE */
 	{
@@ -504,7 +468,7 @@ ConsoleVariable_Simple_Int :: ConsoleVariable_Simple_Int
 	}
 
 	/* CODE */
-	{
+	{ 
 	}
 }
 
@@ -626,9 +590,7 @@ ConsoleVariable_Simple_FixP :: ConsoleVariable_Simple_FixP
 		GLOBALASSERT( pProjCh_Description_ToUse );
 	}
 
-	/* CODE */
-	{
-	}
+
 }
 
 int ConsoleVariable_Simple_FixP :: GetValue(void) const

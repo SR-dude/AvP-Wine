@@ -27,10 +27,6 @@ static const GUID AvPGuid =
 LPDPLCONNECTION	glpdplConnection;	// connection settings
 
 /* Some important globals */
-#if 0
-LPDIRECTPLAY3A lpDPlay3AAVP;
-#endif
-
 LPGUID					glpGuid = (LPGUID)&AvPGuid;
 LPDIRECTPLAY4			glpDP	= NULL;		// directplay object pointer
 LPDPSESSIONDESC2		glpdpSD;			// current session description
@@ -42,48 +38,7 @@ DPNAME AVPDPplayerName;
 BOOL				gbUseProtocol=0;		// DirectPlay Protocol messaging
 BOOL				gbAsyncSupported=0;	// asynchronous sends supported
 
-#if 0
-/*
- * CheckCaps
- *
- * Helper function to check for certain Capabilities
- */
-void CheckCaps(void)
-{
-	HRESULT hr;
-	DPCAPS caps;
 
-	if (!glpDP)
-		return;
-
-	ZeroMemory(&caps, sizeof(DPCAPS));
-	caps.dwSize = sizeof(DPCAPS);
-	// The caps we are checking do not differ for guaranteed msg
-	hr = IDirectPlayX_GetCaps(glpDP, &caps, 0);
-	if (FAILED(hr))
-		return;
-
-	// Determine if Aync messages are supported.
-	gbAsyncSupported = (caps.dwFlags & DPCAPS_ASYNCSUPPORTED) != 0;
-
-	// Diagnostic traces of caps supported
-	if ((caps.dwFlags & DPCAPS_GUARANTEEDSUPPORTED) == 0)
-		TRACE(_T("CheckCaps - Guaranteed msgs not supported!?!\n"));
-	if (gbAsyncSupported)
-	{
-		TRACE(_T("Capabilities supported: Async %s %s %s\n"),
-				 (caps.dwFlags & DPCAPS_SENDPRIORITYSUPPORTED ? _T("SendPriority") : _T("")),
-				 (caps.dwFlags & DPCAPS_SENDTIMEOUTSUPPORTED ? _T("SendTimeout") : _T("")),
-				 (caps.dwFlags & DPCAPS_ASYNCCANCELSUPPORTED
-					? _T("AsyncCancel") 
-					: (caps.dwFlags & DPCAPS_ASYNCCANCELALLSUPPORTED
-						? _T("AsyncCancelAll") : _T("")))
-				);
-	}
-	else
-		TRACE(_T("CheckCaps - Async not supported\n"));
-}
-#endif
 /*
  * DPlayClose
  *
@@ -117,15 +72,10 @@ HRESULT DPlayCreate(LPVOID lpCon)
 
 	// create a DirectPlay4(A) interface
 	hr = CoCreateInstance(&CLSID_DirectPlay, NULL, CLSCTX_INPROC_SERVER,
-#ifdef UNICODE
-						  &IID_IDirectPlay4, (LPVOID *) &glpDP);
-#else
 						  &IID_IDirectPlay4A, (LPVOID *) &glpDP);
-#endif
 	if (FAILED(hr))
 		return (hr);
 
-#if 1
 	// initialize w/address
 	if (lpCon)
 	{
@@ -138,7 +88,6 @@ HRESULT DPlayCreate(LPVOID lpCon)
 FAILURE:
 	IDirectPlayX_Release(glpDP);
 	glpDP = NULL;
-#endif
 
 	return hr;
 }
@@ -158,11 +107,9 @@ HRESULT DPlayCreatePlayer(LPDPID lppidID, LPTSTR lptszPlayerName, HANDLE hEvent,
 	ZeroMemory(&name,sizeof(name));
 	name.dwSize = sizeof(DPNAME);
 
-#ifdef UNICODE
-	name.lpszShortName = lptszPlayerName;
-#else
+
 	name.lpszShortNameA = lptszPlayerName;
-#endif
+
 
 	if (glpDP)
 		hr = IDirectPlayX_CreatePlayer(glpDP, lppidID, &name, hEvent, lpData, 
@@ -190,11 +137,7 @@ HRESULT DPlayCreateSession(LPTSTR lptszSessionName,int maxPlayers,int dwUser1,in
 	if (gbUseProtocol)
 		dpDesc.dwFlags |= DPSESSION_DIRECTPLAYPROTOCOL;
 
-#ifdef UNICODE
-	dpDesc.lpszSessionName = lptszSessionName;
-#else
 	dpDesc.lpszSessionNameA = lptszSessionName;
-#endif
 	dpDesc.dwMaxPlayers=maxPlayers;
 
 	dpDesc.dwUser1 = dwUser1;
@@ -206,9 +149,6 @@ HRESULT DPlayCreateSession(LPTSTR lptszSessionName,int maxPlayers,int dwUser1,in
 
 	hr = IDirectPlayX_Open(glpDP, &dpDesc, DPOPEN_CREATE);
 
-	// Check for Async message support
-//	if (SUCCEEDED(hr))
-//		CheckCaps();
 
 	return hr;
 }

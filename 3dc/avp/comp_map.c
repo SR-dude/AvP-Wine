@@ -33,7 +33,6 @@ MAPHEADER Map[]={
 MAPSETVDB chnk_playcam_vdb = {
 
 	ViewDB_Flag_AdjustScale
-//	| ViewDB_Flag_Hazing
 	| ViewDB_Flag_AddSubject
 	| ViewDB_Flag_ImageBackdrop
 	| ViewDB_Flag_FullSize,
@@ -57,25 +56,14 @@ MAPSETVDB chnk_playcam_vdb = {
 	30000, /*+ (ONE_FIXED << 0),	hazing end */
 	0,
 
-	/*col24(200,200,200),*/			/* Background Colour */
-	/*col24(32,128,255),*/			/* Background Colour */
 	0,										/* Background Colour */
-	/*col24(0,0,0),*/					/* Background Colour */
-	/*col24(255,0,0),*/				/* Background Colour */
 
 	65536 >> 2 ,				/* Ambience */
 
-	#if 0
-	VState_RelativeYRemote,	/* View State */
-	2/*-1*/,					/* View Distance */
-	0,0,						/* Pan X,Y */
-	#endif
 
-#if 1
 	VState_Inside,	/* View State */
 	1,					/* View Distance */
 	0,0,						/* Pan X,Y */
-#endif
 
 };
 
@@ -95,21 +83,8 @@ MAPBLOCK6 Empty_Landscape_Type6 = {
 	0,0,0,				/* Orient */
 
 	ObFlag_MultLSrc
-	/*| ObFlag_BFCRO*/
-	| ObFlag_VertexHazing
-	/* Hack CONSTANTINE */
-	/* | ObFlag_SortFarZ */
-	/*| ObFlag_RSP*/
-	/*| ObFlag_NotVis*/
-	/*| ObFlag_NoColls*/,		/* Flags */
-	
-	#if StandardStrategyAndCollisions
-	StrategyI_Null,	/* Strategy */
-	CollType_Landscape,/* e.g. Shape or Landscape */
-	GameCollStrat_Default,		/* Game Collision Strategy */
-	0,						/* Shape Collision Strategy */
-	0,						/* Landscape Collision Strategy */
-	#endif
+	| ObFlag_VertexHazing,
+
 
 	0,									/* VDB Definition */
 	0									/* Interior Type */
@@ -129,22 +104,9 @@ MAPBLOCK6 Empty_Object_Type6 = {
 	0,0,0,				/* Orient */
 
 	ObFlag_MultLSrc |
-	/*| ObFlag_BFCRO*/
 	ObFlag_VertexHazing	|
-	/* hack CONSTANTINE */
-	/* ObFlag_SortFarZ | */
-	/*| ObFlag_RSP*/
-	/*| ObFlag_NotVis*/
-	/*| ObFlag_NoColls*/
 	0,		/* Flags1 (no others in this map type)*/
 	
-	#if StandardStrategyAndCollisions
-	StrategyI_Null,	/* Strategy */
-	0,/* e.g. Shape or Landscape */
-	GameCollStrat_Default,	/* Game Collision Strategy */
-	0,						/* Shape Collision Strategy */
-	0,						/* Landscape Collision Strategy */
-	#endif
 	0,									/* VDB Definition */
 	0									/* Interior Type */
 
@@ -161,13 +123,6 @@ MAPBLOCK6 Term_Type6 = {
 	0,0,0,
 	0,						/* Flags */
 	
-	#if StandardStrategyAndCollisions
-	0,						/* Strategy */
-	0,						/* e.g. Shape or Landscape */
-	0,						/* Game Collision Strategy */
-	0,						/* Shape Collision Strategy */
-	0,						/* Landscape Collision Strategy */
-	#endif
 	0,						/* VDB Definition */
 	0,						/* Interior Type */
 
@@ -177,7 +132,6 @@ MAPBLOCK6 Term_Type6 = {
 
 
 MAPBLOCK8 Player_and_Camera_Type8[] = {
-#if SupportModules
 	/*  Ship */
 					 
 	MapType_Player,
@@ -195,37 +149,16 @@ MAPBLOCK8 Player_and_Camera_Type8[] = {
 	|0,
 															/* Flags 2 */
 	0
-	/*	| ObFlag2_DirectedMerge	 */			
-	/*	| ObFlag2_SurfaceAlign*/
-	/*	| ObFlag2_Augmented_LFR*/
-	/*	| ObFlag2_LFR_GuessReloc*/
-	/*	| ObFlag2_LFR_UseFRM*/
-	/*	| ObFlag2_FRM_VariableR */
-	/*	| ObFlag2_NoMotionLerp*/
-	/*| ObFlag2_NoMerge*/
-	/*| ObFlag2_NoMergeDIfNear*/
-	/*| ObFlag2_NoMergeD*/
 	|0,
 	
 	0
 	| 0,											/* Flags 3 */
 	
-	#if StandardStrategyAndCollisions
-	StrategyI_Player,						/* Strategy */
-	0,											/* e.g. Shape or Landscape */
-	GameCollStrat_Default,				/* Game Collision Strategy */
-	ShapeCStrat_DoubleExtentEllipsoid,	/* Shape Collision Strategy */
-	0,											/* Landscape Collision Strategy */
-	#endif
 	
 	&chnk_playcam_vdb,					/* VDB Definition */
 	IType_Body,											/* Interior Type */
 									 
 	0,											/* MapLightType */
-	#if StandardStrategyAndCollisions
-	0,											/* MapMass */
-	0,0,0,									/* MapNewtonV */
-	#endif
 	0,0,0,									/* MapOrigin */
 					   
 	0,											/* MapSimShapes */
@@ -235,65 +168,7 @@ MAPBLOCK8 Player_and_Camera_Type8[] = {
 
 	0,											/* MapDPtr */
 	0,0,0,									/* MapMOffset */
-
-
-/****************************************************************************/
-
-	#if 0
-	/* Player Ship Camera - MUST be next map object */
-
-	MapType_PlayerShipCamera,
-
-	I_ShapeCube, /* mainshapelist position 1 */
-
-	0,0,0,							/* Loc */
-	0,0,0,							/* Orient */
-	0
-	|0					/* Flags 1 */
-	| 0,
-
-	0,									/* Flags 2 */
-	0,									/* Flags 3 */
-	
-	#if StandardStrategyAndCollisions
-	StrategyI_Camera,				/* Strategy */
-	0,									/* e.g. Shape or Landscape */
-	GameCollStrat_Default,		/* Game Collision Strategy */
-	0,									/* Shape Collision Strategy */
-	0,									/* Landscape Collision Strategy */
-	#endif
-	
-	&chnk_playcam_vdb,					/* VDB Definition */
-
-	#if 0
-
-		IType_Default,					/* Interior Type */
-
-	#else
-
-		IType_Body,						/* Interior Type */
-
-	#endif
-
-	0,											/* MapLightType */
-	
-	#if StandardStrategyAndCollisions
-	0,											/* MapMass */
-	0,0,0,									/* MapNewtonV */
-	#endif
-	0,0,0,									/* MapOrigin */
-	0,											/* MapSimShapes */
-	0,											/* MapViewType */
-
-	0,											/* MapMPtr */
-	0,											/* MapDPtr */
-	0,0,0,									/* MapMOffset */
-	#endif
-
-/****************************************************************************/
-/****************************************************************************/
 	/* Map End */
-#endif /*SupportModules*/
 	MapType_Term,		/* Map Type Function */
 	0,						/* Shape */
 	0,0,0,				/* Loc */
@@ -301,20 +176,9 @@ MAPBLOCK8 Player_and_Camera_Type8[] = {
 	0,						/* Flags 1 */
 	0,						/* Flags 2 */
 	0,						/* Flags 3 */
-	#if StandardStrategyAndCollisions
-	0,						/* Strategy */
-	0,						/* e.g. Shape or Landscape */
-	0,						/* Game Collision Strategy */
-	0,						/* Shape Collision Strategy */
-	0,						/* Landscape Collision Strategy */
-	#endif
 	0,						/* VDB Definition */
 	0,						/* Interior Type */
 	0,						/* MapLightType */
-	#if StandardStrategyAndCollisions
-	0,						/* MapMass */
-	0,0,0,				/* MapNewtonV */
-	#endif
 	0,0,0,				/* MapOrigin */
 	0,						/* MapSimShapes */
 	0,						/* MapViewType */
@@ -357,20 +221,9 @@ MODULEMAPBLOCK AvpCompiledMaps[] = {
 	0,						/* Flags 1 */
 	0,						/* Flags 2 */
 	0,						/* Flags 3 */
-	#if StandardStrategyAndCollisions
-	0,						/* Strategy */
-	0,						/* e.g. Shape or Landscape */
-	0,						/* Game Collision Strategy */
-	0,						/* Shape Collision Strategy */
-	0,						/* Landscape Collision Strategy */
-	#endif
 	0,						/* VDB Definition */
 	0,						/* Interior Type */
 	0,						/* MapLightType */
-	#if StandardStrategyAndCollisions
-	0,						/* MapMass */
-	0,0,0,				/* MapNewtonV */
-	#endif
 	0,0,0,				/* MapOrigin */
 	0,						/* MapSimShapes */
 	0,						/* MapViewType */
@@ -402,7 +255,6 @@ MODULE Empty_Module = {
 	"null",									/* MREF m_vptr */
 	0,											/* VMODULE *m_v_ptrs */
 	0,											/* struct module **m_link_ptrs */
-//	0,											/* VIEWPORT *m_viewports */
 	0,											/* MODULETABLEHEADER *m_table */
 	mfun_null,								/* MFUNCTION m_ifvisible */
 	mfun_null,								/* MFUNCTION m_ifvinside */
@@ -416,9 +268,7 @@ MODULE Empty_Module = {
 	0,0,0,
 	0,0,0,
 	
-	#if SupportWindows95
 	0,
-	#endif
 
 };
 
@@ -443,12 +293,9 @@ MODULEMAPBLOCK Empty_Module_Map =
 	0
 	| ObFlag_MultLSrc                       /* MapFlags */
 	| ObFlag_NoInfLSrc
-	//| ObFlag_BFCRO
-	//| ObFlag_VertexHazing
 	| 0,
 
 	0
-	//| ObFlag2_SortD
 	| 0,                               /* Flags 2 */
 
 	0
@@ -499,17 +346,12 @@ MODULEMAPBLOCK TempModuleMap = \
 	0,
 	                             	
 	0
-//	| ObFlag3_NoLightDot
 	| 0,															/* Flags 3 */
 
 	0,                                /* VDB Definition */
 	0,                                /* Interior Type */
 
-#if Saturn
-	LightType_PerObject,               /* MapLightType */
-#else
 	LightType_PerVertex,               /* MapLightType */
-#endif
 	0,0,0,                             /* MapOrigin */
 	0,                                 /* MapSimShapes */
 	0,                                 /* MapViewType */

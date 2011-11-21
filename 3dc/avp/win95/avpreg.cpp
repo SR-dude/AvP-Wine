@@ -8,6 +8,8 @@ char* AvpCDPath=0;
 extern char const * SecondTex_Directory;
 extern char * SecondSoundDir;
 
+/* adj */
+
 void GetPathFromRegistry()
 {
 	HKEY hKey;

@@ -12,43 +12,15 @@
 #include "3dc.h"
 #include "conscmnd.hpp"
 #include "strutil.h"
+#define UseLocalAssert Yes
+#include "ourasert.h"
 
-	#define UseLocalAssert Yes
-	#include "ourasert.h"
 
-/* Version settings ************************************************/
-
-/* Constants *******************************************************/
-
-/* Macros **********************************************************/
-
-/* Imported function prototypes ************************************/
-
-/* Imported data ***************************************************/
-#ifdef __cplusplus
-	extern "C"
-	{
-#endif
-		#if 0
-		extern OurBool			DaveDebugOn;
-		extern FDIEXTENSIONTAG	FDIET_Dummy;
-		extern IFEXTENSIONTAG	IFET_Dummy;
-		extern FDIQUAD			FDIQuad_WholeScreen;
-		extern FDIPOS			FDIPos_Origin;
-		extern FDIPOS			FDIPos_ScreenCentre;
-		extern IFOBJECTLOCATION IFObjLoc_Origin;
-		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
-		extern IFCOLOUR			IFColour_Dummy;
- 		extern IFVECTOR			IFVec_Zero;
-		#endif
-#ifdef __cplusplus
-	};
-#endif
 
 
 
 /* Exported globals ************************************************/
-	/*static*/ List<ConsoleCommand*> ConsoleCommand :: List_pConsoleCommand;
+List<ConsoleCommand*> ConsoleCommand :: List_pConsoleCommand;
 
 /* Internal type definitions ***************************************/
 
@@ -125,16 +97,12 @@
 	};
 
 
-/* Internal function ProjChar* pProjCh_In*/
-
-/* Internal globals ************************************************/
-
 /* Exported function definitions ***********************************/
 // class ConsoleCommand : public ConsoleSymbol
 // public:
 
 // Various factory methods:
-/*static*/ void ConsoleCommand :: Make
+void ConsoleCommand :: Make
 (
 	ProjChar* pProjCh_ToUse,
 	ProjChar* pProjCh_Description_ToUse,
@@ -150,7 +118,7 @@
 		Cheat
 	);
 }
-/*static*/ void ConsoleCommand :: Make
+void ConsoleCommand :: Make
 (
 	ProjChar* pProjCh_ToUse,
 	ProjChar* pProjCh_Description_ToUse,
@@ -166,7 +134,7 @@
 		Cheat
 	);
 }
-/*static*/ void ConsoleCommand :: Make
+void ConsoleCommand :: Make
 (
 	ProjChar* pProjCh_ToUse,
 	ProjChar* pProjCh_Description_ToUse,
@@ -184,7 +152,7 @@
 	);
 }
 
-/*static*/ void ConsoleCommand :: Make
+void ConsoleCommand :: Make
 (
 	ProjChar* pProjCh_ToUse,
 	ProjChar* pProjCh_Description_ToUse,
@@ -200,7 +168,7 @@
 		Cheat
 	);
 }
-/*static*/ void ConsoleCommand :: Make
+void ConsoleCommand :: Make
 (
 	ProjChar* pProjCh_ToUse,
 	ProjChar* pProjCh_Description_ToUse,
@@ -217,7 +185,7 @@
 	);
 }
 
-/*static*/ OurBool ConsoleCommand :: Process( ProjChar* pProjCh_In )
+OurBool ConsoleCommand :: Process( ProjChar* pProjCh_In )
 {
 	// used for proccesing input text.
 	// return value = was any processing performed?
@@ -297,10 +265,9 @@
 }
 
 
-/*static*/ void ConsoleCommand :: ListAll(void)
+void ConsoleCommand :: ListAll(void)
 {
 	SCString* pSCString_Temp = new SCString("LIST OF ALL CONSOLE COMMANDS:");
-		// LOCALISEME()
 
 	pSCString_Temp -> SendToScreen();
 
@@ -317,7 +284,7 @@
 	}	
 }
 
-/*virtual*/ ConsoleCommand :: ~ConsoleCommand()
+ConsoleCommand :: ~ConsoleCommand()
 {
 	pSCString_Description -> R_Release();
 

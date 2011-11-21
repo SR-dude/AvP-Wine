@@ -221,29 +221,7 @@ int PlatStartCDDA(void)
 	return 0;
 }
 
-/* this is a support function for PlatStartCDDA() */
-#if 0
-static void PlatGetCDDAVolumeControl(void)
-{
-	MMRESULT mmres;
-	unsigned int numAuxDevs,i;
-	
-	numAuxDevs = auxGetNumDevs();
-	/* search the auxilary device list for the cd player */
-	for(i=0;i<numAuxDevs;i++)
-	{
-		AUXCAPS devCaps;
-		mmres = auxGetDevCaps(i,&devCaps,sizeof(AUXCAPS));
-		if(mmres==MMSYSERR_NOERROR)
-		{
-			if((devCaps.wTechnology&AUXCAPS_CDAUDIO)&&(devCaps.dwSupport&AUXCAPS_VOLUME))
-			{								
-						cdAuxDeviceID = i;					
-			}
-		}
-	}
-}
-#else
+
 static void PlatGetCDDAVolumeControl(void)
 {
 	int i;
@@ -311,7 +289,7 @@ static void PlatGetCDDAVolumeControl(void)
 
 	return;
 }
-#endif
+
 
 
 void PlatEndCDDA(void)
@@ -343,7 +321,6 @@ int PlatPlayCDDA(int track)
 	dwReturn = mciSendCommand((UINT)cdDeviceID,MCI_SET,MCI_SET_TIME_FORMAT,(DWORD)(LPVOID) &mciSetParms);
 	if(dwReturn)
 	{
-//    	NewOnScreenMessage("CD ERROR - TIME FORMAT");
     	/* error */
     	return SOUND_PLATFORMERROR;
 	}  
@@ -355,7 +332,6 @@ int PlatPlayCDDA(int track)
 	if(dwReturn)
 	{
     	/* error */
-//    	NewOnScreenMessage("CD ERROR - GET LENGTH");
     	return SOUND_PLATFORMERROR;
 	}  
 
@@ -365,7 +341,6 @@ int PlatPlayCDDA(int track)
 	if(dwReturn)
 	{
     	/* error */
-//    	NewOnScreenMessage("CD ERROR - TIME FORMAT");
     	return SOUND_PLATFORMERROR;
 	}  
 
@@ -379,7 +354,6 @@ int PlatPlayCDDA(int track)
 	if(dwReturn)
     {
     	/* error */
-//    	NewOnScreenMessage("CD ERROR - PLAY");
     	return SOUND_PLATFORMERROR;
     }
     return 0;
@@ -431,36 +405,7 @@ int PlatStopCDDA(void)
     }
     return 0;
 }
-#if 0
-int PlatChangeCDDAVolume(int volume)
-{
-    MMRESULT mmres;
-	unsigned int newVolume;
 
-    /* check the cdDeviceId */
-    if(cdDeviceID==NO_DEVICE) return SOUND_PLATFORMERROR;
-    /* check the mixer device id */
-	if(cdAuxDeviceID==NO_DEVICE) return SOUND_PLATFORMERROR;
-
-	/* scale and set the new volume */
-	{
-		int channelVolume;
-		channelVolume = VOLUME_CDDA_MINPLAT +  WideMulNarrowDiv(volume,
-		(VOLUME_CDDA_MAXPLAT-VOLUME_CDDA_MINPLAT), (CDDA_VOLUME_MAX-CDDA_VOLUME_MIN));
-		if(channelVolume < VOLUME_CDDA_MINPLAT) channelVolume = VOLUME_CDDA_MINPLAT;
-		if(channelVolume > VOLUME_CDDA_MAXPLAT) channelVolume = VOLUME_CDDA_MAXPLAT;
-
-		/* set left and right channels (if there is only one channel,
-		should still work ok)*/
-		newVolume = channelVolume|(channelVolume<<16);
-	}
-	PlatGetCDDAVolumeControl();
-
-	mmres = auxSetVolume((UINT)cdAuxDeviceID,(DWORD)newVolume);
-	if(mmres==MMSYSERR_NOERROR) return 1;
-	else return SOUND_PLATFORMERROR;	
-}
-#else
 int PlatChangeCDDAVolume(int volume)
 {
     MMRESULT mmres;
@@ -550,7 +495,7 @@ int PlatChangeCDDAVolume(int volume)
 	return SOUND_PLATFORMERROR;
 }
 
-#endif
+
 
 
 
@@ -572,7 +517,6 @@ void PlatCDDAManagementCallBack(WPARAM flags, LONG deviceId)
 	if(flags&MCI_NOTIFY_SUCCESSFUL)
 	{
 		CDDAState = CDOp_Idle;
-		//NewOnScreenMessage("CD COMMAND RETURNED WITH SUCCESSFUL");
 		/* Play it again, sam */
 		if (LastCommandGiven == CDCOMMANDID_PlayLoop)
 		{
@@ -582,7 +526,6 @@ void PlatCDDAManagementCallBack(WPARAM flags, LONG deviceId)
 	else if(flags&MCI_NOTIFY_FAILURE)
 	{
 		/* error while playing: abnormal termination */
-		//NewOnScreenMessage("CD COMMAND FAILED");
 		CDDAState = CDOp_Idle;
 	}
 	else if(flags&MCI_NOTIFY_SUPERSEDED)
@@ -592,11 +535,9 @@ void PlatCDDAManagementCallBack(WPARAM flags, LONG deviceId)
 	else if(flags&MCI_NOTIFY_ABORTED)
 	{
 		/* aborted or superceeded: try and stop the device */
-		//NewOnScreenMessage("CD COMMAND ABORTED(?)");
-	  //	CDDA_Stop();
+
 	}
 	else
 	{
-		//NewOnScreenMessage("CD COMMAND RETURNED WITH UNKNOWN MESSAGE");
 	}
 }

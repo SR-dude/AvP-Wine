@@ -15,11 +15,7 @@ int NumActiveBlocks;
 DISPLAYBLOCK *ActiveBlockList[maxobjects];
 
 
-
-
-/*
- Object Block Lists et al
-*/
+// Object Block Lists et al
 
 static int NumFreeBlocks;
 static DISPLAYBLOCK *FreeBlockList[maxobjects];
@@ -28,9 +24,7 @@ static DISPLAYBLOCK FreeBlockData[maxobjects];
 static DISPLAYBLOCK **ActiveBlockListPtr = &ActiveBlockList[0];
 
 
-/*
- Texture Animation Block Extensions
-*/
+// Texture Animation Block Extensions
 
 static int NumFreeTxAnimBlocks;
 static TXACTRLBLK *FreeTxAnimBlockList[maxTxAnimblocks];
@@ -38,16 +32,12 @@ static TXACTRLBLK **FreeTxAnimBlockListPtr = &FreeTxAnimBlockList[maxTxAnimblock
 static TXACTRLBLK FreeTxAnimBlockData[maxTxAnimblocks];
 
 
-
-/*
- Light Block Extensions
-*/
+// Light Block Extensions
 
 static int NumFreeLightBlocks;
 static LIGHTBLOCK *FreeLightBlockList[maxlightblocks];
 static LIGHTBLOCK **FreeLightBlockListPtr = &FreeLightBlockList[maxlightblocks-1];
 static LIGHTBLOCK FreeLightBlockData[maxlightblocks];
-
 
 
 /*
@@ -81,11 +71,7 @@ void InitialiseObjectBlocks(void)
 }
 
 
-/*
-
- "AllocateObjectBlock()" is identical to the routine "GetBlock"
-
-*/
+// "AllocateObjectBlock()" is identical to the routine "GetBlock"
 
 DISPLAYBLOCK* AllocateObjectBlock(void)
 {
@@ -112,11 +98,7 @@ DISPLAYBLOCK* AllocateObjectBlock(void)
 }
 
 
-/*
-
- "DeallocateObjectBlock()" is identical to the routine "ReturnBlock"
-
-*/
+// "DeallocateObjectBlock()" is identical to the routine "ReturnBlock"
 
 void DeallocateObjectBlock(DISPLAYBLOCK *dblockptr)
 {
@@ -215,15 +197,6 @@ int DestroyActiveObject(DISPLAYBLOCK *dblockptr)
 				}
 
 
-				/* Deallocate the Lazy Morphed Points Array Pointer */
-
-				#if (SupportMorphing && LazyEvaluationForMorphing)
-				if(dblockptr->ObMorphedPts) {
-					DeallocateMem(dblockptr->ObMorphedPts);
-					dblockptr->ObMorphedPts = 0;
-				}
-				#endif
-
 				/* KJL 16:52:43 06/01/98 - dealloc sfx block if one exists */
 				if(dblockptr->SfxPtr)
 				{
@@ -244,12 +217,7 @@ int DestroyActiveObject(DISPLAYBLOCK *dblockptr)
 
 
 
-
-/*
-
- Support Functions for Texture Animation Blocks
-
-*/
+// Support Functions for Texture Animation Blocks
 
 void InitialiseTxAnimBlocks(void)
 
@@ -271,11 +239,9 @@ void InitialiseTxAnimBlocks(void)
 }
 
 
-/*
 
- Allocate a Texture Animation Block
 
-*/
+// Allocate a Texture Animation Block
 
 TXACTRLBLK* AllocateTxAnimBlock(void)
 
@@ -305,11 +271,7 @@ TXACTRLBLK* AllocateTxAnimBlock(void)
 }
 
 
-/*
-
- Deallocate a Texture Animation Block
-
-*/
+// Deallocate a Texture Animation Block
 
 void DeallocateTxAnimBlock(TXACTRLBLK *TxAnimblockptr)
 
@@ -324,11 +286,8 @@ void DeallocateTxAnimBlock(TXACTRLBLK *TxAnimblockptr)
 }
 
 
-/*
 
- Add a Texture Animation Block to a Display Block
-
-*/
+// Add a Texture Animation Block to a Display Block
 
 void AddTxAnimBlock(DISPLAYBLOCK *dptr, TXACTRLBLK *taptr)
 
@@ -356,11 +315,9 @@ void AddTxAnimBlock(DISPLAYBLOCK *dptr, TXACTRLBLK *taptr)
 
 
 
-/*
 
- Support functions for Light Blocks
 
-*/
+// Support functions for Light Blocks
 
 void InitialiseLightBlocks(void)
 

@@ -465,13 +465,9 @@ static int TooManyDecalsOfThisType(enum DECAL_ID decalID, VECTORCH *positionPtr)
 
 void InitialiseDecalSystem(void)
 {
-// 	VECTORCH normal = {0,0,65536};
-// 	VECTORCH position = {-1603,2675,8000};
 	NumActiveDecals=0;
 	CurrentDecalIndex=0;
-
- //	MakeDecal(DECAL_FMV, &normal,&position,1);
-}
+ }
 
 static DECAL* AllocateDecal(void)
 {
@@ -591,7 +587,7 @@ static int TooManyDecalsOfThisType(enum DECAL_ID decalID, VECTORCH *positionPtr)
 		{
 			if (DecalDescription[decalID].CanCombine) 
 			{
-				int j;//= FastRandom()%MAX_NO_OF_SIMILAR_DECALS_IN_ONE_PLACE;
+				int j;
 		  		for (j=0; j<MAX_NO_OF_SIMILAR_DECALS_IN_ONE_PLACE; j++)
 				{
 					similarDecalsPtr[j]->TargetSize += INCREMENT_IN_DECAL_SIZE;
@@ -806,7 +802,6 @@ void HandleDecalSystem(void)
 	{
 		int i = NumActiveDecals;
 		DECAL *decalPtr = DecalStorage;
-	//	textprint("Decals Active: %d\n",i);
 		while(i--)
 		{
 			DECAL_DESC *decalDescPtr = &DecalDescription[decalPtr->DecalID];
@@ -839,7 +834,6 @@ void HandleDecalSystem(void)
 		int i = NumFixedDecals;
 		DECAL dummyDecal;
 		FIXED_DECAL *decalPtr = FixedDecalStorage;
-	//	textprint("Decals Active: %d\n",i);
 		while(i--)
 		{
 			dummyDecal.DecalID = decalPtr->DecalID;
@@ -854,7 +848,6 @@ void HandleDecalSystem(void)
 			decalPtr++;;
 		}
 	}
-//	CubeOMatic();
 	if (AvP.PlayerType == I_Predator && PredatorLaserTarget.ShouldBeDrawn)
 	{
 		RenderLaserTarget(&PredatorLaserTarget);
@@ -914,18 +907,15 @@ void HandleDecalSystem(void)
 						extern void RenderLightFlare(VECTORCH *positionPtr, unsigned int colour);
 						PREDATOR_STATUS_BLOCK *statusPtr = (PREDATOR_STATUS_BLOCK *)sbPtr->SBdataptr;
 						LOCALASSERT(statusPtr);
-//						RenderLightFlare(&(sbPtr->DynPtr->Position),0x7fffffff);
-//						textprint("predator?\n");
+
 						if(statusPtr->Pred_Laser_On)
 						{
 							if (statusPtr->Pred_Laser_Sight.DotIsOnPlayer)
 							{
-//								textprint("Render flare\n");
 								RenderLightFlare(&(statusPtr->Pred_Laser_Sight.LightSource),0xffff0000);
 							}
 							else
 							{
-//								textprint("Render dots\n");
 								RenderLaserTarget(&(statusPtr->Pred_Laser_Sight));
 							}
 						}
@@ -1025,7 +1015,7 @@ void AddDecalToHModel(VECTORCH *normalPtr, VECTORCH *positionPtr, SECTION_DATA *
 
 	
 	decalPtr->DecalID = decalID;
-	decalSize = 40;//DecalDescription[decalID].MaxSize;
+	decalSize = 40;
 
 	decalPtr->Centre = v;
 

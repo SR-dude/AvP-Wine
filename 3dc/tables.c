@@ -10,10 +10,8 @@
 
 */
 
-#if PSX
- int sine[]={};
- int cosine[]={};
-#else
+/*adj*/
+
 int oneoversin[4096];
 
 int sine[]={
@@ -8218,7 +8216,6 @@ int cosine[]={
 
 };
 
-#endif
 
 short ArcCosTable[]={
 

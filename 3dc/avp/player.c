@@ -19,9 +19,7 @@ so player.c is looking a bit bare at the moment. */
 #include "particle.h"
 #include "scream.h"
 #include "savegame.h"
-#if SupportWindows95
-	#include "rebmenus.hpp"
-#endif
+#include "rebmenus.hpp"
 
 #define UseLocalAssert Yes
 #include "ourasert.h"
@@ -29,16 +27,12 @@ so player.c is looking a bit bare at the moment. */
 #include "psnd.h"
 #include "psndplat.h"
 
-/* for win 95 net support */
-#if SupportWindows95
 #include "pldnet.h"
 #include "pldghost.h"
 #include "dp_func.h"
-#endif
 #include "showcmds.h"
 #include "bonusabilities.h"
 
-#define PLAYER_HMODEL 0
 
 /*KJL****************************************************************************************
 *  										G L O B A L S 	            					    *
@@ -149,19 +143,6 @@ void InitPlayer(STRATEGYBLOCK* sbPtr, int sb_type)
 						break;
 				}
 
-				#if 0  //this hmodel isn't being set up for the moment - Richard
-				root_section=GetNamedHierarchyFromLibrary("hnpcmarine","Template");
-				if (!root_section) {
-					GLOBALASSERT(0);
-					/* Sorry, there's just no bouncing back from this one.  Fix it. */
-					return;
-				}
-				#if PLAYER_HMODEL
-				Create_HModel(&psPtr->HModelController,root_section);
-				InitHModelSequence(&psPtr->HModelController,0,0,ONE_FIXED);
-				#endif
-				/* Doesn't matter what the sequence is... */
-				#endif
 				break;
 			}
 			case(I_Predator):
@@ -182,19 +163,6 @@ void InitPlayer(STRATEGYBLOCK* sbPtr, int sb_type)
 						break;
 				}
 
-				#if 0  //this hmodel isn't being set up for the moment - Richard
-				root_section=GetNamedHierarchyFromLibrary("hnpcpredator","Template");
-				if (!root_section) {
-					GLOBALASSERT(0);
-					/* Sorry, there's just no bouncing back from this one.  Fix it. */
-					return;
-				}
-				#if PLAYER_HMODEL
-				Create_HModel(&psPtr->HModelController,root_section);
-				InitHModelSequence(&psPtr->HModelController,0,0,ONE_FIXED);
-				#endif
-				/* Doesn't matter what the sequence is... */
-				#endif
 				break;
 			}
 			case(I_Alien):
@@ -215,19 +183,6 @@ void InitPlayer(STRATEGYBLOCK* sbPtr, int sb_type)
 						break;
 				}
 
-				#if 0  //this hmodel isn't being set up for the moment - Richard
-				root_section=GetNamedHierarchyFromLibrary("hnpcalien","alien");
-				if (!root_section) {
-					GLOBALASSERT(0);
-					/* Sorry, there's just no bouncing back from this one.  Fix it. */
-					return;
-				}
-				#if PLAYER_HMODEL
-				Create_HModel(&psPtr->HModelController,root_section);
-				InitHModelSequence(&psPtr->HModelController,0,0,ONE_FIXED);
-				#endif
-				/* Doesn't matter what the sequence is... */
-				#endif
 				break;
 
 			}
@@ -245,22 +200,10 @@ void InitPlayer(STRATEGYBLOCK* sbPtr, int sb_type)
 		sbPtr->SBDamageBlock.SB_H_flags=NpcData->StartingStats.SB_H_flags;
 		sbPtr->SBDamageBlock.IsOnFire=0;
 
-		//{
-		//	int *nptr,i;
-		//	nptr=(int *)sbPtr->SBname;
-		//	for (i=0; i<(SB_NAME_LENGTH>>2); i++) {
-		//		*nptr=FastRandom();
-		//		nptr++;
-		//	}
-		//	sbPtr->SBname[SB_NAME_LENGTH-1]=3; /* Just to make sure... */
-		//}
 		AssignNewSBName(sbPtr);
 	}
 
-    //psPtr->Health=STARTOFGAME_MARINE_HEALTH;
-    psPtr->Energy=STARTOFGAME_MARINE_ENERGY;
-    //psPtr->Armour=STARTOFGAME_MARINE_ARMOUR;
-
+	psPtr->Energy=STARTOFGAME_MARINE_ENERGY;
 	psPtr->Encumberance.MovementMultiple=ONE_FIXED;
 	psPtr->Encumberance.TurningMultiple=ONE_FIXED;
 	psPtr->Encumberance.JumpingMultiple=ONE_FIXED;
@@ -303,8 +246,6 @@ void InitPlayer(STRATEGYBLOCK* sbPtr, int sb_type)
 		dynPtr->Position = PlayerStartLocation;
 		dynPtr->OrientMat = PlayerStartMat;
 		MatrixToEuler(&dynPtr->OrientMat,&dynPtr->OrientEuler);
-		//dynPtr->OrientEuler = dPtr->ObEuler;
-		
 		
 		dynPtr->PrevPosition = dynPtr->Position;
 		dynPtr->PrevOrientMat = dynPtr->OrientMat;
@@ -357,10 +298,6 @@ void InitPlayer(STRATEGYBLOCK* sbPtr, int sb_type)
 	//restore the number of saves allowed
 	ResetNumberOfSaves();
 
-#if SupportWindows95
-	//choosing a start position now occurs later on
-//	if(AvP.Network!=I_No_Network) TeleportNetPlayerToAStartingPosition(sbPtr, 1);
-#endif
 
 }
 
@@ -471,30 +408,18 @@ void MaintainPlayer(void)
 	textprint("HtoH Strikes %d\n",HtoHStrikes);
 
 	DoPlayerCloakingSystem();/* Patrick 22/8/97 : Cloaking stuff */
-   //	HandlePredatorVisionModes();
 
 	CurrentLightAtPlayer=LightIntensityAtPoint(&Player->ObStrategyBlock->DynPtr->Position);
 
-	#if 1
 	textprint("PlayerLight %d\n",CurrentLightAtPlayer);
-	#endif
 
-	#if SupportWindows95
-	#if 0//UseRebMenus
-	if(playerStatusPtr->Mvt_InputRequests.Flags.Rqst_PauseGame)
-	{
-		REBMENUS_ProcessPauseRequest();
-	}
-	#else
 	if(AvP.Network==I_No_Network)
 	{
-		#if 1
 		if(playerStatusPtr->Mvt_InputRequests.Flags.Rqst_PauseGame)
 		{
 			// go to start menu
 			AvP.MainLoopRunning = 0;
 		}
-		#endif
 	}
 	else
 	if(playerStatusPtr->Mvt_InputRequests.Flags.Rqst_PauseGame)
@@ -512,8 +437,6 @@ void MaintainPlayer(void)
 		// go to start menu
 		AvP.MainLoopRunning = 0;
 	}
-	#endif
-	#endif
 	//Update the player's invulnerabilty timer
 	if(playerStatusPtr->invulnerabilityTimer>0)
 	{
@@ -590,7 +513,6 @@ void MaintainPlayer(void)
 		
 		/* Put the fire out... */
 
-		#if 1
 		{
 			int speed;
 			/* Go out? */
@@ -619,25 +541,6 @@ void MaintainPlayer(void)
 				playerStatusPtr->fireTimer=0;
 			}
 		}
-		#else
-		if (playerStatusPtr->incidentFlag) {
-			int speed;
-			/* Go out? */
-			speed=Approximate3dMagnitude(&Player->ObStrategyBlock->DynPtr->LinVelocity);
-
-			if (speed>15000) {
-				/* Running alien. */
-				if ((FastRandom()&65535)<13107) {
-					Player->ObStrategyBlock->SBDamageBlock.IsOnFire=0;
-				}
-			} else {
-				/* Normal bloke. */
-				if ((FastRandom()&65535)<3000) {
-					Player->ObStrategyBlock->SBDamageBlock.IsOnFire=0;
-				}
-			}
-		}
-		#endif
 	} else {
 		if (playerStatusPtr->soundHandle3!=SOUND_NOACTIVEINDEX) {
 			Sound_Stop(playerStatusPtr->soundHandle3);
@@ -646,25 +549,6 @@ void MaintainPlayer(void)
 	
 	if (playerStatusPtr->IsMovingInWater)
 	{
-		#if 0
-		if (playerStatusPtr->soundHandle4==SOUND_NOACTIVEINDEX) {
-	 		switch (rand % 4) {
-				case 0:
-				 	Sound_Play(SID_SPLASH1,"dev",&(Player->ObStrategyBlock->DynPtr->Position),&playerStatusPtr->soundHandle4,127);
-					break;
-				case 1:
-				 	Sound_Play(SID_SPLASH2,"dev",&(Player->ObStrategyBlock->DynPtr->Position),&playerStatusPtr->soundHandle4,127);
-					break;
-				case 2:
-				 	Sound_Play(SID_SPLASH3,"dev",&(Player->ObStrategyBlock->DynPtr->Position),&playerStatusPtr->soundHandle4,127);
-					break;
-				default:
-				 	Sound_Play(SID_SPLASH4,"dev",&(Player->ObStrategyBlock->DynPtr->Position),&playerStatusPtr->soundHandle4,127);
-					break;
-			}
-		}
-		#else
-		/* KJL 19:07:57 25/05/98 - make a noise at most every 1/4 of a sec */
 		if (playerStatusPtr->soundHandle4<=0)
 		{
 	 		switch (rand&3)
@@ -689,7 +573,6 @@ void MaintainPlayer(void)
 		{
 			playerStatusPtr->soundHandle4-=NormalFrameTime;
 		}
-		#endif
 	}
 
 
@@ -705,16 +588,11 @@ void MaintainPlayer(void)
 
 		if (AvP.PlayerType==I_Alien) {
 
-			//if (playerStatusPtr->tauntTimer>(TAUNT_LENGTH>>1)) {
 			if (TauntSoundPlayed==0) {
 				/* That should make sure we don't get more than one. */
 				if (playerStatusPtr->soundHandle==SOUND_NOACTIVEINDEX) {
-					#if 0
-					Sound_Play(SID_ALIEN_SCREAM,"de",&(Player->ObStrategyBlock->DynPtr->Position),&playerStatusPtr->soundHandle);
-					#else
 					PlayAlienSound(0,ASC_Taunt,0,&playerStatusPtr->soundHandle,&(Player->ObStrategyBlock->DynPtr->Position));
 					if(AvP.Network!=I_No_Network) netGameData.myLastScream=ASC_Taunt;
-					#endif
 					TauntSoundPlayed=1;
 				}
 			}
@@ -810,32 +688,10 @@ void PlayerIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiplie
 	/* Patrick 4/8/97--------------------------------------------------
 	A little hack-et to make the predator tougher in multiplayer games
 	------------------------------------------------------------------*/
-	//if((AvP.Network!=I_No_Network)&&(AvP.PlayerType==I_Predator)) damage>>=1;
 	/* ChrisF 16/9/97 No, predators are now... wait for it... tough. */
 
 	if (playerStatusPtr->IsAlive)
 	{
-		#if 0
-		damage <<= 16;
-		if (playerStatusPtr->Armour > 0)
-		{
-			if (playerStatusPtr->Armour >= damage/2)
-			{
-				playerStatusPtr->Armour -= damage/2;
-				playerStatusPtr->Health -= damage/4;
-			}
-			else
-			{
-				damage -= playerStatusPtr->Armour*2;
-				playerStatusPtr->Health -= playerStatusPtr->Armour/2 + damage;
-				playerStatusPtr->Armour = 0;
-			}
-		}
-		else
-		{
-			playerStatusPtr->Health -= damage;
-		}
-		#endif
 		{
 			int maxTilt = deltaHealth>>12; 
 			int halfTilt = maxTilt/2;
@@ -942,9 +798,6 @@ void PlayerIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiplie
 			if (AvP.PlayerType==I_Marine) {
 				PointAlert(3, &Player->ObStrategyBlock->DynPtr->Position);
 			} else {
-				#if 0
-				PointAlert(2, &Player->ObStrategyBlock->DynPtr->Position);
-				#endif
 			}
 		}
 
@@ -1113,19 +966,12 @@ static void PlayerIsDead(DAMAGE_PROFILE* damage,int multiplier,VECTORCH* incomin
 	}
 
 	/* Well, it was nice knowing you. */
-	//playerStatusPtr->Health = 0;
 	sbPtr->SBDamageBlock.Health=0;
 	playerStatusPtr->IsAlive = 0;
 
-	/* make player fall to the ground */
-//	Player->ObShape=I_ShapeMarinePlayerLieDown;
-  //	MapBlockInit(Player);
 
 	/* give player a little bounce */
 	dynPtr->Elasticity = 16384;
-	/* but a lot of friction */
-//	dynPtr->Friction = 1<<20;
-//	dynPtr->Mass = 1<<20;
 
 	/* cancel any velocity */
 	dynPtr->LinVelocity.vx = 0;
@@ -1147,7 +993,6 @@ static void PlayerIsDead(DAMAGE_PROFILE* damage,int multiplier,VECTORCH* incomin
 	}
 
 	/* network support... */
-	#if SupportWindows95
 	if(AvP.Network!=I_No_Network) 
 	{
 		playerStatusPtr->MyCorpse=MakeNewCorpse();
@@ -1283,7 +1128,6 @@ static void PlayerIsDead(DAMAGE_PROFILE* damage,int multiplier,VECTORCH* incomin
 			
 		}
 
-//		if(AvP.Network==I_Host) DoNetScoresForHostDeath();
 
 		//does this death require a change in character type?
 		if(netGameData.gameType==NGT_LastManStanding)
@@ -1317,7 +1161,6 @@ static void PlayerIsDead(DAMAGE_PROFILE* damage,int multiplier,VECTORCH* incomin
 		    SpeciesTag_DetermineMyNextCharacterType();
 		}
 	}
-	#endif
 	if (playerStatusPtr->soundHandle!=SOUND_NOACTIVEINDEX) {
  		Sound_Stop(playerStatusPtr->soundHandle);
 	}
@@ -1361,9 +1204,6 @@ void DeInitialisePlayer(void) {
 		wdPtr->TxAnimCtrl=NULL;
 	} while(slot);
 
-	#if 0  //this hmodel isn't being set up for the moment - Richard
-	Dispel_HModel(&playerStatusPtr->HModelController);
-	#endif
 
 }
 
@@ -1406,7 +1246,6 @@ static void DoPlayerCloakingSystem(void)
 			{
 				Sound_Play(SID_PRED_CLOAKOFF,"h");
 				playerStatusPtr->cloakOn = 0;
-				//playerNoise=1;
 			} else {
 				/* Check validity. */
 				if ((playerStatusPtr->FieldCharge>CloakThreshold)
@@ -1425,7 +1264,6 @@ static void DoPlayerCloakingSystem(void)
 						playerStatusPtr->cloakOn = 1;
 						playerStatusPtr->CloakingEffectiveness = 0;
 						Sound_Play(SID_PRED_CLOAKON,"h");
-						//playerNoise=1;
 					}
 				}
 			}
@@ -1478,7 +1316,6 @@ static void DoPlayerCloakingSystem(void)
 		}
 
 	}
-	#if 1
 
 	/* position-given-away-timer runs whatever state the cloak is in */
 	if(playerStatusPtr->cloakPositionGivenAway)
@@ -1514,7 +1351,6 @@ static void DoPlayerCloakingSystem(void)
 			playerStatusPtr->cloakOn = 0;
 			playerStatusPtr->Mvt_InputRequests.Flags.Rqst_ChangeVision = 1;
 			Sound_Play(SID_PRED_CLOAKOFF,"h");
-			//playerNoise=1;
 		}
 
 		/* TrickleCharge Difficulty Variation! */
@@ -1545,13 +1381,8 @@ static void DoPlayerCloakingSystem(void)
 				playerStatusPtr->FieldCharge = PLAYERCLOAK_MAXENERGY;
 			}
 			
-			#if 0
-			/* Infinite field charge? */
-			playerStatusPtr->FieldCharge = PLAYERCLOAK_MAXENERGY;
-			#endif
 		}	
 	}
-	#endif
 
 	if (ShowPredoStats) {
 		/* for testing */
@@ -1573,7 +1404,6 @@ static void DoPlayerCloakingSystem(void)
 		PrintDebuggingText("Cloaking Effectiveness: %d \n", playerStatusPtr->CloakingEffectiveness);
 		PrintDebuggingText("Gimme_Charge Calls: %d \n",GimmeChargeCalls);
 	}
-	#if 1
 	/* now, if we are cloaked, lets see if we have given away our position... 
 	if we have already given away our position, we may do so again */
 	if(playerStatusPtr->cloakOn)
@@ -1618,7 +1448,6 @@ static void DoPlayerCloakingSystem(void)
 			}
 		}		
 	}
-	#endif
 
 	if (playerStatusPtr->cloakOn) {
 		CurrentGameStats_CloakOn();
@@ -1736,14 +1565,6 @@ int AlienPCIsCurrentlyVisible(int checktime,STRATEGYBLOCK *sbPtr) {
 			/* It's too bright, mere crouching won't save you. */
 			return(1);
 		}
-		#if 0
-		if ((dynPtr->Position.vx!=dynPtr->PrevPosition.vx)||
-			(dynPtr->Position.vy!=dynPtr->PrevPosition.vy)||
-			(dynPtr->Position.vz!=dynPtr->PrevPosition.vz)) {
-			/* Stand perfectly still? */
-			return(1);
-		}
-		#else
 		speed=Approximate3dMagnitude(&Player->ObStrategyBlock->DynPtr->LinVelocity);
 		/* Speed: < 5000 = standing.  > 22000 = jumping.
 			In practice, walk/fall = 18000 ish, jump = 27000 ish. */
@@ -1757,14 +1578,11 @@ int AlienPCIsCurrentlyVisible(int checktime,STRATEGYBLOCK *sbPtr) {
 		}
 		/* Now should be 0->17000 ish. */
 		speed<<=1;
-		#endif
 		if (checktime) {
 			int chance;
 			/* There is a chance of being seen. */
 			chance=CurrentLightAtPlayer-5000;
-			#if 1
 			chance+=speed;
-			#endif
 			if ((FastRandom()&65535)<chance) {
 				return(1);
 			}
@@ -1773,17 +1591,6 @@ int AlienPCIsCurrentlyVisible(int checktime,STRATEGYBLOCK *sbPtr) {
 	}
 }
 
-#if 0
-static void HandlePredatorVisionModes(void)
-{
-	extern unsigned char DebouncedKeyboardInput[];
-	
-	if (DebouncedKeyboardInput[KEY_K])
-	{
-		ChangePredatorVisionMode();
-	}
-}
-#endif
 
 void ShowAdjacencies(void) {
 

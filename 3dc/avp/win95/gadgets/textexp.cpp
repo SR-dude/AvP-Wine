@@ -11,53 +11,20 @@
 /* Includes ********************************************************/
 #include "3dc.h"
 #include "textexp.hpp"
+#include "strutil.h"
+#include "textin.hpp"
+#define UseLocalAssert Yes
+#include "ourasert.h"
 
-	#include "strutil.h"
-	#include "textin.hpp"
 
-	#define UseLocalAssert Yes
-	#include "ourasert.h"
-
-/* Version settings ************************************************/
-
-/* Constants *******************************************************/
-
-/* Macros **********************************************************/
-
-/* Imported function prototypes ************************************/
-
-/* Imported data ***************************************************/
-#ifdef __cplusplus
-	extern "C"
-	{
-#endif
-		#if 0
-		extern OurBool			DaveDebugOn;
-		extern FDIEXTENSIONTAG	FDIET_Dummy;
-		extern IFEXTENSIONTAG	IFET_Dummy;
-		extern FDIQUAD			FDIQuad_WholeScreen;
-		extern FDIPOS			FDIPos_Origin;
-		extern FDIPOS			FDIPos_ScreenCentre;
-		extern IFOBJECTLOCATION IFObjLoc_Origin;
-		extern UncompressedGlobalPlotAtomID UGPAID_StandardNull;
-		extern IFCOLOUR			IFColour_Dummy;
- 		extern IFVECTOR			IFVec_Zero;
-		#endif
-#ifdef __cplusplus
-	};
-#endif
 
 
 
 /* Exported globals ************************************************/
-	/*static*/ List<TextExpansion*> TextExpansion :: List_pTextExp;
-	/*static*/ int TextExpansion ::  bVerbose = No;
+List<TextExpansion*> TextExpansion :: List_pTextExp;
+int TextExpansion ::  bVerbose = No;
 
-/* Internal type definitions ***************************************/
 
-/* Internal function prototypes ************************************/
-
-/* Internal globals ************************************************/
 
 /* Exported function definitions ***********************************/
 // class TextExpansion
@@ -78,7 +45,7 @@ void TextExpansion :: Display(void)
 	pSCString_Description_Val -> SendToScreen();
 }
 
-/*static*/ void TextExpansion :: AddExpansion
+void TextExpansion :: AddExpansion
 (
 	ProjChar* pProjCh_ToParse
 )
@@ -139,7 +106,7 @@ void TextExpansion :: Display(void)
 	}
 }
 
-/*static*/ void TextExpansion :: TryToRemoveExpansion
+void TextExpansion :: TryToRemoveExpansion
 (
 	ProjChar* pProjCh_ToParse
 )
@@ -172,7 +139,7 @@ void TextExpansion :: Display(void)
 	}
 }
 
-/*static*/ void TextExpansion :: TestForExpansions
+void TextExpansion :: TestForExpansions
 (
 	TextInputState* pTextInputState_In
 )
@@ -187,7 +154,6 @@ void TextExpansion :: Display(void)
 
 	/* CODE */
 	{
-		#if LimitedLineLength
 		{
 			// Find the word that's just been typed:
 			int StartOfWordPos = pTextInputState_In -> CursorPos;
@@ -313,15 +279,10 @@ void TextExpansion :: Display(void)
 			}
 
 		}
-		#else
-		{
-			#error Not yet implemented
-		}
-		#endif
 	}
 }
 
-/*static*/ void TextExpansion :: ListAll(void)
+void TextExpansion :: ListAll(void)
 {
 	for
 	(
@@ -375,7 +336,7 @@ TextExpansion :: TextExpansion
 	List_pTextExp . add_entry( this );
 }
 
-/*static*/ void TextExpansion :: TryToRemoveExpansion
+void TextExpansion :: TryToRemoveExpansion
 (
 	SCString* pSCString_Word
 )
@@ -432,7 +393,6 @@ TextExpansion :: TextExpansion
 		{
 			{
 				SCString* pSCString_Temp = new SCString("EXPANSION REMOVED: ");
-					// LOCALISEME();
 
 				SCString* pSCString_Feedback = new SCString
 				(
@@ -451,11 +411,8 @@ TextExpansion :: TextExpansion
 		}
 		else
 		{
-			// unrecognised
 		}
 	}
 }
 
 
-
-/* Internal function definitions ***********************************/

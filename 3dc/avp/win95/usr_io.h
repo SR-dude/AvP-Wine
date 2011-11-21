@@ -306,11 +306,7 @@ typedef struct
 		that filename to use is passed to them, rather than being hardcoded
 		as "avp.key" so that we can have multiple keyconfig files
 	*/
-	extern void LoadKeyConfiguration(void);
-	extern void SaveKeyConfiguration(void);
 
-	extern void LoadAKeyConfiguration(char* Filename);
-	extern void SaveAKeyConfiguration(char* Filename);
 
 #ifdef __cplusplus
 	};
