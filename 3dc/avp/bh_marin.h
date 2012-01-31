@@ -338,45 +338,35 @@
 	/*--------------------------------------------
    	Some defines....
    	--------------------------------------------*/
-	#define MARINE_STATE_PRINT					0
-	#define MARINE_STARTING_HEALTH				30
-  	#define NO_OF_FRAGMENTS_FROM_DEAD_MARINE	10
-//	#define MARINE_NEAR_SPEED					6000 	/* mm/s */
-	/* Experiment.  Can they take the ramps? */
-	#define MARINE_NEAR_SPEED					6000 	/* mm/s */
-	#define MARINE_NEAR_VIEW_WIDTH				500		/* mm */
-	#define MARINE_WEAPON_DAMAGE				5
-	#define MARINE_CLOSE_APPROACH_DISTANCE		3000	/* mm */
-	#define MARINE_FIRINGPOINT_INFRONT			3000		/* 900 mm */  	
-	#define MARINE_FIRINGPOINT_ACROSS			300 	/* 300 mm */
-	#define MARINE_FIRINGPOINT_UP				200 	/* 200 mm */
-	#define MARINE_FIRINGPOINT_INFRONT_CROUCHED	900		/* mm */  	
-	#define MARINE_FIRINGPOINT_ACROSS_CROUCHED	200 	/* mm */
-	#define MARINE_FIRINGPOINT_UP_CROUCHED		100 	/* mm */
-	#define MARINE_WEAPON_VOLLEYSIZE			(1+(FastRandom()&0x02))	/* 1,2 or 3 1/4 second bursts */
-	#define MARINE_CHANCEOFGRENADE				(3)
-	#define MARINE_TOO_CLOSE_TO_GRENADE_FOOL	3000
-	#define MARINE_PARANOIA_TIME				(ONE_FIXED*10)
-	#define MARINE_PANIC_TIME					(ONE_FIXED*120)
-	#define SQUAD_PARANOIA_TIME					(ONE_FIXED)
+#define MARINE_STARTING_HEALTH				30
+#define MARINE_NEAR_SPEED					6000 	/* mm/s */
+#define MARINE_NEAR_VIEW_WIDTH				500		/* mm */
+#define MARINE_WEAPON_DAMAGE				5
+#define MARINE_CLOSE_APPROACH_DISTANCE		3000	/* mm */
+#define MARINE_FIRINGPOINT_INFRONT			3000		/* 900 mm */  	
+#define MARINE_FIRINGPOINT_ACROSS			300 	/* 300 mm */
+#define MARINE_FIRINGPOINT_UP				200 	/* 200 mm */
+#define MARINE_FIRINGPOINT_INFRONT_CROUCHED	900		/* mm */  	
+#define MARINE_FIRINGPOINT_ACROSS_CROUCHED	200 	/* mm */
+#define MARINE_FIRINGPOINT_UP_CROUCHED		100 	/* mm */
+#define MARINE_CHANCEOFGRENADE				(3)
+#define MARINE_TOO_CLOSE_TO_GRENADE_FOOL	3000
+#define MARINE_PARANOIA_TIME				(ONE_FIXED*10)
+#define MARINE_PANIC_TIME					(ONE_FIXED*120)
+#define SQUAD_PARANOIA_TIME					(ONE_FIXED)
 
 	/* 1.5-2 seconds in 1/16 second. NB DO NOT INCREASE THIS */
-	#define MARINE_FAR_MOVE_TIME ((24+(FastRandom()&0x07))*(ONE_FIXED>>4)) 				
+#define MARINE_FAR_MOVE_TIME ((24+(FastRandom()&0x07))*(ONE_FIXED>>4)) 				
 	/* 1-2 seconds in 1/8ths of a second */
-	#define MARINE_NEAR_TIMEBETWEENFIRING	((8+(FastRandom()&0x07))*(ONE_FIXED>>3))
-//	#define MARINE_NEAR_FIRE_TIME			(ONE_FIXED>>2) 	/* 1/4 second */
-	#define MARINE_NEAR_FIRE_TIME			(ONE_FIXED) 	/* 1 second */
+#define MARINE_NEAR_TIMEBETWEENFIRING	((8+(FastRandom()&0x07))*(ONE_FIXED>>3))
+#define MARINE_NEAR_FIRE_TIME			(ONE_FIXED) 	/* 1 second */
 	/* random time between 1 and 2 seconds,in fixed point,with granularity 1/8th second */
-	#define MARINE_NEARWAITTIME					(ONE_FIXED+((FastRandom()&0x7)*(ONE_FIXED>>3)))
+#define MARINE_NEARWAITTIME					(ONE_FIXED+((FastRandom()&0x7)*(ONE_FIXED>>3)))
 
-	#define SEAL_NEAR_SPEED						7000
-	#define SEAL_WEAPON_DAMAGE					15
-	#define SEAL_STARTING_HEALTH				150
 
-	//#define MINIGUN_IDLE_SPEED (ONE_FIXED>>2)
-	#define MINIGUN_IDLE_SPEED (0)
-	#define MINIGUN_MAX_SPEED (ONE_FIXED*20)
-	#define MINIGUN_MINIMUM_BURST	(25)
+#define MINIGUN_IDLE_SPEED (0)
+#define MINIGUN_MAX_SPEED (ONE_FIXED*20)
+#define MINIGUN_MINIMUM_BURST	(25)
 
 	/*--------------------------------------------
    	Some prototypes...

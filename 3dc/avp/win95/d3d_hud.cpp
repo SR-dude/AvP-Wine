@@ -46,15 +46,7 @@ extern void D3D_RenderHUDNumber_Centred(unsigned int number,int x,int y,int colo
 #define UseLocalAssert No
 #include "ourasert.h"
 #include "vision.h"
-#define RGBLIGHT_MAKE(rr,gg,bb) \
-( \
-	LCCM_NORMAL == d3d_light_ctrl.ctrl ? \
-		RGB_MAKE(rr,gg,bb) \
-	: LCCM_CONSTCOLOUR == d3d_light_ctrl.ctrl ? \
-		RGB_MAKE(MUL_FIXED(rr,d3d_light_ctrl.r),MUL_FIXED(gg,d3d_light_ctrl.g),MUL_FIXED(bb,d3d_light_ctrl.b)) \
-	: \
-		RGB_MAKE(d3d_light_ctrl.GetR(rr),d3d_light_ctrl.GetG(gg),d3d_light_ctrl.GetB(bb)) \
-)
+
 #define RGBALIGHT_MAKE(rr,gg,bb,aa) \
 ( \
 		RGBA_MAKE(rr,gg,bb,aa) \
@@ -237,6 +229,8 @@ void D3D_InitialiseMarineHUD(void)
 	HUDScaleFactor = DIV_FIXED(ScreenDescriptorBlock.SDB_Width,640);	
 
 }
+
+// adj fix these paths
 
 void LoadCommonTextures(void)
 {

@@ -7,23 +7,11 @@
 #ifndef _r2pos666
 #define _r2pos666 1
 
-	#ifndef _r2base
-	#include "r2base.h"
-	#endif
-
-	#ifndef _daemon
-	#include "daemon.h"
-	#endif
-
+#include "r2base.h"
+#include "daemon.h"
 #ifdef __cplusplus
 	extern "C" {
 #endif
-
-/* Version settings *****************************************************/
-
-/* Constants  ***********************************************************/
-
-/* Macros ***************************************************************/
 
 /* Type definitions *****************************************************/
 	class R2PosDaemon : public Daemon
@@ -62,14 +50,6 @@
 		{
 			return R2Pos_FixP_Current;
 		}		
-
-/* Exported globals *****************************************************/
-
-/* Function prototypes **************************************************/
-
-
-
-/* End of the header ****************************************************/
 
 
 #ifdef __cplusplus

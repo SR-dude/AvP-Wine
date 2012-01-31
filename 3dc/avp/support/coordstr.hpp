@@ -1,17 +1,7 @@
-/*
-	
-	coordstr.hpp
-
-*/
-
 #ifndef coordstr
 #define coordstr 1
 
-	#ifndef _daemon
-	#include "daemon.h"
-	#endif
-
-/* Type definitions *****************************************************/
+#include "daemon.h"
 
 	class CoordinateWithStrategy : public Daemon
 	{
@@ -30,24 +20,11 @@
 			virtual ACTIVITY_RETURN_TYPE Activity(ACTIVITY_INPUT) = 0;
 				// the strategy to run when active...
 
-			#if 0
-			virtual void UpdateScreenObject
-			(
-				ScreenObject* pScrObj
-			) = 0;
-			#endif
 
 		protected:
 			int Int_CurrentCoord_Val;
 	};
 
-#if 0
-	class CoordinateWith2DStrategy : public Daemon
-	{
-		public
-			CoordinateWith2DStrategy
-	};    
-#endif
 
 	class CoordinateWithVelocity : public CoordinateWithStrategy
 	{
@@ -137,7 +114,6 @@
 
 	};
 
-#if 1
 	class HomingCoordinate : public CoordinateWithVelocity
 	{
 		protected:
@@ -158,10 +134,6 @@
 			void SetCoord_Int(int Int_NewCoord);
 			void SetCoord_FixP(int FixP_NewCoord);
 
-			#if 0
-			virtual OurBool fTargetWithinThisFramesRange(void) = 0;
-			virtual void ChangeVelocityBasedOnHoming(int FixP_Time) = 0;
-			#endif
 	};
 
 		// Inline fns:
@@ -185,10 +157,6 @@
 				int Int_TargetCoord
 			);
 
-			#if 0
-			OurBool fTargetWithinThisFramesRange(void);
-			void ChangeVelocityBasedOnHoming(int FixP_Time);
-			#endif
 	
 	};
 
@@ -252,13 +220,5 @@
 	};
 		inline int AcyclicFixedSpeedHoming::GetTarget_Int(void) const {return Int_TargetCoord_Val;}
 
-#endif
-
-/* Exported globals *****************************************************/
-
-/* Function prototypes **************************************************/
-
-
-/* End of the header ****************************************************/
 
 #endif

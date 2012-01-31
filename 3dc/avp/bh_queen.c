@@ -42,6 +42,7 @@ extern SECTION * GetNamedHierarchyFromLibrary(const char * rif_name, const char 
 extern char LevelName[];
 extern unsigned char Null_Name[8];
 
+#define QUEEN_STARTING_HEALTH			1400
 #define QueenAttackRange 3500
 
 /*minimum time for flamethrower before queen takes notice*/
@@ -2638,12 +2639,11 @@ void QueenForceReconsider(STRATEGYBLOCK* sbPtr)
 #define AirlockMaxZ -6266
 #define AirlockCentreX ((AirlockMinX+AirlockMaxX)/2)
 #define AirlockCentreZ ((AirlockMinZ+AirlockMaxZ)/2)
-#define AirlockY   12000
 #define HangarFloorLevel 3950
 
 #define AirlockOpeningDistance 2500
 
-#define AirlockOffset 1000
+
 void QueenCheckForAvoidAirlock(STRATEGYBLOCK *sbPtr)
 {
 	//only need to look out for the airlock in hangar

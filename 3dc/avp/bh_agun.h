@@ -4,7 +4,6 @@
 
 extern void AutoGunBehaveFun(STRATEGYBLOCK* ag_sbptr);
 extern void AutoGunBehaveInit(void* bhdata, STRATEGYBLOCK* sbptr);
-//extern void CreatePlayerAutogun(void);
 
 void MakeSentrygunNear(STRATEGYBLOCK *sbPtr);
 void MakeSentrygunFar(STRATEGYBLOCK *sbPtr);

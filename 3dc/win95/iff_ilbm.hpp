@@ -67,20 +67,16 @@ namespace IFF
 	{
 		public:
 			IlbmBodyChunk() : pData(NULL), pDecodeDst(NULL)
-				#ifndef IFF_READ_ONLY
 					, pEncodeDst(NULL), pEncodeSrc(NULL)
-				#endif
 				{ m_idCk = "BODY"; }
 			virtual ~IlbmBodyChunk();
 			
-			#ifndef IFF_READ_ONLY
 				bool BeginEncode();
 				bool EncodeFirstRow(unsigned const * pRow);
 				bool EncodeNextRow(unsigned const * pRow);
 				bool EndEncode();
 				
 				float GetCompressionRatio() const;
-			#endif
 			
 			bool BeginDecode() const;
 			unsigned const * DecodeFirstRow() const;
@@ -103,16 +99,13 @@ namespace IFF
 			mutable unsigned nRemaining;
 			mutable unsigned * pDecodeDst;
 			
-			#ifndef IFF_READ_ONLY
 				DataBlock * pEncodeDst;
 				UBYTE * pEncodeSrc;
 				
 				unsigned nSizeNonCprss;
 				unsigned nSizeCprss;
-			#endif
 	};
 	
-	#ifndef IFF_READ_ONLY
 		inline bool IlbmBodyChunk::EncodeFirstRow(unsigned const * pRow)
 		{
 			if (BeginEncode())
@@ -127,7 +120,6 @@ namespace IFF
 			
 			return (static_cast<float>(nSizeNonCprss)-static_cast<float>(nSizeCprss))/static_cast<float>(nSizeNonCprss);
 		}
-	#endif
 	
 	inline unsigned const * IlbmBodyChunk::DecodeFirstRow() const
 	{

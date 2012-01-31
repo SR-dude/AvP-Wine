@@ -19,36 +19,13 @@
 
 #ifndef _wrapstr_hpp
 #define _wrapstr_hpp 1
-
-	#if ( defined( __WATCOMC__ ) || defined( _MSC_VER ) )
-		#pragma once
-	#endif
-
-	#ifndef _scstring
-	#include "scstring.hpp"
-	#endif
-
-	#ifndef _indexfnt
-	#include "indexfnt.hpp"
-	#endif
-
-	#ifndef _reflist_hpp
-	#include "reflist.hpp"
-	#endif
+#include "scstring.hpp"
+#include "indexfnt.hpp"
+#include "reflist.hpp"
 
 #ifdef __cplusplus
 	extern "C" {
 #endif
-
-/* Version settings *****************************************************/
-
-/* Constants  ***********************************************************/
-
-/* Macros ***************************************************************/
-
-/* Type definitions *****************************************************/
-
-/* Exported globals *****************************************************/
 
 /* Function prototypes **************************************************/
 	namespace WordWrap
@@ -87,9 +64,6 @@
 		int bWithinWord( ProjChar* pProjCh_Test );
 
 	};
-
-
-/* End of the header ****************************************************/
 
 
 #ifdef __cplusplus

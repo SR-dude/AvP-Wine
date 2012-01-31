@@ -7,39 +7,17 @@
 
 #ifndef _trepgadg
 #define _trepgadg 1
+#include "gadget.h"
+#include "list_tem.hpp"
+#include "scstring.hpp"
+#include "reflist.hpp"
+#define TEXT_REPORT_MAX_W (300)
 
-	#ifndef _gadget
-	#include "gadget.h"
-	#endif
 
-	#if UseGadgets
-		#ifndef list_template_hpp
-		#include "list_tem.hpp"
-		#endif
-
-		#ifndef _scstring
-		#include "scstring.hpp"
-		#endif
-
-		#ifndef _reflist_hpp
-		#include "reflist.hpp"
-		#endif
-
-	#endif
 
 #ifdef __cplusplus
 	extern "C" {
 #endif
-
-/* Version settings *****************************************************/
-
-/* Constants  ***********************************************************/
-	#define TEXT_REPORT_MAX_W (300)
-
-/* Macros ***************************************************************/
-
-/* Type definitions *****************************************************/
-	#if UseGadgets
 
 
 	class TeletypeGadget; // fully declared in TELETYPE.HPP
@@ -120,7 +98,6 @@
 		int MinYDisplacement(void);
 		int MaxYDisplacement(void);
 
-		#if 1
 		// Queue of messages waiting to appear:
 		RefList<SCString> RefList_SCString_ToAppear;
 
@@ -133,10 +110,6 @@
 		CheesyDaemon_Flash* p666_CheeseFlash;
 		CheesyDaemon_Lifetime* p666_CheeseLifetime;
 
-		#else
-		// primitive implementation:
-		SCString* pSCString_Current;
-		#endif
 
 		TextReportDaemon_Scroll* p666_Scroll;
 			// scrolling the text box, making it appear and disappear
@@ -145,15 +118,6 @@
 			// countdown for making the text box disappear
 
 	};
-	#endif //UseGadgets
-
-/* Exported globals *****************************************************/
-
-/* Function prototypes **************************************************/
-
-
-
-/* End of the header ****************************************************/
 
 
 #ifdef __cplusplus

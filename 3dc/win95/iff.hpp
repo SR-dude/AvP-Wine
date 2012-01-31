@@ -1,14 +1,7 @@
 #ifndef _INCLUDED_IFF_HPP_
 #define _INCLUDED_IFF_HPP_
 
-#if defined(_WIN32) || defined(WIN32) || defined(WINDOWS) || defined(_WINDOWS)
-	#define _IFF_WIN_TARGET
-	#include <windows.h>
-#else // ! WIN32 && ! _WIN32 && ! WINDOWS && ! _WINDOWS
-	#include <stdio.h>
-	#include <conio.h>
-#endif // ! WIN32 && ! _WIN32 && ! WINDOWS && ! _WINDOWS
-
+#include <windows.h>
 #include "media.hpp"
 
 namespace IFF
@@ -39,12 +32,11 @@ namespace IFF
 	/*   + DeviceHandle      */
 	/*************************/
 	
-	#ifdef _IFF_WIN_TARGET
 		inline void DisplayMessage(TCHAR const * pszTitle,TCHAR const * pszText)
 		{
 			::MessageBox(NULL,pszText,pszTitle,MB_OK|MB_ICONEXCLAMATION|MB_SETFOREGROUND);
 		}
-	#else
+	#if 0 // adj
 		inline void DisplayMessage(char const * pszTitle,char const * pszText)
 		{
 			::printf("%s\n%s\n",pszTitle,pszText);
@@ -87,39 +79,26 @@ namespace IFF
 			unsigned Release() { if (0==(--m_nRefCnt)) { delete this; return 0;} else return m_nRefCnt; }
 		protected:
 			virtual ~Unknown() {
-				#ifndef NDEBUG
 					DbForget(this);
-				#endif
 			}
 			Unknown() : m_nRefCnt(1) {
-				#ifndef NDEBUG
 					DbRemember(this);
-				#endif
 			}
 			Unknown(Unknown const &) : m_nRefCnt(1) {
-				#ifndef NDEBUG
 					DbRemember(this);
-				#endif
 			}
 		private:
 			unsigned m_nRefCnt;
 			
-		#ifndef NDEBUG
 			friend void DbRemember(Unknown * pObj);
 			friend void DbForget(Unknown * pObj);
 			friend class AllocList;
-		#endif
 	};
 	
 	/*******************************/
 	/* Original File: iffTypes.hpp */
 	/*******************************/
 	
-	// deal with any silly bastard who's put #define BYTE ... in a header, etc.
-	#ifdef BYTE
-		#undef BYTE
-		#pragma message("BYTE was defined - undefining")
-	#endif
 	typedef signed char BYTE;
 	typedef unsigned char UBYTE;
 
@@ -156,7 +135,6 @@ namespace IFF
 	
 	ID const ID_ANY(0U);
 	
-	#ifndef IFF_READ_ONLY
 	
 		/*******************************/
 		/* Original File: iffSData.hpp */
@@ -446,23 +424,15 @@ namespace IFF
 			Append(pData,nSize);
 		}
 		
-	#endif // ! IFF_READ_ONLY
 
 	/*******************************/
 	/* Original File: iffArchI.hpp */
 	/*******************************/
 	
-	#ifdef IFF_READ_ONLY
-		#define _IFF_ARCHI_BASE Unknown
-		#define _IFF_ARCHI_GENR ArchvIn
-		#define _IFF_ARCHI_FLAG m_bIsLoading
-		#define _IFF_ARCHI_INIT ,m_bError(false)
-	#else // ! IFF_READ_ONLY
 		#define _IFF_ARCHI_BASE Archive
 		#define _IFF_ARCHI_GENR Archive
 		#define _IFF_ARCHI_FLAG Archive
 		#define _IFF_ARCHI_INIT
-	#endif // ! IFF_READ_ONLY
 	
 	class ArchvIn : public _IFF_ARCHI_BASE
 	{
@@ -470,10 +440,6 @@ namespace IFF
 			ArchvIn() : _IFF_ARCHI_FLAG(true), m_pMedium(NULL) _IFF_ARCHI_INIT {}
 			~ArchvIn();
 			
-			#ifdef IFF_READ_ONLY
-				bool const m_bIsLoading;
-				bool m_bError;
-			#endif // IFF_READ_ONLY
 			
 			signed GetSize() const;
 			
@@ -505,9 +471,6 @@ namespace IFF
 			unsigned m_nEndPos;
 	};
 	
-	#ifdef IFF_READ_ONLY
-		typedef ArchvIn Archive;
-	#endif // IFF_READ_ONLY
 	
 	inline signed ArchvIn::GetSize() const
 	{
@@ -871,9 +834,7 @@ namespace IFF
 	{
 		public:
 			MiscChunk(ID id)
-				#ifndef IFF_READ_ONLY
 					: m_pData(NULL)
-				#endif // ! IFF_READ_ONLY
 				{
 					m_idCk = id;
 				}
@@ -882,15 +843,11 @@ namespace IFF
 				
 		protected:
 			virtual void Serialize(Archive * pArchv);
-			#ifndef IFF_READ_ONLY
 				virtual ~MiscChunk();
-			#endif // ! IFF_READ_ONLY
 			
 		private:
-			#ifndef IFF_READ_ONLY
 				BYTE * m_pData;
 				unsigned m_nSize;
-			#endif // ! IFF_READ_ONLY
 	};
 	
 	/******************************/
@@ -900,23 +857,17 @@ namespace IFF
 	class GenericFile : public SerializableObj
 	{
 		public:
-			#ifndef IFF_READ_ONLY
 				GenericFile() : m_pszFileName(NULL) {}
 				virtual ~GenericFile() { if (m_pszFileName) delete[] m_pszFileName; }
-			#endif
 		
 			bool Load(TCHAR const * pszFileName);
 			bool Load(::MediaMedium * pMedium);
 			
-			#ifndef IFF_READ_ONLY
 				bool Write(TCHAR const * pszFileName = NULL);
 				bool Write(::MediaMedium * pMedium);
-			#endif // ! IFF_READ_ONLY
 			
 		private:
-			#ifndef IFF_READ_ONLY
 				TCHAR * m_pszFileName;
-			#endif // ! IFF_READ_ONLY
 	};
 	
 	class File : public GenericFile
@@ -959,26 +910,16 @@ namespace IFF
 	{
 		public: inline ConsistencyCheck()
 		{
-			#ifdef IFF_READ_ONLY
-				static bool bReadOnly = true;
-				if (!bReadOnly)
-			#else
 				static bool bReadOnly = false;
 				if (bReadOnly)
-			#endif
 			{
 				DisplayMessage
 				(
-					#ifdef NDEBUG
-						TEXT("Error"),
-						TEXT("IFF_READ_ONLY definition not consistent")
-					#else
 						TEXT("IFF Compile Option Error"),
 						TEXT("Some files which #include \"iff.hpp\"\n")
 						TEXT("have the macro IFF_READ_ONLY defined\n")
 						TEXT("and some don't.\n\n")
 						TEXT("Please ensure this is consistent and recompile.")
-					#endif
 				);
 				exit(-45);
 			}

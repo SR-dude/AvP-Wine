@@ -53,11 +53,6 @@ static int numInfiniteModules = 0;
 static int FL_TotalNumAuxLocs = 0;
 static VECTORCH	*FL_AuxData = (VECTORCH *)0;
 
-/* a define for logging location data */
-#define logFarLocData	0
-
-#define logFarLocPositions	0
-
 /*----------------------Patrick 16/12/96------------------------
   This function builds a list of entry points and auxilary
   locations for	each module.

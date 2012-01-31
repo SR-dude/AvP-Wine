@@ -62,6 +62,8 @@ void ReportError(char const * mesg1, char const * mesg2)
 /* HANDY MACRO */
 /***************/
 
+// adj please no more macros
+
 #define READ_FILE(fname,post_proc,on_return,h,data,n_bytes,n_bytes_read,p5) \
 	if (!ReadFile(h,data,n_bytes,&n_bytes_read,p5)) \
 	{ \

@@ -6,7 +6,6 @@
 #endif
 
 #include "gameflow.h"
-
 #include "pmove.h"
 
 
@@ -172,21 +171,6 @@ typedef struct player_input_requests
 
 }PLAYER_INPUT_REQUESTS;
 
-/*-------------Patrick 23/10/96 --------------------
-  Some defines for key combo bit masks
-  these should correspond to the above request flags.
-  --------------------------------------------------*/
-#define INPUT_BITMASK_FORWARD	0x00000001
-#define INPUT_BITMASK_BACKWARD 0x00000002
-#define INPUT_BITMASK_LEFT		0x00000004
-#define INPUT_BITMASK_RIGHT		0x00000008
-#define INPUT_BITMASK_FIRE		0x00000040
-#define INPUT_BITMASK_FASTER 	0x00000080
-#define INPUT_BITMASK_STRAFE 	0x00000100
-#define INPUT_BITMASK_CROUCH 	0x00000200
-#define INPUT_BITMASK_JUMP 		0x00000400
-
-
 
 /* KJL 14:16:52 09/20/96 - the new player status type 
    modified by patrick */
@@ -204,15 +188,7 @@ typedef struct player_status
 	int	Energy;	 /* in 16.16 */
 	int	Armour;	 /* in 16.16 */
  
-    /* general info */
-	/* KJL 17:28:20 09/19/96 - not yet used
-	
-	int	ArmourType;
-	int	HealingRate;
-	int	CloakingType;
-	int	VisionType;
-    */
-		
+ 		
 	/*-----Patrick 15/10/96--------- 
 	Player movement bits...
 	------------------------------*/
@@ -301,21 +277,9 @@ typedef struct player_status
 
 #define TAUNT_LENGTH (ONE_FIXED<<1)
 #define PLAYER_ON_FIRE_TIME	(ONE_FIXED*20)
-
-#define STARTOFGAME_MARINE_HEALTH (100*65536) /* ie. 100 in 16.16 notation */
 #define STARTOFGAME_MARINE_ENERGY (100*65536) /* ie. 100 in 16.16 notation */
-#define STARTOFGAME_MARINE_ARMOUR (100*65536) /* ie. 100 in 16.16 notation */
-
-/* Patrick 22/8/97------------------------------------------------
-Cloaking stuff
-------------------------------------------------------------------*/
-
 #define PLAYERCLOAK_MAXENERGY 					(30*ONE_FIXED) /* fixed point seconds */
-#define PLAYERCLOAK_RECHARGEFACTOR				(4) /* ... times slower than discharge */
 #define PLAYERCLOAK_POSTIONGIVENAWAYTIME		(ONE_FIXED>>2) /*(2*ONE_FIXED) fixed point seconds */
-#define PLAYERCLOAK_THRESHOLD					(5*ONE_FIXED)
-#define PLAYERCLOAK_POWERON_DRAIN				(2*ONE_FIXED)
-#define PLAYERCLOAK_DRAIN_FACTOR				(4)
 
 /* Moved mere from player.c, CDF 23/4/98 */
 
@@ -503,13 +467,6 @@ extern void SetupPlayerAutoGun();
 
 
 #endif
-
-
-
-
-
-
-
 
 
 

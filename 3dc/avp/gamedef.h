@@ -92,7 +92,6 @@ typedef enum gamedifficulty
 
 typedef enum environments
 {
- //#ifndef MPLAYER_DEMO
   	I_Gen1 = 0,
   	I_Gen2,
   	I_Gen3,
@@ -117,10 +116,8 @@ typedef enum environments
   	I_Mps4,
   	I_Surface,
   	I_Entrance,
-#if PSX || Saturn
-#else
+
  	I_Dml1,	// 25- Vertigo.rif for Al
- // #ifndef MPLAYER_DEMO
  	I_Dml2, // KJL 16:59:58 05/1/97 - fruitbat.rif for Al 
  	I_Dml3, // KJL 16:59:58 05/19/97 - kipper.rif for George 
  	I_Dml4, // KJL 16:59:58 05/19/97 - mu.rif for Jake 
@@ -130,8 +127,7 @@ typedef enum environments
  	I_Dml8, // KJL 16:59:58 05/19/97 - mu.rif for Jake 
  	I_Dml9, // KJL 16:59:58 05/19/97 - mu.rif for Jake 
  	I_Dml10, // KJL 16:59:58 05/19/97 - mu.rif for Jake 
- // #endif
-#endif
+
  	I_Num_Environments  // 34
 
 }I_AVP_ENVIRONMENTS;
@@ -139,11 +135,7 @@ typedef enum environments
 extern char* LevelNames[];
 
 
-#if SupportWindows95
 #define GAME_NAME_LENGTH 30
-#else
-#define GAME_NAME_LENGTH 12
-#endif
 
 
 typedef struct avpgamedesc{
@@ -203,28 +195,6 @@ extern int IDemandGoForward();
 extern int IDemandTurnRight();
 extern int IDemandTurnLeft();
 
-//extern int IDemandLookUp(void);
-//extern int IDemandLookDown(void);
-//extern int IDemandTurnLeft(void);
-//extern int IDemandTurnRight(void);
-//extern int IDemandGoForward(void);
-//extern int IDemandGoBackward(void);
-//extern int IDemandFaster(void);
-//extern int IDemandSideStep(void);
-//extern int IDemandStop(void);
-
-//extern int IDemandNextWeapon(void);		/* KJL 11:45:40 10/07/96 */
-//extern int IDemandPreviousWeapon(void);	/* KJL 11:45:44 10/07/96 */
-
-
-//extern int IDemandPickupItem(void);
-//extern int IDemandDropItem(void);
-//extern int IDemandOperate(void);
-//extern int IDemandMenu(void);
-//extern int IDemandChangeEnvironment(void);
-
-
-
 
 /*************************************************
 ************* ENVIRONMENT STUFF
@@ -267,24 +237,7 @@ typedef struct
 	
 }HUDGRAPHIC;
 
-/* where to put the grahic*/
 
-#define HGflag_NotInVRAM 0x0000001		/*saturn only*/
-#define HGflag_LoadIntoVDP2 0x0000002	/*saturn only*/
-#define HGflag_LoadIntoVDP1	0x0000004	/*saturn only*/
-
-/* how to get the graphic */
-
-#define HGflag_AlwaysLoadOffDisk 0x00000200  /*cd or HD*/
-#define HGflag_LoadedIntoMemory  0x00000400	 /*loaded into memory*/
-
-/* source directory for the graphic */
-
-#define HGflag_MenuDir	0x00010000
-
-
-
-/********************************************************/
 /************************ Menu Code ***************/
 
 extern void ChooseLanguage(void);
@@ -295,14 +248,6 @@ extern void DoMainMenu(void);
 
 extern int UsingDataBase;
 
-/* How many info screens will there be? */
-#define MAXINFOSCREENS 10
-/* How many different info screen backgrounds there may be*/
-#define MAXBACKGROUNDS 10 
-/* How many overlay items can be in existence at a  time */
-#define MAXSCREENITEMS 10 
-
-#define NUM_CREDIT_SCREENS 2
 
 extern HUDGRAPHIC Menu[];
 extern HUDGRAPHIC CreditScreen[];

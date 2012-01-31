@@ -22,7 +22,6 @@
 #define FIXED_MINUTE (ONE_FIXED*60)
 
 #define TABPOINT1	(ScreenDescriptorBlock.SDB_Width/10)
-#define TABPOINT1A	(ScreenDescriptorBlock.SDB_Width/4)
 #define TABPOINT2	(ScreenDescriptorBlock.SDB_Width/2)
 #define TABPOINT3	((ScreenDescriptorBlock.SDB_Width/6)+(ScreenDescriptorBlock.SDB_Width/2))
 #define TABPOINT4	(((ScreenDescriptorBlock.SDB_Width/6)*2)+(ScreenDescriptorBlock.SDB_Width/2))

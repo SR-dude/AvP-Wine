@@ -12,13 +12,6 @@
 	extern "C" {
 #endif
 
-/* Version settings *****************************************************/
-
-/* Constants  ***********************************************************/
-
-/* Macros ***************************************************************/
-
-/* Type definitions *****************************************************/
 	enum StatusPanelIndex
 	{
 		I_StatusPanel_Weapons,
@@ -32,9 +25,6 @@
 	}; /* suggested naming: "I_StatusPanel" */
 
 
-/* Exported globals *****************************************************/
-
-/* Function prototypes **************************************************/
 	void STATPANE_RequestStatusPanel
 	(
 		enum StatusPanelIndex I_StatusPanel
@@ -51,9 +41,6 @@
 			for selecting status panels are depressed
 		*/
 
-
-
-/* End of the header ****************************************************/
 
 
 #ifdef __cplusplus

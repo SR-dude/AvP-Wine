@@ -67,12 +67,8 @@
 #ifndef DB_H_INCLUDED
 #define DB_H_INCLUDED
 
-/* I N C L U D E D S ************************************************** */
-#include "advwin32.h"
-#ifndef DB_NOWINDOWS
-	#include <windows.h>
-	#include "advwin32.h"
-#endif
+#include <windows.h>
+
 
 /* Permit use in a C++ source file. */
 #ifdef __cplusplus
@@ -289,9 +285,6 @@ struct db_dd_mode_tag
 
 /* P R O T O S ******************************************************** */
 
-/* Don't prototype anything or declare globals if NDEBUG is defined. */
-#ifndef NDEBUG
-
 /* New formatted debugging fns. */
 extern void __cdecl db_logf_fired(const char *fmtStrP, ...);
 extern void __cdecl db_printf_fired(int x, int y, const char *fmtStrP, ...);
@@ -350,7 +343,6 @@ extern void db_uninit(void);
 /* Should we expand _opt type macros? */
 extern int db_option;
 
-#endif /* of #ifndef NDEBUG */
 
 /* E N D   W R A P P E R ********************************************** */
 

@@ -19,7 +19,7 @@ struct ModuleLink
 	int flags;
 };
 
-#define WaypointFlag_CentreDefinedByUser 0x80000000
+//#define WaypointFlag_CentreDefinedByUser 0x80000000
 #define WaypointFlag_FirstGroundWaypoint 0x40000000 
 struct ChunkWaypoint
 {
@@ -93,11 +93,8 @@ class AI_Module_Slave_Chunk : public Chunk
 	virtual void post_input_processing();
 
 	Object_Chunk* get_my_object_chunk();
-
 	Object_Chunk* MasterModule;
-	#if UseOldChunkLoader
-	char* MasterModuleName;
-	#endif
+
 	int MasterModuleIndex;
 };
 

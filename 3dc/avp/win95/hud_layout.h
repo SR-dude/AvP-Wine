@@ -1,9 +1,9 @@
 /* KJL 17:58:47 18/04/98 - layout defines */
 
 #define HUD_FONT_WIDTH 15
-//5
+
 #define HUD_FONT_HEIGHT 15
-//8
+
 #define HUD_DIGITAL_NUMBERS_WIDTH 14
 #define HUD_DIGITAL_NUMBERS_HEIGHT 22
 

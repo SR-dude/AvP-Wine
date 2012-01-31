@@ -60,10 +60,6 @@ typedef struct avp_menu
 } AVP_MENU;
 
 
-#define BASEX 112
-#define BASEY 43
-
-
 extern AVP_MENU *Current_Menu;
 extern void ProcessGraphicForLoading(AVP_MENU *menu_to_load);
 extern void ProcessGraphicForUnloading(AVP_MENU *menu_to_load);

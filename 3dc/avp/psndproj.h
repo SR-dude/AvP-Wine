@@ -8,14 +8,6 @@
 extern "C" {
 #endif
 
-/* Andy 12/6/97 --------------------------------------------------------------
-  Some background sound defines
-----------------------------------------------------------------------------*/
-#define BACKGROUND_VOLUME 80
-#define BACKGROUND_ATTENUATION 5
-#define ZONE_WIDTH_SHIFT 15    // Size of the sound zones (log 2)
-
-#define ZONE_WIDTH 1<<ZONE_WIDTH_SHIFT
 
 /* Patrick 5/6/97 -------------------------------------------------------------
   Enumeration of all the sounds that may be loaded/used in the game. Each

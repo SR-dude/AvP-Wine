@@ -1,3 +1,4 @@
+// adj  I don't want this
 #define CHAR char
 #define BYTE unsigned char
 #define WORD unsigned short

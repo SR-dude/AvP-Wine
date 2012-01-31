@@ -1706,10 +1706,6 @@ int Fast3dMagnitude(VECTORCH *v)
 	}
 }
 
-#define ZOOM_SCALE_0 1.0f
-#define ZOOM_SCALE_1 0.4f
-#define ZOOM_SCALE_2 0.1f
-#define ZOOM_SCALE_3 0.02f
 
 static int CurrentCameraZoomLevel=0;
 

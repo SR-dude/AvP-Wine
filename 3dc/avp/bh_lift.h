@@ -83,7 +83,6 @@ typedef struct lift_behaviour
 } LIFT_BEHAV_BLOCK;
 	
 #define LiftFlag_Here			0x00000001
-#define LiftFlag_Airlock		0x00000002
 #define LiftFlag_NoTel			0x00000004 /*switches aren't teleported*/
 
 typedef struct lift_tools_template

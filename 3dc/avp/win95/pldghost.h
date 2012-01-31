@@ -57,12 +57,11 @@ typedef struct netghostdatablock
 	unsigned int onlyValidFar:1; //set for alien ai that are far from everyone
 	unsigned int soundStartFlag:1;
 
-	#if EXTRAPOLATION_TEST
 	VECTORCH velocity;
 	int extrapTimerLast;
 	int extrapTimer;
 	unsigned int lastTimeRead;
-	#endif
+	
 }NETGHOSTDATABLOCK;
 
 /*---------------------------Patrick 28/3/97----------------------------
@@ -107,31 +106,10 @@ extern void PlayOtherSound(enum soundindex SoundIndex, VECTORCH *position, int e
 /*---------------------------Patrick 29/3/97----------------------------
   Defines
   ----------------------------------------------------------------------*/
+
+// adj most unused
 #define GHOST_PLAYEROBJECTID	-1
-#define PLAYERGHOST_NUMBEROFFRAGMENTS			10
 #define GHOST_INTEGRITY							(ONE_FIXED*8)
-
-#define MPPRED_MUZZLEFLASHOFFSET_INFRONT		800
-#define MPPRED_MUZZLEFLASHOFFSET_ACROSS			200
-#define MPPRED_MUZZLEFLASHOFFSET_UP				100
-#define MPPRED_MUZZLEFLASHOFFSET_INFRONT_CROUCH	1000
-#define MPPRED_MUZZLEFLASHOFFSET_ACROSS_CROUCH	200
-#define MPPRED_MUZZLEFLASHOFFSET_UP_CROUCH		0
-
-#define MPMARINE_MUZZLEFLASHOFFSET_INFRONT			1100
-#define MPMARINE_MUZZLEFLASHOFFSET_ACROSS			200
-#define MPMARINE_MUZZLEFLASHOFFSET_UP				0
-#define MPMARINE_MUZZLEFLASHOFFSET_INFRONT_CROUCHED	400
-#define MPMARINE_MUZZLEFLASHOFFSET_ACROSS_CROUCHED	300
-#define MPMARINE_MUZZLEFLASHOFFSET_UP_CROUCHED		(-400)
-#define MPMARINE_MUZZLEFLASHOFFSET_INFRONT_RUNNING	1100
-#define MPMARINE_MUZZLEFLASHOFFSET_ACROSS_RUNNING	50
-#define MPMARINE_MUZZLEFLASHOFFSET_UP_RUNNING		400
-
-
-/*---------------------------Patrick 28/3/97----------------------------
-  Globals
-  ----------------------------------------------------------------------*/
 
 #ifdef __cplusplus
 }

@@ -14,7 +14,6 @@ enum LIGHTING_EFFECTS_ID
 
 /* explosions light an area which has a max 15m radius */
 #define EXPLOSION_LIGHT_RANGE 15000
-//#define EXPLOSION_LIGHT_RANGE 30000
 
 extern void AddLightingEffectToObject(DISPLAYBLOCK *objectPtr, enum LIGHTING_EFFECTS_ID lfxID);
 extern void LightBlockDeallocation(void);

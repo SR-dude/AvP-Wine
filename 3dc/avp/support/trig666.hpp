@@ -7,19 +7,12 @@
 #ifndef _trig666
 #define _trig666 1
 
-	#ifndef _daemon
-	#include "daemon.h"
-	#endif
+#include "daemon.h"
 
 #ifdef __cplusplus
 	extern "C" {
 #endif
 
-/* Version settings *****************************************************/
-
-/* Macros ***************************************************************/
-
-/* Type definitions *****************************************************/
 	class TriggerDaemon : public Daemon
 	{
 	public:
@@ -86,15 +79,6 @@
 		int FixP_TimeRemaining;
 	};
 		
-
-/* Exported globals *****************************************************/
-
-/* Function prototypes **************************************************/
-
-
-
-/* End of the header ****************************************************/
-
 
 #ifdef __cplusplus
 	};

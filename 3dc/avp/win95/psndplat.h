@@ -37,7 +37,7 @@ typedef struct soundsampledata
 /* Defines for the flags. */
 #define SAMPLE_IN_HW	0x00000001
 #define SAMPLE_IN_SW	0x00000002
-#define SAMPLE_IN_3D	0x00000004
+//#define SAMPLE_IN_3D	0x00000004
 
 /* Patrick 5/6/97 -------------------------------------------------------------
   Data structure for a playing (active) sound. The first eight fields must be
@@ -175,7 +175,6 @@ and is applied relative to the loaded frequency of the sound */
 
 #define PAN_MAXPLAT					(1200) 	   
 #define PAN_MINPLAT					(-1200)
-#define PAN_3DDAMPDISTANCE			(1000)
 
 /* NB ds supports pan +- 10000: */
 
@@ -187,7 +186,8 @@ and is applied relative to the loaded frequency of the sound */
   by PAN_MAXPLAT and PAN_MINPLAT (ie panattenuation*(1024)<=PAN_MAXPLAT), 
   assuming symetrical range.
   ----------------------------------------------------------------------------*/
-#define VOLUME_3DATTENUATION	(4)
+// adj unused
+// #define VOLUME_3DATTENUATION	(4)
 
 /* Patrick 5/6/97 -------------------------------------------------------------
   Global references to sound management data areas, and blank instances of data

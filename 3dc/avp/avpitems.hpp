@@ -9,29 +9,12 @@
 #ifndef _avpitems
 #define _avpitems 1
 
-	#if ( defined( __WATCOMC__ ) || defined( _MSC_VER ) )
-		#pragma once
-	#endif
-
-	#ifndef _rebmenus_hpp
-		#include "rebmenus.hpp"
-	#endif
-
-	#if UseRebMenus
-		#ifndef _scstring
-			#include "scstring.hpp"
-		#endif
-
-		#include "pcmenus.h"
-
-		#ifndef pldnet_h_included
-				#include "stratdef.h"
-				#include "equipmnt.h"
-					// needed to include pldnet.h				
-
-			#include "pldnet.h"
-		#endif
-	#endif // RebMenus 
+#include "rebmenus.hpp"
+#include "scstring.hpp"
+#include "pcmenus.h"
+#include "stratdef.h"
+#include "equipmnt.h"
+#include "pldnet.h"
 
 
 #ifdef __cplusplus
@@ -289,9 +272,6 @@ namespace RebMenus
 };
 
 
-
-/* End of the header ****************************************************/
 #endif // __cplusplus
-
 
 #endif

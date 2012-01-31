@@ -12,8 +12,6 @@
 	e.g. which levels have been played, which difficulty levels etc.
 
  */
-#define MAX_NO_OF_USERS 4
-
 #define MAX_SIZE_OF_USERS_NAME 15
 
 enum AVP_DIFFICULTY_LEVEL_ID
@@ -142,10 +140,7 @@ typedef struct
 */
 
 
-
-
-
-
+// adj fix this path
 #define USER_PROFILES_PATH "User_Profiles\\"
 #define USER_PROFILES_WILDCARD_NAME "User_Profiles\\*.prf"
 #define USER_PROFILES_SUFFIX ".prf"

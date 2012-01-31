@@ -15,12 +15,6 @@ Deal with lost surfaces and textures - restore them when the application is re-a
 typedef void (* AT_PFN_RESTORETEXTURE) (D3DTexture * pTexture, void * pUser);
 typedef void (* AT_PFN_RESTORESURFACE) (DDSurface * pSurface, void * pUser);
 
-#ifdef NDEBUG
-	extern void ATIncludeTexture(D3DTexture * pTexture, AW_BACKUPTEXTUREHANDLE hBackup);
-	extern void ATIncludeTextureEx(D3DTexture * pTexture, AT_PFN_RESTORETEXTURE pfnRestore, void * pUser);
-	extern void ATIncludeSurface(DDSurface * pSurface, AW_BACKUPTEXTUREHANDLE hBackup);
-	extern void ATIncludeSurfaceEx(DDSurface * pSurface, AT_PFN_RESTORESURFACE pfnRestore, void * pUser);
-#else
 	extern void _ATIncludeTexture(D3DTexture * pTexture, AW_BACKUPTEXTUREHANDLE hBackup, char const * pszFile, unsigned nLine, char const * pszDebugString);
 	extern void _ATIncludeTextureEx(D3DTexture * pTexture, AT_PFN_RESTORETEXTURE pfnRestore, void * pUser, char const * pszFile, unsigned nLine, char const * pszFuncName, char const * pszDebugString);
 	extern void _ATIncludeSurface(DDSurface * pSurface, AW_BACKUPTEXTUREHANDLE hBackup, char const * pszFile, unsigned nLine, char const * pszDebugString);
@@ -33,7 +27,7 @@ typedef void (* AT_PFN_RESTORESURFACE) (DDSurface * pSurface, void * pUser);
 	#define ATIncludeTextureExDb(p,f,u,d) _ATIncludeTextureEx(p,f,u,__FILE__,__LINE__,#f ,d)
 	#define ATIncludeSurfaceDb(p,h,d) _ATIncludeSurface(p,h,__FILE__,__LINE__,d)
 	#define ATIncludeSurfaceExDb(p,f,u,d) _ATIncludeSurfaceEx(p,f,u,__FILE__,__LINE__,#f ,d)
-#endif
+
 
 extern void ATRemoveTexture(D3DTexture * pTexture);
 extern void ATRemoveSurface(DDSurface * pSurface);

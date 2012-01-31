@@ -25,8 +25,6 @@ typedef enum track_object_req_states
 	track_request_startbackward,
 }TRACK_OBJECT_REQUEST_STATE;
 
-
-
 #ifndef TrackRequestFlag_ActiveForward
 	#define TrackRequestFlag_ActiveForward 0x00000001
 	#define TrackRequestFlag_ActiveBackward 0x00000002

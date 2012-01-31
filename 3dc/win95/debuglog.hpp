@@ -24,9 +24,9 @@
 	but can't because of heritage code (and heritage libraries).
 */
 
-	#ifndef _dcontext_hpp
-		#include "dcontext.hpp"
-	#endif
+#ifndef _dcontext_hpp
+	#include "dcontext.hpp"
+#endif
 
 struct LogFile : public R_DumpContext
 {

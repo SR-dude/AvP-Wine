@@ -67,15 +67,6 @@ extern "C++"
 
 #include "dxlog.h"
 
-// Tell system to prefer palettised formats
-// for textures.  The alternative is to prefer
-// non-palettised modes.
-// Note that non-palettised modes certainly seem
-// to look better on the software RGB driver, anyway,
-// leading me to suspect that my runtime ppm quantiser
-// is, ahem, less than totally perfect...
-#define PreferPalettisedTextures Yes
-
 // Externs
 extern int VideoMode;
 extern int VideoModeColourDepth;

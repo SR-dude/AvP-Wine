@@ -9,21 +9,12 @@
 #ifndef _textexp
 #define _textexp 1
 
-	#ifndef _scstring
-	#include "scstring.hpp"
-	#endif
+#include "scstring.hpp"
 
 #ifdef __cplusplus
 	extern "C" {
 #endif
 
-/* Version settings *****************************************************/
-
-/* Constants  ***********************************************************/
-
-/* Macros ***************************************************************/
-
-/* Type definitions *****************************************************/
 	// When typing, whenever space is pressed, the program searches
 	// the last word typed to see if it matches one of the expansions
 	// If it does, then the word is replaced by the expanded version
@@ -83,21 +74,10 @@
 
 	};  // suggested naming: TextExp
 
-/* Exported globals *****************************************************/
-
-/* Function prototypes **************************************************/
-
-
-
-
-
-/* End of the header ****************************************************/
-
 
 #ifdef __cplusplus
 	};
 #endif
-
 
 
 #endif

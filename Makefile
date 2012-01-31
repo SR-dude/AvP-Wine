@@ -301,7 +301,6 @@ SOURCE_FILES= \
 	stubs.c
 
 HEADER_FILES= \
-	3dc/win95/advwin32.h \
 	3dc/avp/win95/gadgets/ahudgadg.hpp \
 	3dc/avp/ai_sight.h \
 	3dc/win95/alt_tab.h \
@@ -481,7 +480,6 @@ HEADER_FILES= \
 	3dc/avp/particle.h \
 	3dc/avp/win95/pathchnk.hpp \
 	3dc/avp/win95/pcmenus.h \
-	3dc/win95/pentime.h \
 	3dc/avp/pfarlocs.h \
 	3dc/avp/pheromon.h \
 	3dc/win95/plat_shp.h \
@@ -540,7 +538,6 @@ HEADER_FILES= \
 	3dc/avp/win95/gadgets/trepgadg.hpp \
 	3dc/avp/support/trig666.hpp \
 	3dc/avp/triggers.h \
-	3dc/win95/txioctrl.h \
 	3dc/avp/win95/usr_io.h \
 	3dc/version.h \
 	3dc/win95/videomodes.h \

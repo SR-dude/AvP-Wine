@@ -9,23 +9,13 @@
 #ifndef _ahudgadg
 #define _ahudgadg 1
 
-	#ifndef _hudgadg
 	#include "hudgadg.hpp"
-	#endif
 
 
 #ifdef __cplusplus
 	extern "C" {
 #endif
 
-/* Version settings *****************************************************/
-
-/* Constants  ***********************************************************/
-
-/* Macros ***************************************************************/
-
-/* Type definitions *****************************************************/
-	#if UseGadgets
 	class TextEntryGadget; // fully declared in TEXTIN.HPP
 
 	class AlienHUDGadget : public HUDGadget
@@ -48,14 +38,6 @@
 		);
 		void ClearTheTextReportQueue(void);
 
-		#if EnableStatusPanels
-		void RequestStatusPanel
-		(
-			enum StatusPanelIndex I_StatusPanel
-		);
-
-		void NoRequestedPanel(void);
-		#endif
 
 		void CharTyped
 		(
@@ -83,15 +65,6 @@
 		TextEntryGadget* pTextEntryGadg;
 			// not allowed to be NULL
 	};
-	#endif // UseGadgets
-
-/* Exported globals *****************************************************/
-
-/* Function prototypes **************************************************/
-
-
-
-/* End of the header ****************************************************/
 
 
 #ifdef __cplusplus

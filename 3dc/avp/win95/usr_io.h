@@ -24,47 +24,8 @@
   set it in ReadPlayerGameInput.
   -------------------------------------------------*/ 
 #include "avp_menus.h"
-#if 0
-typedef struct player_input_configuration
-{
-	unsigned char Forward;
-	unsigned char Backward;
-	unsigned char Left;
-	unsigned char Right;
-	
-	unsigned char Strafe;
-	unsigned char StrafeLeft;
-	unsigned char StrafeRight;
-	
-	unsigned char LookUp;
-	unsigned char LookDown;
-	unsigned char CentreView;
-	
-	unsigned char Walk;
-	unsigned char Crouch;
-	unsigned char Jump;
-	
-	unsigned char Operate;
 
-	unsigned char NextWeapon;
-	unsigned char PreviousWeapon;
-	unsigned char FirePrimaryWeapon;
-	unsigned char FireSecondaryWeapon;
 
-	#ifdef __cplusplus
-	// C++ only stuff, added by DHM 17/3/98 to ease rewrite of the 
-	// key configuration screens:
-	// (definitions are in REBITEMS.HPP)
-	unsigned char GetMethod( enum KeyConfigItems theEffect ) const;
-	void SetMethod
-	(
-		enum KeyConfigItems theEffect,
-		unsigned char newMethod
-	);
-	#endif
-
-}PLAYER_INPUT_CONFIGURATION;
-#endif
 enum PLAYER_INPUT_ID
 {
 	PLAYER_INPUT_FORWARD,
@@ -100,23 +61,11 @@ enum PLAYER_INPUT_ID
 	MAX_NO_OF_PLAYER_INPUTS
 };
 
-#if PREDATOR_DEMO||DEATHMATCH_DEMO
-#define NUMBER_OF_PREDATOR_INPUTS 30
-#else
-#define NUMBER_OF_PREDATOR_INPUTS 30
-#endif
 
-#if MARINE_DEMO||DEATHMATCH_DEMO
+#define NUMBER_OF_PREDATOR_INPUTS 30
 #define NUMBER_OF_MARINE_INPUTS	27
-#else
-#define NUMBER_OF_MARINE_INPUTS	27
-#endif
-
-#if ALIEN_DEMO||DEATHMATCH_DEMO
-#define NUMBER_OF_ALIEN_INPUTS 21
-#else
 #define NUMBER_OF_ALIEN_INPUTS 22
-#endif
+
 
 typedef struct fixed_input_configuration
 {

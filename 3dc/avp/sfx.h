@@ -26,7 +26,6 @@ typedef struct sfxblock
 #define SFXFLAG_ISAFFECTEDBYHEAT	0x1
 #define SFXFLAG_MELTINGINTOGROUND	0x2
 #define SFXFLAG_ONFIRE				0x4
-#define SFXFLAG_SPARKING			0x8
 
 typedef struct forcefield
 {

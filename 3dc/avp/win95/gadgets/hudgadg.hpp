@@ -7,45 +7,27 @@
 #ifndef _hudgadg
 #define _hudgadg 1
 
-	#ifndef _gadget
-	#include "gadget.h"
-	#endif
+#include "gadget.h"
 
 #ifdef __cplusplus
 	extern "C" {
 #endif
 
-/* Version settings *****************************************************/
 
-/* Constants  ***********************************************************/
+#ifndef GAMEDEF_INCLUDED
+#include "module.h"
+// irritatingly, GAMEDEF.H assumes MODULE.H has already been included...
+#include "gamedef.h"
+#endif
 
-/* Macros ***************************************************************/
+#ifdef __cplusplus
+extern "C++" {
+		// JH 140298 - C++ header can only be included in C++ source and must have C++ linkage
+		#include "scstring.hpp"
+	}
+#endif
 
-/* Type definitions *****************************************************/
-	#if UseGadgets
-
-		#ifndef GAMEDEF_INCLUDED
-
-			#ifndef MODULE_INCLUDED
-			#include "module.h"
-			#endif
-				// irritatingly, GAMEDEF.H assumes MODULE.H has already been included...
-
-		#include "gamedef.h"
-		#endif
-
-		#ifndef _scstring
-			#ifdef __cplusplus
-				extern "C++" {
-					// JH 140298 - C++ header can only be included in C++ source and must have C++ linkage
-					#include "scstring.hpp"
-				}
-			#endif
-		#endif
-
-		#ifndef _statpane_h
-		#include "statpane.h"
-		#endif
+#include "statpane.h"
 
 	class TextReportGadget; // fully declared in TREPGADG.HPP
 
@@ -71,13 +53,6 @@
 		virtual void ClearTheTextReportQueue(void) = 0;
 
 		
-		#if EnableStatusPanels
-		virtual void RequestStatusPanel
-		(
-			enum StatusPanelIndex I_StatusPanel
-		) = 0;
-		virtual void NoRequestedPanel(void) = 0;
-		#endif
 
 		virtual void CharTyped
 		(
@@ -105,19 +80,12 @@
 		// Constructor is protected since an abstract class
 		HUDGadget
 		(
-			#if debug
 			char* DebugName
-			#endif
 		);
 
 	private:
 		static HUDGadget* pSingleton;
 
-	#if 0
-	// Temporary text feedback implementation:
-	protected:
-		SCString* pSCString_Current;
-	#endif
 
 	};
 
@@ -126,15 +94,7 @@
 		{
 			return pSingleton;
 		}
-	#endif // UseGadgets
 
-/* Exported globals *****************************************************/
-
-/* Function prototypes **************************************************/
-
-
-
-/* End of the header ****************************************************/
 
 
 #ifdef __cplusplus

@@ -229,9 +229,6 @@
 
 // v1,0 Default Hash Functions defined:
 // HashFunction(unsigned), HashFunction(void const *), HashFunction(char const *)
-// you can disable the default hash functions by defining HT_NODEFAULTFNS
-
-#ifndef HT_NODEFAULTFNS
 	// a hash function for integral (unsigned) values
 	inline unsigned HashFunction(unsigned const _i)
 	{
@@ -252,7 +249,6 @@
 		while (*_sP) rv += toupper(*_sP++);
 		return rv;
 	}
-#endif
 
 // v1,0 Default (initial) table size (log2 of)
 // Define this to another value if you like, 
@@ -263,16 +259,14 @@
 // and if table becomes is self-contracting,
 // this value will also give the minimum table size
 
-#ifndef HT_DEFAULTTABLESIZESHIFT
-	#define HT_DEFAULTTABLESIZESHIFT 6
-#endif
+
+#define HT_DEFAULTTABLESIZESHIFT 6
+
 
 // for asserted functions, define HT_FAIL to be your function
 // to be triggered upon a failure, eg.
-// #define HT_FAIL(strP) fprintf(stderr,"%s\n",strP)
-#ifndef HT_FAIL
-	#define HT_FAIL(strP) ((void)0)
-#endif
+#include <stdio.h>
+#define HT_FAIL(strP) fprintf(stderr,"%s\n",strP)
 
 template <class TYPE, class ARG_TYPE, class CMP_ARG_TYPE>
 class _base_HashTable
@@ -632,20 +626,6 @@ inline void _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::AddRegardless(Node * _n
 	++ nEntries;
 }
 
-// with NDEBUG on these functions evaluate to be identical to AddRegardless
-#ifdef NDEBUG
-template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
-inline void _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::AddAsserted(ARG_TYPE _dataR)
-{
-	AddRegardless(_dataR);
-}
-
-template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
-inline void _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::AddAsserted(Node * _nodeP)
-{
-	AddRegardless(_nodeP);
-}
-#endif
 
 template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
 inline TYPE const * _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::Contains(CMP_ARG_TYPE _dataR) const
@@ -743,8 +723,6 @@ bool _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::AddChecked(Node * _nodeP)
 	return true;
 }
 
-// with NDEBUG on these functions evaluate to be identical to AddRegardless
-#ifndef NDEBUG
 template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
 void _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::AddAsserted(ARG_TYPE _dataR)
 {
@@ -775,7 +753,6 @@ void _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::AddAsserted(Node * _nodeP)
 	chainPR = _nodeP;
 	++ nEntries;
 }
-#endif
 
 template <class TYPE,class ARG_TYPE,class CMP_ARG_TYPE>
 bool _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::Remove(CMP_ARG_TYPE _dataR)
@@ -838,16 +815,10 @@ void _base_HashTable<TYPE,ARG_TYPE,CMP_ARG_TYPE>::DeleteNode(Node * _nodeP)
 #define HT_WATCOM_DEFINE_FOR_SIMPLE_TYPE(TYPE) \
 	class HashTable<TYPE> HT_DEFINITION(TYPE,TYPE,TYPE)
 	
-#ifdef __WATCOMC__
-
-//watcom generartes errors if template<> is added to the start of the line - Richard.
-#define HT_DEFINE_FOR_SIMPLE_TYPE(SIMPLE_TYPE) HT_WATCOM_DEFINE_FOR_SIMPLE_TYPE(SIMPLE_TYPE)
-
-#else
 
 #define HT_DEFINE_FOR_SIMPLE_TYPE(SIMPLE_TYPE) template<> HT_WATCOM_DEFINE_FOR_SIMPLE_TYPE(SIMPLE_TYPE)
 
-#endif
+
 	
 HT_DEFINE_FOR_SIMPLE_TYPE(unsigned long)
 HT_DEFINE_FOR_SIMPLE_TYPE(signed long)
@@ -863,20 +834,11 @@ HT_DEFINE_FOR_SIMPLE_TYPE(float)
 #undef HT_DEFINE_FOR_SIMPLE_TYPE
 #undef HT_WATCOM_DEFINE_FOR_SIMPLE_TYPE
 
-// for pointer types
-#if 0 // doesnt't compile!!
-template <class TYPE>
-class HashTable<TYPE *> HT_DEFINITION(TYPE *, TYPE *, TYPE const *)
-
-template <class TYPE>
-class HashTable<TYPE const *> HT_DEFINITION(TYPE const *, TYPE const *, TYPE const *)
-#endif
 
 // for other types
 template <class TYPE>
 class HashTable HT_DEFINITION(TYPE,TYPE const &, TYPE const &)
 
-//template <class TYPE *> class HashTable : public _base_HashTable<TYPE *,TYPE *,TYPE const *> {};
 
 #undef HT_DEFINITION
 

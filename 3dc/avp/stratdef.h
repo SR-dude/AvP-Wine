@@ -212,21 +212,15 @@ typedef struct strategyblock
 
 	SBFLAGS SBflags;						/* flags */
 	char SBname[SB_NAME_LENGTH];
-	#if SupportModules
 	struct module *SBmoptr;				/* needed if DBdeS are deallocted*/
 	struct modulemapblock*	SBmomptr;	/* module map block ref*/
-	#endif
-	#if SupportMorphing
 	struct morphctrl *SBmorphctrl;
-	#endif
 	
 	/* patrick 15/1/97 - these fields are for object visibility management system */
 	char maintainVisibility;
 	struct module *containingModule;			
 	int shapeIndex;	
-	#if debug	
 	short SBIsValid;								                                     		
-	#endif
 	char* name;
 
 } STRATEGYBLOCK;
@@ -273,22 +267,18 @@ extern int NumActiveStBlocks;
 extern STRATEGYBLOCK *ActiveStBlockList[];
 
 /****** MACROS FOR NAME COMAPRISONS AND COPYS*******/
-
 #define COPY_NAME(name1, name2) \
 			{	\
 				GLOBALASSERT(SB_NAME_LENGTH == 8); \
 				*(int*)name1 = *(int*)name2; \
 				*((int*)name1 + 1) = *((int*)name2 + 1);\
 			}
-
 #define NAME_ISEQUAL(name1, name2) \
 				((*(int*)name1 == *(int*)name2) && \
 				(*(((int*)name1) + 1) == *(((int*)name2) + 1)))
-				
 #define NAME_ISNULL(name1) \
 				((*(int*)name1 == '\0') && \
 				(*(((int*)name1) + 1) == '\0'))
-	
 
 #ifdef __cplusplus
 

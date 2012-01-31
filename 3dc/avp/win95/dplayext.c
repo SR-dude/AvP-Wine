@@ -53,7 +53,7 @@
 /* Generate the msg stamp for a reply to a msg with a specified
  * guaranteed msg id.
  */	
-#define DPEXT_TO_REPLY_STAMP( iSentStamp ) ( -( iSentStamp ) )	
+//#define DPEXT_TO_REPLY_STAMP( iSentStamp ) ( -( iSentStamp ) )	
 
 /* Identify the original msg stamp given a reply stamp. */
 #define DPEXT_TO_ORIGINAL_STAMP( iReplyStamp ) \

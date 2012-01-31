@@ -37,7 +37,6 @@
 #include "pldnet.h"
 
 #define FLAMETHROWER_PARTICLES_PER_FRAME (MUL_FIXED(120,NormalFrameTime))
-#define PREDPISTOLFLECHETTES_PARTICLES_PER_FRAME (MUL_FIXED(50,NormalFrameTime))
 #define TIME_FOR_PREDPISTOLFLECHETTE	(ONE_FIXED/50)
 #define TIME_FOR_FLAMETHROWER_PARTICLE	(ONE_FIXED/120)
 #define PREDPISTOL_SPREAD	(4)
@@ -2016,7 +2015,7 @@ extern void PPPlasmaBoltBehaviour(STRATEGYBLOCK *sbPtr)
 
 #define SPEAR_BOLT_SPEED 		(200000)
 #define SPEAR_PLAYER_IMPULSE 	(-8000)
-#define SPEAR_FUDGE_FACTOR		(500)
+
 
 static void InitialiseSpeargunBoltBehaviour(void)
 {

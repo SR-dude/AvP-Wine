@@ -38,19 +38,9 @@
 #define UseLocalAssert Yes
 #include "ourasert.h"
 #include "frontend/avp_menus.h"
-/* Version settings ************************************************/
 
-/* Constants *******************************************************/
-	#define DEFAULT_KEY_STATUS_PANEL_WEAPONS ( KEY_TAB )
-	#define DEFAULT_KEY_STATUS_PANEL_INVENTORY ( KEY_V )
-	#define DEFAULT_KEY_STATUS_PANEL_OBJECTIVES ( KEY_O )
-	#define DEFAULT_KEY_STATUS_PANEL_GAMESTATS ( KEY_G )
 
-/* Macros **********************************************************/
 
-/* Imported function prototypes ************************************/
-
-/* Imported data ***************************************************/
 #ifdef __cplusplus
 	extern "C"
 	{
@@ -227,12 +217,10 @@ void DAVEHOOK_ScreenModeChange_Cleanup(void)
 		// avoid carriage returns/enter from menu selections triggering typing mode
 
 	// Run program-generated batch file:
-	#if !(PREDATOR_DEMO|MARINE_DEMO||ALIEN_DEMO||DEATHMATCH_DEMO)
 	BatchFileProcessing :: Run("CONFIG.CFG");
 
 	// Run user-generated batch file:
 	BatchFileProcessing :: Run("STARTUP.CFG");
-	#endif
 }
 
 

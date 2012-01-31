@@ -80,22 +80,7 @@ extern "C"
 	enum TexFmt { D3TF_4BIT, D3TF_8BIT, D3TF_16BIT, D3TF_32BIT, D3TF_MAX } d3d_desired_tex_fmt = D3TF_DEFAULT;
 }
 	
-/***************************/
-/* PRIVATE MACRO-CONSTANTS */
-/***************************/
 
-#define DISABLE_VIDEOCARD_ANALYSIS 0 // presently still unstable
-#define FORCE_TEXDIMS_POWER_OF_TWO 1 // full support for determining if this is necessary not yet implemented
-
-// some random random seeds so that we always create the same random texture
-#define RND_SEED1 4479
-#define RND_SEED2 22408
-#define RND_SEED3 14
-#define RND_SEED4 5610
-
-/***************************/
-/* PRIVATE MACRO-FUNCTIONS */
-/***************************/
 
 /*****************/
 /* PRIVATE ENUMS */

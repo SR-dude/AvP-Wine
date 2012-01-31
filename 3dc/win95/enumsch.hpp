@@ -45,10 +45,6 @@ public:
 	List<Enum_Constant> enums;
 
 	virtual ~Enum_Const_List(){}
-#if cencon
-	int lowest_free_index(void);
-	void Sort_By_Name(void);
-#endif
 };
 
 
@@ -58,15 +54,6 @@ public:
 	// constructor from buffer
 	BMP_Enums_Chunk (Chunk_With_Children * const parent, char const * sdata, size_t const ssize);
 
-#if cencon
-	// empty constructor
-	BMP_Enums_Chunk (Chunk_With_Children * const parent)
-		: Chunk(parent,"BMPENUMS")
-		, ctype(0)
-		, reserved1(0)
-		, reserved2(0)
-		{}
-#endif
 
 	~BMP_Enums_Chunk ()
 	{

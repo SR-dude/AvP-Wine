@@ -1950,8 +1950,6 @@ int FireNonAutomaticSecondaryAmmo(PLAYER_WEAPON_DATA *weaponPtr)
 	return(1);	
 }	
 
- 
-#define WEAPON_RANGE 1000000  /* link this to weapon/ammo type perhaps */
 
 /* instantaneous line of sight firing */
 static void PlayerFireLineOfSightAmmo(enum AMMO_ID AmmoID, int multiple)

@@ -7,7 +7,6 @@
 extern "C" {
 #endif
 
-#define EXTRAPOLATION_TEST 1
 
 /* Oh, for heaven's sake... */
 #include "psnd.h"
@@ -16,20 +15,20 @@ extern "C" {
   Some defines for multiplayer games
   ----------------------------------------------------------------------*/
 #define NET_MAXPLAYERS				(8)
-#define NET_MAXPLAYEROBJECTS		(15)
-#define NET_MAXPLAYERSCORE			(500)
-#define NET_MAXGAMETIME				(255) /* minutes */
+// #define NET_MAXPLAYEROBJECTS		(15)
+// #define NET_MAXPLAYERSCORE			(500)
+// #define NET_MAXGAMETIME				(255) /* minutes */
 #define NET_MESSAGEBUFFERSIZE		(3072) /* an adequate number of bytes */
 #define NET_PLAYERNAMELENGTH		(13)
 #define NET_EULERSCALESHIFT			(4)
-#define NET_MAXOBJECTID				(32767) 
+// #define NET_MAXOBJECTID				(32767) 
 #define NET_MESSAGEITERATIONS		(5)
-#define NET_MAXTEAMS				(4)
+// #define NET_MAXTEAMS				(4)
 
 #define NET_IDNOTINPLAYERLIST		(-1)
 #define NET_NOEMPTYSLOTINPLAYERLIST	(-1)
 
-#define NET_STARTUPINTEGRITY 		(ONE_FIXED*2)
+// #define NET_STARTUPINTEGRITY 		(ONE_FIXED*2)
 
 #define NETGAMESPEED_70PERCENT 0
 #define NETGAMESPEED_80PERCENT 1
@@ -302,6 +301,7 @@ typedef struct netgame_gamedata
 /* ---------------------------------------------------------------------
   Individual message structures
   ----------------------------------------------------------------------*/
+// adj ?
 #pragma pack(push,1)
 
 typedef struct netmessageheader
@@ -423,13 +423,12 @@ typedef struct netmessage_playerstate
 
 	unsigned int IAmInvulnerable:1;
 
-#if EXTRAPOLATION_TEST
 	//this lot will need to be sent more efficiently
 	int standard_gravity:1;
 	int velocity_x :10; //in 10's of cm/second
 	int velocity_y :10;	//in 10's of cm/second
 	int velocity_z :10;	//in 10's of cm/second
-#endif
+
 	unsigned int landingNoise:1;
 
 }NETMESSAGE_PLAYERSTATE;
@@ -764,18 +763,11 @@ typedef struct netmessage_alienaistate
 	unsigned char sub_sequence;
 	unsigned short sequence_length:13; //in 256ths of a second , up to ~32 seconds
 
-	#if 0
-	unsigned int Elevation : 12;
-	unsigned char IAmFiringPrimary: 1;								
-	unsigned char IAmFiringSecondary: 1;								
-	#endif
 	unsigned short IAmOnFire: 1;
 	unsigned short AlienType: 2;//alien/predalien/praetorian
 
-	#if EXTRAPOLATION_TEST
 	unsigned short speed:15;
 	unsigned short standard_gravity:1;
-	#endif
 
 }NETMESSAGE_ALIENAISTATE;
 
@@ -902,6 +894,7 @@ typedef struct multiplayer_start
 	EULER orientation;
 }MULTIPLAYER_START;
 
+// adj ?
 #pragma pack(pop)
 
 
@@ -1009,7 +1002,6 @@ extern MULTIPLAYER_START* marineStartPositions;
 extern MULTIPLAYER_START* alienStartPositions;
 extern MULTIPLAYER_START* predatorStartPositions;
 
-#define LobbiedGame_NotLobbied 0
 #define LobbiedGame_Server 1
 #define LobbiedGame_Client 2
 extern int LobbiedGame;

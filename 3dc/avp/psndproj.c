@@ -21,14 +21,6 @@
 #include "db.h"
 #include "dxlog.h"
 
-#define PRED_PISTOL_PITCH_CHANGE 300
-
-/* adj */
-/*Rebellion has this so that when compiling a debug version...
- LOAD_USING_FASTFILES
-will be set to false */
-
-#define USE_REBSND_LOADERS  LOAD_USING_FASTFILES
 
 
 /* Andy 9/6/97 ----------------------------------------------------------------
@@ -543,116 +535,12 @@ int FindAndLoadWavFile(int soundNum,char* wavFileName)
 
 }
 
-
+// adj deleted fastfile sound loading code
 
 /* Patrick 5/6/97 -------------------------------------------------------------
   Sound data loaders 
   ----------------------------------------------------------------------------*/
-#if USE_REBSND_LOADERS
-extern unsigned char *ExtractWavFile(int soundIndex, unsigned char *bufferPtr);
-void *LoadRebSndFile(char *filename)
-{
-	void *bufferPtr;
-	long int save_pos, size_of_file;
-	FILE *fp;
-	fp = fopen(filename,"rb");
-	
-	if (!fp) goto error;
 
-	save_pos=ftell(fp);
-	fseek(fp,0L,SEEK_END);
-	size_of_file=ftell(fp);
-	fseek(fp,save_pos,SEEK_SET);
-	
-	bufferPtr = AllocateMem(size_of_file);
-	LOCALASSERT(bufferPtr);	
-
-	
-	if (!fread(bufferPtr, size_of_file,1,fp))
-	{
-		fclose(fp);
-		DeallocateMem(bufferPtr);
-		goto error;
-	}
-
-	fclose(fp);
-	return bufferPtr;
-	
-error:
-	{
-		return 0;
-	}
-}	
-
-void ReleaseRebSndFile(void *bufferPtr)
-{
-	LOCALASSERT(bufferPtr);
-	DeallocateMem(bufferPtr);
-}
-
-void LoadSounds(char *soundDirectory)
-{
-	void *rebSndBuffer;
-	unsigned char *bufferPtr;
-	int soundIndex;
-	int pitch;
-
-	LOCALASSERT(soundDirectory);
-
-	/* first check that sound has initialised and is turned on */
-	if(!SoundSys_IsOn()) return;	
-
-	/* load RebSnd file into a (big) buffer	*/
-	{
-		char filename[64];
-/*adj*/
-		strcpy(filename, ".\\fastfile");
-		strcat(filename, "\\");
-		strcat(filename, "common.ffl");
-
-		rebSndBuffer = LoadRebSndFile(filename);
-
-		if (!rebSndBuffer)
-		{
-			LOCALASSERT(0);
-			return;
-		}
-	}
-		
-	/* Process the file */
-	bufferPtr = (unsigned char*) rebSndBuffer;
-	soundIndex = (int)(*bufferPtr++);
-	pitch = (int)((signed char)(*bufferPtr++));
-	while((soundIndex!=0xff)||(pitch!=-1))
-	{
-		if((soundIndex<0)||(soundIndex>=SID_MAXIMUM))
-		{
-			/* invalid sound number */
-			LOCALASSERT("Invalid Sound Index"==0);
-		}
-		if(GameSounds[soundIndex].loaded)
-		{
-			/* Duplicate game sound loaded */
-			LOCALASSERT("Duplicate game sound loaded"==0);
-		}
-		
-	  	bufferPtr = ExtractWavFile(soundIndex, bufferPtr);
-		
-	  	GameSounds[soundIndex].loaded = 1;
-		GameSounds[soundIndex].activeInstances = 0;	 
-		GameSounds[soundIndex].volume = VOLUME_DEFAULT;		
-
-		/* pitch offset is in semitones: need to convert to 1/128ths */
-		GameSounds[soundIndex].pitch = pitch;		
-				
-		InitialiseBaseFrequency(soundIndex);
-		soundIndex = (int)(*bufferPtr++);
-		pitch = (int)((signed char)(*bufferPtr++));
-	}
-
-	ReleaseRebSndFile(rebSndBuffer);
-}
-#else
 void LoadSounds(char *soundDirectory)
 {
 	char soundFileName[48];
@@ -714,4 +602,4 @@ void LoadSounds(char *soundDirectory)
 
 	db_log1("loaded all the sounds.");
 }
-#endif
+

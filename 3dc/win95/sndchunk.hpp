@@ -121,36 +121,4 @@ public :
 };
 
 
-
-/*
-struct ChunkSoundWeighting
-{
-	int index;
-	int weighting;
-};
-
-//a collection of indeces of possible sounds to play
-class Sound_Collection_Chunk : public Chunk
-{
-public :
-
-	Sound_Collection_Chunk(Chunk_With_Children* parent,const char*,const size_t);
-	Sound_Collection_Chunk(Chunk_With_Children* parent);
-	~Sound_Collection_Chunk();
-
-	size_t size_chunk();
-	void fill_data_block(char*);
-
-	int index;
-	
-	int num_sounds;
-	ChunkSoundWeighting* sounds;
-
-	int spare;
-
-	
-};
-*/
-
-
 #endif

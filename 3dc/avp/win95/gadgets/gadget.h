@@ -12,29 +12,11 @@
 #define _gadget 1
 
 
-/* Version settings *****************************************************/
-	#define UseGadgets Yes
-		/* If this is set to No all gadget code collapses to void macros */
+#define UseGadgets Yes
+#include "projtext.h"
 
-	#define EnableStatusPanels	No
-
-/* Constants  ***********************************************************/
-	#define HUD_SPACING 20
-
-/* Macros ***************************************************************/
-
-/* Type definitions *****************************************************/
-	#if UseGadgets
-
-		#ifndef _projtext
-		#include "projtext.h"
-		#endif
-
-	#ifdef __cplusplus
-
-		#ifndef _r2base
-		#include "r2base.h"
-		#endif
+#ifdef __cplusplus
+#include "r2base.h"
 
 	class Gadget
 	{
@@ -55,7 +37,6 @@
 		virtual ~Gadget();
 			// ensure virtual destructor
 
-		#if debug
 		char* GetDebugName(void);
 		void Render_Report
 		(
@@ -64,11 +45,9 @@
 			int FixP_Alpha			
 		);
 			// use to textprint useful information about a call to "Render"
-		#endif
 
 	protected:
 		// Protected constructor since abstract base class
-		#if debug
 		Gadget
 		(
 			char* DebugName_New
@@ -76,92 +55,25 @@
 		{
 			// empty
 		}
-		#else
-		Gadget(){}
-		#endif
 
 	private:
-		#if debug
 		char* DebugName;
-		#endif
 
 	}; // end of class Gadget
 
 	// Inline methods:
-	#if debug
 	inline char* Gadget::GetDebugName(void)
 	{
 		return DebugName;
 	}
-	#endif
 		
-	#if 0
-	class GadgetWithSize : public Gadget
-	{
-	// Friends
 
-	// Protected data:
-	protected:
-		r2size R2Size_Val;
-
-	// Public methods:
-	public:
-		r2size GetSize(void) const;
-
-		void SetSize(r2size R2Size);		
-		virtual void SetSize_PostProcessing(void) {}
-
-	// Protected methods:
-	protected:
-		// Protected constructor since abstract class
-		// (It's abstract since Render() remains pure virtual )
-		GadgetWithSize
-		(
-			#if debug
-			char* DebugName_New,
-			#endif
-			r2size R2Size_New
-		) : Gadget
-			(
-				#if debug
-				DebugName_New
-				#endif				
-			),
-			R2Size_Val( R2Size_New ) {}
-
-	// Private methods:
-	private:
-
-	// Private data:
-	private:
-
-	// Inline methods:
-	public:
-		r2size GetSize(void) const
-		{
-			return R2Size_Val;			
-		}
-		void SetSize( r2size R2Size_New )
-		{
-			R2Size_Val = R2Size_New;
-			SetSize_PostProcessing();
-		}
-	protected:
-	private:
-
-	}; // end of class GadgetWithSize
-	#endif
 
 	#endif /* __cplusplus */
-	#endif /* UseGadgets */
 
-/* Exported globals *****************************************************/
-
-/* Function prototypes **************************************************/
 #ifdef __cplusplus
 	extern "C" {
 #endif
-	#if UseGadgets
 
 	extern void GADGET_Init(void);
 		/* expects to be called at program boot-up time */
@@ -183,20 +95,6 @@
 	extern void GADGET_NewOnScreenMessage( ProjChar* messagePtr );
 
 	extern void RemoveTheConsolePlease(void);
-
-	#else /* UseGadgets */
-
-		#define GADGET_Init() ((void) 0)
-		#define GADGET_UnInit() ((void) 0)
-		#define GADGET_Render() ((void) 0)
-		#define GADGET_ScreenModeChange_Setup() ((void) 0)
-		#define GADGET_ScreenModeChange_Cleanup() ((void) 0)
-		#define GADGET_NewOnScreenMessage(x) ((void) 0)
-
-	#endif /* UseGadgets */
-
-
-/* End of the header ****************************************************/
 
 
 #ifdef __cplusplus

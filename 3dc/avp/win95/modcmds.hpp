@@ -7,25 +7,12 @@
 #ifndef _modcmds
 #define _modcmds 1
 
-	#ifndef MODULE_INCLUDED
-	#include "module.h"
-	#endif
+#include "module.h"
 
 #ifdef __cplusplus
 	extern "C" {
 #endif
 
-/* Version settings *****************************************************/
-
-/* Constants  ***********************************************************/
-
-/* Macros ***************************************************************/
-
-/* Type definitions *****************************************************/
-
-/* Exported globals *****************************************************/
-
-/* Function prototypes **************************************************/
 	namespace ModuleCommands
 	{
 		void ListModules(void);
@@ -40,11 +27,10 @@
 	
 
 
-/* End of the header ****************************************************/
-
 
 #ifdef __cplusplus
 	};
 #endif
 
 #endif
+

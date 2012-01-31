@@ -144,15 +144,10 @@ extern AW_TL_ERC awTlLastErr;
 extern HRESULT awTlLastDxErr;
 extern DWORD awTlLastWinErr;
 
-#ifdef NDEBUG
-	#define AwTlErrorToString ThisIsADebugFunction! /* generate compiler error */
-	#define AwDxErrorToString ThisIsADebugFunction! /* generate compiler error */
-	#define AwWinErrorToString ThisIsADebugFunction! /* generate compiler error */
-#else /* ! NDEBUG */
 	extern char const * AwTlErrorToString(AW_TL_ERC _AWTL_DEFAULTPARM(awTlLastErr));
 	extern char const * AwDxErrorToString(HRESULT _AWTL_DEFAULTPARM(awTlLastDxErr));
 	extern char const * AwWinErrorToString(DWORD _AWTL_DEFAULTPARM(awTlLastWinErr));
-#endif /* ? NDEBUG */
+
 
 /*********/
 /* Flags */

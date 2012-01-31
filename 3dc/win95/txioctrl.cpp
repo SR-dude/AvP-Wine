@@ -1,4 +1,5 @@
-#include "txioctrl.h"
+// adj the file reduced to nothing
+//#include "txioctrl.h"
 
 // adj
 #ifdef MaxImageGroups

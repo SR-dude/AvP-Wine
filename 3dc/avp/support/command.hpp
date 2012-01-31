@@ -10,19 +10,12 @@
 #ifndef _command
 #define _command 1
 
-	#ifndef _refobj
-	#include "refobj.hpp"
-	#endif
+#include "refobj.hpp"
+
 	
 #ifdef __cplusplus
 	extern "C" {
 #endif
-
-/* Version settings *****************************************************/
-
-/* Constants  ***********************************************************/
-
-/* Macros ***************************************************************/
 
 /* Type definitions *****************************************************/
 	class Command : public RefCountObject
@@ -44,14 +37,6 @@
 		}
 	};
 	
-/* Exported globals *****************************************************/
-
-/* Function prototypes **************************************************/
-
-
-
-/* End of the header ****************************************************/
-
 
 #ifdef __cplusplus
 	};

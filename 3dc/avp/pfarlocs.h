@@ -61,16 +61,12 @@ extern FARENTRYPOINTSHEADER *FALLP_EntryPoints;
 /* defines for auxilary locations */
 #define FAR_BB_HEIGHT	2000 /* should be height of a crouched alien */
 #define FAR_BB_WIDTH	1000 /* should be the 'width' of an alien */
-#define FAR_POS_HEIGHT	680  /* how high of the floor to put the alien (1/2 alien height + a bit) */
 #define FAR_GRID_SIZE	6
 #define FAR_MAX_LOCS	5
 #define FAR_MIN_INCLINE	50
 
 /* defines for entry points */
 #define	EPBB_XTRA 		100
-#define	EP_POSNDISP		100
-#define EP_MAXPOINTS	200
-#define EP_MAXEDGES		200
 
 /* defines for module door types insofar as they relate to alien behaviour 
 FADT stands for Far Alien Door Type*/

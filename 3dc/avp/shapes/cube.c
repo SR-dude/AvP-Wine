@@ -4,7 +4,6 @@
 
 
 #define PLAYER_RADIUS 300
-#define cube_scale 1/40
 #define CUBE_PolyType I_Polygon
 #define CUBE_colour1 col24(255,16,16)
 

@@ -52,11 +52,9 @@ typedef struct sound3ddata
 #define VOLUME_MAX		(127)		
 #define VOLUME_MIN		(0)
 #define VOLUME_DEFAULT	(127)
-#define VOLUME_FADERATE	(16) /* per second */
 
 #define PITCH_MAX		(6144)	
 #define PITCH_MIN		(-6144)
-#define PITCH_DEFAULT	(0)
 
 /* Patrick 5/6/97 --------------------------------------------------------------
   SoundSys_Start() & SoundSys_End(): initialise and de-initialise the sound 

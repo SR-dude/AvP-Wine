@@ -127,17 +127,10 @@ typedef struct SpearBehaviourType
 
 } SPEAR_BEHAV_BLOCK;
 
+#define FRAG_LIFETIME 65536
 #define FLARE_LIFETIME 16
 #define FLARE_PARTICLE_GENERATION_TIME (ONE_FIXED/120)
 
-#define FRAG_LIFETIME 65536
-
-#if SupportWindows95
-  #define NO_OF_FRAGS_IN_CLUSTER_BOMB 6
-#else
-  #define NO_OF_FRAGS_IN_CLUSTER_BOMB 4
-#endif
-   
 
 #define PROX_GRENADE_TRIGGER_TIME (ONE_FIXED/4)
 #define PROX_GRENADE_RANGE (4000)
@@ -146,51 +139,4 @@ typedef struct SpearBehaviourType
 
 
 
-/* KJL 17:46:30 02/24/97 - below is some old stuff I'll leave for reference */
-#if 0                       
-extern void FlameProjectileFunction(STRATEGYBLOCK *sptr);
-extern void GrenadeBehaviour(STRATEGYBLOCK *sptr);
-extern void TOWMissileBehaviour(STRATEGYBLOCK *sptr);
-extern void PredatorDiscBehaviour(STRATEGYBLOCK *sptr);
 
-typedef struct OneShotBehaviourType {
-
-        AVP_BEHAVIOUR_TYPE bhvr_type;
-        VECTORCH ObWorld;
-        int counter;
-
-        } ONE_SHOT_BEHAV_BLOCK;
-
-typedef struct FlameProjectileBehaviourType {
-
-        AVP_BEHAVIOUR_TYPE bhvr_type;
-        VECTORCH ObWorld;
-        int counter;
-#if SupportMorphing
-	MORPHCTRL *FPmctrl;
-#endif
-
-} FLAME_PROJ_BEHAV_BLOCK;
-
-typedef struct TowMissileBehaviourType {
-
-        AVP_BEHAVIOUR_TYPE bhvr_type;
-        VECTORCH ObWorld;
-		VECTORCH Target;
-        int counter;
-
-} TOW_MISSILE_BEHAV_BLOCK;
-
-typedef struct PredatorDiscBehaviourType {
-
-        AVP_BEHAVIOUR_TYPE bhvr_type;
-        VECTORCH ObWorld;
-		VECTORCH Target;
-		STRATEGYBLOCK *MovingTarget;
-        int counter;
-		int retargetcounter;
-		int phase;
-
-} PRED_DISC_BEHAV_BLOCK;
-
-#endif

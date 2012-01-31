@@ -23,7 +23,6 @@
 * avoid this.                                                                             *
 **************************************************************************************KJL*/
 #define MOTIONTRACKER_RANGE					((int)((float)30000*(float)GlobalScale))
-#define MOTIONTRACKER_RANGE_SQUARED 		(MOTIONTRACKER_RANGE*MOTIONTRACKER_RANGE)
 #define MOTIONTRACKER_SCALE					(int)((65536.0*65536.0)/(float)MOTIONTRACKER_RANGE)
 #define MOTIONTRACKER_SPEED					(MUL_FIXED((65536*2),MotionTrackerSpeed))
 #define MOTIONTRACKER_MAXBLIPS				10
@@ -35,10 +34,6 @@ typedef struct
 	int Y;
 	int Brightness;
 } BLIP_TYPE;
-/*KJL*************************************************
-* Speed at which gunsight moves when smart-targeting *
-*************************************************KJL*/
-#define SMART_TARGETING_SPEED 4
 
 #define SMART_TARGETING_RANGE 1000000
 
@@ -236,7 +231,7 @@ extern void KillHUD(void);
 
 
 /* KJL 11:00:22 05/20/97 - On-screen messaging system */
-#define ON_SCREEN_MESSAGE_LIFETIME (ONE_FIXED*2)
+//#define ON_SCREEN_MESSAGE_LIFETIME (ONE_FIXED*2)
 
 extern void NewOnScreenMessage(unsigned char *messagePtr);
 /*KJL********************************************************************

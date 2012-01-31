@@ -41,7 +41,7 @@
 
 /*New sound system */
 #include "psndplat.h"
-#define FRAMEAV	100
+
 #include "avp_userprofile.h"
 
 /* externs for commonly used global variables and arrays */

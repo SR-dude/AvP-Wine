@@ -3,12 +3,6 @@
 
 #include "particle.h"
 
-#define SOFTWARE_RENDERER 0
-
-#if SOFTWARE_RENDERER 
-#include "SoftwareRender.hpp"
-#endif
-
 
 typedef struct 
 {
@@ -124,11 +118,8 @@ typedef struct
 extern HEATSOURCE HeatSourceList[];
 extern int NumberOfHeatSources;
 
-#define MIRRORING_ON 1
-
-#if MIRRORING_ON
 extern int MirroringActive;
 extern int MirroringAxis;
-#endif
+
 
 #endif

@@ -18,7 +18,7 @@ void* PoolAllocateMem(unsigned int amount)
 {
 	char* retval;
 
-	GLOBALASSERT(amount<=MEMORY_BLOCK_SIZE)
+	GLOBALASSERT(amount<=MEMORY_BLOCK_SIZE);
 	
 	if(amount>MemoryLeft)
 	{

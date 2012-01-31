@@ -189,12 +189,9 @@ extern int start_of_loaded_shapes;
 
 extern unsigned char *TextureLightingTable;
 
-#if defined(InterfaceEngine) && InterfaceEngine
-// this is of crucial importance!!
-extern SHAPEHEADER * mainshapelist[];
-#else
+
 extern SHAPEHEADER ** mainshapelist;
-#endif
+
 
 extern MAPHEADER Map[];
 
@@ -207,14 +204,7 @@ extern unsigned char TestPalette[];
 
 extern unsigned char LPTestPalette[]; /* to cast to lp*/
 
-#if 0
-extern int NumImages;								/* # current images */
-extern IMAGEHEADER *ImageHeaderPtrs[];	/* Ptrs to Image Header Blocks */
-extern IMAGEHEADER ImageHeaderArray[];	/* Array of Image Headers */
-extern IMAGEHEADER *NextFreeImageHeaderPtr;
-#endif
 
-#if SupportModules
 
 extern SCENEMODULE MainScene;
 extern MODULE Empty_Module;
@@ -222,7 +212,6 @@ extern MODULE Term_Module;
 
 extern MODULEMAPBLOCK Empty_Module_Map;
 
-#endif
 
 #ifdef __cplusplus
 

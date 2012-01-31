@@ -6,37 +6,16 @@
 
 #ifndef _t_ingadg_hpp
 #define _t_ingadg_hpp 1
+#include "gadget.h"
+#include "textin.hpp"
+#include "scstring.hpp"
 
-	#if ( defined( __WATCOMC__ ) || defined( _MSC_VER ) )
-		#pragma once
-	#endif
-
-	#ifndef _gadget
-	#include "gadget.h"
-	#endif
-
-	#if UseGadgets
-		#ifndef _textin_hpp
-		#include "textin.hpp"
-		#endif
-
-		#ifndef _scstring
-		#include "scstring.hpp"
-		#endif
-	#endif
 
 #ifdef __cplusplus
 	extern "C" {
 #endif
 
-/* Version settings *****************************************************/
 
-/* Constants  ***********************************************************/
-
-/* Macros ***************************************************************/
-
-/* Type definitions *****************************************************/
-	#if UseGadgets
 	class AcyclicFixedSpeedHoming; // fully declared in COORDSTR.HPP
 
 	class AVPTextInputState : public TextInputState
@@ -139,16 +118,6 @@
 			theState . SetString(SCString_ToUse);
 		}
 	};
-	#endif // UseGadgets
-
-/* Exported globals *****************************************************/
-
-/* Function prototypes **************************************************/
-
-
-
-/* End of the header ****************************************************/
-
 
 #ifdef __cplusplus
 	};

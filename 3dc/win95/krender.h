@@ -1,6 +1,3 @@
-/* If this define is set to a non-zero value then the new scandraws will be used */
-#define KRENDER_ON 1
-
 /* prototypes of the replacement scandraw functions */
 extern void KR_ScanDraw_Item_2dTexturePolygon_VideoModeType_8(int *itemptr);
 extern void KR_ScanDraw_Item_Gouraud2dTexturePolygon_VideoModeType_8(int *itemptr);
@@ -27,24 +24,10 @@ extern void BlankScreen(void);
 extern int KRenderDrawMode;
 
 
-
-
-
-
 extern void KDraw_Item_GouraudPolygon(int *itemptr);
 extern void KDraw_Item_2dTexturePolygon(int *itemptr);
 extern void KDraw_Item_Gouraud2dTexturePolygon(int *itemptr);
 extern void KDraw_Item_Gouraud3dTexturePolygon(int *itemptr);
-
-
-
-
-
-
-
-
-
-
 
 
 extern void MakeViewingWindowSmaller(void);

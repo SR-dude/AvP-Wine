@@ -212,7 +212,6 @@ void PlayerBehaviour(STRATEGYBLOCK* sbPtr)
 #define JUMPVELOCITY 9000
 
 #define FASTMOVESCALE 12000
-#define FASTTURNSCALE 2000
 #define FASTSTRAFESCALE 10000
 
 /* KJL 14:39:45 01/14/97 - Camera stuff */

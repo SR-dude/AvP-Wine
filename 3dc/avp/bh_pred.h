@@ -221,26 +221,13 @@ typedef struct tools_data_predator
 #define PRED_PATIENCE_TIME					(6*ONE_FIXED)
 #define PRED_REGEN_TIME						(10*ONE_FIXED)
 #define PRED_MAXIDENTITY					(4) 	 	
-#define NO_OF_FRAGMENTS_FROM_DEAD_PREDATOR 	(10)
 #define PRED_CLOSE_ATTACK_RANGE				(1500) 	/* mm */
 #define PRED_STAFF_ATTACK_RANGE				(2000) 	/* mm */
 #define PRED_NEAR_VIEW_WIDTH				(500)	/* mm */  	
-#define PRED_FPPLASMA_INFRONT				(600) 	/* mm */
-#define PRED_FPPLASMA_ACROSS				(-500) 	/* mm */
-#define PRED_FPPLASMA_UP					(900) 	/* mm */
-#define PRED_FPPLASMA_INFRONTCROUCH			(600) 	/* mm */
-#define PRED_FPPLASMA_ACROSSCROUCH			(-500) 	/* mm */
-#define PRED_FPPLASMA_UPCROUCH				(400) 	/* mm */
-#define PRED_FPDISC_INFRONT					(600) 	/* mm */
-#define PRED_FPDISC_ACROSS					(500) 	/* mm */
-#define PRED_FPDISC_UP						(500) 	/* mm */
-#define PRED_FPDISC_INFRONTCROUCH			(600) 	/* mm */
-#define PRED_FPDISC_ACROSSCROUCH			(500) 	/* mm */
-#define PRED_FPDISC_UPCROUCH				(200) 	/* mm */
-#define PRED_PLASBOLTSPEED 					(22000)	/* mm/s */
-#define PRED_PLASBOLTDAMAGE					(50)
+
 /* 1.5-2 seconds in 1/16 second. NB DO NOT INCREASE THIS */
 #define PRED_FAR_MOVE_TIME			((24+(FastRandom()&0x07))*(ONE_FIXED>>4))  	
+
 #define PRED_NEAR_CLOSEATTACK_TIME	ONE_FIXED	   /* 1 second */
 
 extern void InitPredatorBehaviour(void* bhdata, STRATEGYBLOCK *sbPtr);

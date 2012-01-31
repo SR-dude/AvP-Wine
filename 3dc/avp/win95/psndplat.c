@@ -42,7 +42,8 @@ struct SoundConfigTag
 #define GET_REF_COUNT(x) (x ? IUnknown_AddRef(x), IUnknown_Release(x) : -1)
 #define LOG_RC() db_logf4(("DSO %i, DSPB %i, DS3DL %i, PS %i", GET_REF_COUNT(DSObject), GET_REF_COUNT(DSPrimaryBuffer), GET_REF_COUNT(DS3DListener), GET_REF_COUNT(PropSetP)));
 
-#ifndef DSBCAPS_CTRLDEFAULT
+//#ifndef DSBCAPS_CTRLDEFAULT
+#if 0
 	#define DSBCAPS_CTRLDEFAULT (DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLPAN | DSBCAPS_CTRLFREQUENCY)
 #endif
 
@@ -1982,7 +1983,7 @@ void PlatSetEnviroment(unsigned int env_index, float reverb_mix)
 
 
 
-
+// adj Do something about this
 #define RebSndRead(dest,size,n,src)\
 {\
 	unsigned char *d = (unsigned char*)(dest);\

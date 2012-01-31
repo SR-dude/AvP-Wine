@@ -11,9 +11,6 @@ class Object_Hierarchy_Name_Chunk;
 
 class Shape_Chunk;
 
-#ifdef MAXEXPORT
-	class INode;
-#endif
 
 
 class Object_Hierarchy_Chunk : public Chunk_With_Children
@@ -32,9 +29,6 @@ public:
 	Object_Hierarchy_Name_Chunk * get_name ();
 
 
-#ifdef MAXEXPORT
-	INode* node;
-#endif
 
 
 };
@@ -114,7 +108,10 @@ struct Replaced_Shape_Details
 
 #define Avp_ShapeSet_Flag_Female 0x00000001
 
+// adj define not used
 #define List_Object_Hierarchy_Alternate_Shape_Set_Chunk(parent,list) (parent)->lookup_child("OBHALTSH",list)
+// 
+
 class Object_Hierarchy_Alternate_Shape_Set_Chunk : public Chunk
 {
 public :
@@ -140,8 +137,6 @@ private:
 
 };
 
-
-#define AvP_HColl_Flag_NotRandom 0x00000001
 
 #define List_Hierarchy_Shape_Set_Collection_Chunk(parent,list) (parent)->lookup_child("HSETCOLL",list)
 //this chunk hold a list of indeces for shape_set_chunks that should be applied

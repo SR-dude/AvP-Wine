@@ -24,20 +24,6 @@ struct DEBUGGINGTEXTOPTIONS
 
 extern struct DEBUGGINGTEXTOPTIONS ShowDebuggingText;
 
-#ifdef AVP_DEBUG_VERSION
-	#define DEBUGGING_TEXT_ON 1
-#else
-	#define DEBUGGING_TEXT_ON 0
-#endif
-
-#if DEBUGGING_TEXT_ON
 extern int PrintDebuggingText(const char* t, ...);
-#else
-#define PrintDebuggingText(ignore)
-#endif
-
-#if 1
 extern int ReleasePrintDebuggingText(const char* t, ...);
-#else
-#define PrintDebuggingText(ignore)
-#endif
+

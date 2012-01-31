@@ -1,3 +1,6 @@
+Removed pre-processor stubbed out code from C++ files. Very readable now.
+220 files changed, 6865 insertions(+), 43635 deletions(-)
+
 Borrowed some inline assembly from relnev.
 
 3dc/mathline.c

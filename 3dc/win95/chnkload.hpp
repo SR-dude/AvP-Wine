@@ -11,10 +11,6 @@
 #include "bmpnames.hpp"
 #include "projload.hpp"
 
-#if 0
-extern BOOL copy_to_mainshpl (Shape_Chunk *shape, int list_pos);
-extern BOOL copy_to_mainshpl (Shape_Sub_Shape_Chunk *shape, int list_pos);
-#endif
 
 extern void copy_to_module (Object_Chunk * ob, int mod_pos, int shplst_pos);
 
@@ -54,7 +50,6 @@ extern File_Chunk * Env_Chunk;
 extern double local_scale;
 
 // copies shape to msl
-#if SupportMorphing && LOAD_MORPH_SHAPES
 typedef struct
 {
 	int start_list_pos;
@@ -62,9 +57,6 @@ typedef struct
 	MORPHCTRL * mc;
 
 } CTM_ReturnType;
-#else
-typedef int CTM_ReturnType;
-#endif
 
 CTM_ReturnType copy_to_mainshapelist(RIFFHANDLE,  Shape_Chunk *, int flags,const ChunkObject* object=0);
 #define CopyToMainshapelist(h,r,p,f) copy_to_mainshapelist(h,r,p,f)

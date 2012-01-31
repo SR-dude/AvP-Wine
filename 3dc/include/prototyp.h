@@ -1,10 +1,5 @@
 #ifndef PROTOTYP_INCLUDED
 
-/*
-
- Global Functions, Structures and Variables are prototyped here
-
-*/
 
 
 #include "shpanim.h"
@@ -21,22 +16,13 @@
 
 
 
-
-/*
-
- Structures, Unions & Enums
-
-*/
-
-
-
 /* Grrr!!  That's the last time these will be missing! */
 /* Oh, CDF 18/12/97 */
 
-#if platform_pc
+
 extern int sine[];
 extern int cosine[];
-#endif
+
 
 /*
 
@@ -70,7 +56,6 @@ typedef struct quat {
 
 } QUAT;
 
-#if SupportFPMathsFunctions
 
 typedef struct vectorchf {
 
@@ -82,7 +67,6 @@ typedef struct vectorchf {
 
 void FNormalise(VECTORCHF *n);
 
-#endif
 
 
 typedef struct vector2d {
@@ -93,7 +77,6 @@ typedef struct vector2d {
 } VECTOR2D;
 
 
-#if SupportFPMathsFunctions
 
 typedef struct vector2df {
 
@@ -104,7 +87,6 @@ typedef struct vector2df {
 
 void FNormalise2d(VECTOR2DF *n);
 
-#endif
 
 
 typedef struct line {
@@ -156,7 +138,6 @@ typedef struct matrixch {
 } MATRIXCH;
 
 
-#if SupportFPMathsFunctions
 
 typedef struct matrixchf {
 
@@ -174,7 +155,6 @@ typedef struct matrixchf {
 
 } MATRIXCHF;
 
-#endif
 
 
 /* Sorry about this... */
@@ -258,13 +238,6 @@ typedef struct mapblock1 {
 
 	int MapType;
 
-	#if LoadingMapsShapesAndTexturesEtc
-
-		int MapFNameIndex;
-		char **MapFNameArray;
-		SHAPEHEADER **MapShapeDataArray;
-
-	#endif
 
 } MAPBLOCK1;
 
@@ -274,13 +247,6 @@ typedef struct mapblock2 {
 	int MapType;
 	int MapShape;
 
-	#if LoadingMapsShapesAndTexturesEtc
-
-		int MapFNameIndex;
-		char **MapFNameArray;
-		SHAPEHEADER **MapShapeDataArray;
-
-	#endif
 
 } MAPBLOCK2;
 
@@ -290,13 +256,6 @@ typedef struct mapblock3 {
 	int MapType;
 	int MapShape;
 
-	#if LoadingMapsShapesAndTexturesEtc
-
-		int MapFNameIndex;
-		char **MapFNameArray;
-		SHAPEHEADER **MapShapeDataArray;
-
-	#endif
 
 	VECTORCH MapWorld;
 
@@ -308,13 +267,6 @@ typedef struct mapblock4 {
 	int MapType;
 	int MapShape;
 
-	#if LoadingMapsShapesAndTexturesEtc
-
-		int MapFNameIndex;
-		char **MapFNameArray;
-		SHAPEHEADER **MapShapeDataArray;
-
-	#endif
 
 	VECTORCH MapWorld;
 
@@ -328,13 +280,6 @@ typedef struct mapblock5 {
 	int MapType;
 	int MapShape;
 
-	#if LoadingMapsShapesAndTexturesEtc
-
-		int MapFNameIndex;
-		char **MapFNameArray;
-		SHAPEHEADER **MapShapeDataArray;
-
-	#endif
 
 	VECTORCH MapWorld;
 
@@ -351,13 +296,6 @@ typedef struct mapblock6 {
 	int MapType;
 	int MapShape;
 
-	#if LoadingMapsShapesAndTexturesEtc
-
-		int MapFNameIndex;
-		char **MapFNameArray;
-		SHAPEHEADER **MapShapeDataArray;
-
-	#endif
 
 	VECTORCH MapWorld;
 
@@ -370,14 +308,6 @@ typedef struct mapblock6 {
 
 	int MapInteriorType;
 
-	#if InterfaceEngine
-
-	/* This will point to the Object_Chunk, it will have to be */
-	/* cast within C++ though */
-	
-	void * o_chunk;
-
-	#endif
 
 } MAPBLOCK6;
 
@@ -387,13 +317,6 @@ typedef struct mapblock7 {
 	int MapType;
 	int MapShape;
 
-	#if LoadingMapsShapesAndTexturesEtc
-
-		int MapFNameIndex;
-		char **MapFNameArray;
-		SHAPEHEADER **MapShapeDataArray;
-
-	#endif
 
 	VECTORCH MapWorld;
 
@@ -408,14 +331,6 @@ typedef struct mapblock7 {
 
 	int MapInteriorType;
 
-	#if InterfaceEngine
-
-	/* This will point to the Object_Chunk, it will have to be */
-	/* cast within C++ though */
-	
-	void * o_chunk;
-
-	#endif
 
 	int MapLightType;			/* See LIGHTTYPES */
 
@@ -502,9 +417,7 @@ typedef struct screendescriptorblock {
 	int SDB_Width;
 	int SDB_Height;
 	int SDB_Depth;
-	#if SupportWindows95
 	int SDB_ScreenDepth;
-	#endif
 	int SDB_Size;
 
 	int SDB_DiagonalWidth;
@@ -616,9 +529,7 @@ typedef struct viewdescriptorblock {
 	int VDB_Width;
 	int VDB_Height;
 	int VDB_Depth;
-	#if SupportWindows95
 	int VDB_ScreenDepth;
-	#endif
 
 	int VDB_CentreX;
 	int VDB_CentreY;
@@ -662,14 +573,7 @@ typedef struct viewdescriptorblock {
 
 	int VDB_Ambience;
 
-	#if pc_backdrops
-	BACKDROPTYPE VDB_BackdropType;
-	unsigned short VDB_ProjectorXOffsets[MaxScreenWidth];
-	#endif
 
-	#if ProjectSpecificVDBs
-	void* VDB_ProjectSpecificHook;
-	#endif
 
 } VIEWDESCRIPTORBLOCK;
 
@@ -813,7 +717,7 @@ typedef struct lightblock {
 /* KJL 16:17:42 01/10/98 - used to specify no specular component to the light;
 avoids unnecessary texture wash-out. */
 
-#if SupportMorphing
+
 
 
 /*
@@ -879,8 +783,6 @@ typedef struct morphctrl {
 } MORPHCTRL;
 
 
-#endif /* SupportMorphing */
-
 
 
 /*
@@ -897,13 +799,8 @@ typedef struct displayblock
 
 	SHAPEHEADER* ObShapeData;
 
-	#if SupportWindows95
 	char * name;
-	#endif
 	
-	#if (SupportMorphing && LazyEvaluationForMorphing)
-	VECTORCH *ObMorphedPts;
-	#endif
 
  	VECTORCH ObWorld;		/* World Space Location */
 	EULER ObEuler;			/* Euler Orientation */
@@ -917,10 +814,8 @@ typedef struct displayblock
  	int ObNumLights;
 	LIGHTBLOCK *ObLights[MaxObjectLights];
  
-	#if SupportModules
 	struct module *ObMyModule;	/* This is our module */
 	struct module *ObModule;	/* We are in this module */
-	#endif
 
 	VECTORCH ObView;			/* View Space Location */
  
@@ -942,9 +837,8 @@ typedef struct displayblock
 
 	EXTRAITEMDATA *ObEIDPtr;				/* Overrides shape EID pointer */
 
-	#if SupportMorphing
 	MORPHCTRL *ObMorphCtrl;				/* Structure provided by project */
-	#endif
+
 
 	/* The Strategy Block Pointer */
  	struct strategyblock *ObStrategyBlock;	/* Defined in stratdef.h */
@@ -1080,7 +974,7 @@ typedef struct displayblock
 
 
 
-#if SupportMorphing
+
 
 /*
 
@@ -1107,7 +1001,7 @@ typedef struct displayblock
 #define mph_flag_finished				0x00000020
 #define mph_flag_looped					0x00000040
 
-#endif
+
 
 
 
@@ -1136,25 +1030,7 @@ typedef struct p3d {
 
 */
 
-#if ZBufferTest
 
-typedef struct p2d_zb {
-
-	VECTOR2D point2d;
-	int z2d;
-
-} P2D_ZB;
-
-typedef struct p3d_zb {
-
-	VECTORCH point3d;
-	int z3d;
-
-} P3D_ZB;
-
-#endif
-
-#if SupportZBuffering
 
 typedef struct p2d_zb {
 
@@ -1170,7 +1046,7 @@ typedef struct p3d_zb {
 
 } P3D_ZB;
 
-#endif
+
 
 
 /*
@@ -1200,27 +1076,8 @@ typedef struct p3d_gouraud {
 
 */
 
-#if ZBufferTest
 
-typedef struct p2d_gouraud_zb {
 
-	VECTOR2D point2d;
-	int i2d;
-	int zg2d;
-
-} P2D_GOURAUD_ZB;
-
-typedef struct p3d_gouraud_zb {
-
-	VECTORCH point3d;
-	int i3d;
-	int zg3d;
-
-} P3D_GOURAUD_ZB;
-
-#endif
-
-#if SupportZBuffering
 
 typedef struct p2d_gouraud_zb {
 
@@ -1238,7 +1095,7 @@ typedef struct p3d_gouraud_zb {
 
 } P3D_GOURAUD_ZB;
 
-#endif
+
 
 
 
@@ -1294,7 +1151,6 @@ typedef struct p3d_texture2d {
 
 */
 
-#if SupportZBuffering
 
 typedef struct p2d_texture2d_zb {
 
@@ -1315,7 +1171,7 @@ typedef struct p3d_texture2d_zb {
 
 } P3D_TEXTURE2D_ZB;
 
-#endif
+
 
 
 /*
@@ -1324,29 +1180,7 @@ typedef struct p3d_texture2d_zb {
 
 */
 
-#if support3dtextures
 
-#if int3dtextures
-
-typedef struct p2d_texture3d {
-
-	VECTOR2D point2d;
-	int u2d_tx3d;
-	int v2d_tx3d;
-	int z2d_tx3d;
-
-} P2D_TEXTURE3D;
-
-
-typedef struct p3d_texture3d {
-
-	VECTORCH point3d;
-	int u3d_tx3d;
-	int v3d_tx3d;
-
-} P3D_TEXTURE3D;
-
-#else
 
 typedef struct p2d_texture3d {
 
@@ -1366,41 +1200,7 @@ typedef struct p3d_texture3d {
 
 } P3D_TEXTURE3D;
 
-#endif
 
-#endif
-
-
-/*
-
- Texture 3d Points - Z-Buffered
-
-*/
-
-#if 0
-#if (support3dtextures && SupportZBuffering)
-
-typedef struct p2d_texture3d_zb {
-
-	VECTOR2D point2d;
-	float u2d_tx3d;
-	float v2d_tx3d;
-	float z2d_tx3d;
-
-} P2D_TEXTURE3D_ZB;
-
-
-typedef struct p3d_texture3d_zb {
-
-	VECTORCH point3d;
-	float u3d_tx3d;
-	float v3d_tx3d;
-	float z3d_tx3d;
-
-} P3D_TEXTURE3D_ZB;
-
-#endif
-#endif
 
 
 /*
@@ -1435,7 +1235,6 @@ typedef struct p3d_gouraudtexture2d {
 
 */
 
-#if SupportZBuffering
 
 typedef struct p2d_gouraudtexture2d_zb {
 
@@ -1458,10 +1257,9 @@ typedef struct p3d_gouraudtexture2d_zb {
 
 } P3D_GOURAUDTEXTURE2D_ZB;
 
-#endif
 
 
-#if SupportGouraud3dTextures
+
 
 /*
 
@@ -1489,7 +1287,6 @@ typedef struct p3d_gouraudtexture3d {
 
 } P3D_GOURAUDTEXTURE3D;
 
-#endif	/* SupportGouraud3dTextures */
 
 
 
@@ -1523,19 +1320,8 @@ typedef struct i_polygon_pt {
 
 */
 
-#if ZBufferTest
 
-typedef struct i_polygon_zbuffer_pt {
 
-	int i_x;
-	int i_y;
-	int i_z;
-
-} I_POLYGON_ZBUFFER_PT;
-
-#endif
-
-#if SupportZBuffering
 
 typedef struct i_polygon_zbuffer_pt {
 
@@ -1545,7 +1331,7 @@ typedef struct i_polygon_zbuffer_pt {
 
 } I_POLYGON_ZBUFFER_PT;
 
-#endif
+
 
 
 /*
@@ -1569,20 +1355,8 @@ typedef struct i_gouraudpolygon_pt {
 
 */
 
-#if ZBufferTest
 
-typedef struct i_gouraudpolygon_zbuffer_pt {
 
-	int i_x;
-	int i_y;
-	int i_int;
-	int i_gz;
-
-} I_GOURAUDPOLYGON_ZBUFFER_PT;
-
-#endif
-
-#if SupportZBuffering
 
 typedef struct i_gouraudpolygon_zbuffer_pt {
 
@@ -1593,7 +1367,7 @@ typedef struct i_gouraudpolygon_zbuffer_pt {
 
 } I_GOURAUDPOLYGON_ZBUFFER_PT;
 
-#endif
+
 
 
 /*
@@ -1611,7 +1385,6 @@ typedef struct i_phongpolygon_pt {
 
 } I_PHONGPOLYGON_PT;
 
-#if SupportZBuffering
 
 typedef struct i_phongpolygon_zbuffer_pt {
 
@@ -1624,7 +1397,7 @@ typedef struct i_phongpolygon_zbuffer_pt {
 
 } I_PHONGPOLYGON_ZBUFFER_PT;
 
-#endif
+
 
 
 /*
@@ -1643,7 +1416,7 @@ typedef struct i_2dtexturepolygon_pt {
 
 } I_2DTEXTUREPOLYGON_PT;
 
-#if SupportZBuffering
+
 
 typedef struct i_2dtexturepolygon_zbuffer_pt {
 
@@ -1657,7 +1430,7 @@ typedef struct i_2dtexturepolygon_zbuffer_pt {
 
 } I_2DTEXTUREPOLYGON_ZBUFFER_PT;
 
-#endif
+
 
 
 /*
@@ -1666,22 +1439,8 @@ typedef struct i_2dtexturepolygon_zbuffer_pt {
 
 */
 
-#if support3dtextures
 
-#if int3dtextures
 
-typedef struct i_3dtexturepolygon_pt {
-
-	int i_x;
-	int i_y;
-
-	int i_tx3d_u;
-	int i_tx3d_v;
-	int i_tx3d_z;
-
-} I_3DTEXTUREPOLYGON_PT;
-
-#else
 
 typedef struct i_3dtexturepolygon_pt {
 
@@ -1694,9 +1453,9 @@ typedef struct i_3dtexturepolygon_pt {
 
 } I_3DTEXTUREPOLYGON_PT;
 
-#endif
 
-#if SupportZBuffering
+
+
 
 typedef struct i_3dtexturepolygon_zbuffer_pt {
 
@@ -1709,9 +1468,7 @@ typedef struct i_3dtexturepolygon_zbuffer_pt {
 
 } I_3DTEXTUREPOLYGON_ZBUFFER_PT;
 
-#endif
 
-#endif
 
 
 /*
@@ -1733,7 +1490,6 @@ typedef struct i_gouraud2dtexturepolygon_pt {
 } I_GOURAUD2DTEXTUREPOLYGON_PT;
 
 
-#if SupportZBuffering
 
 typedef struct i_gouraud2dtexturepolygon_zbuffer_pt {
 
@@ -1749,10 +1505,10 @@ typedef struct i_gouraud2dtexturepolygon_zbuffer_pt {
 
 } I_GOURAUD2DTEXTUREPOLYGON_ZBUFFER_PT;
 
-#endif
 
 
-#if SupportGouraud3dTextures
+
+
 
 /*
 
@@ -1773,7 +1529,7 @@ typedef struct i_gouraud3dtexturepolygon_pt {
 
 } I_GOURAUD3DTEXTUREPOLYGON_PT;
 
-#endif	/* SupportGouraud3dTextures */
+
 
 
 /*
@@ -1795,21 +1551,6 @@ typedef struct clip_point {
 } CLIP_POINT;
 
 
-#if support3dtextures
-
-#if int3dtextures
-
-typedef struct clip_point_f {
-
-	VECTORCH ClipPointF;
-	VECTORCH ClipNormalF;
-	TEXELF ClipTexelF;
-	int ClipIntF;
-	int ClipZBufferF;
-
-} CLIP_POINT_F;
-
-#else
 
 typedef struct clip_point_f {
 
@@ -1821,12 +1562,11 @@ typedef struct clip_point_f {
 
 } CLIP_POINT_F;
 
-#endif
-
-#endif
 
 
-#if SupportGouraud3dTextures
+
+
+
 
 typedef struct clip_point_gtx3d {
 
@@ -1838,7 +1578,6 @@ typedef struct clip_point_gtx3d {
 
 } CLIP_POINT_GTX3D;
 
-#endif
 
 
 
@@ -1862,22 +1601,7 @@ typedef struct i_polygon_scan {
 
 } I_POLYGON_SCAN;
 
-#if ZBufferTest
 
-typedef struct i_polygon_zbuffer_scan {
-
-	int ips_colour;
-	int ips_x1;
-	int ips_x2;
-	int ips_y;
-	int ips_z1;
-	int ips_z2;
-
-} I_POLYGON_ZBUFFER_SCAN;
-
-#endif
-
-#if SupportZBuffering
 
 typedef struct i_polygon_zbuffer_scan {
 
@@ -1890,7 +1614,7 @@ typedef struct i_polygon_zbuffer_scan {
 
 } I_POLYGON_ZBUFFER_SCAN;
 
-#endif
+
 
 
 typedef struct i_gouraudpolygon_scan {
@@ -1905,26 +1629,7 @@ typedef struct i_gouraudpolygon_scan {
 
 } I_GOURAUDPOLYGON_SCAN;
 
-#if ZBufferTest
 
-typedef struct i_gouraudpolygon_zbuffer_scan {
-
-	int igs_c1;
-	int igs_c2;
-
-	int igs_x1;
-	int igs_x2;
-
-	int igs_y;
-
-	int igs_z1;
-	int igs_z2;
-
-} I_GOURAUDPOLYGON_ZBUFFER_SCAN;
-
-#endif
-
-#if SupportZBuffering
 
 typedef struct i_gouraudpolygon_zbuffer_scan {
 
@@ -1941,7 +1646,7 @@ typedef struct i_gouraudpolygon_zbuffer_scan {
 
 } I_GOURAUDPOLYGON_ZBUFFER_SCAN;
 
-#endif
+
 
 
 typedef struct i_phongpolygon_scan {
@@ -1956,7 +1661,6 @@ typedef struct i_phongpolygon_scan {
 
 } I_PHONGPOLYGON_SCAN;
 
-#if SupportZBuffering
 
 typedef struct i_phongpolygon_zbuffer_scan {
 
@@ -1973,7 +1677,6 @@ typedef struct i_phongpolygon_zbuffer_scan {
 
 } I_PHONGPOLYGON_ZBUFFER_SCAN;
 
-#endif
 
 
 typedef struct i_2dtexturepolygon_scan {
@@ -1991,7 +1694,6 @@ typedef struct i_2dtexturepolygon_scan {
 
 } I_2DTEXTUREPOLYGON_SCAN;
 
-#if SupportZBuffering
 
 typedef struct i_2dtexturepolygon_zbuffer_scan {
 
@@ -2011,31 +1713,10 @@ typedef struct i_2dtexturepolygon_zbuffer_scan {
 
 } I_2DTEXTUREPOLYGON_ZBUFFER_SCAN;
 
-#endif
 
 
-#if support3dtextures
 
-#if int3dtextures
 
-typedef struct i_3dtexturepolygon_scan {
-
-	int i3s_u1;
-	int i3s_v1;
-	int i3s_z1;
-
-	int i3s_u2;
-	int i3s_v2;
-	int i3s_z2;
-
-	int i3s_x1;
-	int i3s_x2;
-
-	int i3s_y;
-
-} I_3DTEXTUREPOLYGON_SCAN;
-
-#else
 
 typedef struct i_3dtexturepolygon_scan {
 
@@ -2054,9 +1735,8 @@ typedef struct i_3dtexturepolygon_scan {
 
 } I_3DTEXTUREPOLYGON_SCAN;
 
-#endif
 
-#if SupportZBuffering
+
 
 typedef struct i_3dtexturepolygon_zbuffer_scan {
 
@@ -2075,9 +1755,6 @@ typedef struct i_3dtexturepolygon_zbuffer_scan {
 
 } I_3DTEXTUREPOLYGON_ZBUFFER_SCAN;
 
-#endif
-
-#endif
 
 
 typedef struct i_gouraud2dtexturepolygon_scan {
@@ -2097,7 +1774,6 @@ typedef struct i_gouraud2dtexturepolygon_scan {
 
 } I_GOURAUD2DTEXTUREPOLYGON_SCAN;
 
-#if SupportZBuffering
 
 typedef struct i_gouraud2dtexturepolygon_zbuffer_scan {
 
@@ -2119,10 +1795,8 @@ typedef struct i_gouraud2dtexturepolygon_zbuffer_scan {
 
 } I_GOURAUD2DTEXTUREPOLYGON_ZBUFFER_SCAN;
 
-#endif
 
 
-#if SupportGouraud3dTextures
 
 typedef struct i_gouraud3dtexturepolygon_scan {
 
@@ -2143,7 +1817,7 @@ typedef struct i_gouraud3dtexturepolygon_scan {
 
 } I_GOURAUD3DTEXTUREPOLYGON_SCAN;
 
-#endif	/* SupportGouraud3dTextures */
+
 
 
 
@@ -2154,9 +1828,8 @@ typedef struct i_gouraud3dtexturepolygon_scan {
 
 */
 
-#if SupportWindows95
 void ClearScreen(SCREENDESCRIPTORBLOCK *sdb, int Colour);
-#endif
+
 
 
 void PlatformSpecificShowViewEntry(VIEWDESCRIPTORBLOCK *vdb, SCREENDESCRIPTORBLOCK *sdb);
@@ -2188,6 +1861,7 @@ void MapBlockInit(DISPLAYBLOCK *dblockptr);
 void MapSetVDB(DISPLAYBLOCK *dptr, MAPSETVDB *mapvdbdata);
 
 
+
 void UpdateGame(void);
 
 
@@ -2197,7 +1871,7 @@ void UpdateGame(void);
 SHAPEHEADER* GetShapeData(int shapenum);
 
 
-#if flic_player
+
 
 /*
 
@@ -2218,11 +1892,6 @@ int PlayFLICFile(char *fname, int fflags, int floops, unsigned char *pal);
 																the old palette */
 
 #define FFlag_EnableFade		0x00000008		/* NOT fading is the default */
-
-	#endif
-
-
-
 
 
 
@@ -2465,11 +2134,8 @@ void BackFaceCullPointOutcodeFlagging(void);
 
 */
 
-#if SupportWindows95
 void InitialiseSystem(HINSTANCE hInstance, int nCmdShow);
-#else
-void InitialiseSystem(void);
-#endif
+
 
 void InitialiseRenderer(void);
 
@@ -2480,7 +2146,7 @@ void InitialVideoMode(void);
 void ResetFrameCounter(void);
 void FrameCounterHandler(void);
 
-#if SupportWindows95
+
 void DirectWriteD3DLine(VECTOR2D* LineStart, VECTOR2D* LineEnd, int LineColour);
 void* LoadImageIntoDirectDrawSurface(char *fname, IMAGEHEADER *iheader,
       int ImageLoadMode, BOOL Sysmem);
@@ -2506,7 +2172,7 @@ LPDIRECTDRAWSURFACE LoadPGMInD3DMode(char* fname,
         LPDDSURFACEDESC lpFormat, IMAGEHEADER* iheader,
         int MemoryType);
 #endif // for __cplusplus
-#endif // for SupportWindows95
+
 
 void InitGame(void);
 void StartGame(void);
@@ -2518,42 +2184,18 @@ void UpdateParallelStrategy(void);
 unsigned char* AllocateScreenBuffer(int sbuffersize);
 
 
-#if 0
-
-#if 0
-void *AllocateMem(size_t __size);
-void DeallocateMem(void *__ptr);
-#endif
-
-#if PSX
-  #ifdef DBGMALLOC
-  extern void *record_malloc(long size, char string[], unsigned long lineno);
-  extern void record_free(void *ptr,char string[], unsigned long lineno);
-  #define AllocateMem(x) record_malloc(x,__FILE__, __LINE__)
-  #define DeallocateMem(x) record_free(x,__FILE__, __LINE__)
-  #else
-  void *AllocateMem(size_t __size);
-  void DeallocateMem(void *__ptr);
-  #endif
-#else
-void *AllocateMem(size_t __size);
-void DeallocateMem(void *__ptr);
-#endif
-
-#endif
-
 
 void ScanDraw_Item_Polygon_VideoModeType_8(int *itemptr);
 void ScanDraw_Item_Polygon_VideoModeType_15(int *itemptr);
 void ScanDraw_Item_Polygon_VideoModeType_24(int *itemptr);
 void ScanDraw_Item_Polygon_VideoModeType_8T(int *itemptr);
 
-#if (ZBufferTest || SupportZBuffering)
+
 void ScanDraw_Item_Polygon_ZBuffer_VideoModeType_8(int *itemptr);
 void ScanDraw_Item_Polygon_ZBuffer_VideoModeType_15(int *itemptr);
 void ScanDraw_Item_Polygon_ZBuffer_VideoModeType_24(int *itemptr);
 void ScanDraw_Item_Polygon_ZBuffer_VideoModeType_8T(int *itemptr);
-#endif
+
 
 void ScanDraw_Item_GouraudPolygon_VideoModeType_8(int *itemptr);
 void ScanDraw_Item_GouraudPolygon_VideoModeType_15(int *itemptr);
@@ -2564,31 +2206,25 @@ void ScanDraw_Item_GouraudPolygon_HPV_VideoModeType_15(int *itemptr);
 void ScanDraw_Item_GouraudPolygon_HPV_VideoModeType_24(int *itemptr);
 void ScanDraw_Item_GouraudPolygon_HPV_VideoModeType_8T(int *itemptr);
 
-#if ZBufferTest
-void ScanDraw_Item_GouraudPolygon_ZBuffer_VideoModeType_8(int *itemptr);
-void ScanDraw_Item_GouraudPolygon_ZBuffer_VideoModeType_15(int *itemptr);
-void ScanDraw_Item_GouraudPolygon_ZBuffer_VideoModeType_24(int *itemptr);
-void ScanDraw_Item_GouraudPolygon_ZBuffer_VideoModeType_8T(int *itemptr);
-#endif
 
-#if SupportZBuffering
+
 void ScanDraw_ZB_Item_GouraudPolygon_VideoModeType_8(int *itemptr);
 void ScanDraw_ZB_Item_GouraudPolygon_VideoModeType_15(int *itemptr);
 void ScanDraw_ZB_Item_GouraudPolygon_VideoModeType_24(int *itemptr);
 void ScanDraw_ZB_Item_GouraudPolygon_VideoModeType_8T(int *itemptr);
-#endif
+
 
 void ScanDraw_Item_2dTexturePolygon_VideoModeType_8(int *itemptr);
 void ScanDraw_Item_2dTexturePolygon_VideoModeType_15(int *itemptr);
 void ScanDraw_Item_2dTexturePolygon_VideoModeType_24(int *itemptr);
 void ScanDraw_Item_2dTexturePolygon_VideoModeType_8T(int *itemptr);
 
-#if SupportZBuffering
+
 void ScanDraw_ZB_Item_2dTexturePolygon_VideoModeType_8(int *itemptr);
 void ScanDraw_ZB_Item_2dTexturePolygon_VideoModeType_15(int *itemptr);
 void ScanDraw_ZB_Item_2dTexturePolygon_VideoModeType_24(int *itemptr);
 void ScanDraw_ZB_Item_2dTexturePolygon_VideoModeType_8T(int *itemptr);
-#endif
+
 
 void ScanDraw_Item_Gouraud2dTexturePolygon_VideoModeType_8(int *itemptr);
 void ScanDraw_Item_Gouraud2dTexturePolygon_VideoModeType_15(int *itemptr);
@@ -2601,14 +2237,14 @@ void ScanDraw_Item_ZB_Gouraud2dTexturePolygon_VideoModeType_24(int *itemptr);
 void ScanDraw_Item_ZB_Gouraud2dTexturePolygon_VideoModeType_8T(int *itemptr);
 
 
-#if support3dtextures
+
 void ScanDraw_Item_3dTexturePolygon_VideoModeType_8(int *itemptr);
 void ScanDraw_Item_3dTexturePolygon_VideoModeType_15(int *itemptr);
 void ScanDraw_Item_3dTexturePolygon_VideoModeType_24(int *itemptr);
 void ScanDraw_Item_3dTexturePolygon_VideoModeType_8T(int *itemptr);
-#endif
 
-#if SupportGouraud3dTextures
+
+
 
 void ScanDraw_Item_Gouraud3dTexturePolygon_VideoModeType_8(int *itemptr);
 void ScanDraw_Item_Gouraud3dTexturePolygon_VideoModeType_15(int *itemptr);
@@ -2625,7 +2261,7 @@ void ScanDraw_Item_Gouraud3dTexturePolygon_Linear_S_VideoModeType_15(int *itempt
 void ScanDraw_Item_Gouraud3dTexturePolygon_Linear_S_VideoModeType_24(int *itemptr);
 void ScanDraw_Item_Gouraud3dTexturePolygon_Linear_S_VideoModeType_8T(int *itemptr);
 
-#if SupportZBuffering
+
 
 void ScanDraw_Item_ZB_Gouraud3dTexturePolygon_VideoModeType_8(int *itemptr);
 void ScanDraw_Item_ZB_Gouraud3dTexturePolygon_VideoModeType_15(int *itemptr);
@@ -2642,56 +2278,49 @@ void ScanDraw_Item_ZB_Gouraud3dTexturePolygon_Linear_S_VideoModeType_15(int *ite
 void ScanDraw_Item_ZB_Gouraud3dTexturePolygon_Linear_S_VideoModeType_24(int *itemptr);
 void ScanDraw_Item_ZB_Gouraud3dTexturePolygon_Linear_S_VideoModeType_8T(int *itemptr);
 
-#endif	/* SupportZBuffering */
 
-#endif	/* SupportGouraud3dTextures */
 
-#if support3dtextures
-
-#if SupportZBuffering
 void ScanDraw_Item_ZB_3dTexturePolygon_VideoModeType_8(int *itemptr);
 void ScanDraw_Item_ZB_3dTexturePolygon_VideoModeType_15(int *itemptr);
 void ScanDraw_Item_ZB_3dTexturePolygon_VideoModeType_24(int *itemptr);
 void ScanDraw_Item_ZB_3dTexturePolygon_VideoModeType_8T(int *itemptr);
-#endif
+
 
 void ScanDraw_Item_3dTexturePolygon_QuadI_VideoModeType_8(int *itemptr);
 void ScanDraw_Item_3dTexturePolygon_QuadI_VideoModeType_15(int *itemptr);
 void ScanDraw_Item_3dTexturePolygon_QuadI_VideoModeType_24(int *itemptr);
 void ScanDraw_Item_3dTexturePolygon_QuadI_VideoModeType_8T(int *itemptr);
 
-#if SupportZBuffering
+
 void ScanDraw_ZB_Item_3dTexturePolygon_QuadI_VideoModeType_8(int *itemptr);
 void ScanDraw_ZB_Item_3dTexturePolygon_QuadI_VideoModeType_15(int *itemptr);
 void ScanDraw_ZB_Item_3dTexturePolygon_QuadI_VideoModeType_24(int *itemptr);
 void ScanDraw_ZB_Item_3dTexturePolygon_QuadI_VideoModeType_8T(int *itemptr);
-#endif
+
 
 void ScanDraw_Item_3dTexturePolygon_Linear_VideoModeType_8(int *itemptr);
 void ScanDraw_Item_3dTexturePolygon_Linear_VideoModeType_15(int *itemptr);
 void ScanDraw_Item_3dTexturePolygon_Linear_VideoModeType_24(int *itemptr);
 void ScanDraw_Item_3dTexturePolygon_Linear_VideoModeType_8T(int *itemptr);
 
-#if SupportZBuffering
+
 void ScanDraw_Item_ZB_3dTexturePolygon_Linear_VideoModeType_8(int *itemptr);
 void ScanDraw_Item_ZB_3dTexturePolygon_Linear_VideoModeType_15(int *itemptr);
 void ScanDraw_Item_ZB_3dTexturePolygon_Linear_VideoModeType_24(int *itemptr);
 void ScanDraw_Item_ZB_3dTexturePolygon_Linear_VideoModeType_8T(int *itemptr);
-#endif
+
 
 void ScanDraw_Item_3dTexturePolygon_Linear_S_VideoModeType_8(int *itemptr);
 void ScanDraw_Item_3dTexturePolygon_Linear_S_VideoModeType_15(int *itemptr);
 void ScanDraw_Item_3dTexturePolygon_Linear_S_VideoModeType_24(int *itemptr);
 void ScanDraw_Item_3dTexturePolygon_Linear_S_VideoModeType_8T(int *itemptr);
 
-#if SupportZBuffering
+
 void ScanDraw_Item_ZB_3dTexturePolygon_Linear_S_VideoModeType_8(int *itemptr);
 void ScanDraw_Item_ZB_3dTexturePolygon_Linear_S_VideoModeType_15(int *itemptr);
 void ScanDraw_Item_ZB_3dTexturePolygon_Linear_S_VideoModeType_24(int *itemptr);
 void ScanDraw_Item_ZB_3dTexturePolygon_Linear_S_VideoModeType_8T(int *itemptr);
-#endif
 
-#endif	/* support3dtextures */
 
 void ScanDraw_Item_Polyline_VideoModeType_8(int *itemptr);
 void ScanDraw_Item_Polyline_VideoModeType_15(int *itemptr);
@@ -2708,12 +2337,7 @@ void ScanDraw_Item_Wireframe_VideoModeType_15(int *itemptr);
 void ScanDraw_Item_Wireframe_VideoModeType_24(int *itemptr);
 void ScanDraw_Item_Wireframe_VideoModeType_8T(int *itemptr);
 
-#if 0
-void ScanDraw_Item_HUDPolyline_VideoModeType_8(int *itemptr);
-void ScanDraw_Item_HUDPolyline_VideoModeType_15(int *itemptr);
-void ScanDraw_Item_HUDPolyline_VideoModeType_24(int *itemptr);
-void ScanDraw_Item_HUDPolyline_VideoModeType_8T(int *itemptr);
-#endif
+
 
 void SetPalette(unsigned char *palette);
 
@@ -2728,16 +2352,9 @@ unsigned char GetRemappedPaletteColour(int r, int g, int b, int bitsize);
 
 int NearestColour(int rs, int gs, int bs, unsigned char *palette);
 
-#if LoadingMapsShapesAndTexturesEtc
-
-void InitialiseImageHeaders(void);
-int LoadImagesForShapes(SHAPEHEADER **shapelist);
-
-#else
 
 int InitialiseTextures(void);
 
-#endif
 
 void MakeShapeTexturesGlobal(SHAPEHEADER *shptr, int TxIndex, int LTxIndex);
 void MakeTxAnimFrameTexturesGlobal(SHAPEHEADER *sptr,
@@ -2758,15 +2375,6 @@ void* GetTexture(int texindex);
 
 TEXTURE* GetTextureMemory(int txsize);
 void ReturnTextureMemory(TEXTURE *txptr);
-
-
-/* Backdrops */
-
-#if pc_backdrops
-int UpdateBackdrops(SCENE Scene);
-int DeallocateBackdrops(SCENE Scene);
-int LoadBackdrop(char *image, IMAGEHEADER *ihdr);
-#endif
 
 
 void GetProjectFilename(char *fname, char *image);
@@ -2826,32 +2434,6 @@ typedef struct mousedata {
 void ReadKeyboard(void);
 
 
-#if 0
-void ReadEmulatedSaturnControlPad(void);
-unsigned int CheckPad(void);
-void ExaminePad(void);
-/*
- Saturn Control Pad
- See pad.h
- Model S Pad, direct mode
-*/
-#define PAD_DOWN	0x0001
-#define PAD_UP  	0x0002
-#define PAD_LEFT	0x0004
-#define PAD_RIGHT	0x0008
-#define PAD_BUTC	0x0010
-#define PAD_BUTB	0x0020
-#define PAD_BUTA	0x0040
-#define PAD_START	0x0080
-#define PAD_BUTZ	0x0100
-#define PAD_BUTY	0x0200
-#define PAD_BUTX	0x0400
-#define PAD_MODE	0x0800
-#define	PAD_R	    0x0800
-#define PAD_L     0x1000
-#endif
-
-
 void WaitForReturn(void);
 
 void CursorHome(void);
@@ -2889,10 +2471,6 @@ void Draw_Item_ZB_Gouraud3dTexturePolygon(int *itemptr);
 
 int* GetTxAnimArrayZ(int shape, int item);
 TXANIMHEADER* GetTxAnimDataZ(int shape, int item, int sequence);
-
-#if SupportBSP
-TXANIMHEADER* GetTxAnimDataBSP(int shape, int node, int item, int sequence);
-#endif
 
 
 int GT_LL(LONGLONGCH *a, LONGLONGCH *b);
@@ -2933,24 +2511,12 @@ typedef enum {
 
 
 
-#if SupportMorphing
-
 void UpdateMorphing(MORPHCTRL *mcptr);
 void UpdateMorphingDptr(DISPLAYBLOCK *dptr);
 void GetMorphDisplay(MORPHDISPLAY *md, DISPLAYBLOCK *dptr);
 void CopyMorphCtrl(MORPHCTRL *src, MORPHCTRL *dst);
 
 VECTORCH* GetMorphedPts(DISPLAYBLOCK *dptr, MORPHDISPLAY *md);
-
-#if LazyEvaluationForMorphing
-void FreeMorphArrays(void);
-#endif
-
-#endif
-
-
-
-
 
 
 
@@ -2966,10 +2532,6 @@ void CrossProduct(VECTORCH *a, VECTORCH *b, VECTORCH *c);
 /* KJL 12:01:08 7/16/97 - returns the magnitude of a vector - max error about 13%, though average error
    less than half this. Very fast compared to other approaches. */
 int Approximate3dMagnitude(VECTORCH *v);
-
-
-
-
 
 
 

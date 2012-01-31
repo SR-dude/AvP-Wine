@@ -1,9 +1,8 @@
 #ifndef _chnktype_hpp
 #define _chnktype_hpp 1
 
-#if engine
+
 #include "3dc.h"
-#endif
 #include "list_tem.hpp"
 
 struct ChunkVectorInt;
@@ -28,10 +27,7 @@ struct ChunkVector
   	ChunkVector friend operator*(const ChunkVector&, const ChunkVector&); //cross prod
 
 
-	
-	#if engine
 	operator VECTORCH () const;
-	#endif
 	operator ChunkVectorInt () const;
 	operator ChunkVectorFloat () const;
 
@@ -59,10 +55,7 @@ struct ChunkVectorInt
   	//ChunkVectorInt friend operator*(const ChunkVectorInt&, const ChunkVectorInt&); //cross prod
 
 
-	
-	#if engine
 	operator VECTORCH () const;
-	#endif
 
   	//friend double dot(const ChunkVector&, const ChunkVector&);//dot product
   	friend double mod(const ChunkVectorInt&);//magnitude of vector
@@ -84,9 +77,9 @@ struct ChunkVectorFloat
  	ChunkVectorFloat friend operator/(const ChunkVectorFloat&, const double); 
 	
 	//ChunkVectorInt friend operator*(const ChunkVectorInt&, const ChunkVectorInt&); //cross prod
-	#if engine
+
 	operator VECTORCH () const;
-	#endif
+
 
   	//friend double dot(const ChunkVector&, const ChunkVector&);//dot product
   	friend double mod(const ChunkVectorFloat&);//magnitude of vector
@@ -177,10 +170,6 @@ struct ChunkShape
 	int num_verts;
 	ChunkVectorInt * v_list;
 
-	#if UseOldChunkLoader
-	ChunkVector * float_v_list;
-	#endif
-
 	//int num_vert_normals; //I don't think num_vert_normals is ever used
 	ChunkVectorFloat * v_normal_list;
 
@@ -220,10 +209,6 @@ struct ChunkObject
 
 	ChunkVectorInt location;
 
-	#if UseOldChunkLoader
-	ChunkVector float_location;
-	#endif
-
 	ChunkQuat orientation;
 
 	BOOL is_base_object;
@@ -250,10 +235,6 @@ struct VMod_Arr_Item
 	int spare;
 	int object_index;
 	
-	#if UseOldChunkLoader
-	char * o_name; //replaced by object_index
-	#endif
-
 	friend BOOL operator==(const VMod_Arr_Item &, const VMod_Arr_Item &);
 	friend BOOL operator!=(const VMod_Arr_Item &, const VMod_Arr_Item &);
 	
@@ -270,10 +251,6 @@ struct Adjacent_Module
 	int flags;
 	ChunkVectorInt entry_point;
 	int object_index;
-
-	#if UseOldChunkLoader
-	char * o_name;
-	#endif 
 
 	friend BOOL operator==(const Adjacent_Module & am1, const Adjacent_Module & am2);
 	friend BOOL operator!=(const Adjacent_Module & am1, const Adjacent_Module & am2);
@@ -358,10 +335,6 @@ struct ChunkAnimFrame
 	int num_interp_frames;
 	int pad3,pad4;
 };
-
-
-#define animseqflag_not_in_psx			0x00000001
-#define animseqflag_not_in_saturn		0x00000002
 
 
 struct ChunkAnimSequence

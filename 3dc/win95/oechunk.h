@@ -4,20 +4,6 @@
 #include "chunk.hpp"
 #include "obchunk.hpp"
 
-#if objedit
-#include "Template.hpp"
-#endif
-//#if engine
-//#define VECTOR VECTORCH
-//#endif
-
-#if engine
-#else
-struct VECTORCH
-{
-	int vx, vy, vz;
-};
-#endif
 
 struct	ChunkMapBlock
 {

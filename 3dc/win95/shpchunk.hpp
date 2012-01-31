@@ -2,28 +2,12 @@
 #define _shpchunk_hpp 1
 
 #include "chunk.hpp"
-
 #include "chnktype.hpp"
 #include "mishchnk.hpp"
 
 // shape flags
-
-#define SHAPE_FLAG_PALETTISED		0x0000100
-#define SHAPE_FLAG_USEZSP				0x0000200
-#define SHAPE_FLAG_USEAUGZS			0x0000400
-#define SHAPE_FLAG_USEAUGZSL		0x0000800
+// adj most used and removed
 #define SHAPE_FLAG_EXTERNALFILE	0x0001000
-#define SHAPE_FLAG_RECENTRED	0x0002000
-
-
-#define SHAPE_FLAG_UNSTABLEBOUND_ZPOS 0x00004000
-#define SHAPE_FLAG_UNSTABLEBOUND_ZNEG 0x00008000
-#define SHAPE_FLAG_UNSTABLEBOUND_YPOS 0x00010000
-#define SHAPE_FLAG_UNSTABLEBOUND_YNEG 0x00020000
-#define SHAPE_FLAG_UNSTABLEBOUND_XPOS 0x00040000
-#define SHAPE_FLAG_UNSTABLEBOUND_XNEG 0x00080000
-
-#define SHAPE_FLAG_PSX_SUBDIVIDE	  0x80000000	
 
 //flags that need to be removed before being copied into the shapeheaders
 #define ChunkInternalItemFlags 0x00000000
@@ -232,8 +216,6 @@ private:
 
 
 ///////////////////////////////////////////////
-#define AnimCentreFlag_CentreSetByUser		0x00000001  //centre should not be recalculated from the extents of the sequences
-
 class Anim_Shape_Centre_Chunk : public Chunk
 {
 	public:
@@ -775,9 +757,6 @@ public:
 	
 	void post_input_processing();
 	
-	#if cencon || InterfaceEngine
-	void update_from_external_rif(BOOL force_scale_update);
-	#endif
 	
 	//gets name from shape_external_object_name_chunk if it has one
 	//otherwise takes name from rif_name_chunk

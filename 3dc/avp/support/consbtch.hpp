@@ -9,25 +9,13 @@
 #ifndef _consbtch
 #define _consbtch 1
 
-	#if ( defined( __WATCOMC__ ) || defined( _MSC_VER ) )
-		#pragma once
-	#endif
+#include "scstring.hpp"
 
-	#ifndef _scstring
-		#include "scstring.hpp"
-	#endif
 
 #ifdef __cplusplus
 	extern "C" {
 #endif
 
-/* Version settings *****************************************************/
-
-/* Constants  ***********************************************************/
-
-/* Macros ***************************************************************/
-
-/* Type definitions *****************************************************/
 	class BatchFileProcessing
 	{
 	public:
@@ -39,15 +27,6 @@
 	public:
 		static int bEcho;
 	};
-
-/* Exported globals *****************************************************/
-
-/* Function prototypes **************************************************/
-
-
-
-/* End of the header ****************************************************/
-
 
 #ifdef __cplusplus
 	};

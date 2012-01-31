@@ -43,9 +43,6 @@ extern int StartUpMenus(void);
 extern void PlatformSpecificEnteringMenus();
 extern void PlatformSpecificExitingMenus();
 
-#if PSX
-extern int PsxOptionsMenu(int state);
-#endif
 
 /* Those functions I need, so they're here.
  Non-playstation coders, feel free to leave
@@ -99,9 +96,6 @@ typedef enum {
 	PREDATOR_BRIEFING,
 	ALIEN_BRIEFING,
 	LOAD_GAME,
-#if PSX
-	JOYPAD_CONFIG,
-#endif
 	END
 } START_MENU_STATES;
 
@@ -113,13 +107,9 @@ typedef enum {
 	NEW_GAME_ITEM =0,
 	LOAD_GAME_ITEM,
 	OPTIONS_ITEM,
-#if PSX || Saturn
-//	DEMO_ITEM,
-#else
 	DEMO_ITEM,
 	MULTIPLAYER_ITEM,
 	QUIT_ITEM,
-#endif
 	MAX_GAMESTART_MENU_ITEMS
 
 } GAMESTART_MENU_ITEMS;
@@ -184,57 +174,6 @@ typedef enum {
 } LOAD_MENU_ITEMS;
 
 
-#if PSX
-typedef enum {
-
-	MUSIC_ITEM = 0,
-	SOUND_ITEM,
-	DIFFICULTY_ITEM,
-	CONTROLS_ITEM,
-	EXIT_ITEM_OPTIONS,
-	EASY_ITEM,
-	MEDIUM_ITEM,
-	HARD_ITEM,
-	IMPOSSIBLE_ITEM,
-	MAX_OPTIONS_MENU_ITEMS
-
-} OPTIONS_MENU_ITEMS;
-
-typedef enum {
-
-	OPTIONS_PAUSE_LIGHT = 0,
-	PAUSED_MUSIC_ITEM,
-	PAUSED_SOUND_ITEM,
-	PAUSED_EXIT_ITEM_OPTIONS,
-	MAX_PAUSED_OPTIONS_MENU_ITEMS
-
-} PAUSED_OPTIONS_MENU_ITEMS;
-
-typedef enum {
-
-	PAUSE_LIGHT = 0,
-	PAUSED_RESUME_ITEM,
-	PAUSED_OPTIONS_ITEM,
-	PAUSED_EXIT_ITEM,
-	MAX_PAUSED_MENU_OPTIONS
-
-} PAUSED_MENU_OPTIONS;
-
-typedef enum {
-
-	ALIEN_PAUSE_LIGHT = 0,
-	ALIEN_PAUSED_RESUME_ITEM,
-	ALIEN_PAUSED_OBJECTIVE_ITEM,
-	ALIEN_PAUSED_OPTIONS_ITEM,
-	ALIEN_PAUSED_LOAD_ITEM,
-	ALIEN_PAUSED_SAVE_ITEM_ENABLED,
-	ALIEN_PAUSED_SAVE_ITEM_DISABLED,
-	ALIEN_PAUSED_EXIT_ITEM,
-	MAX_ALIEN_PAUSED_MENU_OPTIONS
-
-} ALIEN_PAUSED_MENU_OPTIONS;
-
-#endif
 
 /* Well, that's it.  Yes, I know that
  much of menus.c was done with cut'n'paste,

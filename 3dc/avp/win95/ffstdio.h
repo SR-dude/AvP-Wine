@@ -50,14 +50,7 @@ extern long    fftell(FFILE * fp);
 /* nb. the buffer remains valid until a call to ffcloseall */
 extern void const * ffreadbuf(char const * filename, size_t * len);
 
-/* speedy macros */
-#define ffclearerr(fp) ((fp)->flag &= ~(FFF_ERR|FFF_EOF))
-#define ffeof(fp) ((fp)->flag & FFF_EOF)
-#define fferror(fp) ((fp)->flag & FFF_ERR)
-#define ffgetpos(fp,pos) (*(pos) = (fp)->pos,0)
-#define fftell(fp) ((fp)->pos)
 #define ffread(ptr,size,n,fp) ffreadb(ptr,(size)*(n),fp)
-#define fflook(ptr,size,n,fp) fflookb(ptr,(size)*(n),fp)
 
 #ifdef __cplusplus
 }

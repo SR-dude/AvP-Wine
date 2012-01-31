@@ -107,8 +107,6 @@
 	extern void ActivateHive(void);
 
 	/* defines */
-	#define DEFAULTHIVESTATETIME		(60*ONE_FIXED)
-
 	#define MAXGENNPCS_MAX				(255)
 	#define MAXGENNPCS_MIN				(0)
 	#define GENSPERMINUTE_MAX			(255)

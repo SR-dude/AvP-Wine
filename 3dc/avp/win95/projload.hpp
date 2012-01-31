@@ -4,8 +4,6 @@
 #include "chnkload.h"
 #include "hmodel.h"
 
-
-
 #ifdef __cplusplus
 
 #include "hierchnk.hpp"
@@ -102,16 +100,6 @@ extern "C" {
 
 #endif
 
-#define LOAD_MORPH_SHAPES 1 // you can compile out the code that copies morph data
-
-#define CL_SUPPORT_ALTTAB 1 // textures and surfaces loaded with CL_LoadImageOnce with LIO_RESTORABLE set will be added to ALT+TAB lists
-#define CL_SUPPORT_FASTFILE 1 // AvP uses fastfiles (but if the gfx aren't in them, it'll try the actual files
-#ifdef AVP_DEBUG_VERSION
-#define CL_SUPPORTONLY_FASTFILE 0 // for release, milestones, CDs, demos, may want this to be non-zero
-#else
-//allow loading from outside of fastfiles to help with custom levels
-#define CL_SUPPORTONLY_FASTFILE 0 // for release, milestones, CDs, demos, may want this to be non-zero
-#endif
 // project specific copy chunks flags
 #define CCF_ENVIRONMENT   0x00000001
 #define CCF_IMAGEGROUPSET 0x00000002
@@ -126,15 +114,12 @@ extern BOOL copy_chunks_from_environment(int flags);
 
 // set the local_scale
 extern void set_local_scale(RIFFHANDLE, int flags);
-#define SetLocalScale(h,f) set_local_scale(h,f)
 
 // copies all shapes and objects etc
 extern BOOL copy_rif_data (RIFFHANDLE, int flags,int progress_start,int progress_interval);
-#define CopyRIFData(h,f) copy_rif_data(h,f)
 
 // this should return the next free main shape list position for loaded shapes; it may be called more than once
 extern int load_precompiled_shapes();
-#define LoadPrecompiledShapes() load_precompiled_shapes()
 
 void avp_undo_rif_load(RIFFHANDLE h);
 RIFFHANDLE avp_load_rif (const char * fname);

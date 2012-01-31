@@ -3,22 +3,11 @@
 
 #include "chunk.hpp"
 
-// for assert
-#if engine
 
 #define UseLocalAssert No
 #include "ourasert.h"
 #define assert(x) GLOBALASSERT(x)
 
-#else
-
-#if cencon
-#include "ccassert.h"
-#else
-#include <assert.h>
-#endif
-
-#endif
 
 enum BMPN_Flags
 {
@@ -165,23 +154,6 @@ public:
 	
 	void Validate(void);
 	
-	#if cencon
-	int const * md5val; // space to put a pointer
-
-	void DeleteAssociatedFiles() const;
-	void DeleteAssociatedMipFiles() const;
-	// changes the filename member, returns FALSE on failure
-	BOOL Rename(char const * newname);
-	
-	// use these to prevent DeleteAssociatedMipFiles & DeleteAssociatedFiles
-		// from deleting specific files
-	static void PreventDeleteFile(char const * pszFileName);
-	static void ReallowDeleteFile(char const * pszFileName);
-	private:
-	static List<char *> ms_listFilesCantDelete;
-	static void DeleteFileProt(char const * pszFileName);
-	public:
-	#endif
 	
 	unsigned GetTranspRedVal() const;
 	unsigned GetTranspGreenVal() const;

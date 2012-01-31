@@ -22,35 +22,12 @@
 #ifndef _projmenu_hpp
 #define _projmenu_hpp 1
 
-	#if ( defined( __WATCOMC__ ) || defined( _MSC_VER ) )
-		#pragma once
-	#endif
+#include "projfont.h"
+#include "module.h"
+#include "gamedef.h"
 
-	#if UseRebMenus
-
-		#ifndef _projfont
-			#include "projfont.h"
-		#endif
-
-		#ifndef GAMEDEF_INCLUDED
-				#ifndef MODULE_INCLUDED
-					#include "module.h"
-						// needed to include gamedef.h
-				#endif
-				
-			#include "gamedef.h"
-		#endif
-
-	#endif
-
-/* Version settings *****************************************************/
-
-/* Constants  ***********************************************************/
-
-/* Macros ***************************************************************/
 
 /* Type definitions *****************************************************/
-#if UseRebMenus
 	enum PageID
 	{
 		PageID_NoMenu,
@@ -81,9 +58,7 @@
 	};
 
 	// Grab Avp's string table enum, and typedef "TextID" to it:
-	#ifndef _langenum_h_
-		#include "langenum.h"
-	#endif
+	#include "langenum.h"
 
 	typedef enum TEXTSTRING_ID TextID;
 
@@ -99,7 +74,6 @@
 			void Maintain(void);
 		};
 
-		#if OverrideOldMenus
 		// Additions to the RebMenus namespace: handling a loop outside the main game
 		class MenuLoop
 		{
@@ -199,8 +173,7 @@
 		private:
 			static OurBool bInTheGame_Val;
 		};
-		#endif
-			// OverrideOldMenus
+
 
 		// A class required by the project-independent menu code
 		// to tell label rendering which fonts to use, and when:
@@ -214,14 +187,9 @@
 		public:
 			static FontIndex GetIndex
 			(
-				#if OverrideOldMenus
 				OurBool bSelected
-				#else
-				OurBool
-				#endif
 			)
 			{
-				#if OverrideOldMenus
 				if (InGame::Get())
 				{
 					return LabelFont_InGame;
@@ -237,9 +205,6 @@
 						return LabelFont_OutOfGame_Unselected;
 					}
 				}
-				#else
-				return LabelFont_InGame;
-				#endif
 			}
 		};
 
@@ -250,8 +215,6 @@
 
 	};
 	#endif
-#endif // UseRebMenus
-/* Exported globals *****************************************************/
 
 /* Function prototypes **************************************************/
 #ifdef __cplusplus
@@ -266,8 +229,5 @@
 	};
 #endif
 
-
-
-/* End of the header ****************************************************/
 
 #endif

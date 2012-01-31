@@ -17,10 +17,6 @@ BOOL BuildLoadIPAddressMenu();
 void SaveIPAddress(const char* name,const char* address);
 void LoadIPAddress(const char* name);
 
-#define LOAD_NEW_MPCONFIG_ENTRIES	(1)
-#define SAVE_NEW_MPCONFIG_ENTRIES	(1)
-
-
 
 extern int NumCustomLevels;
 extern int NumMultiplayerLevels;

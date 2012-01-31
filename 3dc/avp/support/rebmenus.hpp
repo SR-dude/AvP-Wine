@@ -7,9 +7,6 @@
 #ifndef _rebmenus_hpp
 #define _rebmenus_hpp 1
 
-	#if ( defined( __WATCOMC__ ) || defined( _MSC_VER ) )
-		#pragma once
-	#endif
 
 /* Version settings *****************************************************/
 	#define UseRebMenus Yes
@@ -27,109 +24,50 @@
 		// so it's a real pain to debug
 
 /* Includes  *************************************************************/
-#if UseRebMenus
-	#ifdef __cplusplus
-		#ifndef _ourbool
-			#include "ourbool.h"
-		#endif
+#ifdef __cplusplus
+#include "ourbool.h"
+#include "command.hpp"
+#include "r2base.h"
+#include "expvar.hpp"
+#include "projmenu.hpp"
+// Include project specific header.
+/*
+	It is assumed that this project specific header will define
+	the following:
 
-		#if 0
-			#ifndef _scstring
-				#include "scstring.hpp"
-			#endif
-		#endif
+		- an "enum PageID" enumeration of the various pages in the menus;
+		they must range in value from 0 inclusive to NUM_PAGE_IDS exclusive
+		(currently gaps are allowed in the range, but an array of pointers
+		gets defined so don't be excessive)
 
-		#ifndef _command
-			#include "command.hpp"
-		#endif
+		- a TextID typedef giving an enumeration of text string IDs from
+		the language localisation table
 
-		#ifndef _r2base
-			#include "r2base.h"
-		#endif
+		- functions:
+		void Init(void)
+		void UnInit(void)
+		void Maintain(void)
+		within scope ProjectSpecific (either namespace or public static in a class)
+		inside namespace RebMenus.  They can be empty, but typically
+		you should construct your menu pages within them.
 
-		#if 0
-			// Expects an enum "FontIndex" for the font to be defined in PROJFONT.H
-			#ifndef _projfont
-				#include "projfont.h"
-			#endif
-		#endif
+		- a scope (class or namespace) Fonts containing
+		( static )
+		FontIndex RebMenus :: Fonts :: GetIndex(OurBool bSelected)
+		to tell the text code which font to use for labels
 
-		#ifndef _expvar_hpp
-			#include "expvar.hpp"
-		#endif
+*/
 
-		#ifndef _projmenu_hpp
-			#include "projmenu.hpp"
-				// Include project specific header.
-				/*
-					It is assumed that this project specific header will define
-					the following:
 
-						- an "enum PageID" enumeration of the various pages in the menus;
-						they must range in value from 0 inclusive to NUM_PAGE_IDS exclusive
-						(currently gaps are allowed in the range, but an array of pointers
-						gets defined so don't be excessive)
-
-						- a TextID typedef giving an enumeration of text string IDs from
-						the language localisation table
-
-						- functions:
-							void Init(void)
-							void UnInit(void)
-							void Maintain(void)
-						within scope ProjectSpecific (either namespace or public static in a class)
-						inside namespace RebMenus.  They can be empty, but typically
-						you should construct your menu pages within them.
-
-						- a scope (class or namespace) Fonts containing
-							( static )
-							FontIndex RebMenus :: Fonts :: GetIndex(OurBool bSelected)
-						to tell the text code which font to use for labels
-				*/
-
-		#endif
-	#endif
-		/* __cplusplus */
 #endif
-	// UseRebMenus
 
 
 
-/* Constants  ***********************************************************/
-
-/* Macros ***************************************************************/
-
-/* Type definitions *****************************************************/
-#if UseRebMenus
 #ifdef __cplusplus
 	#define DUMMY_TEXTID ((TextID)0)
 
 namespace RebMenus
 {
-	#if 0
-	// perhaps has some kind of message passing hook:
-	class Message
-	{
-	};
-		// derived classes for keydown messages, mouse messages, etc
-		// But how is it interrogated?
-		// (you have two class hierarchies, with a single process fn)
-		// 
-		// What class have I forgotten?
-
-	// need a class with somd kind of hook for either processing
-	// a messages, or passing it down the chain of responsibility
-	// (a boolean return type to say whether it's been processed?)
-
-	class MessageProcessor
-	{
-		
-	};
-
-	class Selectable : MessageProcessor //?????
-	{
-	};
-	#endif
 	enum Direction
 	{
 		D_Horiz,
@@ -763,15 +701,6 @@ namespace RebMenus
 		Item* GetSelected(void) const;
 			// will return NULL iff there are no items in the composition
 
-		// Get index of next selectable
-		#if 0
-			// what if all disabled?
-
-			// what if wraparound turned off?
-
-		ItemIndex NxtSelectable(void) const;
-		ItemIndex PrvSelectable(void) const;
-		#endif
 
 		// Methods relating to rendering:
 		virtual void Render
@@ -796,12 +725,7 @@ namespace RebMenus
 		int NumItems;
 		Item* pItem_A[ MAX_ITEMS_PER_LIST ];
 
-		#if 1
 		int SelectedItem;
-		#else
-		// Selected item:
-		IndexInRange theIIR;
-		#endif
 
 		// Direction:
 		const enum Direction theDir;
@@ -946,8 +870,7 @@ namespace RebMenus
 
 }; // end of namespace RebMenus
 #endif // __cplusplus
-#endif // UseRebMenus
-/* Exported globals *****************************************************/
+
 
 /* Function prototypes **************************************************/
 #ifdef __cplusplus
@@ -961,21 +884,7 @@ namespace RebMenus
 	};
 #endif
 
-/* End of the header ****************************************************/
-
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
 
 

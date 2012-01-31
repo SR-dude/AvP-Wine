@@ -11,25 +11,13 @@
 #ifndef _conssym_hpp
 #define _conssym_hpp 1
 
-	#if ( defined( __WATCOMC__ ) || defined( _MSC_VER ) )
-		#pragma once
-	#endif
-
-	#ifndef _scstring
-	#include "scstring.hpp"
-	#endif	
+#include "scstring.hpp"
 
 #ifdef __cplusplus
 	extern "C" {
 #endif
 
-/* Version settings *****************************************************/
 
-/* Constants  ***********************************************************/
-
-/* Macros ***************************************************************/
-
-/* Type definitions *****************************************************/
 	class ConsoleSymbol
 	{
 		friend class TextInputState;
@@ -65,14 +53,6 @@
 	private:
 		static List <ConsoleSymbol*> List_pConsoleSym;
 	};	// suggested naming: "ConsoleSym"
-
-/* Exported globals *****************************************************/
-
-/* Function prototypes **************************************************/
-
-
-
-/* End of the header ****************************************************/
 
 
 #ifdef __cplusplus

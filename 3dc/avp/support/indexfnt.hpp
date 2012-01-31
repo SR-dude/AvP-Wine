@@ -16,27 +16,14 @@
 #ifndef _indexfnt
 #define _indexfnt 1
 
-	#ifndef _projfont
-		#include "projfont.h"
-	#endif
-
-	#ifndef _r2base
-		#include "r2base.h"
-	#endif
+#include "projfont.h"
+#include "r2base.h"
 
 #ifdef __cplusplus
-	
-	#ifndef _scstring
-	#include "scstring.hpp"
-	#endif
-
+#include "scstring.hpp"
 #endif
 
-/* Version settings *****************************************************/
-
-/* Constants  ***********************************************************/
 #include "hud_layout.h"
-/* Macros ***************************************************************/
 
 /* Type definitions *****************************************************/
 	#ifdef __cplusplus
@@ -137,7 +124,6 @@
 		OurBool bCanRenderFully( ProjChar* pProjCh );
 			// returns true iff all characters in the string are renderable by the font
 
-		#if debug
 		void Render_Clipped_Report
 		(
 			const struct r2pos& R2Pos_Cursor,
@@ -145,7 +131,6 @@
 			int FixP_Alpha,
 			const SCString& SCStr
 		) const;
-		#endif
 
 	protected:
 		// Protected constructor since abstract class
@@ -166,13 +151,6 @@
 			return pIndexedFont[ I_Font_ToGet ];
 		}
 
-	#if 0
-	class IndexedFont_FixedSpace : public IndexedFont
-	{
-	public:
-	private:
-	};
-	#endif
 	/*
 	   KJL 17:20:10 15/04/98 - May God have mercy on my soul
 	   fixed space HUD font
@@ -271,7 +249,6 @@
 				GetHeight()
 			);
 		}
-		#if 1
 		inline r2size IndexedFont_HUD::CalcSize
 		(
 			ProjChar* pProjCh,
@@ -289,7 +266,6 @@
 				GetHeight()
 			);
 		}
-		#endif
 	class IndexedFont_Proportional : public IndexedFont
 	{
 	public:
@@ -325,9 +301,6 @@
 			ProjChar ProjCh
 		) const;
 
-		#if 0
-		OurBool bCanRender( ProjChar ProjCh_In ) const;
-		#endif
 
 	protected:
 		IndexedFont_Proportional
@@ -518,7 +491,6 @@
 
 
 	#endif // __cplusplus
-/* Exported globals *****************************************************/
 
 /* Function prototypes **************************************************/
 #ifdef __cplusplus
@@ -532,9 +504,6 @@
 #ifdef __cplusplus
 	};
 #endif
-
-/* End of the header ****************************************************/
-
 
 
 #endif

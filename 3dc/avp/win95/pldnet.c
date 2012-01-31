@@ -50,7 +50,6 @@
 #define DB_LEVEL 3
 #include "db.h"
 
-#define CalculateBytesSentPerSecond 0
 							  
 /*----------------------------------------------------------------------
   Some globals for use in this file
@@ -10567,9 +10566,7 @@ void DoMultiplayerEndGameScreen(void)
 		if(ShowMultiplayerScoreTimer<=0)ShowMultiplayerScoreTimer=0;
 	}
 	
-//   RenderStringCentred("Test Endgame Screen",ScreenDescriptorBlock.SDB_Width/2,ScreenDescriptorBlock.SDB_Height/2,0xffffffff);
 
-		
 	//draw headings
 	y=150;
 	x=120;

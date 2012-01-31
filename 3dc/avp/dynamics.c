@@ -32,15 +32,10 @@ you should have seen the previous versions. */
 #define UseLocalAssert Yes
 #include "ourasert.h"
 
-#define TELEPORT_IF_OUTSIDE_ENV 1	   
 #define MINIMUM_BOUNDINGBOX_EXTENT 25
-
 
 #define FLOOR_THRESHOLD 30000
 #define NEARLYFLATFLOOR_THRESHOLD 60000
-
-
-#define LogInfo(args) (void)0
 
 
 extern MORPHDISPLAY MorphDisplay;
@@ -267,11 +262,6 @@ int PlayersMaxHeightWhilstNotInContactWithGround;
 extern void ObjectDynamics(void)
 {
 	int i;
- /*	textprint("player Impulse at %d,%d,%d\n",
-	Player->ObStrategyBlock->DynPtr->LinImpulse.vx,
-	Player->ObStrategyBlock->DynPtr->LinImpulse.vy,
-	Player->ObStrategyBlock->DynPtr->LinImpulse.vz);
- */	
 
 	if (FREEFALL_CHEATMODE)
 	{
@@ -287,19 +277,8 @@ extern void ObjectDynamics(void)
 	/* create ordered list of dynamic objects */
 	InitialiseDynamicObjectsList();
 
-	{
-		DYNAMICSBLOCK *dynPtr = Player->ObStrategyBlock->DynPtr;
-		LogInfo
-		((
-			"Dynamics Logging: frame %d\nDL: player's Position %d,%d,%d\nDL: player's Displacement %d,%d,%d\nDL: NormalFrameTime %d\n",
-			GlobalFrameCounter,
-			dynPtr->Position.vx,dynPtr->Position.vy,dynPtr->Position.vz,
-			dynPtr->Displacement.vx,dynPtr->Displacement.vy,dynPtr->Displacement.vz,
-			NormalFrameTime
-		));
-	
-	}
-	
+	DYNAMICSBLOCK *dynPtr = Player->ObStrategyBlock->DynPtr;
+
 	i = NumberOfDynamicObjects;
 	/* scan through objects */
 	while(i--)

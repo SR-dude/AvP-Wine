@@ -9,34 +9,14 @@
 #ifndef _equiputl
 #define _equiputl 1
 
-	#if ( defined( __WATCOMC__ ) || defined( _MSC_VER ) )
-		#pragma once
-	#endif
+#include "equipmnt.h"
+#include "langenum.h"
 
-
-	#ifndef _equipmnt_h_
-	#include "equipmnt.h"
-	#endif
-
-	#ifndef _langenum_h_
-	#include "langenum.h"
-	#endif
 
 #ifdef __cplusplus
 	extern "C" {
 #endif
 
-/* Version settings *****************************************************/
-
-/* Constants  ***********************************************************/
-
-/* Macros ***************************************************************/
-
-/* Type definitions *****************************************************/
-
-/* Exported globals *****************************************************/
-
-/* Function prototypes **************************************************/
 	namespace EquipmentUtil
 	{
 		// Functions to get the ID for the text string "ROUNDS" and "MAGAZINES"
@@ -55,10 +35,6 @@
 
 	};
 	
-
-
-/* End of the header ****************************************************/
-
 
 #ifdef __cplusplus
 	};

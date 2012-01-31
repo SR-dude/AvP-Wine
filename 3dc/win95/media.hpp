@@ -1,11 +1,7 @@
 #ifndef _INCLUDED_MEDIA_HPP_
 #define _INCLUDED_MEDIA_HPP_
 
-#if defined(_WIN32) || defined(WIN32) || defined(WINDOWS) || defined(_WINDOWS)
-	#define _MEDIA_WIN_TARGET
-	#include <windows.h>
-#endif // WIN32 || _WIN32 || WINDOWS || _WINDOWS
-
+#include <windows.h>
 #include <stdio.h>
 #include <conio.h>
 #include <limits.h>
@@ -29,9 +25,6 @@ void MediaRead(MediaMedium * pThis, TYPE * p);
 template <class TYPE>
 void MediaWrite(MediaMedium * pThis, TYPE d);
 
-#ifdef __WATCOMC__
-template <class TYPE> class _Media_CompilerHack;
-#endif
 
 class MediaMedium
 {
@@ -278,15 +271,10 @@ class MediaMedium
 	friend class _Media_CompilerHack;
 };
 
-#ifdef __WATCOMC__
-template <class TYPE>
-#endif
 class _Media_CompilerHack
 {
 	public:
-		#ifndef __WATCOMC__
 		template <class TYPE>
-		#endif
 		static inline void MediaRead(MediaMedium * pThis, TYPE * p)
 		{
 			if (pThis->m_nReadBufPos + sizeof(TYPE) <= pThis->m_nBufSize)
@@ -311,9 +299,7 @@ class _Media_CompilerHack
 			}
 		}
 	
-		#ifndef __WATCOMC__
 		template <class TYPE>
-		#endif
 		static inline void MediaWrite(MediaMedium * pThis, TYPE d)
 		{
 			if (pThis->m_nWriteBufPos + sizeof(TYPE) <= pThis->m_nBufSize)
@@ -348,9 +334,6 @@ template <class TYPE>
 inline void MediaRead(MediaMedium * pThis, TYPE * p)
 {
 	_Media_CompilerHack
-		#ifdef __WATCOMC__
-		<TYPE>
-		#endif
 		::MediaRead(pThis,p);
 }
 
@@ -363,13 +346,9 @@ template <class TYPE>
 inline void MediaWrite(MediaMedium * pThis, TYPE d)
 {
 	_Media_CompilerHack
-		#ifdef __WATCOMC__
-		<TYPE>
-		#endif
 		::MediaWrite(pThis,d);
 }
 
-#ifdef _MEDIA_WIN_TARGET
 
 class MediaWinFileMedium : public MediaMedium
 {
@@ -472,7 +451,6 @@ class MediaWinFileMedium : public MediaMedium
 		virtual void DoSetPos(unsigned nPos);
 };
 
-#endif // _MEDIA_WIN_TARGET
 
 class MediaStdFileMedium : public MediaMedium
 {

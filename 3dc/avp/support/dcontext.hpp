@@ -19,21 +19,11 @@
 #ifndef _dcontext
 #define _dcontext 1
 
-	#if ( defined( __WATCOMC__ ) || defined( _MSC_VER ) )
-		#pragma once
-	#endif
 
 #ifdef __cplusplus
 	extern "C" {
 #endif
 
-/* Version settings *****************************************************/
-
-/* Constants  ***********************************************************/
-
-/* Macros ***************************************************************/
-
-/* Type definitions *****************************************************/
 	class R_DumpContext
 	{
 	public:
@@ -41,14 +31,6 @@
 		virtual int dprintf(char const * format, ... ) = 0;
 		virtual int vdprintf(char const * format, va_list ap ) = 0;
 	};
-
-/* Exported globals *****************************************************/
-
-/* Function prototypes **************************************************/
-
-
-
-/* End of the header ****************************************************/
 
 
 #ifdef __cplusplus

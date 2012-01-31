@@ -6,9 +6,7 @@
  *																		*
  * ******************************************************************** */
 
-#include "advwin32.h"
 #include <windows.h>
-#include "advwin32.h"
 #include <ddraw.h>
 #include "db.h"	
 
@@ -39,11 +37,6 @@ int db_option = 0; /* Default is off. */
 /* Logfile name */
 #define LOGFILE_NAME "LOGFILE.TXT"
 
-/* Set this to 1 if the logfile name is an absolute path. Otherwise the
- * logfile will go in the directory that is current when db_log_init() 
- * is called.
- */
-#define ABSOLUTE_PATH	0
 
 /* M A C R O S ******************************************************** */
 
@@ -546,11 +539,13 @@ static void db_do_std_prompt(unsigned yOffset)
 	{
 		if(db_use_brakepoints)
 		{
-//adj			DB_FORCE_BRAKEPOINT();
+//adj
+			DB_FORCE_BRAKEPOINT();
 		}
 		else
 		{
-//adj			DB_FORCE_EXCEPTION();
+//adj
+			DB_FORCE_EXCEPTION();
 		}
 	}
 

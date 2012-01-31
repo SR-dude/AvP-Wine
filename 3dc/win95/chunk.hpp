@@ -4,64 +4,17 @@
 #define _chunk_hpp 1
 
 
-#if engine
-
-	#include "3dc.h"
-	#include "mem3dc.h" // for debug new and delete
-	
-	
-	#include "inline.h"
-
-#if SupportModules
-
-	#include "module.h"
-
-#endif
-
-	#include "list_tem.hpp"
-	
-
-#endif
-
-#if cencon
-
-#include "AFXWIN.H"
-
-#ifdef _DEBUG
-#undef new
-#define new DEBUG_NEW
-#define my_new DEBUG_NEW
-#else
-#define my_new new
-#endif
-
+#include "3dc.h"
+#include "mem3dc.h" // for debug new and delete
+#include "inline.h"
+#include "module.h"
 #include "list_tem.hpp"
-
-#endif
-
-#if objedit || sprite_edit || ANIMEXP
-#include "StdAfx.h"
-#include "list_tem.hpp"
-#endif
-
-#if shpedit
-#include "stdafx.h"
-#include "list_tem.hpp"
-#endif
-
-#if standard
-#include "advwin32.h"
-#include <windows.h>
-#include "list_tem.hpp"
-#endif
-
 
 #define CHUNK_FAILED_ON_LOAD -1
 #define CHUNK_FAILED_ON_LOAD_NOT_RECOGNISED -2
 #define CHUNK_FAILED_ON_WRITE -3
-#define CHECK_FAILED_NOT_OPEN -4
+//#define CHECK_FAILED_NOT_OPEN -4
 
-#define DisableLock 1
 
 #define GENERAL_FLAG_LOCKED 0x0000001
 
@@ -74,13 +27,7 @@
 // we start at the header of the chunk we are in
 // so that we can stop at the end of the chunk
 
-#if cencon
-extern char users_name[];
-#endif
-
-#ifndef RIFF_OPTIMIZE // define this to get compiler errors where you are calling the old slow functions
 extern List<int> list_chunks_in_file (HANDLE &, const char * chunk_id);
-#endif
 extern void list_chunks_in_file (List<int> * pList, HANDLE, const char * chunk_id);
 
 // Structures for interfacing with the outside application
@@ -345,9 +292,8 @@ public:
 	virtual void post_input_processing();
 
 	// look for child chunk(s)
-	#ifndef RIFF_OPTIMIZE // define this to get compiler errors where you are calling the old slow functions
 	List<Chunk *> lookup_child (const char *) const;
-	#endif
+
 	void lookup_child (const char *,List<Chunk*>&) const;
 	Chunk* lookup_single_child(const char*) const;
 	unsigned count_children(char const *) const;
@@ -652,35 +598,6 @@ FORCE_CHUNK_INCLUDE_END
 */
 
 #endif // !included
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

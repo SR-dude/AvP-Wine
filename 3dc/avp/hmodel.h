@@ -71,6 +71,7 @@ extern void CopyIntQuatToShort(QUAT* q_from,QUAT_SHORT* qs_to);
 #define KEYFRAME_VECTOR_SHIFT 4
 
 //make sure the keyframe structure packs as much as possible
+// adj the use of the pramas ?
 #pragma pack(push,1) 
 typedef struct keyframe_data {
 	short Offset_x; /*Offset values may need to be scaled*/

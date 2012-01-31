@@ -11108,7 +11108,6 @@ static STATE_RETURN_CONDITION Execute_MNS_DischargeShotgun(STRATEGYBLOCK *sbPtr)
 	return(SRC_No_Change);
 }
 
-#define PISTOL_RELOAD_TIME 65536
 
 static STATE_RETURN_CONDITION Execute_MNS_DischargePistol(STRATEGYBLOCK *sbPtr)
 {

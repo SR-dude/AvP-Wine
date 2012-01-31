@@ -7,33 +7,14 @@
 #ifndef _missions
 #define _missions 1
 
-	#if ( defined( __WATCOMC__ ) || defined( _MSC_VER ) )
-		#pragma once
-	#endif
-
-	#ifndef _scstring
-	#include "scstring.hpp"
-	#endif
-
-	#ifndef _langenum_h_
-	#include "langenum.h"
-	#endif
-
-	#ifndef _strtab
-	#include "strtab.hpp"
-	#endif
+#include "scstring.hpp"
+#include "langenum.h"
+#include "strtab.hpp"
 
 #ifdef __cplusplus
 	extern "C" {
 #endif
 
-/* Version settings *****************************************************/
-	#define WithinTheGame	Yes
-		// as opposed to within the editor
-
-/* Constants  ***********************************************************/
-
-/* Macros ***************************************************************/
 
 /* Type definitions *****************************************************/
 	// Enum for what can happen when a mission event is triggered; these
@@ -131,30 +112,6 @@
 		}
 
 
-	#if 0
-	class MissionEvent
-	{
-	public:
-		virtual void OnTriggering(void) = 0;
-
-		virtual ~MissionEvent();
-
-	protected:
-		MissionEvent
-		(
-			enum TEXTSTRING_ID I_TextString_TriggeringFeedback,
-			enum MissionEffects MissionFX
-		);
-
-	protected:
-		enum MissionEffects MissionFX_Val;
-
-	private:
-		enum TEXTSTRING_ID I_TextString_TriggeringFeedback_Val;
-
-		static List<MissionEvent*> List_pMissionEvent;
-	};
-	#endif
 	
 	class MissionObjective;
 	#define MissionAlteration_MakeVisible  0x00000001
@@ -199,10 +156,8 @@
 		void SetMOS( MissionObjectiveState MOS_New  );
 
 	private:
-		#if WithinTheGame
 		MissionHint aMissionHint_Incomplete;
 		MissionHint aMissionHint_Complete;
-		#endif
 
 		enum TEXTSTRING_ID I_TextString_Description_Val;
 
@@ -248,20 +203,10 @@
 		{
 			return bComplete( MOS_Val );
 		}
-		
-
-
-/* Exported globals *****************************************************/
-
-/* Function prototypes **************************************************/
 	namespace MissionHacks
 	{
 		void TestInit(void);
 	};
-
-
-
-/* End of the header ****************************************************/
 
 
 #ifdef __cplusplus

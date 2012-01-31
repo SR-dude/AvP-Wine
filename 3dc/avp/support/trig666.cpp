@@ -1,76 +1,82 @@
-/*******************************************************************
- *
- *    DESCRIPTION: 	trig666.cpp
- *
- *    AUTHOR: David Malcolm
- *
- *    HISTORY:  Created 18/11/97 from Headhunter's TRIGGERS.CPP; had to
- * 				rename to avoid conflict with AVP file TRIGGERS.H
- *
- *******************************************************************/
+/*$T trig666.cpp GC 1.140 NO_DATE NO_TIME */
 
-/* Includes ********************************************************/
+/**
+ *  DESCRIPTION: trig666.cpp AUTHOR: David Malcolm HISTORY: Created 18/11/97 from Headhunter's TRIGGERS.CPP;
+ *  had to rename to avoid conflict with AVP file TRIGGERS.H
+ */
+
+/* Includes */
 #include "3dc.h"
 #include "trig666.hpp"
-#define UseLocalAssert Yes
+#define UseLocalAssert	Yes
 #include "ourasert.h"
 
-
-
-/* Exported function definitions ***********************************/
-// class TriggerDaemon : public Daemon
-TriggerDaemon :: TriggerDaemon
-(
-	OurBool fActive
-) : Daemon
-	(
-		fActive
-	)
+/*
+ =======================================================================================================================
+    Exported function definitions ;
+    class TriggerDaemon : public Daemon
+ =======================================================================================================================
+ */
+TriggerDaemon::TriggerDaemon(OurBool fActive) :
+	Daemon(fActive)
 {
 }
 
-TriggerDaemon :: ~TriggerDaemon()
+/*
+ =======================================================================================================================
+ =======================================================================================================================
+ */
+TriggerDaemon::~TriggerDaemon()
 {
 }
 
-// A daemon which fires at regular intervals (potentially more than once per frame)
-// class PulsingTriggerDaemon : public TriggerDaemon
-PulsingTriggerDaemon :: PulsingTriggerDaemon
-(
-	OurBool fActive,
-	int FixP_Period // interval between triggers in seconds			
-) : TriggerDaemon
-	(
-		fActive
-	)
+/*
+ =======================================================================================================================
+    A daemon which fires at regular intervals (potentially more than once per frame) ;
+    class PulsingTriggerDaemon : public TriggerDaemon
+ =======================================================================================================================
+ */
+PulsingTriggerDaemon::PulsingTriggerDaemon(OurBool fActive, int FixP_Period /* interval between triggers in seconds */ ) :
+	TriggerDaemon(fActive)
 {
-	GLOBALASSERT( FixP_Period > 0);
+	GLOBALASSERT(FixP_Period > 0);
 
 	FixP_Period_Val = FixP_Period;
-	FixP_TimeToNextPulse = FixP_Period;	
+	FixP_TimeToNextPulse = FixP_Period;
 }
 
-PulsingTriggerDaemon :: ~PulsingTriggerDaemon()
+/*
+ =======================================================================================================================
+ =======================================================================================================================
+ */
+PulsingTriggerDaemon::~PulsingTriggerDaemon()
 {
 }
 
-ACTIVITY_RETURN_TYPE PulsingTriggerDaemon :: Activity(ACTIVITY_INPUT)
+/*
+ =======================================================================================================================
+ =======================================================================================================================
+ */
+ACTIVITY_RETURN_TYPE PulsingTriggerDaemon::Activity(ACTIVITY_INPUT)
 {
-	while ( FixP_Time > 0 )
+	while(FixP_Time > 0)
 	{
-		if ( FixP_Time >= FixP_TimeToNextPulse )
+		if(FixP_Time >= FixP_TimeToNextPulse)
 		{
-			// then elapse some of the available time to take you to the pulse
+			/* then elapse some of the available time to take you to the pulse */
 			FixP_Time -= FixP_TimeToNextPulse;
 			FixP_TimeToNextPulse = FixP_Period_Val;
 
-			// and trigger:
+			/* and trigger: */
 			Triggered();
 		}
 		else
 		{
-			// Not enough time to warrant triggering; reduce time
-			// to next pulse and stop.
+			/*
+			 * Not enough time to warrant triggering;
+			 * reduce time ;
+			 * to next pulse and stop.
+			 */
 			FixP_TimeToNextPulse -= FixP_Time;
 			ACTIVITY_RVAL_NOCHANGE
 		}
@@ -79,46 +85,52 @@ ACTIVITY_RETURN_TYPE PulsingTriggerDaemon :: Activity(ACTIVITY_INPUT)
 	ACTIVITY_RVAL_NOCHANGE
 }
 
-void PulsingTriggerDaemon :: SetFuse_FixP
-(
-	int FixP_Fuse // time until it next triggers; doesn't change the period
-)
+/*
+ =======================================================================================================================
+ =======================================================================================================================
+ */
+void PulsingTriggerDaemon::SetFuse_FixP(int FixP_Fuse /* time until it next triggers; doesn't change the period */ )
 {
-	GLOBALASSERT( FixP_Fuse > 0 );
+	GLOBALASSERT(FixP_Fuse > 0);
 	FixP_TimeToNextPulse = FixP_Fuse;
 }
 
-// A countdown daemon which DESTROYS ITSELF after it triggers
-// class CountdownDaemon : public TriggerDaemon
-CountdownDaemon :: CountdownDaemon
-(
-	OurBool fActive,
-	int FixP_Fuse // time until it triggers
-) : TriggerDaemon
-	(
-		fActive
-	)
+/*
+ =======================================================================================================================
+    A countdown daemon which DESTROYS ITSELF after it triggers ;
+    class CountdownDaemon : public TriggerDaemon
+ =======================================================================================================================
+ */
+CountdownDaemon::CountdownDaemon(OurBool fActive, int FixP_Fuse /* time until it triggers */ ) :
+	TriggerDaemon(fActive)
 {
-	GLOBALASSERT( FixP_Fuse > 0 );
+	GLOBALASSERT(FixP_Fuse > 0);
 
 	FixP_TimeRemaining = FixP_Fuse;
 }
 
-CountdownDaemon :: ~CountdownDaemon()
+/*
+ =======================================================================================================================
+ =======================================================================================================================
+ */
+CountdownDaemon::~CountdownDaemon()
 {
 }
 
-ACTIVITY_RETURN_TYPE CountdownDaemon :: Activity(ACTIVITY_INPUT)
+/*
+ =======================================================================================================================
+ =======================================================================================================================
+ */
+ACTIVITY_RETURN_TYPE CountdownDaemon::Activity(ACTIVITY_INPUT)
 {
-
-	if ( FixP_TimeRemaining > FixP_Time )
+	if(FixP_TimeRemaining > FixP_Time)
 	{
-		// Keep counting down:
+		/* Keep counting down: */
 		FixP_TimeRemaining -= FixP_Time;
-	}	
+	}
 	else
 	{
-		// Countdown has elapsed:
+		/* Countdown has elapsed: */
 		Triggered();
 		delete this;
 	}
@@ -126,12 +138,11 @@ ACTIVITY_RETURN_TYPE CountdownDaemon :: Activity(ACTIVITY_INPUT)
 	ACTIVITY_RVAL_NOCHANGE
 }
 
-void CountdownDaemon :: SetFuse_FixP
-(
-	int FixP_Fuse // time until it triggers
-)
+/*
+ =======================================================================================================================
+ =======================================================================================================================
+ */
+void CountdownDaemon::SetFuse_FixP(int FixP_Fuse /* time until it triggers */ )
 {
 	FixP_TimeRemaining = FixP_Fuse;
 }
-
-

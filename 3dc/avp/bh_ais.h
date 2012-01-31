@@ -75,20 +75,14 @@ typedef struct npc_wanderdata
 	VECTORCH worldPosition;
 }NPC_WANDERDATA;
 	
+
+#define NPC_TURNRATE				(4096)
 #define NPC_AVOIDTIME				(ONE_FIXED<<1)
 #define NPC_GMD_NOPOLY				(-1)
 #define NPC_MIN_MOVEFROMPOLYDIST	(650)
 #define NPC_IMPEDING_COL_THRESHOLD	(10) /* Was 10 */
-#define NPC_JUMPSPEED				(55) /* mm/s */
-#define NPC_JUMPHEIGHT				(1000)
-//#define NPC_TURNRATE				(ONE_FIXED) /* thro' 360 degrees */
-#define NPC_TURNRATE				(4096)
-#define NPC_DEATHTIME				(ONE_FIXED>>1)
-#define NPC_TARGETPOINTELEVATION	(-400)
-#define NPC_INANIMATEOBJECTDAMAGE	(10000)
 #define NPC_NOWANDERMODULE			(-1)
 #define NPC_BIMBLINGINMODULE 		(-2)
-
 #define NUM_ATTACKFLAGS				(3)
 
 /* Death Structures */

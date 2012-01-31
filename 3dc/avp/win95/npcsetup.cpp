@@ -17,7 +17,6 @@
 #define DIRECTORY_FOR_RIFS "avp_huds\\"
 
 
-#if debug
 extern "C"
 {
 	BOOL ForceLoad_Alien=FALSE;
@@ -34,7 +33,7 @@ extern "C"
 	extern BOOL KeepMainRifFile;
 
 };
-#endif
+
 
 static char Marine_File[]= "hnpcmarine.rif";
 static char Alien_File[]= "hnpcalien.rif";

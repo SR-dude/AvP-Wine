@@ -1,4 +1,3 @@
-#include "advwin32.h"
 #ifndef DB_LEVEL
 #define DB_LEVEL 4
 #endif
@@ -51,13 +50,6 @@ static inline void INITDXSTRUCT(X & x)
 
 namespace AwTl
 {
-	/**************************************************/
-	/* Allow breakpoints to be potentially hard coded */
-	/* into macros and template functions             */
-	/**************************************************/
-	
-	db_code5(void BrkPt(){})
-	#define BREAKPOINT db_code5(::AwTl::BrkPt();)
 	
 	
 	/*********************************/

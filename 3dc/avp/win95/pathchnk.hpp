@@ -5,8 +5,7 @@
 #include "chnktype.hpp"
 #include "obchunk.hpp"
 
-#define PathPointFlag_InterpolatedPoint 0x00000001
-#define PathPointFlag_LocationValid     0x00000002
+
 
 struct ChunkPathPoint
 {
@@ -16,7 +15,7 @@ struct ChunkPathPoint
 };
 
 
-#define PathFlag_LoopPath 0x00000001
+
 #define PathFlag_BackAndForth 0x00000002
  
 class AVP_Path_Chunk : public Chunk

@@ -4,14 +4,6 @@
 #include "shpchunk.hpp"
 
 
-#define rsp_oc_x0 0x00000001
-#define rsp_oc_x1 0x00000002
-#define rsp_oc_y0 0x00000004
-#define rsp_oc_y1 0x00000008
-#define rsp_oc_z0 0x00000010
-#define rsp_oc_z1 0x00000020
-
-
 // this file should be included from chunk.hpp
 
 
@@ -19,9 +11,6 @@ struct ChunkShape;
 
 struct ZSP_zone
 {
-#if (cencon || shpedit)
-	ZSP_zone (const ChunkShape &, double, double, double, double);
-#endif
 
 	ZSP_zone ();
 	~ZSP_zone();
@@ -44,9 +33,6 @@ class ZSP_Data
 
 public:
 
-#if (cencon || shpedit)
-	ZSP_Data (const ChunkShape &, int);
-#endif
 
 	ZSP_Data (const char * zdata, size_t zsize);
 
@@ -69,15 +55,6 @@ class Shape_ZSP_Data_Chunk : public Chunk
 {
 public:
 
-#if cencon || shpedit
-	Shape_ZSP_Data_Chunk (Shape_Sub_Shape_Chunk * parent, ZSP_Data zspin)
-	: Chunk(parent, "SHPZSPDT"), zspdata (zspin)
-	{}
-
-	Shape_ZSP_Data_Chunk (Shape_Chunk * parent, ZSP_Data zspin)
-	: Chunk(parent, "SHPZSPDT"), zspdata (zspin)
-	{}
-#endif
 
 	const ZSP_Data zspdata;
 
@@ -93,14 +70,6 @@ public:
 	{}
 	
 };
-
-
-
-
-
-
-
-
 
 
 

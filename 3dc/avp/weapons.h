@@ -14,10 +14,6 @@
 	#endif
 
 
-/*KJL****************************************************************************************
-* 										D E F I N E S 										*
-****************************************************************************************KJL*/
-
 typedef enum HitAreaMatrix {
 	HAM_Centre = 0,
 	HAM_Front,
@@ -33,13 +29,8 @@ typedef enum HitAreaMatrix {
 	HAM_end,
 } HITAREAMATRIX;
 
-/*KJL****************************************************************************************
-*                                    P R O T O T Y P E S	                                *
-****************************************************************************************KJL*/
 extern void UpdateWeaponStateMachine(void);
-
 extern int AreTwoPistolsInTertiaryFire(void);
-
 extern void HandleEffectsOfExplosion(STRATEGYBLOCK *objectToIgnorePtr, VECTORCH *centrePtr, int maxRange, DAMAGE_PROFILE *maxDamage, int flat);
 /*KJL*******************************************************************************
 * centrePtr - is a pointer to the explosion's position vector in world space.      *
@@ -101,7 +92,6 @@ struct Target
 extern struct Target PlayersTarget;
 extern SECTION_DATA *HitLocationRoll(STRATEGYBLOCK *sbPtr, STRATEGYBLOCK *source);
 
-#define FORCE_MINIGUN_STOP 1
 
 #define SPEARS_PER_PICKUP	30
 #define MAX_SPEARS			99

@@ -1,4 +1,3 @@
-#include "advwin32.h"
 #include "media.hpp"
 
 void * MediaMedium::GetWriteBuffer(unsigned * pSize, unsigned /*nDesiredSize*/)
@@ -41,10 +40,6 @@ unsigned MediaMedium::GetRemainingSize()
 }
 
 // MediaWinFileMedium
-
-// adj I think _MEDIA_WIN_TARGET is true becuase I need this
-#ifdef _MEDIA_WIN_TARGET
-
 unsigned MediaWinFileMedium::GetRemainingSize()
 {
 	if (INVALID_HANDLE_VALUE == m_hFile)
@@ -178,7 +173,6 @@ void MediaWinFileMedium::DoSetPos(unsigned nPos)
 		m_fError |= MME_UNAVAIL;
 }
 
-#endif // _MEDIA_WIN_TARGET
 
 // MediaStdFileMedium
 

@@ -12,16 +12,6 @@
 #ifndef _r2base
 #define _r2base 1
 
-//#ifdef __cplusplus
-	//extern "C" {
-//#endif
-
-/* Version settings *****************************************************/
-	#define UseTemplates	No
-
-/* Constants  ***********************************************************/
-
-/* Macros ***************************************************************/
 
 /* Type definitions *****************************************************/
 	struct r2pos
@@ -43,9 +33,6 @@
 			// empty
 		}
 
-		#if 0
-		friend bool operator==(const r2pos& R2Pos_1, const r2pos& R2Pos_2);
-		#endif
 
 		int bIsOrigin(void) const;
 
@@ -103,86 +90,7 @@
 	#endif /* __cplusplus */
 
 
-	#if UseTemplates
-		#ifdef __cplusplus
-		// C++ implementation:
-		// 		r2size defined from a template
-		template <class ValType> struct size2d
-		{
-			ValType w;
-			ValType h;
 
-		// Construction:
-			size2d() : w(0), h(0)
-			{
-				// empty
-			}
-
-			size2d(ValType w_new,ValType h_new) : w(w_new), h(h_new)
-			{
-				// empty
-			}
-
-		// Method declarations:
-			int bHasArea(void);
-				// Does this size have non-zero area?:
-
-			void VCompose(const size2d& Size2D_Other );
-			void HCompose(const size2d& Size2D_Other );
-				// update size to the size necessary for composing
-				// this and another size either vertically or horizontally
-
-
-		// Inline methods:
-			int bHasArea(void)
-			{
-				// Does this size have non-zero area?:
-				if (w<=0)
-				{
-					return No;
-				}
-				if (h<=0)
-				{
-					return No;
-				}
-				return Yes;
-			}
-			void VCompose(const size2d& Size2D_Other )
-			{
-				// sum of heights; greater of widths
-				
-				h += Size2D_Other . h;
-
-				if (w < Size2D_Other . w)
-				{
-					w = Size2D_Other . w;
-				}
-			}
-			void HCompose(const size2d& Size2D_Other )
-			{
-				// sum of widths; greater of heights
-				w += Size2D_Other . w;
-
-				if (h < Size2D_Other . h)
-				{
-					h = Size2D_Other . h;
-				}
-			}
-
-		};  // Suggested naming convention: "Size2D"
-		
-		typedef size2d<int> r2size; // suggested naming convention: "R2Size"
-		#else
-		/* C implementation: r2size defined as a simple struct: */
-
-		struct r2size
-		{
-			int w;
-			int h;
-		}; /* suggested naming convention: "R2Size" */
-
-		#endif	// __cplusplus
-	#else	// UseTemplates
 	struct r2size
 	{
 		int w;
@@ -251,7 +159,6 @@
 		}
 	#endif /* __cplusplus */
 		
-	#endif	// UseTemplates
 
 	struct r2rect
 	{
@@ -496,12 +403,6 @@
 				R2Rect_ToClip . y1 = y1;
 			}
 		}
-		#if 0
-		inline void r2rect::Clip(const struct r2rect& R2Rect_In, struct r2rect& R2Rect_Out )
-		{
-			R2Rect_Out . x0 = 
-		}
-		#endif
 		inline /*static*/ const r2rect& r2rect::PhysicalScreen(void)
 		{
 			return R2Rect_PhysicalScreen;
@@ -621,7 +522,6 @@
 		}
 	#endif /* __cplusplus */
 
-/* Exported globals *****************************************************/
 
 /* Function prototypes **************************************************/
 	extern void R2BASE_ScreenModeChange_Setup(void);
@@ -631,8 +531,5 @@
 /* End of the header ****************************************************/
 
 
-//#ifdef __cplusplus
-//	};
-//#endif
 
 #endif

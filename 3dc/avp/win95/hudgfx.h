@@ -6,11 +6,6 @@
 * Contains the enumerations and structures that are used in DDPLAT.CPP to draw the HUD graphics. *
 *********************************************************************************************KJL*/
 
-
-/*KJL****************************************************************************************
-* 										D E F I N E S 										*
-****************************************************************************************KJL*/
-
 /* fonts used in HUD */
 enum HUD_FONT
 {
@@ -59,9 +54,7 @@ enum HUD_RES_ID
 	HUD_RES_MED,
 	HUD_RES_HI,
 };
-/*KJL****************************************************************************************
-* 									 S T R U C T U R E S									*
-****************************************************************************************KJL*/
+
 
 /* description of a single DD surface used for HUD gfx */
 struct DDGraphicTag 
@@ -104,19 +97,13 @@ struct LittleMDescTag
 	int Y;
 };
 
-/*JH*****************************************************************************************
-*                                     P R O T O T Y P E S                                   *
-*****************************************************************************************JH*/
-
 /* JH 3/6/97 - these functions are to 
    release hud graphics with any links to direct draw
    but still keep them in memory, so they can be restored */
 extern void MinimizeAllDDGraphics(void);
 extern void RestoreAllDDGraphics(void);
 
-/*KJL****************************************************************************************
-* 										 E X T E R N S 	  									*
-****************************************************************************************KJL*/
+
 extern LPDIRECTDRAW lpDD;
 extern LPDIRECTDRAWSURFACE lpDDSBack;
 

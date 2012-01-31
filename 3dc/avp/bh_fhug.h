@@ -82,14 +82,12 @@ typedef struct tools_data_facehugger
   Some structures
   -------------------------------------------------------------*/
 #define FACEHUGGER_STARTING_HEALTH			5 	 
-#define NO_OF_FRAGMENTS_FROM_DEAD_FHUGA	 	10
 #define FACEHUGGER_NEAR_SPEED				4000/* 8000 */
 #define FACEHUGGER_JUMPSPEED				6000/* 10000 */
 #define FACEHUGGER_JUMPDISTANCE				3000
 #define FACEHUGGER_ATTACKYOFFSET			(-300)/*300*/
 #define FACEHUGGER_ATTACKZOFFSET			(325)/*2000*/
 #define	FACEHUGGER_NEARATTACKTIME			(ONE_FIXED>>2)
-#define	FACEHUGGER_NEARATTACKDAMAGE			10
 #define FACEHUGGER_DYINGTIME				(ONE_FIXED<<2)
 #define FACEHUGGER_EXPIRY_TIME				5
 #define FACEHUGGER_JUMP_SPEED				(15000)

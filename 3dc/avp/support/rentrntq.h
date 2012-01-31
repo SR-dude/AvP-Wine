@@ -34,17 +34,6 @@
 	extern "C" {
 #endif
 
-/* Version settings *****************************************************/
-
-/* Constants  ***********************************************************/
-
-/* Macros ***************************************************************/
-
-/* Type definitions *****************************************************/
-
-/* Exported globals *****************************************************/
-
-/* Function prototypes **************************************************/
 	/* Functions callable within the Windows procedure */
 	extern void RE_ENTRANT_QUEUE_WinProc_AddMessage_WM_CHAR
 	(
@@ -59,9 +48,6 @@
 	/* Functions callable from the WinMain() body of code */
 	extern void RE_ENTRANT_QUEUE_WinMain_FlushMessages(void);
 	extern void RE_ENTRANT_QUEUE_WinMain_FlushMessagesWithoutProcessing(void);
-
-
-/* End of the header ****************************************************/
 
 
 #ifdef __cplusplus

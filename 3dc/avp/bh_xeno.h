@@ -5,14 +5,12 @@
   ---------------------------------------------*/
 
 #ifndef _bhxeno_h_
-	#define _bhxeno_h_ 1
+#define _bhxeno_h_ 1
 
+#ifdef __cplusplus
 
-	#ifdef __cplusplus
-
-		extern "C" {
-
-	#endif
+	extern "C" {
+#endif
 
 /* KJL 16:57:28 16/07/98 - particle.h is needed for LASER_BEAM_DESC */
 #include "particle.h"
@@ -160,58 +158,35 @@
 /* Patrick 4/7/97------------------------------
   Some defines
   ---------------------------------------------*/
-	#define XENO_STARTING_HEALTH				600 	 
-	#define XENO_NEAR_SPEED						1000 	/* mm/s */
-  	#define XENO_NEAR_ACCURACY					5		/* mm per m max deviation */		
-	#define XENO_NEAR_VIEW_WIDTH				500		/* mm */
-	#define XENO_CLOSE_APPROACH_DISTANCE		3000	/* mm */
-	#define XENO_FIRINGPOINT_INFRONT			1000		/* mm */  	
-	#define XENO_FIRINGPOINT_ACROSS				300 	/* mm */
-	#define XENO_FIRINGPOINT_UP					100 	/* mm */
-    #define XENO_PROJECTILESPEED 				20000	/* mm/s */
-	#define XENO_PROJECTILEDAMAGE				10
-	#define XENO_SENTRY_SENSITIVITY				1500
-	#define XENO_FAR_MOVE_TIME					((24+(FastRandom()&0x07))*(ONE_FIXED>>4))
+#define XENO_NEAR_SPEED						1000 	/* mm/s */
+#define XENO_NEAR_VIEW_WIDTH				500		/* mm */
+#define XENO_CLOSE_APPROACH_DISTANCE		3000	/* mm */
+#define XENO_SENTRY_SENSITIVITY				1500
+#define XENO_FAR_MOVE_TIME					((24+(FastRandom()&0x07))*(ONE_FIXED>>4))
 
-	/* 1-2 seconds in 1/8ths of a second */
-	#define XENO_NEAR_TIMEBETWEENFIRING	((8+(FastRandom()&0x07))*(ONE_FIXED>>3))
-	#define XENO_RECOILTIME				(ONE_FIXED>>1) 	/* 1/2 seconds */
-	#define XENO_ACTIVATION_TIME		(ONE_FIXED)  /* 1 second */
-	#define XENO_DEACTIVATION_TIME		(ONE_FIXED)  /* 1 second */
-	#define XENO_REGEN_TIME				(ONE_FIXED*5)
-	#define XENO_POWERDOWN_TIME			(ONE_FIXED*5)
+#define XENO_REGEN_TIME				(ONE_FIXED*5)
+#define XENO_POWERDOWN_TIME			(ONE_FIXED*5)
 		  
-	/* 2,3 or 4*/
-	#define XENO_VOLLEYSIZE				(2+(FastRandom()%3))
 
-	#define XENO_HEADPAN_GIMBALL		(1024)
-	#define XENO_HEADTILT_GIMBALL		(512)
-	#define XENO_TORSO_GIMBALL			(1195)
+#define XENO_HEADPAN_GIMBALL		(1024)
+#define XENO_HEADTILT_GIMBALL		(512)
+#define XENO_TORSO_GIMBALL			(1195)
 
-	#define XENO_LEFTARM_CW_GIMBALL		(626)
-	#define XENO_LEFTARM_ACW_GIMBALL	(910)
-	#define XENO_RIGHTARM_CW_GIMBALL	(910)
-	#define XENO_RIGHTARM_ACW_GIMBALL	(626)
+#define XENO_LEFTARM_CW_GIMBALL		(626)
+#define XENO_LEFTARM_ACW_GIMBALL	(910)
+#define XENO_RIGHTARM_CW_GIMBALL	(910)
+#define XENO_RIGHTARM_ACW_GIMBALL	(626)
 	
-	#define XENO_ARM_PITCH_GIMBALL		(1024)
+#define XENO_ARM_PITCH_GIMBALL		(1024)
 	
-	#if 0
-	/* Original values. */
-	#define XENO_HEAD_LOCK_RATE			(2)	/* Was 0 */
-	#define XENO_HEAD_SCAN_RATE			(3)
-	#define XENO_TORSO_TWIST_RATE		(3)
-	#define XENO_ARM_LOCK_RATE			(4)
-	#define XENO_FOOT_TURN_RATE			(3)
-	
-	#else
-	/* Let's slow everything down a wee bit. */
-	#define XENO_HEAD_LOCK_RATE			(2)	/* Was 0 */
-	#define XENO_HEAD_SCAN_RATE			(4)
-	#define XENO_TORSO_TWIST_RATE		(5)
-	#define XENO_ARM_LOCK_RATE			(5)
-	#define XENO_FOOT_TURN_RATE			(5)
+/* Let's slow everything down a wee bit. */
+#define XENO_HEAD_LOCK_RATE			(2)	/* Was 0 */
+#define XENO_HEAD_SCAN_RATE			(4)
+#define XENO_TORSO_TWIST_RATE		(5)
+#define XENO_ARM_LOCK_RATE			(5)
+#define XENO_FOOT_TURN_RATE			(5)
 
-	#endif
+
 
 /* Patrick 4/7/97------------------------------
    Some prototypes

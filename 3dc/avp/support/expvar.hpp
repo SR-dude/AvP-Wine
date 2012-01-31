@@ -14,14 +14,7 @@
 #ifndef _expvar_hpp
 #define _expvar_hpp 1
 
-	#if ( defined( __WATCOMC__ ) || defined( _MSC_VER ) )
-		#pragma once
-	#endif
 
-#ifdef __cplusplus
-#endif // __cplusplus
-
-/* Type definitions *****************************************************/
 template <class T> class ExportVariable
 {
 protected:
@@ -139,9 +132,5 @@ private:
 
 
 };
-
-/* End of the header ****************************************************/
-
-
 
 #endif

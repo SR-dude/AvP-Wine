@@ -21,44 +21,15 @@
 #pragma once
 
 #include <stdio.h>
+// run time type information not available
+// adj    won't compile 
+//#include <typeinfo>
+//#define LIST_TEM_TYPEID_THIS typeid(*this).name()
+#define LIST_TEM_TYPEID_THIS "?"
 
-#ifdef _CPPRTTI // run time type information available
-	#include <typeinfo.h>
-	#define LIST_TEM_TYPEID_THIS typeid(*this).name()
-#else
-	#define LIST_TEM_TYPEID_THIS "?"
-#endif
+// if -Dengine is defined but this file compiles without it
+//	#include "mem3dc.h"
 
-#if defined(engine) 
-// Not all preprocessors do lazy evaluation. DW
-#if engine
-	#include "mem3dc.h"
-#endif
-#endif
-
-#ifdef NDEBUG
-	#define fail if (0)
-	#define list_fail_get_data_from_sentinel NULL
-	#define list_fail_add_entry_after NULL
-	#define list_fail_add_entry_before NULL
-	#define list_fail_delete_entry NULL
-	#define list_fail_delete_entry_by_pointer NULL
-	#define list_fail_alter_entry NULL
-	#define list_fail_next_entry_nonexist NULL
-	#define list_fail_next_entry_sentinel NULL
-	#define list_fail_prev_entry_nonexist NULL
-	#define list_fail_prev_entry_sentinel NULL
-	#define list_fail_last_entry NULL
-	#define list_fail_first_entry NULL
-	#define list_fail_similar_entry NULL
-	#define list_fail_delete_last_entry NULL
-	#define list_fail_delete_first_entry NULL
-	#define list_fail_operator NULL
-	#define lit_fail_next NULL
-	#define lit_fail_operator NULL
-	#define lit_fail_delete_current NULL
-	#define lit_fail_change_current NULL
-#else
 	#include "fail.h"
 	extern char const * list_fail_get_data_from_sentinel;
 	extern char const * list_fail_add_entry_after;
@@ -80,7 +51,6 @@
 	extern char const * lit_fail_operator;
 	extern char const * lit_fail_delete_current;
 	extern char const * lit_fail_change_current;
-#endif
 
 // The first declaration of these class templates was previously as friends
 // of List. However, Visual C++ 5 can't parse them unless we give a 
@@ -105,9 +75,8 @@ struct List_Member_Base
 	union
 	{
 		List_Member_Base<T> *prev;
-		#ifndef __WATCOMC__
 	   	List_Member<T> *prev_debug; // encourage the debugger to display the list members data
-		#endif                      // hopefully casting from base to derived class would not
+		                           // hopefully casting from base to derived class would not
 		                            // cause the actual value of the ptr to change, so the debugger
 		                            // will display the information correctly, and this union
 		                            // won't cause any kind of performance hit
@@ -120,9 +89,7 @@ struct List_Member_Base
 	union
 	{
 		List_Member_Base<T> *next;
-		#ifndef __WATCOMC__
 		List_Member<T> *next_debug;
-		#endif
 	};
 	virtual ~List_Member_Base() {}
 };
@@ -622,14 +589,6 @@ class ConstList_Iterator_Forward
         return l->data(m);
     }
 
-    #if 0 // shouldn't really be available on a const list
-    void change_current(T const & new_val) const {
-        if (m != l->sentinel) {
-            m->data = new_val;
-        } else
-            fail(lit_fail_change_current,LIST_TEM_TYPEID_THIS);
-    }
-    #endif
 
     bool done() const { if (m == l->sentinel) return true; else return false; }
     void restart() { m = l->sentinel->next; }       
@@ -741,14 +700,6 @@ class ConstList_Iterator_Backward
         return l->data(m);
     }
 
-    #if 0 // shouldn't really be available on a const list
-    void change_current(T const & new_val) const {
-        if (m != l->sentinel) {
-            m->data = new_val;
-        } else
-            fail(lit_fail_change_current,LIST_TEM_TYPEID_THIS);
-    }
-    #endif
 
     bool done() const { if (m == l->sentinel) return true; else return false; }
     void restart() { m = l->sentinel->prev; }
@@ -863,9 +814,5 @@ class List_Iterator_Loop
 };
 
 #define LIL List_Iterator_Loop
-
-#ifdef NDEBUG
-	#undef fail // allow other code to have local variables called or differently scoped 'fail'
-#endif
 
 #endif

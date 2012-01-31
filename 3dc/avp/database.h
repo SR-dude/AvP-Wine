@@ -1,6 +1,3 @@
-
-#define NUM_SAVE_SLOTS 10
-
 enum DB_STATE_ID
 {
 	DB_STATE_MAINMENU,

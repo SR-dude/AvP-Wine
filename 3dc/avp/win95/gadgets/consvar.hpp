@@ -9,25 +9,12 @@
 #ifndef _consvar_hpp
 #define _consvar_hpp 1
 
-	#if ( defined( __WATCOMC__ ) || defined( _MSC_VER ) )
-		#pragma once
-	#endif
-
-	#ifndef _conssym_hpp
-	#include "conssym.hpp"
-	#endif
+#include "conssym.hpp"
 
 #ifdef __cplusplus
 	extern "C" {
 #endif
 
-/* Version settings *****************************************************/
-
-/* Constants  ***********************************************************/
-
-/* Macros ***************************************************************/
-
-/* Type definitions *****************************************************/
 
 	// Abstract base class of console variable
 	// It's abstract because the Get/SetValue functions are pure virtual.
@@ -121,14 +108,6 @@
 
 		static List <ConsoleVariable*> List_pConsoleVar;
 	};	// suggested naming: "ConsoleVar"
-
-/* Exported globals *****************************************************/
-
-/* Function prototypes **************************************************/
-
-
-
-/* End of the header ****************************************************/
 
 
 #ifdef __cplusplus

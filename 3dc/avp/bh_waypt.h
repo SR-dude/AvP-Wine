@@ -33,7 +33,6 @@ typedef struct waypoint_volume {
 
 } WAYPOINT_VOLUME;
 
-#define wayflag_cancrawl	0x00000001
 
 typedef struct waypoint_header {
 

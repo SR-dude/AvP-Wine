@@ -9,26 +9,11 @@
 #ifndef _teletype
 #define _teletype 1
 
-	#ifndef _gadget
-	#include "gadget.h"
-	#endif
+#include "gadget.h"
+#include "ourbool.h"
+#include "scstring.hpp"
 
-/* Version settings *****************************************************/
-
-/* Constants  ***********************************************************/
-	#define I_Font_TeletypeLettering	(DATABASE_MESSAGE_FONT)
-
-/* Macros ***************************************************************/
-
-/* Type definitions *****************************************************/
-	#if UseGadgets
-		#ifndef _ourbool
-		#include "ourbool.h"
-		#endif
-
-		#ifndef _scstring
-		#include "scstring.hpp"
-		#endif
+#define I_Font_TeletypeLettering	(DATABASE_MESSAGE_FONT)
 
 // moved wrapper here since scstring.hpp is a C++ header and templates can't have C linkage
 #ifdef __cplusplus
@@ -90,15 +75,6 @@
 			return pSCString_Val;
 		}
 
-	#endif // UseGadgets
-
-/* Exported globals *****************************************************/
-
-/* Function prototypes **************************************************/
-
-
-
-/* End of the header ****************************************************/
 
 
 #ifdef __cplusplus

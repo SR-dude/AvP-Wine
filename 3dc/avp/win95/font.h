@@ -1,13 +1,9 @@
 #ifndef _font_h_included
 #define _font_h_included 1
 
-	#ifdef __cplusplus
-		// Necessary header files for the C++ stuff:
-		#ifndef _projtext
-		#include "projtext.h"
-		#endif
-	#endif
-
+#ifdef __cplusplus
+#include "projtext.h"
+#endif
 #include "aw.h"
 
 /************* fonts. not set up yet************/

@@ -11,29 +11,13 @@
 #ifndef _strutil
 #define _strutil 1
 
-	#ifndef _projtext
-	#include "projtext.h"
-	#endif
-
-	#ifndef _ourbool
-	#include "ourbool.h"
-	#endif
+#include "projtext.h"
+#include "ourbool.h"
 
 #ifdef __cplusplus
 	extern "C" {
 #endif
 
-/* Version settings *****************************************************/
-
-/* Constants  ***********************************************************/
-
-/* Macros ***************************************************************/
-
-/* Type definitions *****************************************************/
-
-/* Exported globals *****************************************************/
-
-/* Function prototypes **************************************************/
 	/* String manipulation **********************************************/
 		extern void STRUTIL_SC_WriteTerminator
 		(
@@ -45,26 +29,6 @@
 			const ProjChar* pProjCh
 		);
 
-	/* Ansi to HHTS conversion ********************************************/
-		/* Return value = Yes iff no truncation occurred i.e. the whole string was copied */
-
- 		#if 0
- 		extern OurBool STRUTIL_ProjChar_To_ANSI
-		(
-			LPTSTR lptszANSI_Out,
-			unsigned int MaxSize, /* includes NULL-terminator; truncates after this */
-
-			ProjChar* pProjCh_In		
-		);
-
- 		extern OurBool STRUTIL_ANSI_To_ProjChar
-		(
-			ProjChar* pProjCh_Out,
-			unsigned int MaxSize, /* includes NULL-terminator; truncates after this */
-			
-			LPTSTR lptszANSI_In
-		);
-		#endif
 
 	/* Emulation of <string.h> *******************************************/
 		extern unsigned int STRUTIL_SC_Strlen
@@ -126,9 +90,6 @@
 			const ProjChar* pProjCh
 		);
 
-
-
-/* End of the header ****************************************************/
 
 
 #ifdef __cplusplus

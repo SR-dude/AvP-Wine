@@ -4,16 +4,13 @@
 #include "chunk.hpp"
 #include "chnktype.hpp"
 
-#if InterfaceEngine
-#include "strachnk.hpp"
-#endif
-
-#define LOFlag_On					0x00000001
-#define LOFlag_ShadowData	0x00000002
-#define LOFlag_Changed		0x00000004
-#define LOFlag_Calc_Data	0x00000008
+// adj
+// #define LOFlag_On					0x00000001
+// #define LOFlag_ShadowData	0x00000002
+// #define LOFlag_Changed		0x00000004
+// #define LOFlag_Calc_Data	0x00000008
 #define LOFlag_Runtime		0x00000010
-#define LOFlag_Invisible	0x00000020
+//#define LOFlag_Invisible	0x00000020
 #define LOFlag_NoPreLight	0x00000040
 
 class Environment_Data_Chunk;
@@ -41,13 +38,13 @@ public:
 };
 
 
-#define PlacedLightType_Standard 0
-#define PlacedLightType_Strobe   1
-#define PlacedLightType_Flicker  2
+//#define PlacedLightType_Standard 0
+//#define PlacedLightType_Strobe   1
+//#define PlacedLightType_Flicker  2
 
-#define PlacedLightOnOff_Standard 0
-#define PlacedLightOnOff_Fade 1
-#define PlacedLightOnOff_Flicker 2
+// #define PlacedLightOnOff_Standard 0
+//#define PlacedLightOnOff_Fade 1
+//#define PlacedLightOnOff_Flicker 2
 
 #define PlacedLightFlag_On 				   0x00000001
 #define PlacedLightFlag_SwapColourBright   0x00000002
@@ -143,10 +140,6 @@ public:
 	
 	void fill_data_block ( char * data_start);
 
-#if InterfaceEngine
-	AVP_Strategy_Chunk* GetStrategyChunk();
-	AVP_Strategy_Chunk* CreateStrategyChunk();
-#endif
 	
 private:
 
@@ -239,7 +232,6 @@ private:
 
 };
 
-#define PSXLightMode 0
 //details of how light data should be altered for different platforms.
 //currently just playstation
 class Light_Scale_Chunk : public Chunk

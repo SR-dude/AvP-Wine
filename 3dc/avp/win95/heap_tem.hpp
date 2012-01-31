@@ -22,7 +22,6 @@ private:
 	Ordered_Heap_Member<T> * lower, * higher, * parent;
 	int num_lower, num_higher;
 
-	// Ordered_Heap_Member() : lower(0), higher(0), parent(0), num_lower(0), num_higher(0) {}
 	Ordered_Heap_Member(const T & d) : lower(0), higher(0), parent(0), num_lower(0), num_higher(0), data(d) {}
 	
 	void delete_tree()
@@ -39,10 +38,6 @@ private:
 		}
 	}
 
-	#if 0
-	operator T const & () const { return data; }
-	operator T & () { return data; }
-	#endif
 
 	friend class Ordered_Heap<T>;
 	friend class Ordered_Heap_Iterator_Forward<T>;

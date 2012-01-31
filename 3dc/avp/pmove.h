@@ -59,16 +59,6 @@ typedef enum player_morph_state
 
 
 
-/*--------------Patrick 1/11/96 ---------------------
-  this define determines how crouching and lying down 
-  are implemented for the player.  It can either be
-  done by changing the shape, or by morphing....
-  Morphing is better, but doesn't work with the current
-  collision system.
-  ---------------------------------------------------*/
-#define CrouchByMorphingPlayer	0
-
-
 /* Prototypes */
 extern void InitPlayerMovementData(STRATEGYBLOCK* sbPtr);
 extern void PlayerBehaviour(STRATEGYBLOCK* sbptr);

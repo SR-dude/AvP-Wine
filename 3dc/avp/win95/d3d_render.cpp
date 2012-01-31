@@ -472,7 +472,6 @@ void WriteEndCodeToExecuteBuffer(void)
 	OP_EXIT(ExecBufInstPtr);
 }
 
-// adj #include "pentime.h"
 BOOL ExecuteBuffer(void)
 
 {
@@ -2750,7 +2749,6 @@ void D3D_DrawMoltenMetalMesh_Unclipped(void);
 void D3D_DrawMoltenMetalMesh_Clipped(void);
 
 
-//#define WATER_POLY_SCALE 256
 int MeshXScale;
 int MeshZScale;
 int WaterFallBase;
@@ -3182,7 +3180,6 @@ void D3D_DrawWaterTest(MODULE *testModulePtr)
 }
 
 VECTORCH MeshVertex[256];
-#define TEXTURE_WATER 0
 
 VECTORCH MeshWorldVertex[256];
 unsigned int MeshVertexColour[256];

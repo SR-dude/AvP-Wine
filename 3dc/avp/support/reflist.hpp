@@ -29,17 +29,8 @@
 #ifndef _reflist_hpp
 #define _reflist_hpp 1
 
-	#if ( defined( __WATCOMC__ ) || defined( _MSC_VER ) )
-		#pragma once
-	#endif
-
-	#ifndef list_template_hpp
-	#include "list_tem.hpp"
-	#endif
-
-	#ifndef _refobj
-	#include "refobj.hpp"
-	#endif
+#include "list_tem.hpp"
+#include "refobj.hpp"
 
 extern char const* reflist_fail_destructor;
 
@@ -152,12 +143,10 @@ public:
 
 			List_pRC . delete_first_entry();
 
-			#ifndef NDEBUG
 			if ( !pRC )
 			{
 				fail( reflist_fail_destructor );
 			}
-			#endif
 
 			pRC -> R_Release();			
 		}

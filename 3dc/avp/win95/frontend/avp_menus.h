@@ -1,38 +1,19 @@
 #ifndef _included_AvP_Menus_h_
 #define _included_AvP_Menus_h_
 
-#define MARINE_DEMO 0
-#define PREDATOR_DEMO 0
-#define ALIEN_DEMO 0
- // Edmond modified for Mplayer Demo
- #ifdef MPLAYER_DEMO
- #define DEATHMATCH_DEMO 1
- #else
- #define DEATHMATCH_DEMO 0 // more multiplayer-only demo really
- #endif
+// adj #define MARINE_DEMO 0
+//adj #define PREDATOR_DEMO 0
+// adj #define ALIEN_DEMO 0
 
-#ifdef AVP_DEBUG_VERSION
-	#define CONSOLE_DEBUGGING_COMMANDS_ACTIVATED 1
+//#define DEATHMATCH_DEMO 0 // more multiplayer-only demo really
 
-	#define LOAD_SCREAMS_FROM_FASTFILES 0
-	#define LOAD_USING_FASTFILES 0
+#define CONSOLE_DEBUGGING_COMMANDS_ACTIVATED 1
+#define LOAD_SCREAMS_FROM_FASTFILES 0
+#define LOAD_USING_FASTFILES 0
 
-#else //AVP_DEBUG_VERSION
-
-	#ifdef AVP_DEBUG_FOR_FOX
-		#define CONSOLE_DEBUGGING_COMMANDS_ACTIVATED 1
-	#else
-		#define CONSOLE_DEBUGGING_COMMANDS_ACTIVATED 0
-	#endif
-
-	#define LOAD_SCREAMS_FROM_FASTFILES 1
-	#define LOAD_USING_FASTFILES 1
-#endif //AVP_DEBUG_VERSION
 
 #define PLAY_INTRO 1
 #define ALLOW_SKIP_INTRO 1
-
-#define SAVE_GAME_ON 1 
 
 #include "avp_menugfx.hpp"
 #include "language.h"

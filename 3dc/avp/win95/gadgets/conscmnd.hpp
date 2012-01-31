@@ -7,25 +7,13 @@
 #ifndef _conscmnd
 #define _conscmnd 1
 
-	#if ( defined( __WATCOMC__ ) || defined( _MSC_VER ) )
-		#pragma once
-	#endif
+#include "conssym.hpp"
 
-	#ifndef _conssym_hpp
-	#include "conssym.hpp"
-	#endif
 
 #ifdef __cplusplus
 	extern "C" {
 #endif
 
-/* Version settings *****************************************************/
-
-/* Constants  ***********************************************************/
-
-/* Macros ***************************************************************/
-
-/* Type definitions *****************************************************/
 	class ConsoleCommand : public ConsoleSymbol
 	{
 	public:
@@ -100,13 +88,6 @@
 	};
 	
 
-/* Exported globals *****************************************************/
-
-/* Function prototypes **************************************************/
-
-
-
-/* End of the header ****************************************************/
 
 
 #ifdef __cplusplus

@@ -7,20 +7,12 @@ extern "C" {
 
 #include "menugfx.h"
 
-#define ENABLE_SHADING_OPTION 0
-#define ENABLE_MIPMAP_OPTION 0
 
 typedef enum OptionsMenuItem
 {
 	OMI_DIRECT3D,
 	OMI_DISPLAY,
 	OMI_ZBUFFER,
-	#if ENABLE_MIPMAP_OPTION
-	OMI_MIPMAP,
-	#endif
-	#if ENABLE_SHADING_OPTION
-	OMI_SHADING,
-	#endif
 	OMI_TEXTUREFORMAT,
 	OMI_BILINFILTER,
   OMI_KEYCONFIG,
@@ -112,8 +104,6 @@ extern const char * GenTex50pc_Directory;
 void SelectGenTexDirectory(IMAGETYPEIDX);
 float GetUVScale(IMAGETYPEIDX);
 
-/* This will change the video mode to 640x480x8 (or rather, the menu video mode) if it is not already in that mode */
-#define AMB_MODELESS 0x00000001 /* do not wait for select or blank screen */
 void AvpMessageBox(char const * text, char const * title, int flags);
 
 extern AVP_MENU OptionsMenuData;
@@ -137,12 +127,9 @@ extern AVP_MENU VideoModeOptionsMenu;
 	hoping this will make the code cleaner.
 */
 #ifdef __cplusplus
-#	ifndef _expvar_hpp
-#		include "expvar.hpp"
-#	endif
-#	ifndef _scstring
-#		include "scstring.hpp"
-#	endif
+
+#include "expvar.hpp"
+#include "scstring.hpp"
 
 	namespace RebMenus
 	{
@@ -177,8 +164,6 @@ extern AVP_MENU VideoModeOptionsMenu;
 	};
 
 #endif /* __cplusplus */
-
-
 
 
 #endif /* ! _included_pcmenus_h_ */

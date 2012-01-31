@@ -11,64 +11,11 @@
 extern "C" {
 #endif
 
-#define default_global_h1 5000000
-#define default_global_h2 (5000000 + (ONE_FIXED << 5))
-#define default_global_hs 5
 
 
-#define default_zratio_threshold 320	/* 1.25 */
-
-#define MaxObjectLights 50			/* Sources attached to the object */
-
-#define maxlightblocks 100			/* This ought to be MORE than enough */
-
-#if PSX
-#define MaxLightsPerObject 10	/* Sources lighting the object */
-#else
+#define MaxObjectLights 50	/* Sources attached to the object */
+#define maxlightblocks 100	/* This ought to be MORE than enough */
 #define MaxLightsPerObject 100	/* Sources lighting the object */
-#endif
-
-
-/*
-
- 3d Texture Scan Subdivision limits
-
-*/
-
-#define lin_s_max 5
-
-#if 0
-
-	#define lin_s_zthr 320		/* 1.25 */
-
-#else
-
-	#if 1
-
-		#define lin_s_zthr 281		/* 1.1 */
-
-	#else
-
-		#define lin_s_zthr 260		/* 1.01 */
-
-	#endif
-
-#endif
-
-
-
-/* AH Table */
-
-
-
-
-#define RScale 2
-#define VScale (6 + 3)
-
-#define Wibble Yes
-
-#define GlobalScale 1
-
 
 
 
@@ -121,12 +68,6 @@ typedef enum {
 
 } VIEWSTATES;
 
-#define CameraTrackingNormal  0x00000000
-#define CameraTrackingSlew    0x00000001
-#define CameraTrackingFollow  0x00000002
-#define CameraTrackingTrakBak 0x00000004
-
-#define PanChange             128
 
 
 /*
@@ -147,33 +88,6 @@ typedef enum {
 } ITYPES;
 
 
-/*
-
- Shape enum for mainshapelist[]	 
-
- We don't need this except for compiled in
- shapes. For pc riff loading the comipled in
- shape enum is in cnkhmaps.c in avp\win95
- 
-*/
-
-#if PSX
-#if BinaryLoading
-#else
-typedef enum {
-
-	Shape_bob,
-	Shape_Default,
-	Shape_Alien,
-	Shape_weapon,
-	Shape_terminal,
-	Shape_mmseg1,
-	Shape_Cube,
-
-} AVP_SHAPES;
-
-#endif
-#endif
 
 
 /* Map Types */
@@ -209,15 +123,6 @@ typedef enum {
 } AVP_STRATEGIES;
 
 
-
-
-
-
-#define MaxSint5SortArraySize 50 /* was 100, must be at least ml_shm_maxheights */
-
-
-
-/***********end for C++************/
 
 #ifdef __cplusplus
 };

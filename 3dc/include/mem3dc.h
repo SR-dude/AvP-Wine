@@ -11,12 +11,6 @@
 #include "system.h"
 #include <stddef.h>
 
-/* defines */
-
-#define DBGMALLOC 0
-
-
-
 
 /* JH - 30.5.97
 I noticed that the MALLOC_RECORD structure has char[40]
