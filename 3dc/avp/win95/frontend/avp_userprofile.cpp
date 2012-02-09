@@ -24,7 +24,6 @@ extern "C"
 static int LoadUserProfiles(void);
 
 static void EmptyUserProfilesList(void);
-static int MakeNewUserProfile(void);
 static void InsertProfileIntoList(AVP_USER_PROFILE *profilePtr);
 static int ProfileIsMoreRecent(AVP_USER_PROFILE *profilePtr, AVP_USER_PROFILE *profileToTestAgainstPtr);
 static void SetDefaultProfileOptions(AVP_USER_PROFILE *profilePtr);

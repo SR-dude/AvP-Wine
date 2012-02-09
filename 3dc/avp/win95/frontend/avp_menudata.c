@@ -24,7 +24,6 @@ char MP_PlayerName[NET_PLAYERNAMELENGTH+3] = "";
 char MP_SessionName[MAX_MULTIPLAYER_NAME_LENGTH+23] = "TEST SESH";
 char IPAddressString[MAX_IPADDRESS_LENGTH+1]= ""; 
 char CommandLineIPAddressString[MAX_IPADDRESS_LENGTH+1]= ""; 
-char UserProfileName[MAX_SIZE_OF_USERS_NAME+1]="";
 char IP_Address_Name[22];
 
 int MP_Species=0;

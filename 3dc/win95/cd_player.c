@@ -66,12 +66,6 @@ void CDDA_End(void)
 	LastCommandGiven = CDCOMMANDID_End;
 }
 
-void CDDA_Management(void)
-{
-	if(!CDDASwitchedOn) return; /* CDDA is off */
-	if(CDDAState==CDOp_Playing) return; /* already playing */
-	PlatCDDAManagement();
-}
 
 void CDDA_Play(int CDDATrack)
 {
@@ -130,10 +124,7 @@ void CDDA_ChangeVolume(int volume)
 	}
 }
 
-int CDDA_GetCurrentVolumeSetting(void)
-{
-	return CDDAVolume;
-}
+
 
 void CDDA_Stop()
 {	

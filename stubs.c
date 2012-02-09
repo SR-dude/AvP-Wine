@@ -23,8 +23,3 @@ void SmackSoundOnOff(void) { }
 void SmackGoto(void) { }
 
 
-// from DrawMotionTrackerPoly () in ddplat.cpp
-// compiling the non-stub version created more
-// problems than it solved.
-void Draw_Item_2dTexturePolygon (void) {}
-

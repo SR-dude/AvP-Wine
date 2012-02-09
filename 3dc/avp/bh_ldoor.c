@@ -10,8 +10,6 @@
 #include "comp_shp.h"
 #include "inventry.h"
 #include "triggers.h"
-#include "mslhand.h"
-
 #include "dynblock.h"
 #include "dynamics.h"
 
@@ -25,7 +23,6 @@
 #include "bh_swdor.h"
 #include "bh_ldoor.h"
 #include "bh_plift.h"
-#include "load_shp.h"
 #include "lighting.h"
 #include "bh_lnksw.h"
 #include "bh_binsw.h"
@@ -156,6 +153,7 @@ void LiftDoorBehaveFun(STRATEGYBLOCK* sbptr)
 {
 	LIFT_DOOR_BEHAV_BLOCK *doorbhv;
 	MORPHCTRL *mctrl;
+// adj unused
 	DISPLAYBLOCK* dptr;
 	MODULE *mptr;
 

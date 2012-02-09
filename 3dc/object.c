@@ -287,35 +287,6 @@ void DeallocateTxAnimBlock(TXACTRLBLK *TxAnimblockptr)
 
 
 
-// Add a Texture Animation Block to a Display Block
-
-void AddTxAnimBlock(DISPLAYBLOCK *dptr, TXACTRLBLK *taptr)
-
-{
-
-	TXACTRLBLK *taptr_tmp;
-
-
-	if(dptr->ObTxAnimCtrlBlks) {
-
-		taptr_tmp = dptr->ObTxAnimCtrlBlks;
-
-		while(taptr_tmp->tac_next)
-			taptr_tmp = taptr_tmp->tac_next;
-
-		taptr_tmp->tac_next = taptr;
-
-	}
-
-	else dptr->ObTxAnimCtrlBlks = taptr;
-
-}
-
-
-
-
-
-
 
 // Support functions for Light Blocks
 
@@ -506,65 +477,3 @@ void DeleteLightBlock(LIGHTBLOCK *lptr, DISPLAYBLOCK *dptr)
 }
 
 
-
-
-/*
-
- When running the parallel strategies, display and light block deallocation
- must only be done at the end of the frame, AFTER processor synchronisation
- and BEFORE the shadow copy.
-
-*/
-
-int DisplayAndLightBlockDeallocation(void)
-{
-
-	DISPLAYBLOCK **activeblocksptr;
-	DISPLAYBLOCK *dptr;
-	int i, j;
-	LIGHTBLOCK *lptr;
-
-	if(NumActiveBlocks) {
-
-		activeblocksptr = &ActiveBlockList[NumActiveBlocks - 1];
-
-		for(i = NumActiveBlocks; i!=0; i--) {
-
-			dptr = *activeblocksptr--;
-
-			/* Deallocate Object? */
-
-			if(dptr->ObFlags2 & ObFlag2_Deallocate) {
-
-				DestroyActiveObject(dptr);
-
-			}
-
-
-			/* Deallocate any Lights? */
-
-			else {
-
-				if(dptr->ObNumLights) {
-
-					for(j = dptr->ObNumLights - 1; j > -1; j--) {
-
-						lptr = dptr->ObLights[j];
-
-						if(lptr->LightFlags & LFlag_Deallocate) {
-
-							DeleteLightBlock(dptr->ObLights[j], dptr);
-
-						}
-
-					}
-
-				}
-
-			}
-
-		}
-
-	}
-	return 0;
-}

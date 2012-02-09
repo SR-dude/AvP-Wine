@@ -47,6 +47,7 @@ extern int				memoryInitialisationFailure;
 extern IMAGEHEADER			ImageHeaderArray[];		/* Array of Image Headers */
 
 /* Global Variables for PC Watcom Functions and Windows 95! */
+// adj is this used?
 int						DrawMode = DrawPerVDB;
 
 /*
@@ -56,8 +57,6 @@ int						DrawMode = DrawPerVDB;
 long						lastTickCount;
 
 unsigned char				*ScreenBuffer = 0;		/* Ensure initialised to Null */
-unsigned char				*ScreenBuffer2 = 0;
-
 unsigned char				LPTestPalette[1024];	/* to cast to lp */
 
 int						InputMode;
@@ -77,22 +76,14 @@ BOOL						MMXAvailable;
 
 unsigned char				*TextureLightingTable = 0;
 
-unsigned char				*PaletteRemapTable = 0;
 
 int						**ShadingTableArray = 0;
-int						NumShadingTables = 0;
-
-unsigned char				**PaletteShadingTableArray = 0;
-int						NumPaletteShadingTables = 0;
 
 int						FrameRate;
 int						NormalFrameTime;
 int						PrevNormalFrameTime;
 extern int				CloakingPhase;
 
-/* These two are dummy values to get the DOS platform to compile */
-unsigned char				KeyCode;
-unsigned char				KeyASCII;
 
 unsigned char				*palette_tmp;
 static VIEWDESCRIPTORBLOCK	*vdb_tmp;
@@ -117,12 +108,9 @@ int						bEnableTextprint = No;
 /* Added 28/1/98 by DHM: as above, but applies specifically to textprintXY */
 int						bEnableTextprintXY = Yes;
 
-/* Palette */
-unsigned char				PaletteBuffer[768 + 1];
-
 /* Test Palette */
 unsigned char				TestPalette[768];
-unsigned char				TestPalette2[768];
+
 
 /*
  * KJL 11:48:45 28/01/98 - used to scale NormalFrameTime, so the game can be
@@ -192,172 +180,6 @@ void PlatformSpecificShowViewExit(VIEWDESCRIPTORBLOCK *vdb, SCREENDESCRIPTORBLOC
 	vdb_tmp = vdb;
 	sdb_tmp = sdb;
 
-}
-
-/*
- =======================================================================================================================
-     Convert UNIX to MS-DOS
- =======================================================================================================================
- */
-void GetDOSFilename(char *fnameptr)
-{
-	while(*fnameptr)
-	{
-		if(*fnameptr == 0x2f) *fnameptr = 0x5c;
-		fnameptr++;
-	}
-}
-
-/*
- =======================================================================================================================
-     Compare two strings. Return Yes if they're the same, else No. ;
-     IMPORTANT!!! This function is not ideal!!! It is used here because this is only an initialisation stage, but if
-     you want to compare strings elsewhere you should either use the C library function or (if there's a problem with
-     that) write your own.
- =======================================================================================================================
- */
-int CompareStringCH(char *string1, char *string2)
-{
-	/*~~~~~~~~~~~*/
-	char *srtmp;
-	char *srtmp2;
-	int	slen1 = 0;
-	int	slen2 = 0;
-	int	i;
-	/*~~~~~~~~~~~*/
-
-	srtmp = string1;
-
-	while(*srtmp++ != 0) slen1++;
-
-	srtmp = string2;
-
-	while(*srtmp++ != 0) slen2++;
-
-	if(slen1 != slen2)
-		return No;
-	else
-	{
-		srtmp = string1;
-		srtmp2 = string2;
-
-		for(i = slen1; i != 0; i--)
-			if(*srtmp++ != *srtmp2++) return No;
-
-		return Yes;
-	}
-}
-
-/*
- =======================================================================================================================
-     Compare two filenames. The first filename is assumed to be raw i.e. has no project subdirectory appended. The
-     second is assumed to be ready for use. Make a copy of both strings, prefix the copy of the first with the project
-     subdirectory and convert them to DOS format before the comparison.
- =======================================================================================================================
- */
-int CompareFilenameCH(char *string1, char *string2)
-{
-	/*~~~~~~~~~~~~~~~~~~~~~~~*/
-	char *srtmp1;
-	char *srtmp2;
-	int	slen1 = 0;
-	int	slen2 = 0;
-	int	i;
-	char fname1[ImageNameSize];
-	char fname2[ImageNameSize];
-	/*~~~~~~~~~~~~~~~~~~~~~~~*/
-
-
-	/* Make a copy of string 1, adding the project subdirectory */
-	srtmp1 = projectsubdirectory;
-	srtmp2 = fname1;
-	while(*srtmp1) *srtmp2++ = *srtmp1++;
-	srtmp1 = string1;
-	while(*srtmp1) *srtmp2++ = *srtmp1++;
-	*srtmp2 = 0;
-
-	/* Make a copy of string 2 */
-	srtmp1 = string2;
-	srtmp2 = fname2;
-	while(*srtmp1) *srtmp2++ = *srtmp1++;
-	*srtmp2 = 0;
-
-	/* How long are they? */
-	srtmp1 = fname1;
-	while(*srtmp1++ != 0) slen1++;
-
-	srtmp2 = fname2;
-	while(*srtmp2++ != 0) slen2++;
-
-	fname1[slen1] = 0;	/* Term */
-	fname2[slen2] = 0;
-
-
-	GetDOSFilename(fname1);
-	GetDOSFilename(fname2);
-
-	if(slen1 != slen2)
-	{
-		return No;
-	}
-
-	srtmp1 = fname1;
-	srtmp2 = fname2;
-
-
-	for(i = slen1; i != 0; i--)
-	{
-		if(*srtmp1++ != *srtmp2++)
-		{
-			return No;
-		}
-	}
-
-	return Yes;
-}
-
-
-/*
- =======================================================================================================================
- =======================================================================================================================
- */
-
-int NearestColour(int rs, int gs, int bs, unsigned char *palette)
-{
-	/*~~~~~~~~~~~~~~~~~~~~*/
-	int		i;
-	VECTORCH	p0;
-	VECTORCH	p1;
-	int		nearest_index;
-	int		nearest_delta;
-	int		d;
-	/*~~~~~~~~~~~~~~~~~~~~*/
-
-	p0.vx = rs;
-	p0.vy = gs;
-	p0.vz = bs;
-
-	nearest_index = 0;
-	nearest_delta = bigint;
-
-	for(i = 0; i < 256; i++)
-	{
-		p1.vx = palette[0];
-		p1.vy = palette[1];
-		p1.vz = palette[2];
-
-		d = FandVD_Distance_3d(&p0, &p1);
-
-		if(d < nearest_delta)
-		{
-			nearest_delta = d;
-			nearest_index = i;
-		}
-
-		palette += 3;
-	}
-
-	return nearest_index;
 }
 
 
@@ -547,46 +369,7 @@ void FrameCounterHandler(void)
 	RouteFinder_CallsThisFrame = 0;
 }
 
-/*
- * This jump table has been provided solely to ensure compatibility with DOS and
- * other versions.
- */
-void (*UpdateScreen[]) (void) =
-{
-	FlipBuffers,
-	FlipBuffers,
-	FlipBuffers,
-	FlipBuffers,
-	FlipBuffers,
-	FlipBuffers,
-	FlipBuffers,
-	FlipBuffers,
-	FlipBuffers,
-	FlipBuffers,
-	FlipBuffers,
-	FlipBuffers,
-	FlipBuffers,
-	FlipBuffers,
-	FlipBuffers,
-	FlipBuffers,
-	FlipBuffers,
-	FlipBuffers,
-	FlipBuffers,
-	FlipBuffers,
-	FlipBuffers,
-	FlipBuffers,
-	FlipBuffers,
-	FlipBuffers
-};
 
-/*
- =======================================================================================================================
-     Not supported in Windows 95 !!!
- =======================================================================================================================
- */
-void PlotPixelTest(int x, int y, unsigned char col)
-{ /* adj stub */
-}
 
 /*
  =======================================================================================================================
@@ -627,23 +410,7 @@ void ReadUserInput(void)
 	DirectReadKeyboard();
 }
 
-/*
- =======================================================================================================================
-     At present all keyboard and mouse input is handled through project specific functionality in win_func, and all
-     these functions are therefore empty. Later we may port to DirectInput, at which point we may reactivate these.
- =======================================================================================================================
- */
-void ReadKeyboard(void)
-{ /* adj stub */
-}
 
-/*
- =======================================================================================================================
- =======================================================================================================================
- */
-void ReadMouse(void)
-{/* adj stub */
-}
 
 /*
  =======================================================================================================================
@@ -657,28 +424,7 @@ void CursorHome(void)
 	textprintPosY = 0;
 }
 
-/*
- =======================================================================================================================
- =======================================================================================================================
- */
-void GetProjectFilename(char *fname, char *image)
-{
-	/*~~~~~~*/
-	char *src;
-	char *dst;
-	/*~~~~~~*/
 
-	src = projectsubdirectory;
-	dst = fname;
-
-	while(*src) *dst++ = *src++;
-
-	src = image;
-
-	while(*src) *dst++ = *src++;
-
-	*dst = 0;
-}
 
 /*
  =======================================================================================================================
@@ -1187,22 +933,4 @@ int ChangeDisplayModes
 	return TRUE;
 }
 
-/*
- =======================================================================================================================
-     Reverse of ConvertToDDPalette, introduced to maintain internal interfaces only...
- =======================================================================================================================
- */
-void ConvertDDToInternalPalette(unsigned char *src, unsigned char *dst, int length)
-{
-	/*~~~*/
-	int	i;
-	/*~~~*/
 
-	/* Copy palette, shifting down to 5 bit triple */
-	for(i = 0; i < length; i++)
-	{
-		*dst++ = (*src++) >> 2;
-		*dst++ = (*src++) >> 2;
-		*dst++ = (*src++) >> 2;
-	}
-}

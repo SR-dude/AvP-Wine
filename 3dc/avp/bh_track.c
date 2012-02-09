@@ -66,7 +66,6 @@ void* TrackObjectBehaveInit(void* bhdata,STRATEGYBLOCK* sbptr)
 			POLYHEADER *poly =  (POLYHEADER*)(shptr->items[item_num]);
 			LOCALASSERT(poly);
 
-			SetupPolygonFlagAccessForShape(shptr);
 				
 			if((Request_PolyFlags((void *)poly)) & iflag_txanim)
 				{
@@ -387,7 +386,7 @@ void TrackObjectBehaveFun(STRATEGYBLOCK* sbptr)
 }
 
 
-void TrackObjectIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple)
+void TrackObjectIsDamaged(STRATEGYBLOCK *sbPtr/*, DAMAGE_PROFILE *damage, int multiple*/)
 {
 	TRACK_OBJECT_BEHAV_BLOCK* to_bhv = sbPtr->SBdataptr;
 	LOCALASSERT(to_bhv);

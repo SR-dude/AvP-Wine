@@ -5188,38 +5188,3 @@ int NumberForCurrentLevel(void) {
 }
 
 
-
-static BOOL DoesNamedLevelExist(const char* level_name)
-{
-	HANDLE file_handle;
-	char filename[200];
-	
-	sprintf(filename,"avp_rifs\\%s.rif",level_name);
-
-	file_handle = CreateFile(filename,GENERIC_READ,0,0,OPEN_EXISTING,FILE_FLAG_RANDOM_ACCESS, 0);
-	if(file_handle == INVALID_HANDLE_VALUE)	return FALSE;
-	CloseHandle(file_handle);
-
-	return TRUE;
-}
-
-BOOL DoesMultiplayerLevelExist(int level)
-{
-	/*
-	Check that the level number is valid , and the level actually exists on 
-	the players hard drive.
-	*/
-	if(level<0 || level>=MAX_NO_OF_MULTIPLAYER_EPISODES) return FALSE;
-	return DoesNamedLevelExist(RifNamesForEnvironments[MultiplayerEpisodes[level]]);
-
-}
-
-BOOL DoesCooperativeLevelExist(int level)
-{
-	/*
-	Check that the level number is valid , and the level actually exists on 
-	the players hard drive.
-	*/
-	if(level<0 || level>=MAX_NO_OF_COOPERATIVE_EPISODES) return FALSE;
-	return DoesNamedLevelExist(RifNamesForEnvironments[CooperativeEpisodes[level]]);
-}

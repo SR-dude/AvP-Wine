@@ -713,15 +713,12 @@ CTM_ReturnType copy_to_mainshapelist(RIFFHANDLE h, Shape_Chunk * tmpshp, int fla
 	if(spdc)
 	{
 		copy_preprocessed_to_shapeheader (
-			h, 
 			spdc, 
 			mainshapelist[list_pos], 
-			tmpshp, 
 			flags, 
 			local_max_index,
 			local_tex_index_nos,
-			list_pos,
-			object
+			list_pos
 			);
 	}
 	else
@@ -964,15 +961,12 @@ CTM_ReturnType copy_to_mainshapelist(RIFFHANDLE h, Shape_Chunk * tmpshp, int fla
 								if(spdc)
 								{
 									copy_preprocessed_to_shapeheader (
-										h, 
 										spdc, 
 										mainshapelist[list_pos], 
-										afi()->shape1a, 
 										flags, 
 										local_max_index,
 										local_tex_index_nos,
-										list_pos,
-										object
+										list_pos
 										);
 								}
 								else
@@ -1031,15 +1025,12 @@ CTM_ReturnType copy_to_mainshapelist(RIFFHANDLE h, Shape_Chunk * tmpshp, int fla
 								if(spdc)
 								{
 									copy_preprocessed_to_shapeheader (
-										h, 
 										spdc, 
 										mainshapelist[list_pos], 
-										afi()->shape1a, 
 										flags, 
 										local_max_index,
 										local_tex_index_nos,
-										list_pos,
-										object
+										list_pos
 										);
 								}
 								else
@@ -1359,23 +1350,6 @@ SHAPEHEADER * CopyNamedShapePtr (RIFFHANDLE h, char const * shapename)
 	return CreateShapeFromRif(h,shapename);
 }
 
-// copy one named shape or sprite; put it in the main shape list
-int CopyNamedShapeMSL (RIFFHANDLE h, char const * shapename)
-{
-	int listpos = GetMSLPos();
-	SHAPEHEADER * shp = CreateShapeFromRif(h,shapename,listpos);
-	if (shp)
-	{
-		h->shape_nums.add_entry(listpos);
-		mainshapelist[listpos] = shp;
-		return listpos;
-	}
-	else
-	{
-		FreeMSLPos(listpos);
-		return GLS_NOTINLIST;
-	}
-}
 
 ////////////////////////////////////////////////////////////////////////
 // Functions which do not operate on RIFFHANDLEs and may become obsolete
@@ -1405,110 +1379,8 @@ int GetLoadedShapeMSL(char const * shapename)
 		return GLS_NOTINLIST;
 }
 
-// ditto, but returns a pointer; the shape need not be in the msl
-SHAPEHEADER * GetLoadedShapePtr(char const * shapename)
-{
-	ShapeInMSL const * sim = ShapeInMSL::GetByName(shapename);
-	
-	if (sim)
-		return sim->Shptr();
-	else
-		return 0;
-}
 
-// gets name of shape from msl pos
-char const * GetMSLLoadedShapeName(int listpos)
-{
-	ShapeInMSL const * sim = ShapeInMSL::GetByMSL(listpos);
 
-	if (sim)
-		return sim->Name();
-	else
-		return 0;
-}
-
-// gets name of shape from pointer; the shape need not be in msl
-char const * GetPtrLoadedShapeName(SHAPEHEADER * shptr)
-{
-	ShapeInMSL const * sim = ShapeInMSL::GetByPtr(shptr);
-
-	if (sim)
-		return sim->Name();
-	else
-		return 0;
-}
-
-// free a reference to a named shape if it exists - not necessary since these are all tidied up
-void FreeShapeNameReference(SHAPEHEADER * shptr)
-{
-	for (LIF<ShapeInMSL*> search(&msl_shapes); !search.done(); search.next())
-	{
-		if (search()->Shptr() == shptr)
-		{
-			delete search();
-			search.delete_current();
-			break;
-		}
-	}
-
-	return;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// Initializing, deallocating of shapes, mainly hooks for project specific fns
-//////////////////////////////////////////////////////////////////////////////
-
-// delete a shape by the shapeheader
-void DeallocateLoadedShapePtr(SHAPEHEADER * shp)
-{
-	DeallocateLoadedShapeheader(shp);
-
-	FreeShapeNameReference(shp);
-}
-
-// delete a shape by the shape list number
-void DeallocateLoadedShapeMSL(RIFFHANDLE h, int list_pos)
-{
-	h->shape_nums.delete_entry(list_pos);
-	
-	DeallocateLoadedShapeheader(mainshapelist[list_pos]);
-
-	FreeMSLPos(list_pos);
-
-	for(LIF<ShapeInMSL*> msl_shape_lif(&msl_shapes);!msl_shape_lif.done();msl_shape_lif.next())
-	{
-		if(list_pos==msl_shape_lif()->Listpos())
-		{
-			delete msl_shape_lif();
-			msl_shape_lif.delete_current();
-			break;
-		}
-	}
-}
-
-void DeallocateRifLoadedShapeheader(SHAPEHEADER * shp)
-{
-	// because the SHAPEHEADER is calloced, we can
-	// just delete the arrays we want
-	
-
-	int max_num_texs = 0;
-	int i;
-
-	if(shp->animation_header)
-	{
-		// so it gets deallocated properly
-		shp->points[0] = 0;
-		shp->sh_normals[0] = 0;
-		shp->sh_vnormals[0] = 0;
-	}
-	if (shp->sh_fragdesc)
-	{
-		DeallocateFragments(shp,shp->sh_fragdesc);
-	}
-	
-
-}
 
 ///////
 // Misc
@@ -2231,15 +2103,12 @@ BOOL copy_to_shapeheader (
 	
 }
 BOOL copy_preprocessed_to_shapeheader (
-	RIFFHANDLE h, 
 	Shape_Preprocessed_Data_Chunk* spdc, 
 	SHAPEHEADER *& shphd, 
-	Chunk_With_Children * shape, 
 	int /*flags*/, 
 	int local_max_index,
 	int * local_tex_index_nos,
-	int /*listpos*/,
-	const ChunkObject* object
+	int /*listpos*/
 	)
 {
 	shphd = (SHAPEHEADER*)spdc->GetMemoryBlock();

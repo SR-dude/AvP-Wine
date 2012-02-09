@@ -132,7 +132,7 @@ void InitQueenBehaviour(void* bhdata, STRATEGYBLOCK *sbPtr);
 void QueenBehaviour(STRATEGYBLOCK *sbPtr);
 void MakeQueenNear(STRATEGYBLOCK *sbPtr);
 void MakeQueenFar(STRATEGYBLOCK *sbPtr);
-void QueenIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple,SECTION_DATA *Section, VECTORCH *incoming, VECTORCH *point);
+void QueenIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple,SECTION_DATA *Section, VECTORCH *incoming/*, VECTORCH *point*/);
 
 #ifdef __cplusplus
 }

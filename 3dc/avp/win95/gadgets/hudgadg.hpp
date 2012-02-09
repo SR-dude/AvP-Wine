@@ -41,7 +41,6 @@ extern "C++" {
 		// Factory method:
 		static HUDGadget* MakeHUD
 		(
-			I_PLAYER_TYPE IPlayerType_ToMake
 		);
 
 		virtual void AddTextReport

@@ -89,10 +89,6 @@ static BOOL gbDpExtDoGrntdMsgs = FALSE;
  */
 static int gnCurrGrntdMsgId = 1;
 
-/* Storage for guaranteed msgs and replies to guaranteed msgs. */
-static struct DpExtGrntdMsgInfo	ggmiMsgs 	= { NULL, 0, 0 };
-static struct DpExtGrntdMsgInfo ggmiReplies = { NULL, 0, 0 };
-
 /* P R O T O S -------------------------------------------------------- */
 
 /* Should all be static. */
@@ -105,19 +101,7 @@ static struct DpExtGrntdMsgInfo ggmiReplies = { NULL, 0, 0 };
 static BOOL DpExtProcessRecvdMsg(BOOL bIsSystemMsg, LPVOID lpData, 
  	DWORD dwDataSize);
 
-/* Generates and returns a checksum for the supplied buffer. The algorithm
- * used ignores the first 4 bytes of the buffer (this is where the checksum
- * should eventually be stored) and is sensitive to the order of the bytes 
- * and long words stored as well as lost data, added data, duplicated data,
- * and standard corruption.
- */ 
-static DWORD DpExtChecksumMsg(LPVOID lpData, DWORD dwDataSize);
-	
-/* Use a destroy msg to try and free up nodes in the guaranteed msg list 
- * that will never now be freed in the usual manner i.e. by a reply to or 
- * a re-send from the player.
- */
-static void DpExtUseDestroyMsg(LPDPMSG_DESTROYPLAYERORGROUP pmsgDestroy);
+
 	
 /* -------------------------------------------------------------------- *
  *																		*
@@ -142,12 +126,6 @@ BOOL DpExtInit(DWORD cGrntdBufs, DWORD cBytesPerBuf,
 	BOOL bErrChcks)
 {
 	return TRUE;
-}
-
-
-/* Un-initialises the DpExt module. */ 
-void DpExtUnInit(void)
-{
 }
 
  
@@ -188,7 +166,7 @@ HRESULT DpExtSend
 		}
 		if( gbDpExtDoErrChcks ) 
 		{
-			pmsghdr->dwChecksum = DpExtChecksumMsg( lpData, dwDataSize );
+			pmsghdr->dwChecksum = 0;
 		}
 	}
 	
@@ -343,16 +321,12 @@ static BOOL DpExtProcessRecvdMsg(BOOL bIsSystemMsg, LPVOID lpData,
 			 */
 			DPMSG_GENERIC *pmsgGeneric = (DPMSG_GENERIC *) lpData; 
 			
-			if( DPSYS_DESTROYPLAYERORGROUP == pmsgGeneric->dwType )
-			{
-				DpExtUseDestroyMsg( (LPDPMSG_DESTROYPLAYERORGROUP) 
-					pmsgGeneric );
-			} 
 		} 
 	}
 	else
 	{
 		/* No, this isn't a system message. Use DpExt header... */
+// adj unused
 		struct DpExtHeader *pmsghdr = (struct DpExtHeader *) lpData;
 		
 		LOCALASSERT( dwDataSize >= DPEXT_HEADER_SIZE );
@@ -370,23 +344,4 @@ static BOOL DpExtProcessRecvdMsg(BOOL bIsSystemMsg, LPVOID lpData,
 }	
 
 
-/* Generates and returns a checksum for the supplied buffer. The algorithm
- * used ignores the first 4 bytes of the buffer (this is where the checksum
- * should eventually be stored) and is sensitive to the order of the bytes 
- * and long words stored as well as lost data, added data, duplicated data,
- * and standard corruption.
- */ 
-static DWORD DpExtChecksumMsg(LPVOID lpData, DWORD dwDataSize)
-{
-	return 0;	/* No implementation yet. */
-}
 
-
-/* Use a destroy msg to try and free up nodes in the guaranteed msg list 
- * that will never now be freed in the usual manner i.e. by a reply to or 
- * a re-send from the player.
- */
-static void DpExtUseDestroyMsg(LPDPMSG_DESTROYPLAYERORGROUP pmsgDestroy)
-{
-	/* No implementation yet. */
-}

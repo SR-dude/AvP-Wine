@@ -99,7 +99,7 @@ void InitFacehuggerBehaviour(void* bhdata, STRATEGYBLOCK *sbPtr);
 void FacehuggerBehaviour(STRATEGYBLOCK *sbPtr);
 void MakeFacehuggerNear(STRATEGYBLOCK *sbPtr);
 void MakeFacehuggerFar(STRATEGYBLOCK *sbPtr);
-void FacehuggerIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple);
+void FacehuggerIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage);
 void Wake_Hugger(STRATEGYBLOCK *sbPtr);
 		
 

@@ -79,7 +79,6 @@ typedef enum ImageTypeIdx
 
 } IMAGETYPEIDX;
 
-extern SHADING desired_shading;
 
 int PcOptionsMenu(void);
 void MouseOptionsMenu(void);
@@ -92,14 +91,7 @@ extern int SetGameVideoMode(void);
 void RestoreGameVideoMode(void);
 void InitOptionsMenu(void);
 
-extern void SaveVideoModeSettings(void);
-
 BOOL PreferTextureFormat(struct D3DTextureFormat const * oldfmt,struct D3DTextureFormat const * newfmt);
-
-extern const char * GenTex4bit_Directory;
-extern const char * GenTex8bit_Directory;
-extern const char * GenTex75pc_Directory;
-extern const char * GenTex50pc_Directory;
 
 void SelectGenTexDirectory(IMAGETYPEIDX);
 float GetUVScale(IMAGETYPEIDX);

@@ -11,7 +11,6 @@
 #include "dynblock.h"
 #include "avpview.h"
 
-#include "load_shp.h"
 #include "kzsort.h"
 #include "kshape.h"
 

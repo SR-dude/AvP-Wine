@@ -103,7 +103,6 @@ void InitPlayer(STRATEGYBLOCK* sbPtr, int sb_type)
 	* and fills in some initial values.                                                       *
 	**************************************************************************************KJL*/
 
-	SECTION *root_section;
 	PLAYER_STATUS *psPtr = &PlayerStatusBlock;
 	GLOBALASSERT(psPtr);
  	GLOBALASSERT(sbPtr);
@@ -1186,6 +1185,7 @@ void DeInitialisePlayer(void) {
 	/* I thought it would be logical to put it here... */
 	
   	int slot = MAX_NO_OF_WEAPON_SLOTS;
+// adj unused
 	PLAYER_STATUS *playerStatusPtr= (PLAYER_STATUS *) (Player->ObStrategyBlock->SBdataptr);
 
     do {

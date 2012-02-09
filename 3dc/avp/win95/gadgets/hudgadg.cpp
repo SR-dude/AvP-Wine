@@ -31,7 +31,6 @@ HUDGadget* HUDGadget :: pSingleton;
 // Factory method:
 HUDGadget* HUDGadget :: MakeHUD
 (
-	I_PLAYER_TYPE IPlayerType_ToMake
 )
 {
 

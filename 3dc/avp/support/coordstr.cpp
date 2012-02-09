@@ -185,6 +185,7 @@ AcyclicPulsingCoordinate::~AcyclicPulsingCoordinate()
 ACTIVITY_RETURN_TYPE AcyclicPulsingCoordinate::Activity(ACTIVITY_INPUT)
 {
 	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+// adj unused
 	int Int_CurrentCoord_Old = Int_CurrentCoord_Val;
 	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -237,6 +238,7 @@ CyclicPulsingCoordinate::~CyclicPulsingCoordinate()
 ACTIVITY_RETURN_TYPE CyclicPulsingCoordinate::Activity(ACTIVITY_INPUT)
 {
 	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+// adj unused
 	int Int_CurrentCoord_Old = Int_CurrentCoord_Val;
 	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -385,6 +387,7 @@ AcyclicFixedSpeedHoming::~AcyclicFixedSpeedHoming()
 ACTIVITY_RETURN_TYPE AcyclicFixedSpeedHoming::Activity(ACTIVITY_INPUT)
 {
 	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+// adj unused
 	int Int_CurrentCoord_Old = Int_CurrentCoord_Val;
 	int FixP_Delta_Homing = (FixP_TargetCoord_Val - FixP_Position_Val);
 	int FixP_Delta_Position = MUL_FIXED(FixP_Time, FixP_Velocity_Val);

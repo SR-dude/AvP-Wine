@@ -303,7 +303,8 @@ int AVP_ChangeDisplayMode
 // hooks for doing stuff after drawing and
 // after a flip
 
-void ProjectSpecificItemListPostProcessing(void){;}
+
+// adj stub
 void ProjectSpecificBufferFlipPostProcessing(void){;}
 
 

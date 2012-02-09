@@ -10,7 +10,6 @@
 #include "bh_types.h"
 #include "inventry.h"
 #include "comp_shp.h"
-#include "load_shp.h"
 #include "huddefs.h"
 
 #define UseLocalAssert Yes

@@ -110,7 +110,6 @@ void* BinarySwitchBehaveInit(void* bhdata, STRATEGYBLOCK* sbptr)
 		int shape_num = bs_tt->shape_num;
 		SHAPEHEADER *shptr = GetShapeData(shape_num);
  
-		SetupPolygonFlagAccessForShape(shptr);
 
 		pptxactrlblk = &bs_bhv->bs_tac;
 

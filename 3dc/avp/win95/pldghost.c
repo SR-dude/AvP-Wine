@@ -17,7 +17,6 @@ d  ----------------------------------------------------------------------*/
 #include "pldghost.h"
 #include "lighting.h"
 #include "psnd.h"
-#include "load_shp.h"
 #include "projload.hpp"
 #include "particle.h"
 #include "sfx.h"
@@ -47,7 +46,6 @@ extern MATRIXCH Identity_RotMat; /* From HModel.c */
   ----------------------------------------------------------------------*/
 
 static void SetPlayerGhostAnimationSequence(STRATEGYBLOCK *sbPtr, int sequence, int special);
-static void InitPlayerGhostAnimSequence(STRATEGYBLOCK *sbPtr);
 static void UpdatePlayerGhostAnimSequence(STRATEGYBLOCK *sbPtr, int sequence, int special);
 
 SOUND3DDATA Ghost_Explosion_SoundData={
@@ -842,6 +840,7 @@ void PostDynamicsExtrapolationUpdate()
 				{
 					if(MultiplayerObservedPlayer==ghostData->playerId)
 					{
+// adj unused
 						PLAYER_STATUS *playerStatusPtr= (PLAYER_STATUS *) (Player->ObStrategyBlock->SBdataptr);
 						Player->ObStrategyBlock->DynPtr->Position=sbPtr->DynPtr->Position;
 						Player->ObStrategyBlock->DynPtr->PrevPosition=sbPtr->DynPtr->Position;
@@ -1611,42 +1610,7 @@ Update changes the sequence if appropriate (and calls set if the sbPtr has a dpt
 Set selects the correct sequence/type, infers the speed and follow-on sequences,
 etc, and sets it.
 ------------------------------------------------------------------------------*/
-static void InitPlayerGhostAnimSequence(STRATEGYBLOCK *sbPtr)
-{
-	NETGHOSTDATABLOCK *ghostData;
-	AVP_BEHAVIOUR_TYPE type;
-	
-	LOCALASSERT(sbPtr);
-	LOCALASSERT(!(sbPtr->SBdptr));
-	ghostData = (NETGHOSTDATABLOCK *)sbPtr->SBdataptr;
-	LOCALASSERT(ghostData);
-	type = ghostData->type;
-
-	InitShapeAnimationController(&ghostData->ShpAnimCtrl, GetShapeData(sbPtr->shapeIndex));
-	switch(type)
-	{
-		case(I_BehaviourMarinePlayer):
-		{
-			ghostData->currentAnimSequence = MSQ_Stand;
-			break;
-		}
-		case(I_BehaviourAlienPlayer):
-		{
-			ghostData->currentAnimSequence = ASQ_Stand;
-			break;
-		}
-		case(I_BehaviourPredatorPlayer):
-		{
-			ghostData->currentAnimSequence = PredSQ_Stand;
-			break;
-		}
-		default:
-		{
-			LOCALASSERT(1==0);
-			break;
-		}
-	}
-}
+// adj deleted  InitPlayerGhostAnimSequence ()
 
 static void UpdatePlayerGhostAnimSequence(STRATEGYBLOCK *sbPtr, int sequence, int special)
 {
@@ -3876,49 +3840,7 @@ void MaintainGhostFireStatus(STRATEGYBLOCK *sbPtr, int IsOnFire)
 	}
 }
 
-void Engage_Template_Death(STRATEGYBLOCK *sbPtr,SECTION *root,HMODELCONTROLLER *controller,int type, int subtype,
-	int length, int tweening) {
 
-	RemoveAllDeltas(controller);
-	Transmogrify_HModels(sbPtr,controller, root, 1, 0,0);
-	InitHModelTweening(controller,tweening,type,subtype,length,0);
-
-}
-
-void Create_Marine_Standing_Template_Death(STRATEGYBLOCK *sbPtr,HMODELCONTROLLER *controller,int type, int subtype,
-	int length, int tweening) {
-
-	/* Standing template. */
-	SECTION *root;
-	
-	/* This has gotta be considered weird. */
-	InitHModelSequence(controller,(int)HMSQT_MarineStand,
-		(int)MSSS_Dies_Standard,(ONE_FIXED<<1));
-	ProveHModel_Far(controller,sbPtr);
-	/* And now we change it.  See? */
-	
-	root=GetNamedHierarchyFromLibrary("hnpcmarine","Template");
-	
-	Engage_Template_Death(sbPtr,root,controller,type,subtype,length,tweening);
-
-}
-
-void Create_Predator_Standing_Template_Death(STRATEGYBLOCK *sbPtr,HMODELCONTROLLER *controller,int type, int subtype,
-	int length, int tweening) {
-
-	/* Standing template. */
-	SECTION *root;
-	
-	/* This has gotta be considered weird. */
-	InitHModelSequence(controller,(int)HMSQT_PredatorStand,
-		(int)PSSS_Dies_Standard,(ONE_FIXED<<1));
-	ProveHModel_Far(controller,sbPtr);
-	/* And now we change it.  See? */
-	
-	root=GetNamedHierarchyFromLibrary("hnpcpredator","Template");
-
-	Engage_Template_Death(sbPtr,root,controller,type,subtype,length,tweening);
-}
 
 /* Kills a ghost, to leave a corpse */
 void KillGhost(STRATEGYBLOCK *sbPtr,int objectId)
@@ -4252,32 +4174,18 @@ extern void KillAlienAIGhost(STRATEGYBLOCK *sbPtr,int death_code,int death_time,
 
 }
 
-int Deduce_PlayerDeathSequence(void) {
 
-	int a;
-	PLAYER_STATUS *playerStatusPtr = (PLAYER_STATUS *)(Player->ObStrategyBlock->SBdataptr);
-
-	a=((FastRandom()&65535)>>12)&14; /* 0,2,4,6,8,10,12,14 */
-	if (playerStatusPtr->ShapeState == PMph_Crouching) {
-		return(a);
-	} else {
-		return(a+1);
-	}
-
-}
 
 int Deduce_PlayerMarineDeathSequence(STRATEGYBLOCK* sbPtr,DAMAGE_PROFILE* damage,int multiple,VECTORCH* incoming)
 {
 	PLAYER_STATUS *playerStatusPtr = (PLAYER_STATUS *)(Player->ObStrategyBlock->SBdataptr);
 	NETCORPSEDATABLOCK *corpseDataPtr=(NETCORPSEDATABLOCK *)sbPtr->SBdataptr;
 	
-	int deathtype,gibbFactor;
-	int a;
-
-	SECTION_DATA *head;
+	int deathtype;
+// adj unused	//int gibbFactor;
 
 	/* Set GibbFactor  and death type*/
-	gibbFactor=0;
+//	gibbFactor=0;
 	{
 		int tkd;
 		
@@ -4287,7 +4195,7 @@ int Deduce_PlayerMarineDeathSequence(STRATEGYBLOCK* sbPtr,DAMAGE_PROFILE* damage
 		if (damage->ExplosivePower==1) {
 			if (MUL_FIXED(tkd,(multiple&((ONE_FIXED<<1)-1)))>20) {
 				/* Okay, you can gibb now. */
-				gibbFactor=ONE_FIXED>>1;
+//				gibbFactor=ONE_FIXED>>1;
 				deathtype=2;
 			}
 		} else if ((tkd>60)&&((multiple>>16)>1)) {
@@ -4296,14 +4204,14 @@ int Deduce_PlayerMarineDeathSequence(STRATEGYBLOCK* sbPtr,DAMAGE_PROFILE* damage
 			newmult=DIV_FIXED(multiple,NormalFrameTime);
 			if (MUL_FIXED(tkd,newmult)>(500)) {
 				/* Loadsabullets! */
-				gibbFactor=-(ONE_FIXED>>2);
+//				gibbFactor=-(ONE_FIXED>>2);
 				deathtype=2;
 			}
 		}
 
 		if ((damage->ExplosivePower==2)||(damage->ExplosivePower==6)) {
 			/* Basically SADARS only. */
-			gibbFactor=ONE_FIXED;
+//			gibbFactor=ONE_FIXED;
 			deathtype=3;
 		}
 	}
@@ -4543,7 +4451,6 @@ int Deduce_PlayerPredatorDeathSequence(STRATEGYBLOCK* sbPtr,DAMAGE_PROFILE* dama
 		HIT_FACING facing;
 		SECTION *root;
 		int burning;
-		int wounds;
 		int crouched;
 
 		root=GetNamedHierarchyFromLibrary("hnpcpredator","Template");

@@ -30,11 +30,8 @@ CDOPERATIONSTATES;
   -----------------------------------------------------------------------------*/
 extern void CDDA_Start(void);
 extern void CDDA_End(void);
-/* Patrick 10/6/97 --------------------------------------------------------------
- This is provided to allow platform specific polling/management of the CD device
- whilst playing. It should be called during the main game loop. 
-  -----------------------------------------------------------------------------*/
-extern void CDDA_Management(void);
+
+
 /* Patrick 10/6/97 --------------------------------------------------------------
   Play , change volume, and stop are the basic CDDA operations provided. An
   enumeration of tracks should be provided in the platform header.
@@ -44,12 +41,8 @@ extern void CDDA_PlayLoop(int CDDATrack);
 extern void CDDA_ChangeVolume(int volume);
 extern void CDDA_Stop(void);
 extern int CDDA_CheckNumberOfTracks(void);
-/* Patrick 23/6/97 --------------------------------------------------------------
-  Returns the current CDDA volume setting.  NB if the cd player has not been 
-  initialised the volume setting can still be obtained by calling this function,
-  though it may not be changed using CDDA_ChangeVolume(). 
-  -----------------------------------------------------------------------------*/
-extern int CDDA_GetCurrentVolumeSetting(void);
+
+
 /* Patrick 10/6/97 --------------------------------------------------------------
   Switch on and switch off may be used to stop and start the CDDA system after
   initialisation. They are provided to allow the user to stop and start CDDA

@@ -409,62 +409,7 @@ void StartAlienMovementSequence(STRATEGYBLOCK *sbPtr) {
 
 }
 
-void Force_Alien_Running_Sequence(STRATEGYBLOCK *sbPtr) {
 
-	int redo;
-	ALIEN_STATUS_BLOCK *alienStatusPointer;
-	
-	LOCALASSERT(sbPtr);
-	alienStatusPointer=(ALIEN_STATUS_BLOCK *)(sbPtr->SBdataptr);    
-	LOCALASSERT(alienStatusPointer);
-	
-	redo=0;
-
-	switch(alienStatusPointer->HModelController.Sequence_Type) {
-		case ((int)HMSQT_AlienCrawl):
-		{
-			int crawlMode;
-			
-			crawlMode=GetAlienCrawlMode(sbPtr);
-
-			if (alienStatusPointer->HModelController.Sub_Sequence!=crawlMode) {
-				redo=1;
-			}
-			break;
-		}
-		case ((int)HMSQT_AlienRun):
-		{
-			if (alienStatusPointer->HModelController.Sub_Sequence!=(int)ARSS_Standard) {
-				redo=1;
-			}
-			break;
-		}
-		case ((int)HMSQT_AlienStand):
-		{
-				redo=1;
-			break;
-		}
-		case ((int)HMSQT_AlienCrouch):
-		{
-				redo=1;
-			break;
-		}
-		default:
-		{
-			GLOBALASSERT(0);
-			break;
-		}
-	}
-
-	if (redo) {
-
-		StartAlienMovementSequence(sbPtr);
-
-	}
-
-	GLOBALASSERT(alienStatusPointer->HModelController.Playing);	
-
-}
 
 void StartAlienAttackSequence(STRATEGYBLOCK *sbPtr) {
 
@@ -595,27 +540,6 @@ static enum AMMO_ID GetAttackDamageType(STRATEGYBLOCK *sbPtr,int flagnum) {
 
 }
 
-static void DoAlienAIAttackSound(STRATEGYBLOCK *sbPtr) {
-
-	DYNAMICSBLOCK *dynPtr;
-	SOUNDINDEX soundIndex;
-	ALIEN_STATUS_BLOCK *alienStatusPointer;
-
-	GLOBALASSERT(sbPtr);
-	alienStatusPointer = (ALIEN_STATUS_BLOCK *)(sbPtr->SBdataptr);    
-	LOCALASSERT(alienStatusPointer);
-	dynPtr = sbPtr->DynPtr;
-	LOCALASSERT(dynPtr);
-
-	/* This one is for ALIEN SWIPE SOUND. */
-
-	soundIndex=SID_NOSOUND;
-
-	PlayAlienSound((int)alienStatusPointer->Type,ASC_Swipe,0,
-		NULL,&sbPtr->DynPtr->Position);
-
-
-}
 
 static void DoAlienAIRandomHiss(STRATEGYBLOCK *sbPtr) {
 
@@ -802,7 +726,6 @@ static void AlienNearState_Approach(STRATEGYBLOCK *sbPtr)
  	
  	/* target acquisition ? */
 	{
-		extern DISPLAYBLOCK *Player;
 		if(VectorDistance(&(alienStatusPointer->Target->DynPtr->Position),&(dynPtr->Position)) < ALIEN_CURVETOPLAYERDIST)		  
 		{
 			curveToPlayer = 1;	
@@ -1258,7 +1181,6 @@ static void AlienNearState_Wander(STRATEGYBLOCK *sbPtr)
 {
 	ALIEN_STATUS_BLOCK *alienStatusPointer;    
 	DYNAMICSBLOCK *dynPtr;
-	int approachingAirDuct = 0;
 	VECTORCH velocityDirection = {0,0,0};
 
 	LOCALASSERT(sbPtr);
@@ -1491,7 +1413,6 @@ static void AlienNearState_Retreat(STRATEGYBLOCK *sbPtr)
 {
 	ALIEN_STATUS_BLOCK *alienStatusPointer;    
 	DYNAMICSBLOCK *dynPtr;
-	int approachingAirDuct = 0;
 	VECTORCH velocityDirection = {0,0,0};
 
 	LOCALASSERT(sbPtr);
@@ -1965,6 +1886,7 @@ int AlienHasPathToTarget(STRATEGYBLOCK *sbPtr) {
 	{
 		GLOBALASSERT(alienStatusPointer->Target->containingModule);
 		{
+// adj unused
 			PLAYER_STATUS *playerStatusPtr= (PLAYER_STATUS *) (Player->ObStrategyBlock->SBdataptr);
 			LOCALASSERT(playerStatusPtr);
 

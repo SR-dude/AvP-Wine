@@ -346,7 +346,7 @@ struct ChunkAnimSequence
 	ChunkAnimSequence& operator=(const ChunkAnimSequence &);
 	
 	void DeleteInterpolatedFrames();
-	void GenerateInterpolatedFrames(ChunkShape const *cs);
+	void GenerateInterpolatedFrames(/*ChunkShape const *cs*/void);
 	
 	void UpdateNormalsAndExtents(ChunkShape const *cs,List<int>* poly_not_in_bb=0);
 

@@ -24,7 +24,7 @@
 
 GUID SPGuid;
 LPGUID lpSPGuid = (LPGUID) &SPGuid;
-BOOL GotTCPIP;
+
 
 /*
 Version 0 - Original multiplayer + save patch
@@ -198,7 +198,6 @@ int DirectPlay_JoinGame(void)
 
 int DirectPlay_ConnectToSession(int sessionNumber, char *playerName)
 {
-	extern unsigned char DebouncedKeyboardInput[];
 	
 	if (FAILED(DPlayOpenSession((LPGUID)&SessionData[sessionNumber].Guid))) return 0;
 	
@@ -398,7 +397,7 @@ int DirectPlay_Disconnect(void)
 }
 
 
-
+// adj  lpdwTimeOut lpContext unused
 BOOL FAR PASCAL EnumSessionsCallback(
 						LPCDPSESSIONDESC2       lpSessionDesc,
 						LPDWORD                         lpdwTimeOut,
@@ -507,6 +506,8 @@ void FindAvPSessions(void)
 
 
 // ---------------------------------------------------------------------------
+
+// adj  dwSize lpName dwFlags lpContext unused 
 BOOL FAR PASCAL EnumSPCallback(
 						LPCGUID			lpguidSP,
 						LPVOID			lpConnection,
@@ -543,6 +544,7 @@ BOOL FAR PASCAL EnumSPCallback(
 
 static BOOL ConnectionOk;
 
+// adj  dwSize lpName dwFlags unused
 BOOL FAR PASCAL EnumSPAndConnectCallback(
 						LPCGUID			lpguidSP,
 						LPVOID			lpConnection,
@@ -585,60 +587,6 @@ void DirectPlay_EnumConnections()
 	IDirectPlayX_EnumConnections( glpDP, glpGuid, EnumSPCallback, 0, 0);
 }
 
-
-
-BOOL GetTCPIPConnection(void)
-{
-	extern char IPAddressString[]; 
-	HRESULT hr;
-	DPCOMPOUNDADDRESSELEMENT addressElements[3];
-	LPVOID lpAddress=NULL;
-	DWORD dwElementCount;
-	DWORD dwAddressSize;
-
-	GotTCPIP = FALSE;
-	/* Enumerate Service Providers */
-	IDirectPlayX_EnumConnections( glpDP, glpGuid, EnumSPCallback, 0, 0);
-
-	if (!GotTCPIP) return FALSE;
-
-	DPlayRelease();
-
-	addressElements[0].guidDataType = DPAID_ServiceProvider;
-	addressElements[0].dwDataSize = sizeof(GUID);
-	addressElements[0].lpData = (LPVOID) &DPSPGUID_TCPIP;
-
-	// IP address string
-	addressElements[1].guidDataType = DPAID_INet;
-	addressElements[1].dwDataSize = lstrlen(IPAddressString) + 1;
-	addressElements[1].lpData = IPAddressString;
-	dwElementCount = 2;
-
-	// see how much room is needed to store this address
-	hr = lpDPlayLobby->lpVtbl->CreateCompoundAddress(lpDPlayLobby,addressElements, dwElementCount, NULL, &dwAddressSize);
-
-	if (hr != DPERR_BUFFERTOOSMALL)	goto FAILURE;
-
-	// allocate space
-	lpAddress = AllocMem(dwAddressSize);
-	if (lpAddress == NULL)
-	{
-		hr = DPERR_NOMEMORY;
-		goto FAILURE;
-	}
-
-	// create the address
-	hr = lpDPlayLobby->lpVtbl->CreateCompoundAddress(lpDPlayLobby,addressElements, dwElementCount, lpAddress, &dwAddressSize);
-	if FAILED(hr) goto FAILURE;
-
-	DPlayCreate(lpAddress);
-	return TRUE;
-
-	FAILURE:
-
-	if (lpAddress) DeallocateMem(lpAddress);
-	return FALSE;
-}
 
 BOOL InitialiseConnection()
 {

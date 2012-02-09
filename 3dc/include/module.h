@@ -239,53 +239,50 @@ typedef struct	aview
 } AVIEW;
 
 /* Module Function Prototypes */
-void				ModuleHandler(VIEWDESCRIPTORBLOCK *vdb);
-void				ProcessModules(VIEWDESCRIPTORBLOCK *vdb, MODULE *mptr);
-void				ViewFinder(MODULE *mptr);
-void				ReadVMODULEArrays(VMODULE *vptr);
+void ModuleHandler(VIEWDESCRIPTORBLOCK *vdb);
+void ProcessModules(VIEWDESCRIPTORBLOCK *vdb, MODULE *mptr);
+void ViewFinder(MODULE *mptr);
+void ReadVMODULEArrays(VMODULE *vptr);
 
-void				UpdateModules(void);
-void				ModuleFunctions(MODULE *mptr, MFUNCTION mf);
-void				AllocateModuleObject(MODULE *mptr);
-void				DeallocateModuleObject(MODULE *mptr);
+void UpdateModules(void);
+void AllocateModuleObject(MODULE *mptr);
+void DeallocateModuleObject(MODULE *mptr);
 
 /* A project supplied function. These are the new and old modules this ???? */
-void				NewAndOldModules(int num_new, MODULE **m_new, int num_old, MODULE **m_old, char *m_currvis);
+void NewAndOldModules(int num_new, MODULE **m_new, int num_old, MODULE **m_old, char *m_currvis);
 
-void				InitGlobalVMA(void);
-void				DeallocateGlobalVMA(void);
-void				UpdateDynamicModuleObjects(void);
+void InitGlobalVMA(void);
+void DeallocateGlobalVMA(void);
+void UpdateDynamicModuleObjects(void);
 
-void				PreprocessAllModules(void);
-void				PreprocessModuleArray(MODULE **m_array_ptr);
-void				PreprocessVMODIDATA(VMODULE *v_ptr);
+void PreprocessAllModules(void);
+void PreprocessModuleArray(MODULE **m_array_ptr);
+void PreprocessVMODIDATA(VMODULE *v_ptr);
 
-void				DeallocateModuleVisArrays(void);
-int					GetModuleVisArrays(void);
-int					InsideModule(MODULE *mptr);
+void DeallocateModuleVisArrays(void);
+int GetModuleVisArrays(void);
+int InsideModule(MODULE *mptr);
 
-void				ConvertModuleNameToPointer(MREF *mref_ptr, MODULE **m_array_ptr);
-void				ConvertVModuleNameToPointer(VMODIDATA *vmodidata_ptr, VMODULE *v_array_ptr);
+void ConvertModuleNameToPointer(MREF *mref_ptr, MODULE **m_array_ptr);
+void ConvertVModuleNameToPointer(VMODIDATA *vmodidata_ptr, VMODULE *v_array_ptr);
 
-int					CompareName(char *name1, char *name2);
-void				PrintName(char *name);
+int CompareName(char *name1, char *name2);
 
-int					SaveModuleArray(MODULE *mptr, char *filename);
-MODULE				*LoadModuleArray(MODULE *mptr, int size, char *filename);
+int SaveModuleArray(MODULE *mptr, char *filename);
+MODULE *LoadModuleArray(MODULE *mptr, int size, char *filename);
 
-int					IsModuleVisibleFromModule(MODULE *source, MODULE *target);
+int IsModuleVisibleFromModule(MODULE *source, MODULE *target);
 
 extern SCENEMODULE	**Global_ModulePtr;
 extern SCENEMODULE	*MainSceneArray[];
 extern AVIEW		ModuleView;
-extern MODULE		*Global_MotherModule;
-extern char			*ModuleCurrVisArray;
-extern char			*ModulePrevVisArray;
-extern char			*ModuleTempArray;
-extern char			*ModuleLocalVisArray;
-extern int			ModuleArraySize;
+extern char		*ModuleCurrVisArray;
+extern char		*ModulePrevVisArray;
+extern char		*ModuleTempArray;
+extern char		*ModuleLocalVisArray;
+extern int		ModuleArraySize;
 
-extern int			AIModuleArraySize;
+extern int		AIModuleArraySize;
 extern AIMODULE		*AIModuleArray;
 
 #ifdef __cplusplus

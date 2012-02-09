@@ -1114,17 +1114,6 @@ void ReadPlayerGameInput(STRATEGYBLOCK* sbPtr)
 
 
 
-void SaveDefaultPrimaryConfigs(void)
-{
-	FILE* file=fopen("default.cfg","wb");
-	if(!file) return;
-
-	fwrite(&DefaultMarineInputPrimaryConfig,sizeof(PLAYER_INPUT_CONFIGURATION),1,file);
-	fwrite(&DefaultPredatorInputPrimaryConfig,sizeof(PLAYER_INPUT_CONFIGURATION),1,file);
-	fwrite(&DefaultAlienInputPrimaryConfig,sizeof(PLAYER_INPUT_CONFIGURATION),1,file);
-
-	fclose(file);
-}
 void LoadDefaultPrimaryConfigs(void)
 {
 	FILE* file=fopen("default.cfg","rb");
@@ -1136,14 +1125,5 @@ void LoadDefaultPrimaryConfigs(void)
 
 	fclose(file);
 }
-
-
-
-
-
-
-
-
-
 
 

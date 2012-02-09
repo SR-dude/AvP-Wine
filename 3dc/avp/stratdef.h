@@ -247,11 +247,6 @@ extern void DestroyAnyStrategyBlock(STRATEGYBLOCK* sbptr);
 extern void RemoveDestroyedStrategyBlocks(void);
 extern void DestroyAllStrategyBlocks(void);
 
-/* This should be in PLAYER.  But Kevin was on holiday with his files checked out. */
-extern void GivePlayerCloakAway(void);
-
-
-
 
 // for lift and airlock code
 

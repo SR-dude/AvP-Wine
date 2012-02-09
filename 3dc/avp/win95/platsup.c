@@ -13,21 +13,6 @@
 /* Externs from pc\io.c */
 extern int InputMode;
 extern unsigned char KeyboardInput[];
-extern SCREENDESCRIPTORBLOCK ScreenDescriptorBlock;
-extern void (*SetVideoMode[]) (void);
-extern unsigned char *ScreenBuffer;
-extern  unsigned char KeyASCII;
-
-extern void D3D_Line(VECTOR2D* LineStart, VECTOR2D* LineEnd, int LineColour);
-extern void Draw_Line_VMType_8(VECTOR2D* LineStart, VECTOR2D* LineEnd, int LineColour);
-
-
-
-int IDemandFireWeapon(void);
-int IDemandNextWeapon(void);
-int IDemandPreviousWeapon(void);
-
-
 
 
 void catpathandextension(char* dst, char* src)
@@ -54,23 +39,6 @@ void catpathandextension(char* dst, char* src)
 }
 
 
-/* game platform definition of the Mouse Mode*/
-int MouseMode = MouseVelocityMode;
-
-
-/*   Real PC control functions */
-int IDemandLookUp(void)
-{
-	return No;
-}
-
-
-int IDemandLookDown(void)
-{
-	return No;
-}
-
-
 int IDemandTurnLeft(void)
 {
 	InputMode = Digital;
@@ -78,6 +46,7 @@ int IDemandTurnLeft(void)
 		return Yes;
 	return No;
 }
+
 
 
 int IDemandTurnRight(void)
@@ -89,6 +58,7 @@ int IDemandTurnRight(void)
 }
 
 
+
 int IDemandGoForward(void)
 {
 	InputMode = Digital;
@@ -96,6 +66,7 @@ int IDemandGoForward(void)
 		return Yes;
 	return No;
 }
+
 
 
 int IDemandGoBackward(void)
@@ -107,23 +78,6 @@ int IDemandGoBackward(void)
 }
 
 
-int IDemandJump(void)
-{
-	InputMode = Digital;
-        if(KeyboardInput[KEY_CAPS])
-		return Yes;
-	return No;
-}
-
-
-
-int IDemandCrouch(void)
-{
-	InputMode = Digital;
-        if(KeyboardInput[KEY_Z])
-		return Yes;
-	return No;
-}
 
 int IDemandSelect(void)
 {
@@ -134,103 +88,6 @@ int IDemandSelect(void)
 	else return No;
 }
 
-int IDemandStop(void)
-{
-	return No;
-}
-
-
-int IDemandFaster(void)
-{
-	InputMode = Digital;
-	if(KeyboardInput[KEY_LEFTSHIFT])
-		return Yes;
-	return No;
-}
-
-
-int IDemandSideStep(void)
-{
-	InputMode = Digital;
-	if(KeyboardInput[KEY_LEFTALT])
-		return Yes;
-	return No;
-}
-
-int IDemandPickupItem(void)
-{
-	InputMode = Digital;
-	if(KeyboardInput[KEY_P])
-		return Yes;
-	return No;
-}
-
-int IDemandDropItem(void)
-{
-	InputMode = Digital;
-	if(KeyboardInput[KEY_D])
-		return Yes;
-	return No;
-}
-
-int IDemandMenu(void)
-{
-	InputMode = Digital;
-	if(KeyboardInput[KEY_M])
-		return Yes;
-	return No;
-}
-
-int IDemandOperate(void)
-{
-	InputMode = Digital;
-	if(KeyboardInput[KEY_SPACE])
-		return Yes;
-	return No;
-}
-
-
-
-int IDemandFireWeapon(void)
-{
-	InputMode = Digital;
-        if(KeyboardInput[KEY_CR])
-		return Yes;
-	return No;
-}
-
-/* KJL 11:29:12 10/07/96 - added by me */
-int IDemandPreviousWeapon(void)
-{
-	InputMode = Digital;
-   	if(KeyboardInput[KEY_1]) return Yes;
-    else return No;
-}
-int IDemandNextWeapon(void)
-{
-	InputMode = Digital;
-   	if(KeyboardInput[KEY_2]) return Yes;
-    else return No;
-}
-
-
-int IDemandChangeEnvironment()
-{
-	InputMode = Digital;
-
-	if(KeyboardInput[KEY_F1])
-		return 0;
-	else if(KeyboardInput[KEY_F2])
-		return 1;
-	else if(KeyboardInput[KEY_F3])
-		return 2;
-	else if(KeyboardInput[KEY_F4])
-		return 3;
-	else if(KeyboardInput[KEY_F5])
-		return 4;
-	else
-		return(-1);
-}
 
 
 /* KJL 15:53:52 05/04/97 - 

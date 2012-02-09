@@ -104,12 +104,6 @@ enum BMPN_Flags
 
 #define DEFAULT_BMPN_PRIORITY 6
 
-
-extern void Palette_Outdated(Chunk_With_Children * parent); // decalred here, defined in chunkpal to avoid extra compiler dependencies
-extern void FixedPalette_Outdated(Chunk_With_Children * parent); // decalred here, defined in chunkpal to avoid extra compiler dependencies
-extern BOOL IsFixedPalette(Chunk_With_Children * parent);
-
-
 class BMP_Name
 {
 public:

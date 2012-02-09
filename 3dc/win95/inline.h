@@ -36,10 +36,7 @@ extern "C" {
 
 
 /* inline assembly has been moved to mathline.c */
-void ADD_LL(LONGLONGCH *a, LONGLONGCH *b, LONGLONGCH *c);
 void ADD_LL_PP(LONGLONGCH *c, LONGLONGCH *a);
-void SUB_LL(LONGLONGCH *a, LONGLONGCH *b, LONGLONGCH *c);
-void SUB_LL_MM(LONGLONGCH *c, LONGLONGCH *a);
 void MUL_I_WIDE(int a, int b, LONGLONGCH *c);
 int CMP_LL(LONGLONGCH *a, LONGLONGCH *b);
 void EQUALS_LL(LONGLONGCH *a, LONGLONGCH *b);
@@ -75,8 +72,8 @@ a = fti_itmp;}
 
 int WideMul2NarrowDiv(int a, int b, int c, int d, int e);
 int _Dot(VECTORCH *vptr1, VECTORCH *vptr2);
-void MakeV(VECTORCH *v1, VECTORCH *v2, VECTORCH *v3);
-void AddV(VECTORCH *v1, VECTORCH *v2);
+
+
 void RotVect(VECTORCH *v, MATRIXCH *m);
 
 

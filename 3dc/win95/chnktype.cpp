@@ -1053,7 +1053,7 @@ void ChunkAnimSequence::DeleteInterpolatedFrames()
 
 }
 
-void ChunkAnimSequence::GenerateInterpolatedFrames(ChunkShape const *cs)
+void ChunkAnimSequence::GenerateInterpolatedFrames(void)
 {
 	DeleteInterpolatedFrames();
 

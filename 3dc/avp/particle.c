@@ -1975,6 +1975,7 @@ void HandleParticleSystem(void)
 			}
 			case PARTICLE_EXPLOSIONFIRE:
 			{
+// adj both unused
 				VECTORCH obstacleNormal;
 				int moduleIndex;
 
@@ -1987,6 +1988,8 @@ void HandleParticleSystem(void)
 			}
 			case PARTICLE_MOLOTOVFLAME:
 			{
+// adj both unused
+
 				VECTORCH obstacleNormal;
 				int moduleIndex;
 					
@@ -3356,51 +3359,7 @@ void InitialiseRainDrops(void)
 	}
 }
 
-void HandleRainDrops(MODULE *modulePtr,int numberOfRaindrops)
-{
-	int i = numberOfRaindrops;
 
-	PARTICLE *particlePtr = RainDropStorage;
-	LOCALASSERT(i<MAX_RAINDROPS);
-	do
-	{
-		if((particlePtr->Position.vy > modulePtr->m_world.vy+modulePtr->m_maxy-500)
-		 ||(particlePtr->Position.vx < modulePtr->m_world.vx+modulePtr->m_minx)
-		 ||(particlePtr->Position.vx > modulePtr->m_world.vx+modulePtr->m_maxx)
-		 ||(particlePtr->Position.vz < modulePtr->m_world.vz+modulePtr->m_minz)
-		 ||(particlePtr->Position.vz > modulePtr->m_world.vz+modulePtr->m_maxz))
-		{
-			AddRipple(particlePtr->Position.vx,particlePtr->Position.vz,400);
-			particlePtr->Position.vy = modulePtr->m_world.vy+modulePtr->m_miny;
-			particlePtr->Position.vx = modulePtr->m_world.vx+modulePtr->m_minx+(FastRandom()%(modulePtr->m_maxz-modulePtr->m_minx));
-			particlePtr->Position.vz = modulePtr->m_world.vz+modulePtr->m_minz+(FastRandom()%(modulePtr->m_maxz-modulePtr->m_minz));
-			particlePtr->Velocity.vy = (FastRandom()&8191)+15000;
-			particlePtr->Velocity.vx = (FastRandom()&255)-128;
-			particlePtr->Velocity.vz = (FastRandom()&255)-128;
-			{
-				particlePtr->Offset.vx = -particlePtr->Velocity.vz;
-				particlePtr->Offset.vy = 0;
-				particlePtr->Offset.vz = particlePtr->Velocity.vx;
-				Normalise(&(particlePtr->Offset));
-				particlePtr->Offset.vx = MUL_FIXED(particlePtr->Offset.vx,50);
-				particlePtr->Offset.vz = MUL_FIXED(particlePtr->Offset.vz,50);
-			}
-		}
-		{
-			VECTORCH prevPosition = particlePtr->Position;
-
-			particlePtr->Position.vx += MUL_FIXED(particlePtr->Velocity.vx,NormalFrameTime);
-			particlePtr->Position.vy += MUL_FIXED(particlePtr->Velocity.vy,NormalFrameTime);
-			particlePtr->Position.vz += MUL_FIXED(particlePtr->Velocity.vz,NormalFrameTime);
-			if (particlePtr->Position.vy>modulePtr->m_world.vy+modulePtr->m_maxy-500)
-				particlePtr->Position.vy=modulePtr->m_world.vy+modulePtr->m_maxy-495;
-			D3D_DrawParticle_Rain(particlePtr,&prevPosition);
-		}
-		particlePtr++;
-	}
-	while(--i);
-	
-}
 
 void HandleRain(int numberOfRaindrops)
 {
@@ -3443,55 +3402,6 @@ void HandleRain(int numberOfRaindrops)
 			particlePtr->Position.vy = -10000;
 			particlePtr->Position.vx = -77000+(FastRandom()%(211000));
 			particlePtr->Position.vz = -145000+(FastRandom()%(145000+49000));
-	  		particlePtr->Velocity.vy = (FastRandom()&8191)+15000;
-  			particlePtr->Velocity.vx = (FastRandom()&255)+5000;
- 			particlePtr->Velocity.vz = (FastRandom()&255)-128;
-			{
-				particlePtr->Offset.vx = -particlePtr->Velocity.vz;
-				particlePtr->Offset.vy = 0;
-				particlePtr->Offset.vz = particlePtr->Velocity.vx;
-				Normalise(&(particlePtr->Offset));
-				particlePtr->Offset.vx = MUL_FIXED(particlePtr->Offset.vx,20);
-				particlePtr->Offset.vz = MUL_FIXED(particlePtr->Offset.vz,20);
-			}
-		}
-		{
-			VECTORCH prevPosition = particlePtr->Position;
-
-			particlePtr->Position.vx += MUL_FIXED(particlePtr->Velocity.vx,NormalFrameTime);
-			particlePtr->Position.vy += MUL_FIXED(particlePtr->Velocity.vy,NormalFrameTime);
-			particlePtr->Position.vz += MUL_FIXED(particlePtr->Velocity.vz,NormalFrameTime);
-			D3D_DrawParticle_Rain(particlePtr,&prevPosition);
-		}
-		particlePtr++;
-	}
-	while(--i);
-	
-}
-void HandleRainInTrench(int numberOfRaindrops)
-{
-	int i = numberOfRaindrops;
-	/* KJL 15:23:37 12/8/97 - this is written to work with the yard in genshd1 */
-
-	PARTICLE *particlePtr = RainDropStorage;
-	LOCALASSERT(i<MAX_RAINDROPS);
-	do
-	{
-		int killDrop=0;
-		if((particlePtr->Position.vy > 3000)
-		 ||(particlePtr->Position.vx < 13500)
-		 ||(particlePtr->Position.vx > -50000)
-		 ||(particlePtr->Position.vz < -150655)
-		 ||(particlePtr->Position.vz > -50655))
-		{
-			killDrop=1;
-		}
-		
-		if (killDrop)
-		{
-			particlePtr->Position.vy = -16000;
-			particlePtr->Position.vx = -50000+(FastRandom()%(63500));
-			particlePtr->Position.vz = -150655+(FastRandom()%(100000));
 	  		particlePtr->Velocity.vy = (FastRandom()&8191)+15000;
   			particlePtr->Velocity.vx = (FastRandom()&255)+5000;
  			particlePtr->Velocity.vz = (FastRandom()&255)-128;
@@ -4213,7 +4123,7 @@ void MakeVolumetricExplosionAt(VECTORCH *positionPtr, enum EXPLOSION_ID explosio
 		{
 			VOLUMETRIC_EXPLOSION *expPtr;
 			int i;
-			int r;
+			//adj int r;
 			
 			/* KJL 11:49:25 19/08/98 - check to see if explosion is inside environment */
 			{
@@ -4230,7 +4140,7 @@ void MakeVolumetricExplosionAt(VECTORCH *positionPtr, enum EXPLOSION_ID explosio
 			{
 				expPtr->UseCollisions = 1;
 			}
-			r = (FastRandom()&7)+1;
+			//adj r = (FastRandom()&7)+1;
 			
 			for(i=0; i<SPHERE_VERTICES; i++)
 			{
@@ -4447,34 +4357,6 @@ static void HandleVolumetricExplosion(VOLUMETRIC_EXPLOSION *expPtr)
 	}
 }
 
-void MakeOldVolumetricExplosionAt(VECTORCH *positionPtr)
-{
-	int noRequired = 32;//MUL_FIXED(2500,NormalFrameTime);
-	int i;
-	for (i=0; i<noRequired; i++)
-	{
-		VECTORCH velocity;
-		int phi = FastRandom()&4095;
-		int speed = 6000*4+(FastRandom()&4095);
-
-		velocity.vz = (FastRandom()&131071) - ONE_FIXED;
-		{
-			float z = ((float)velocity.vz)/65536.0;
-			z = sqrt(1-z*z);
-
-			f2i(velocity.vx,(float)GetCos(phi)*z);
-			f2i(velocity.vy,(float)GetSin(phi)*z);
-		}
-		
-		velocity.vx = MUL_FIXED(velocity.vx,speed);
-		velocity.vy = MUL_FIXED(velocity.vy,speed);
-		velocity.vz = MUL_FIXED(velocity.vz,speed);
-
-		MakeParticle(positionPtr, &velocity, PARTICLE_EXPLOSIONFIRE);
-	}
-
-	MakeLightElement(positionPtr, LIGHTELEMENT_EXPLOSION);
-}
 
 extern void MakePlasmaExplosion(VECTORCH *positionPtr, VECTORCH *fromPositionPtr, enum EXPLOSION_ID explosionID)
 {
@@ -4770,16 +4652,16 @@ void NewTrailPoint(DYNAMICSBLOCK *dynPtr)
 	trailPtr->Size[1] = 127*65536-MUL_FIXED(TRAIL_DECAY_SPEED,PrevNormalFrameTime);
 }
 
-VECTORCH PlayerPheromoneTrailPerp = {0,0,0};
+
 void PlayerPheromoneTrail(DYNAMICSBLOCK *dynPtr)
 {
  	PHEROMONE_TRAIL *trailPtr = AllocatePheromoneTrail();
-	VECTORCH disp;
+//adj	VECTORCH disp;
 	if (!trailPtr) return;
 
-	disp.vx = dynPtr->Position.vx-dynPtr->PrevPosition.vx;
-	disp.vy = dynPtr->Position.vy-dynPtr->PrevPosition.vy;
-	disp.vz = dynPtr->Position.vz-dynPtr->PrevPosition.vz;
+//	disp.vx = dynPtr->Position.vx-dynPtr->PrevPosition.vx;
+//	disp.vy = dynPtr->Position.vy-dynPtr->PrevPosition.vy;
+//	disp.vz = dynPtr->Position.vz-dynPtr->PrevPosition.vz;
 
 	trailPtr->Vertex[0] = dynPtr->Position;
 	trailPtr->Vertex[0].vx -= dynPtr->OrientMat.mat21>>6;
@@ -4954,7 +4836,6 @@ extern void RenderParticlesInMirror(void)
 		while(numOfObjects)
 		{
 			DISPLAYBLOCK *objectPtr = OnScreenBlockList[--numOfObjects];
-			STRATEGYBLOCK *sbPtr = objectPtr->ObStrategyBlock;
 
 			if (!objectPtr->ObShape && objectPtr->SfxPtr)
 			{

@@ -246,8 +246,6 @@ extern void CharacterChoice(void);
 extern void InitDataBaseMenus(void);
 extern void DoMainMenu(void);
 
-extern int UsingDataBase;
-
 
 extern HUDGRAPHIC Menu[];
 extern HUDGRAPHIC CreditScreen[];

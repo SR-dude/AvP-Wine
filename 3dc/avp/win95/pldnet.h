@@ -901,7 +901,7 @@ typedef struct multiplayer_start
 /* ---------------------------------------------------------------------
    Some prototypes
   ----------------------------------------------------------------------*/
-extern void InitAVPNetGame(void);
+
 extern void NetCollectMessages(void);
 extern void NetSendMessages(void);
 extern void EndAVPNetGame(void);
@@ -914,7 +914,6 @@ extern void DoNetScoresForHostDeath(NETGAME_CHARACTERTYPE myType,NETGAME_CHARACT
 extern void RemovePlayerFromGame(DPID id);
 extern int EmptySlotInPlayerList(void);
 extern void TeleportNetPlayerToAStartingPosition(STRATEGYBLOCK *playerSbPtr, int startOfGame);
-extern int AddUpPlayerFrags(int playerId);
 
 extern void AddNetMsg_GameDescription(void);
 extern void AddNetMsg_PlayerDescription(void);
@@ -928,7 +927,6 @@ extern void AddNetMsg_PlayerLeaving(void);
 extern void AddNetMsg_AllGameScores(void);
 extern void AddNetMsg_PlayerScores(int playerId);
 extern void AddNetMsg_SpeciesScores();
-extern void AddNetMsg_LocalRicochet(AVP_BEHAVIOUR_TYPE behaviourType, VECTORCH *position, VECTORCH *direction);
 extern void AddNetMsg_LocalObjectState(STRATEGYBLOCK *sbPtr);
 extern void AddNetMsg_LocalObjectDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple, int sectionID,int delta_seq,int delta_sub_seq,VECTORCH* incoming);
 extern void AddNetMsg_LocalObjectDestroyed(STRATEGYBLOCK *sbPtr);
@@ -940,7 +938,7 @@ extern void AddNetMsg_PlatformLiftState(STRATEGYBLOCK *sbPtr);
 extern void AddNetMsg_RequestPlatformLiftActivate(STRATEGYBLOCK *sbPtr);
 extern void AddNetMsg_RequestPlatformLiftReverse(STRATEGYBLOCK *sbPtr);
 extern void AddNetMsg_PlayerAutoGunState(STRATEGYBLOCK *sbPtr);
-extern void AddNetMsg_EndGame(void);
+
 extern void AddNetMsg_MakeDecal(enum DECAL_ID decalID, VECTORCH *normalPtr, VECTORCH *positionPtr, int moduleIndex);
 extern void AddNetMsg_ChatBroadcast(char *string,BOOL same_species_only);
 extern void AddNetMsg_MakeExplosion(VECTORCH *positionPtr, enum EXPLOSION_ID explosionID);
@@ -973,7 +971,7 @@ extern void AddNetMsg_SpotOtherSound(enum soundindex SoundIndex,VECTORCH *positi
 
 extern void TransmitEndOfGameNetMsg(void);
 extern void TransmitPlayerLeavingNetMsg(void);
-extern void TransmitStartGameNetMsg(void);
+
 
 extern void RestartNetworkGame(int seed);
 

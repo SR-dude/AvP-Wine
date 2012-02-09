@@ -22,7 +22,7 @@
 #include "ourasert.h"
 
 extern int MarineSight_FrustrumReject(STRATEGYBLOCK *sbPtr,VECTORCH *localOffset,STRATEGYBLOCK *target);
-extern int FrisbeeSight_FrustrumReject(STRATEGYBLOCK *sbPtr,VECTORCH *localOffset,STRATEGYBLOCK *target);
+extern int FrisbeeSight_FrustrumReject(STRATEGYBLOCK *sbPtr,VECTORCH *localOffset/*,STRATEGYBLOCK *target*/);
 
 int NPCCanSeeTarget(STRATEGYBLOCK *sbPtr, STRATEGYBLOCK *target, int viewRange)
 {
@@ -82,7 +82,7 @@ int NPCCanSeeTarget(STRATEGYBLOCK *sbPtr, STRATEGYBLOCK *target, int viewRange)
 					TransposeMatrixCH(&WtoL);
 					RotateVector(&offset,&WtoL);
 
-					frustrum_test=FrisbeeSight_FrustrumReject(sbPtr,&offset,target);
+					frustrum_test=FrisbeeSight_FrustrumReject(sbPtr,&offset);
 				}
 				break;
 			case I_BehaviourMarine:

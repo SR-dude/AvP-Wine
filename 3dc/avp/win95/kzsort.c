@@ -20,188 +20,10 @@ extern int NumVertices;
 extern int WireFrameMode;
 extern int DrawingAReflection;
 
-struct KItem KItemList[maxpolyptrs]={0,};
-static struct KItem KItemList2[maxpolyptrs]={0,};
-
 static struct KObject VisibleModules[MAX_NUMBER_OF_VISIBLE_MODULES]={0,};
 static struct KObject VisibleModules2[MAX_NUMBER_OF_VISIBLE_MODULES]={0,};
 static struct KObject *SortedModules;
 static struct KObject VisibleObjects[maxobjects]={0,};
-
-
-/*KJL*****************************
-* externs for new shape function *
-*****************************KJL*/
-int *MorphedObjectPointsPtr=0;
-
-static void MergeItems(struct KItem *src1, int n1, struct KItem *src2, int n2, struct KItem *dest)
-{
-	/* merge the 2 sorted lists: at src1, length n1, and at src2, length n2, into dest */
-
-	while (n1>0 && n2>0) /* until one list is exhausted */
-	{
-		if (src1->SortKey < src2->SortKey)
-		{
-			/* src1 is nearer */
-			*dest++ = *src1++;
-			n1--;
-		}
-	 	else
-		{
-			/* src2 is nearer */
-			*dest++ = *src2++;
-			n2--;
-		}
-	}
-
-	if (n1==0)
-	{
-	   /* remainder in srce2 goes into dest */
-	   while (n2>0)
-	   {
-			*dest++ = *src2++;
-			n2--;
-	   }
-	}
-	else
-	{
-	   /* remainder in srce1 goes into dest */
-	   while (n1>0)
-	   {
-			*dest++ = *src1++;
-			n1--;
-	   }
-	}
-}
-
-static void MergeObjects(struct KObject *src1, int n1, struct KObject *src2, int n2, struct KObject *dest)
-{
-	/* merge the 2 sorted lists: at src1, length n1, and at src2, length n2, into dest */
-
-	while (n1>0 && n2>0) /* until one list is exhausted */
-	{
-		if (src1->SortKey < src2->SortKey)
-		{
-			/* src1 is nearer */
-			*dest++ = *src1++;
-			n1--;
-		}
-	 	else
-		{
-			/* src2 is nearer */
-			*dest++ = *src2++;
-			n2--;
-		}
-	}
-
-	if (n1==0)
-	{
-	   /* remainder in srce2 goes into dest */
-	   while (n2>0)
-	   {
-			*dest++ = *src2++;
-			n2--;
-	   }
-	}
-	else
-	{
-	   /* remainder in srce1 goes into dest */
-	   while (n1>0)
-	   {
-			*dest++ = *src1++;
-			n1--;
-	   }
-	}
-}
-
-void SortModules(unsigned int noOfItems)
-{
-	unsigned int partitionSize;
-	unsigned int noOfPasses = 0;
-
-	struct KObject *mergeFrom = &VisibleModules[0];
-	struct KObject *mergeTo = &VisibleModules2[0];
-	struct KObject *mergeTemp;
-	
-	unsigned int offSet;
-
-	for (partitionSize=1;partitionSize<noOfItems;partitionSize*=2)
-	{
-		/* for each partition size...
-		   loop through partition pairs and merge */
-
-		/* initialise partition and destination offsets */
-		offSet = 0;
-
-		/* do merges for this partition size,
-		omitting the last merge if the second partition is incomplete  */
-		while((offSet+(partitionSize*2)) <= noOfItems)
-		{
-			MergeObjects(
-				(mergeFrom+offSet),
-				partitionSize,
-				(mergeFrom+offSet+partitionSize),
-				partitionSize,
-				(mergeTo+offSet) );
-
-			offSet += partitionSize*2;
-		}
-
-		/* At this stage, there's less than 2 whole partitions
-		left in the array.  If there's no data left at all, then
-		there's nothing left to do.  However, if there's any data
-		left at the end of the array, we need to do something with it:
-
-		If there's more than a full partition, merge it against the remaining
-		partial partition.  If there's less than a full partition, just copy
-		it across (via the MergeObjects fn): it will be merged in again during a
-		later pass.
-
-		*/
-
-		if((offSet+partitionSize) < noOfItems)
-		{
-			/* merge full partition against a partial partition */
-			MergeObjects(
-				(mergeFrom+offSet),
-				partitionSize,
-				(mergeFrom+offSet+partitionSize),
-				(noOfItems - (offSet+partitionSize)),
-				(mergeTo+offSet) );
-		}
-		else if(offSet < noOfItems)
-		{
-			/* pass the incomplete partition thro' the merge fn
-			   to copy it across */
-			MergeObjects(
-				(mergeFrom+offSet),
-				(noOfItems-offSet),
-				(mergeFrom+offSet),	/* this is a dummy parameter ... */
-				0,
-				(mergeTo+offSet) );
-		}
-
-		/* count number of passes */
-		noOfPasses++;
-		/* swap source and destination */
-		mergeTemp = mergeFrom;
-		mergeFrom = mergeTo;
-		mergeTo = mergeTemp;
-	}
-
-	/* check where the final list is, and move if neccesary */
-	if (noOfPasses%2 == 1)
-	{
-		/* final list is in the auxiliary buffer */
-		SortedModules = VisibleModules2;
-	}
-	else
-	{
-		SortedModules = VisibleModules;
-	}
-}
-
-
 
 
 
@@ -210,7 +32,6 @@ static int PointIsInModule(VECTORCH *pointPtr,MODULE *modulePtr);
 /* KJL 12:21:51 02/11/97 - This routine is too big and ugly. Split & clean up required! */
 void KRenderItems(VIEWDESCRIPTORBLOCK *VDBPtr)
 {
-	extern int NumActiveBlocks;
 	extern int NumOnScreenBlocks;
 	extern DISPLAYBLOCK *OnScreenBlockList[];
 	int numOfObjects = NumOnScreenBlocks;
@@ -569,26 +390,7 @@ void KRenderItems(VIEWDESCRIPTORBLOCK *VDBPtr)
 	}
 }
 
-static int ObjectIsInModule(DISPLAYBLOCK *objectPtr,MODULE *modulePtr)
-{
-	int objectSize = objectPtr->ObRadius;
-	VECTORCH position = objectPtr->ObWorld;
 
-	position.vx -= modulePtr->m_world.vx;
-	position.vy -= modulePtr->m_world.vy;
-	position.vz -= modulePtr->m_world.vz;
-
-	if (position.vx + objectSize >= modulePtr->m_minx) 
-    	if (position.vx - objectSize <= modulePtr->m_maxx) 
-		    if (position.vz + objectSize >= modulePtr->m_minz) 
-			    if (position.vz - objectSize <= modulePtr->m_maxz) 
-				    if (position.vy + objectSize >= modulePtr->m_miny) 
-					    if (position.vy - objectSize <= modulePtr->m_maxy)
-							return 1;
-
-	return 0;
-
-}
 static int PointIsInModule(VECTORCH *pointPtr,MODULE *modulePtr)
 {
 	VECTORCH position = *pointPtr;

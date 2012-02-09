@@ -156,20 +156,13 @@ static void MakeStaticBoundingBoxForNRBB(STRATEGYBLOCK *sbPtr);
 static int RelocateNRBB(STRATEGYBLOCK *sbPtr);
 
 static void FindLandscapePolygonsInObjectsVicinity(STRATEGYBLOCK *sbPtr);
-static signed int DistanceMovedBeforeNRBBHitsNegYPolygon(DYNAMICSBLOCK *dynPtr, struct ColPolyTag *polyPtr, int distanceToMove);
-static signed int DistanceMovedBeforeNRBBHitsPosYPolygon(DYNAMICSBLOCK *dynPtr, struct ColPolyTag *polyPtr, int distanceToMove);
-static signed int DistanceMovedBeforeNRBBHitsNegXPolygon(DYNAMICSBLOCK *dynPtr, struct ColPolyTag *polyPtr, int distanceToMove);
-static signed int DistanceMovedBeforeNRBBHitsPosXPolygon(DYNAMICSBLOCK *dynPtr, struct ColPolyTag *polyPtr, int distanceToMove);
-static signed int DistanceMovedBeforeNRBBHitsNegZPolygon(DYNAMICSBLOCK *dynPtr, struct ColPolyTag *polyPtr, int distanceToMove);
-static signed int DistanceMovedBeforeNRBBHitsPosZPolygon(DYNAMICSBLOCK *dynPtr, struct ColPolyTag *polyPtr, int distanceToMove);
-static void TestForValidMovement(STRATEGYBLOCK *sbPtr);
 static int MoveObject(STRATEGYBLOCK *sbPtr);
 static void TestForValidPlayerStandUp(STRATEGYBLOCK *sbPtr);
 static int SteppingUpIsValid(STRATEGYBLOCK *sbPtr);
 static void TestShapeWithStaticBoundingBox(DISPLAYBLOCK *objectPtr);
 static int IsPolygonWithinDynamicBoundingBox(const struct ColPolyTag *polyPtr);
 static int IsPolygonWithinStaticBoundingBox(const struct ColPolyTag *polyPtr);
-static int WhichNRBBVertex(DYNAMICSBLOCK *dynPtr, VECTORCH *normalPtr);
+static int WhichNRBBVertex(VECTORCH *normalPtr);
 static int DoesPolygonIntersectNRBB(struct ColPolyTag *polyPtr,VECTORCH *objectVertices);
 
 
@@ -277,6 +270,7 @@ extern void ObjectDynamics(void)
 	/* create ordered list of dynamic objects */
 	InitialiseDynamicObjectsList();
 
+// adj unused
 	DYNAMICSBLOCK *dynPtr = Player->ObStrategyBlock->DynPtr;
 
 	i = NumberOfDynamicObjects;
@@ -448,7 +442,6 @@ extern void ObjectDynamics(void)
 		DYNAMICSBLOCK *dynPtr = Player->ObStrategyBlock->DynPtr;
 		MODULE *newModule = (ModuleFromPosition(&(dynPtr->Position), playerPherModule));
 		
-		extern unsigned char KeyboardInput[];
 		if (!newModule)
 		{
 			/* hmm, player isn't in a module */
@@ -1643,7 +1636,7 @@ static void MovePlatformLift(STRATEGYBLOCK *sbPtr)
 							   		int greatestDistance;
 
 							    	{
-							    		VECTORCH vertex = obstaclePtr->DynPtr->ObjectVertices[WhichNRBBVertex(obstaclePtr->DynPtr,&(polyPtr->PolyNormal))];
+							    		VECTORCH vertex = obstaclePtr->DynPtr->ObjectVertices[WhichNRBBVertex(&(polyPtr->PolyNormal))];
 										vertex.vx -= polyPtr->PolyPoint[0].vx;
 										vertex.vy -= polyPtr->PolyPoint[0].vy;
 										vertex.vz -= polyPtr->PolyPoint[0].vz;
@@ -1850,7 +1843,7 @@ static void TestForValidPlayerStandUp(STRATEGYBLOCK *sbPtr)
 		   		int greatestDistance;
 
 		    	{
-		    		VECTORCH vertex = dynPtr->ObjectVertices[WhichNRBBVertex(dynPtr,&(polyPtr->PolyNormal))];
+		    		VECTORCH vertex = dynPtr->ObjectVertices[WhichNRBBVertex(&(polyPtr->PolyNormal))];
 					vertex.vx -= polyPtr->PolyPoint[0].vx;
 					vertex.vy -= polyPtr->PolyPoint[0].vy;
 					vertex.vz -= polyPtr->PolyPoint[0].vz;
@@ -3145,30 +3138,7 @@ static int AxisToIgnore(VECTORCH *normal)
 	}
 }
 
-
-
-   
-static void TestForValidMovement(STRATEGYBLOCK *sbPtr)
-{
-	DYNAMICSBLOCK *dynPtr = sbPtr->DynPtr;
-
-	/* I'm a platform lift - leave me alone */
-	if(dynPtr->OnlyCollideWithObjects)
-		return;
-
-	if(RelocationIsValid(sbPtr))
-	{
-		/* movement ok */
-	}
-	else
-	{
-		/* cancel movement */
-		dynPtr->Position=dynPtr->PrevPosition;
-		dynPtr->LinVelocity.vx = 0;
-		dynPtr->LinVelocity.vy = 0;
-		dynPtr->LinVelocity.vz = 0;
-	}
-}   
+  
 
 static int RelocateSphere(STRATEGYBLOCK *sbPtr)
 {
@@ -3340,7 +3310,7 @@ static int RelocateNRBB(STRATEGYBLOCK *sbPtr)
 			int greatestDistance;
 
 	    	{
-	    		VECTORCH vertex = objectVertices[WhichNRBBVertex(dynPtr,&planeNormal)];
+	    		VECTORCH vertex = objectVertices[WhichNRBBVertex(&planeNormal)];
 				vertex.vx -= pointOnPlane.vx;
 				vertex.vy -= pointOnPlane.vy;
 				vertex.vz -= pointOnPlane.vz;
@@ -3749,7 +3719,7 @@ static int DoesPolygonIntersectNRBB(struct ColPolyTag *polyPtr,VECTORCH *objectV
 } 
 
 
-static int WhichNRBBVertex(DYNAMICSBLOCK *dynPtr, VECTORCH *normalPtr)
+static int WhichNRBBVertex(VECTORCH *normalPtr)
 {
 	VECTORCH dir;
 	
@@ -5498,7 +5468,6 @@ VECTORCH *GetNearestModuleTeleportPoint(MODULE* thisModulePtr, VECTORCH* positio
 	{
 		VECTORCH p = *positionPtr;
 		int d;		
-		char buffer[100];
 
 		p.vx -= thisModulePtr->m_aimodule->m_world.vx + epList->position.vx;
 		p.vy -= thisModulePtr->m_aimodule->m_world.vy + epList->position.vy;
@@ -5525,28 +5494,6 @@ VECTORCH *GetNearestModuleTeleportPoint(MODULE* thisModulePtr, VECTORCH* positio
 		return &(thisEp->position);
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

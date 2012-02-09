@@ -54,12 +54,9 @@ extern void D3D_RenderHUDNumber_Centred(unsigned int number,int x,int y,int colo
 #include "kshape.h"
 
 
-
 void D3D_DrawHUDFontCharacter(HUDCharDesc *charDescPtr);
-void D3D_DrawHUDDigit(HUDCharDesc *charDescPtr);
-
 extern void YClipMotionTrackerVertices(struct VertexTag *v1, struct VertexTag *v2);
-extern void XClipMotionTrackerVertices(struct VertexTag *v1, struct VertexTag *v2);
+
 /* HUD globals */
 extern SCREENDESCRIPTORBLOCK ScreenDescriptorBlock;
 extern int sine[],cosine[];
@@ -79,15 +76,12 @@ static HUDImageDesc BlueBar;
 
 int HUDImageNumber;
 int SpecialFXImageNumber;
-int SmokyImageNumber;
 int ChromeImageNumber;
 int CloudyImageNumber;
 int BurningImageNumber;
 int HUDFontsImageNumber;
-int RebellionLogoImageNumber;
-int FoxLogoImageNumber;
 int MotionTrackerScale;
-int PredatorVisionChangeImageNumber;
+
 int PredatorNumbersImageNumber;
 int StaticImageNumber;
 int AlienTongueImageNumber;
@@ -182,9 +176,6 @@ void Draw_HUDImage(HUDImageDesc *imageDescPtr)
 
 void D3D_InitialiseMarineHUD(void)
 {
-	//SelectGenTexDirectory(ITI_TEXTURE);
-
-	extern unsigned char *ScreenBuffer;
 
 	/* set game mode: different though for multiplayer game */
 	if(AvP.Network==I_No_Network)
@@ -304,7 +295,6 @@ void D3D_BLTMotionTrackerToHUD(int scanLineSize)
 
 	struct VertexTag quadVertices[4];
 	int widthCos,widthSin;
-	extern int CloakingPhase;
 
 	BlueBar.TopLeftY = ScreenDescriptorBlock.SDB_Height-MUL_FIXED(MotionTrackerScale,40);
 	MotionTrackerCentreY = BlueBar.TopLeftY;
@@ -418,7 +408,6 @@ void D3D_BLTMotionTrackerToHUD(int scanLineSize)
 void D3D_BLTMotionTrackerBlipToHUD(int x, int y, int brightness)
 {
 	HUDImageDesc imageDesc;
-	int screenX,screenY; /* in 16.16 */
 	int frame;
 	int motionTrackerScaledHalfWidth = MUL_FIXED(MotionTrackerScale*3,MotionTrackerHalfWidth/2);
     
@@ -427,7 +416,7 @@ void D3D_BLTMotionTrackerBlipToHUD(int x, int y, int brightness)
 	frame = (brightness*5)/65537;
 	GLOBALASSERT(frame>=0 && frame<5);
 	
-    frame = 4 - frame; // frames bloody wrong way round
+	frame = 4 - frame; // frames bloody wrong way round
 	imageDesc.ImageNumber = HUDImageNumber;
 	imageDesc.Scale = MUL_FIXED(MotionTrackerScale*3,(brightness+ONE_FIXED)/4);
 	imageDesc.TopLeftX = MotionTrackerCentreX - MUL_FIXED(MT_BlipWidth/2,imageDesc.Scale) + MUL_FIXED(x,motionTrackerScaledHalfWidth);
@@ -452,6 +441,7 @@ void D3D_BLTMotionTrackerBlipToHUD(int x, int y, int brightness)
 	}
 	Draw_HUDImage(&imageDesc);
 }
+
 extern void D3D_BlitWhiteChar(int x, int y, unsigned char c)
 {
 	HUDImageDesc imageDesc;
@@ -499,38 +489,7 @@ void D3D_DrawHUDFontCharacter(HUDCharDesc *charDescPtr)
 	Draw_HUDImage(&imageDesc);
 	
 }
-void D3D_DrawHUDDigit(HUDCharDesc *charDescPtr)
-{
-	HUDImageDesc imageDesc;
 
-	imageDesc.ImageNumber = HUDFontsImageNumber;
-
-	imageDesc.TopLeftX = charDescPtr->X;
-	imageDesc.TopLeftY = charDescPtr->Y;
-
-	if (charDescPtr->Character<8)
-	{
-		imageDesc.TopLeftU = 1+(charDescPtr->Character)*16;
-		imageDesc.TopLeftV = 81;
-	}
-	else
-	{
-		imageDesc.TopLeftU = 1+(charDescPtr->Character-8)*16;
-		imageDesc.TopLeftV = 81+24;
-	}
-
-
-	imageDesc.Height = HUD_DIGITAL_NUMBERS_HEIGHT;
-	imageDesc.Width = HUD_DIGITAL_NUMBERS_WIDTH;
-	imageDesc.Scale = ONE_FIXED;
-	imageDesc.Translucency = charDescPtr->Alpha;
-	imageDesc.Red = charDescPtr->Red;
-	imageDesc.Green = charDescPtr->Green;
-	imageDesc.Blue = charDescPtr->Blue;
-
-	Draw_HUDImage(&imageDesc);
-	
-}
 void D3D_DrawHUDPredatorDigit(HUDCharDesc *charDescPtr, int scale)
 {
 	HUDImageDesc imageDesc;
@@ -657,21 +616,9 @@ void D3D_BLTGunSightToHUD(int screenX, int screenY, enum GUNSIGHT_SHAPE gunsight
 	Draw_HUDImage(&imageDesc);
 }
 
-void LoadBackdropImage(void)
-{
-
-	extern int BackdropImage;
-	extern char LevelName[];
-	if (!strcmp(LevelName,"pred03"))
-	  	BackdropImage = CL_LoadImageOnce("Envrnmts\\Pred03\\backdrop.RIM",LIO_D3DTEXTURE|LIO_RELATIVEPATH|LIO_RESTORABLE);
-
-}
-
 
 void Render_HealthAndArmour(unsigned int health, unsigned int armour)
 {
-	HUDCharDesc charDesc;
-	int i=MAX_NO_OF_COMMON_HUD_DIGITS;
 	unsigned int healthColour;
 	unsigned int armourColour;
 
@@ -817,8 +764,6 @@ void Render_HealthAndArmour(unsigned int health, unsigned int armour)
 } 
 void Render_MarineAmmo(enum TEXTSTRING_ID ammoText, enum TEXTSTRING_ID magazinesText, unsigned int magazines, enum TEXTSTRING_ID roundsText, unsigned int rounds, int primaryAmmo)
 {
-	HUDCharDesc charDesc;
-	int i=MAX_NO_OF_COMMON_HUD_DIGITS;
 	int xCentre = MUL_FIXED(HUDLayout_RightmostTextCentre,HUDScaleFactor)+ScreenDescriptorBlock.SDB_Width;
 	if(!primaryAmmo) xCentre+=MUL_FIXED(HUDScaleFactor,HUDLayout_RightmostTextCentre*2);
 
@@ -860,52 +805,6 @@ void Render_MarineAmmo(enum TEXTSTRING_ID ammoText, enum TEXTSTRING_ID magazines
 
 		
 } 
-void DrawPredatorEnergyBar(void)
-{
-	PLAYER_STATUS *playerStatusPtr= (PLAYER_STATUS *) (Player->ObStrategyBlock->SBdataptr);
-	PLAYER_WEAPON_DATA *weaponPtr = &(playerStatusPtr->WeaponSlot[playerStatusPtr->SelectedWeaponSlot]);
-	int maxHeight = ScreenDescriptorBlock.SDB_Height*3/4;
-	int h;
-	{
-		h = MUL_FIXED(DIV_FIXED(playerStatusPtr->FieldCharge,PLAYERCLOAK_MAXENERGY),maxHeight);
-		
-		r2rect rectangle
-		(
-			ScreenDescriptorBlock.SDB_Width+HUDLayout_RightmostTextCentre*3/2,
-			ScreenDescriptorBlock.SDB_Height-h,
-			ScreenDescriptorBlock.SDB_Width+HUDLayout_RightmostTextCentre/2,
-			ScreenDescriptorBlock.SDB_Height
-			
-		);
-		rectangle . AlphaFill
-		(
-			0xff, // unsigned char R,
-			0x00,// unsigned char G,
-			0x00,// unsigned char B,
-		   	128 // unsigned char translucency
-		);
-	}
-	if (weaponPtr->WeaponIDNumber == WEAPON_PRED_SHOULDERCANNON)
-	{
-		h = MUL_FIXED(playerStatusPtr->PlasmaCasterCharge,maxHeight);
-			
-		r2rect rectangle
-		(
-			ScreenDescriptorBlock.SDB_Width+HUDLayout_RightmostTextCentre*3,
-			ScreenDescriptorBlock.SDB_Height-h,
-			ScreenDescriptorBlock.SDB_Width+HUDLayout_RightmostTextCentre*2,
-			ScreenDescriptorBlock.SDB_Height
-			
-		);
-		rectangle . AlphaFill
-		(
-			0x00, // unsigned char R,
-			0xff,// unsigned char G,
-			0xff,// unsigned char B,
-		   	128 // unsigned char translucency
-		);
-	}
 
-}
 
 };

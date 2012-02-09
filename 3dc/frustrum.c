@@ -93,7 +93,6 @@ static int VertexWithin_Wide_Frustrum(RENDERVERTEX *vertexPtr);
 static int ObjectWithin_Norm_Frustrum(DISPLAYBLOCK *dbPtr);
 static int ObjectWithin_Wide_Frustrum(DISPLAYBLOCK *dbPtr);
 static int ObjectCompletelyWithin_Norm_Frustrum(DISPLAYBLOCK *dbPtr);
-static int ObjectCompletelyWithin_Wide_Frustrum(DISPLAYBLOCK *dbPtr);
 static void TestVerticesWith_Norm_Frustrum(void);
 static void TestVerticesWith_Wide_Frustrum(void);
 
@@ -157,7 +156,7 @@ void SetFrustrumType(enum FrustrumType frustrumType)
 			/* FRUSTRUM TESTS */
 			TestVerticesWithFrustrum = TestVerticesWith_Wide_Frustrum;
 			ObjectWithinFrustrum = ObjectWithin_Wide_Frustrum;
-			ObjectCompletelyWithinFrustrum = ObjectCompletelyWithin_Wide_Frustrum;
+			ObjectCompletelyWithinFrustrum = 0;
 			VertexWithinFrustrum = VertexWithin_Wide_Frustrum;
 			
 			break;
@@ -953,45 +952,7 @@ int PolygonWithinFrustrum(POLYHEADER *polyPtr)
 	return 1;
 }	
 
-int PolygonShouldBeDrawn(POLYHEADER *polyPtr)
-{
-
-	/* at this point we know that the poly is inside the view frustrum */
-	if (polyPtr->PolyFlags & iflag_notvis) return 0;
-
-	/* if not a sprite, test direction of poly */
-	if (!( (Global_ShapeHeaderPtr->shapeflags&ShapeFlag_Sprite) || (polyPtr->PolyFlags & iflag_no_bfc) ))
-	{
-		/* KJL 16:49:14 7/10/97 -  
-		
-		***** MORPHED NORMALS SUPPORT NOT YET ADDED *****
-		
-		*/
-		VECTORCH pop;
-		VECTORCH *normalPtr = (VECTORCH*)(Global_ShapeNormals + polyPtr->PolyNormalIndex);
-		VECTORCH *pointsArray = (VECTORCH*)(Global_ShapePoints);
-		/* Get the 1st polygon point as the POP */
-
-		pop.vx = pointsArray[polyPtr->Poly1stPt].vx - LocalView.vx;
-		pop.vy = pointsArray[polyPtr->Poly1stPt].vy - LocalView.vy;
-		pop.vz = pointsArray[polyPtr->Poly1stPt].vz - LocalView.vz;
 	
-		if (Dot(&pop, normalPtr)>0) return 0;
-	}
-	{
-		int *vertexNumberPtr = &polyPtr->Poly1stPt;
-		if (vertexNumberPtr[3] == Term)
-		{
-			RenderPolygon.NumberOfVertices = 3;
-		}
-		else
-		{
-			RenderPolygon.NumberOfVertices = 4;
-		}
-	}
-
-	return 2;
-}	
 
 /* KJL 16:18:59 7/7/97 - simple vertex test to be used in first
 pass of subdividing code */
@@ -1052,10 +1013,6 @@ static int ObjectCompletelyWithin_Norm_Frustrum(DISPLAYBLOCK *dbPtr)
 					if ((dbPtr->ObView.vz+dbPtr->ObView.vy)>=radius)
 						return 1;
 	}
-	return 0;
-}
-static int ObjectCompletelyWithin_Wide_Frustrum(DISPLAYBLOCK *dbPtr)
-{
 	return 0;
 }
 

@@ -26,7 +26,6 @@
 #include "bh_alien.h"
 #include "psnd.h"
 #include "weapons.h"
-#include "load_shp.h"
 #include "particle.h"
 #include "sfx.h"
 #include "huddefs.h"
@@ -85,7 +84,6 @@ extern void PrintSpottedNumber(void);
 
 /* prototypes for this file */
 static STATE_RETURN_CONDITION Execute_MFS_Wait(STRATEGYBLOCK *sbPtr);
-static STATE_RETURN_CONDITION Execute_MFS_Hunt(STRATEGYBLOCK *sbPtr);
 static STATE_RETURN_CONDITION Execute_MFS_Wander(STRATEGYBLOCK *sbPtr);
 static STATE_RETURN_CONDITION Execute_MFS_Approach(STRATEGYBLOCK *sbPtr);
 static STATE_RETURN_CONDITION Execute_MFS_Firing(STRATEGYBLOCK *sbPtr);
@@ -101,13 +99,11 @@ static STATE_RETURN_CONDITION Execute_MNS_Wait(STRATEGYBLOCK *sbPtr);
 static STATE_RETURN_CONDITION Execute_MNS_DischargeLOSWeapon(STRATEGYBLOCK *sbPtr);
 static STATE_RETURN_CONDITION Execute_MNS_DischargeShotgun(STRATEGYBLOCK *sbPtr);
 static STATE_RETURN_CONDITION Execute_MNS_DischargePistol(STRATEGYBLOCK *sbPtr);
-static STATE_RETURN_CONDITION Execute_MNS_DischargeGL(STRATEGYBLOCK *sbPtr);
 static STATE_RETURN_CONDITION Execute_MNS_DischargeSADAR(STRATEGYBLOCK *sbPtr);
 static STATE_RETURN_CONDITION Execute_MNS_DischargeFlamethrower(STRATEGYBLOCK *sbPtr);
 static STATE_RETURN_CONDITION Execute_MNS_ThrowMolotov(STRATEGYBLOCK *sbPtr);
 static STATE_RETURN_CONDITION Execute_MNS_DischargeMinigun(STRATEGYBLOCK *sbPtr);
 static STATE_RETURN_CONDITION Execute_MNS_SentryMode(STRATEGYBLOCK *sbPtr);
-static STATE_RETURN_CONDITION Execute_MNS_Hunt(STRATEGYBLOCK *sbPtr);
 static STATE_RETURN_CONDITION Execute_MNS_Respond(STRATEGYBLOCK *sbPtr);
 static STATE_RETURN_CONDITION Execute_MNS_Retreat(STRATEGYBLOCK *sbPtr);
 static STATE_RETURN_CONDITION Execute_MNS_Return(STRATEGYBLOCK *sbPtr);
@@ -1238,38 +1234,6 @@ void ChangeToAlternateAccoutrementSet(STRATEGYBLOCK *sbPtr, int index) {
 
 }
 
-void ChangeToAlternateShapeSet(STRATEGYBLOCK *sbPtr, char *setname) {
-
-	HIERARCHY_SHAPE_REPLACEMENT* replacement_array;
-	MARINE_STATUS_BLOCK *marineStatusPointer;
-	int a;
-	    
-	LOCALASSERT(sbPtr);
-	marineStatusPointer = (MARINE_STATUS_BLOCK *)(sbPtr->SBdataptr);    
-    LOCALASSERT(marineStatusPointer);	          		
-	
-	replacement_array=GetHierarchyAlternateShapeSetFromLibrary(marineStatusPointer->My_Weapon->Riffname,setname);
-
-	if (replacement_array==NULL) {
-		return;
-	}
-
-	a=0;
-
-	while (replacement_array[a].replaced_section_name!=NULL) {
-		SECTION_DATA *target_section;
-
-		target_section=GetThisSectionData(marineStatusPointer->HModelController.section_data,
-			replacement_array[a].replaced_section_name);
-		if (target_section) {
-			target_section->Shape=replacement_array[a].replacement_shape;
-			target_section->ShapeNum=replacement_array[a].replacement_shape_index;
-			
-			Setup_Texture_Animation_For_Section(target_section);
-		}
-		a++;
-	}
-}
 
 /* CDF 3/4/98 */
 
@@ -5010,7 +4974,7 @@ void MakeMarineFar(STRATEGYBLOCK *sbPtr)
 
 }
 
-void KillMarine(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple, int wounds,SECTION_DATA *Section,VECTORCH *incoming) {
+void KillMarine(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple, SECTION_DATA *Section,VECTORCH *incoming) {
 
 	int deathtype,gibbFactor;
 	int a;
@@ -5332,7 +5296,7 @@ void MarineIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple,
 		if (AvP.PlayerType!=I_Marine) {
 			CurrentGameStats_CreatureKilled(sbPtr,Section);
 		}
-		KillMarine(sbPtr,damage,multiple,wounds,Section,incoming);
+		KillMarine(sbPtr,damage,multiple,Section,incoming);
 	} else {
 		/* If not dead, play a hit delta. */
 		DELTA_CONTROLLER *hitdelta;
@@ -5735,47 +5699,6 @@ static STATE_RETURN_CONDITION Execute_MFS_SentryMode(STRATEGYBLOCK *sbPtr)
 	return(SRC_No_Change);
 }
 
-static STATE_RETURN_CONDITION Execute_MFS_Hunt(STRATEGYBLOCK *sbPtr)
-{
-	MARINE_STATUS_BLOCK *marineStatusPointer;    
-	AIMODULE *targetModule = 0;
-
-	LOCALASSERT(sbPtr);
-	marineStatusPointer = (MARINE_STATUS_BLOCK *)(sbPtr->SBdataptr);    
-    LOCALASSERT(marineStatusPointer);	          		
-
-	/* Decrement the Far state timer */
-	marineStatusPointer->stateTimer -= NormalFrameTime;	
-	/* check if far state timer has timed-out. If so, it is time 
-	to do something. Otherwise just return. */
-	if(marineStatusPointer->stateTimer > 0) return(SRC_No_Change);
-			
-	/* check for state changes */
-	
-	if ((!MarineIsAwareOfTarget(sbPtr))
-		||(marineStatusPointer->Target!=Player->ObStrategyBlock))
-	{
-		/* we should be wandering... can't hunt other NPCs */
-		return(SRC_Request_Wander);
-	}
-
-	/* get the target module... */
-	targetModule = FarNPC_GetTargetAIModuleForHunt(sbPtr,0);
-
-	/* if there is no target module, it means that the pred is trapped in an
-	unlinked module. In this case, reset the timer and return. */			
-	if(!targetModule)
-	{
-		marineStatusPointer->stateTimer = MARINE_FAR_MOVE_TIME;
-		return(SRC_Request_Wait);
-	}
-	/* Examine target, and decide what to do */
-	GLOBALASSERT(AIModuleIsPhysical(targetModule));		
-	ProcessFarMarineTargetModule(sbPtr, targetModule);	
-	/* reset timer */
-	marineStatusPointer->stateTimer = MARINE_FAR_MOVE_TIME;					
-	return(SRC_No_Change);
-}
 
 static STATE_RETURN_CONDITION Execute_MFS_Approach(STRATEGYBLOCK *sbPtr) {
 
@@ -10597,97 +10520,7 @@ void FakeTrackerWheepGenerator(VECTORCH *marinepos, STRATEGYBLOCK *me) {
 	}
 }
 
-static STATE_RETURN_CONDITION Execute_MNS_Hunt(STRATEGYBLOCK *sbPtr)
-{
-	MARINE_STATUS_BLOCK *marineStatusPointer;    
-	DYNAMICSBLOCK *dynPtr;
-	VECTORCH velocityDirection = {0,0,0};
 
-	/* Your mission: to advance into the players module, even if near. */
-	
-	LOCALASSERT(sbPtr);
-	marineStatusPointer=(MARINE_STATUS_BLOCK *)(sbPtr->SBdataptr);    
-	dynPtr = sbPtr->DynPtr;
-	LOCALASSERT(marineStatusPointer);
-	LOCALASSERT(dynPtr);
-		
-	/* check if we should be crouched or standing up */
-	if(marineStatusPointer->IAmCrouched)
-	{
-		/* curently crouched */
-		if(!(MarineShouldBeCrawling(sbPtr)))
-		{
-			/* should be running*/
-			marineStatusPointer->IAmCrouched = 0;
-			SetMarineAnimationSequence_Null(sbPtr,HMSQT_MarineRun,MRSS_Standard,ONE_FIXED,(ONE_FIXED>>3));
-		}
-	}
-	else
-	{
-		/* currently standing */
-		if(MarineShouldBeCrawling(sbPtr))
-		{
-			/* should be crawling */
-			marineStatusPointer->IAmCrouched = 1;
-			SetMarineAnimationSequence_Null(sbPtr,HMSQT_MarineCrawl,MCrSS_Standard,ONE_FIXED,(ONE_FIXED>>3));
-		}
-	}
-
-	/* should we change to approach state? */
-	if(MarineCanSeeTarget(sbPtr))
-	{
-		return(SRC_Request_Approach);
-	} else if(!(MarineIsAwareOfTarget(sbPtr))) {
-		return(SRC_Request_Wait);
-	}
-
-	{
-		AIMODULE *targetModule;
-		FARENTRYPOINT *thisEp = (FARENTRYPOINT *)0;
-
-		targetModule = FarNPC_GetTargetAIModuleForHunt(sbPtr,0);
-
-
-		if (targetModule==sbPtr->containingModule->m_aimodule) {
-			/* Hey, it'll drop through. */
-			return(SRC_Request_Approach);
-		}
-		
-		if (!targetModule) {
-			/* Must be sealed off. */
-			return(SRC_Request_Wait);
-		}				
-
-		thisEp=GetAIModuleEP(targetModule,sbPtr->containingModule->m_aimodule);
-		if (!thisEp) {
-			LOGDXFMT(("This assert is a busted adjacency!"));
-			GLOBALASSERT(thisEp);
-		}
-		/* If that fired, there's a farped adjacency. */
-		GLOBALASSERT(thisEp->alien_only==0);
-		/* If that fired, Get...ModuleForHunt went wrong. */
-	
-		marineStatusPointer->wanderData.worldPosition=thisEp->position;
-		marineStatusPointer->wanderData.worldPosition.vx+=targetModule->m_world.vx;
-		marineStatusPointer->wanderData.worldPosition.vy+=targetModule->m_world.vy;
-		marineStatusPointer->wanderData.worldPosition.vz+=targetModule->m_world.vz;
-		
-	}
-
-	/* ok: should have a current target at this stage... */
-	NPCGetMovementDirection(sbPtr, &velocityDirection, &(marineStatusPointer->wanderData.worldPosition),&marineStatusPointer->waypointManager);
-	NPCSetVelocity(sbPtr, &velocityDirection, marineStatusPointer->nearSpeed);	
-
-	/* test here for impeding collisions, and not being able to reach target... */
-	{
-		if (New_NPC_IsObstructed(sbPtr,&marineStatusPointer->avoidanceManager)) {
-			/* Go to all new avoidance. */
-			return(SRC_Request_Avoidance);
-		}
-	}
-
-	return(SRC_No_Change);
-}
 
 static STATE_RETURN_CONDITION Execute_MNS_Respond(STRATEGYBLOCK *sbPtr)
 {
@@ -11526,218 +11359,6 @@ static STATE_RETURN_CONDITION Execute_MNS_ThrowMolotov(STRATEGYBLOCK *sbPtr)
 	return(SRC_No_Change);
 }
 
-static STATE_RETURN_CONDITION Execute_MNS_DischargeGL(STRATEGYBLOCK *sbPtr)
-{
-	MARINE_STATUS_BLOCK *marineStatusPointer;    
-	VECTORCH orientationDirn,relPos,relPos2;
-	int correctlyOrientated,range;
-
-	LOCALASSERT(sbPtr);
-	marineStatusPointer = (MARINE_STATUS_BLOCK *)(sbPtr->SBdataptr);    
-	LOCALASSERT(marineStatusPointer);	          		
-
-
-	/* zero velocity */
-	LOCALASSERT(sbPtr->DynPtr);
-	sbPtr->DynPtr->LinVelocity.vx = 0;
-	sbPtr->DynPtr->LinVelocity.vy = 0;
-	sbPtr->DynPtr->LinVelocity.vz = 0;
-
-	/* first of all, validate this state: if the target suddenly becomes cloaked, then
-	we should switch immediately to wait state.*/
-
-	if (marineStatusPointer->HModelController.keyframe_flags&2) {
-		marineStatusPointer->internalState=1;
-	}
-	if (marineStatusPointer->HModelController.keyframe_flags&1) {
-		marineStatusPointer->internalState=0;
-	} 
-
-	if(!MarineCanSeeTarget(sbPtr))
-	{
-		/* Remove the gunflash */
-		if(marineStatusPointer->myGunFlash) 
-		{	
-			RemoveNPCGunFlashEffect(marineStatusPointer->myGunFlash);
-			marineStatusPointer->myGunFlash = NULL;
-		}
-		/* .... and stop the sound */
-		if(marineStatusPointer->soundHandle!=SOUND_NOACTIVEINDEX) {
-			Sound_Stop(marineStatusPointer->soundHandle);		
-			Sound_Play(marineStatusPointer->My_Weapon->EndSound,"d",&(sbPtr->DynPtr->Position));
-		}
-		return(SRC_Request_Wait);
-	}
-
-	if (marineStatusPointer->clipammo==0) {
-		/* Reload here. */
-		return(SRC_Request_Reload);
-	}		
-
-	/* Here we must have a target.  Renew suspicion for new arrivals. */
-	if (NpcSquad.Squad_Suspicion==0) {
-		PointAlert(2,&marineStatusPointer->weaponTarget);
-	}
-
-	if (marineStatusPointer->stateTimer==marineStatusPointer->My_Weapon->FiringTime) {
-		
-		if (marineStatusPointer->HModelController.Tweening==Controller_NoTweening) {
-			marineStatusPointer->HModelController.Playing=0;
-		}
-
-		/* Only terminate if you haven't fired yet... */
-		if(!MarineCanSeeTarget(sbPtr))
-		{
-			/* ... and remove the gunflash */
-			if(marineStatusPointer->myGunFlash)
-			{
-				RemoveNPCGunFlashEffect(marineStatusPointer->myGunFlash);
-				marineStatusPointer->myGunFlash = NULL;		
-			}
-		
-			/* .... and stop the sound */
-			if(marineStatusPointer->soundHandle!=SOUND_NOACTIVEINDEX) {
-				Sound_Stop(marineStatusPointer->soundHandle);		
-				Sound_Play(marineStatusPointer->My_Weapon->EndSound,"d",&(sbPtr->DynPtr->Position));
-			}
-			
-			return(SRC_Request_Wait);
-		}
-
-		GLOBALASSERT(marineStatusPointer->Target);
-		NPCGetTargetPosition(&(marineStatusPointer->weaponTarget),marineStatusPointer->Target);
-		/* Fix weapon target! */
-		if (marineStatusPointer->My_Weapon->TargetCallibrationShift) {
-			marineStatusPointer->weaponTarget.vx-=MUL_FIXED(sbPtr->DynPtr->OrientMat.mat11,
-				marineStatusPointer->My_Weapon->TargetCallibrationShift);
-			marineStatusPointer->weaponTarget.vy-=MUL_FIXED(sbPtr->DynPtr->OrientMat.mat12,
-				marineStatusPointer->My_Weapon->TargetCallibrationShift);
-			marineStatusPointer->weaponTarget.vz-=MUL_FIXED(sbPtr->DynPtr->OrientMat.mat13,
-				marineStatusPointer->My_Weapon->TargetCallibrationShift);
-		}
-	
-		/* Aim up a little? */
-		range=VectorDistance((&marineStatusPointer->weaponTarget),(&sbPtr->DynPtr->Position));
-
-		marineStatusPointer->weaponTarget.vy-=(range/6);
-			
-		/* orientate to firing point first */
-		orientationDirn.vx =  marineStatusPointer->weaponTarget.vx - sbPtr->DynPtr->Position.vx;
-		orientationDirn.vy = 0;
-		orientationDirn.vz = marineStatusPointer->weaponTarget.vz - sbPtr->DynPtr->Position.vz;
-		correctlyOrientated = NPCOrientateToVector(sbPtr, &orientationDirn,NPC_TURNRATE,NULL);
-		
-		/* we are not correctly orientated to the target: this could happen because we have
-		just entered this state, or the target has moved during firing*/
-		if((!correctlyOrientated)||(marineStatusPointer->HModelController.Tweening!=Controller_NoTweening)) {
-
-			/* stop visual and audio cues: technically, we're not firing at this moment */
-			if(marineStatusPointer->myGunFlash) 
-			{
-				RemoveNPCGunFlashEffect(marineStatusPointer->myGunFlash);
-				marineStatusPointer->myGunFlash = NULL;				
-			}
-			if(marineStatusPointer->soundHandle!=SOUND_NOACTIVEINDEX) {
-				Sound_Stop(marineStatusPointer->soundHandle);
-				Sound_Play(marineStatusPointer->My_Weapon->EndSound,"d",&(sbPtr->DynPtr->Position));
-			}
-			return(SRC_No_Change);
-		}
-		
-		/* If you are correctly oriented, you can now fire! */
-
-		marineStatusPointer->HModelController.Playing=1;
-		marineStatusPointer->HModelController.sequence_timer=0;
-
-
-		relPos.vx=(marineStatusPointer->Target->DynPtr->Position.vx)-(sbPtr->DynPtr->Position.vx);
-		relPos.vy=(marineStatusPointer->Target->DynPtr->Position.vy)-(sbPtr->DynPtr->Position.vy);
-		relPos.vz=(marineStatusPointer->Target->DynPtr->Position.vz)-(sbPtr->DynPtr->Position.vz);
-			  
-		relPos2.vx=(marineStatusPointer->Target->DynPtr->Position.vx)-(marineStatusPointer->Target->DynPtr->PrevPosition.vx);
-		relPos2.vy=(marineStatusPointer->Target->DynPtr->Position.vy)-(marineStatusPointer->Target->DynPtr->PrevPosition.vy);
-		relPos2.vz=(marineStatusPointer->Target->DynPtr->Position.vz)-(marineStatusPointer->Target->DynPtr->PrevPosition.vz);
-		
-		range=VectorDistance((&marineStatusPointer->Target->DynPtr->Position),(&sbPtr->DynPtr->Position));
-		
-		/* Are they, by some chance, really close? */
-		if (range<marineStatusPointer->My_Weapon->MinRange) {
-			if (!(MarineRetreatsInTheFaceOfDanger(sbPtr))) {
-				/* Stay cool. */
-				return(SRC_Request_PullPistol);
-			} else {
-				if (MarineRetreatsInTheFaceOfDanger(sbPtr)) {
-					/* Fail twice, then flee... else continue. */
-					return(SRC_Request_Retreat);
-				}
-			}
-		}
-
-		/* look after the gun flash */
-		if(marineStatusPointer->myGunFlash) MaintainMarineGunFlash(sbPtr);
-		else CreateMarineGunFlash(sbPtr);
-		
-		/* look after the sound */
-		if(marineStatusPointer->soundHandle!=SOUND_NOACTIVEINDEX) Sound_Update3d(marineStatusPointer->soundHandle,&(sbPtr->DynPtr->Position));
-		else 
-		{ 
-			Sound_Play(marineStatusPointer->My_Weapon->StartSound,"d",&(sbPtr->DynPtr->Position));
-			Sound_Play(marineStatusPointer->My_Weapon->LoopSound,"del",&(sbPtr->DynPtr->Position),&(marineStatusPointer->soundHandle));
-		}
-	
-		/* Now fire a grenade. */
-	
-	
-		{
-			LOCALASSERT(marineStatusPointer->My_Gunflash_Section);
-			
-			CreateGrenadeKernel(I_BehaviourGrenade, &marineStatusPointer->My_Gunflash_Section->World_Offset, &marineStatusPointer->My_Gunflash_Section->SecMat,0);
-		
-			if (marineStatusPointer->clipammo>0) {
-				marineStatusPointer->clipammo--;
-			}
-		}
-	}	
-
-	if (marineStatusPointer->stateTimer<marineStatusPointer->My_Weapon->FiringTime) {
-		/* Remove the gunflash */
-		if(marineStatusPointer->myGunFlash) 
-		{	
-			RemoveNPCGunFlashEffect(marineStatusPointer->myGunFlash);
-			marineStatusPointer->myGunFlash = NULL;
-		}
-		/* .... and stop the sound */
-		if(marineStatusPointer->soundHandle!=SOUND_NOACTIVEINDEX) {
-			Sound_Stop(marineStatusPointer->soundHandle);		
-			Sound_Play(marineStatusPointer->My_Weapon->EndSound,"d",&(sbPtr->DynPtr->Position));
-		}
-	}
-
-	marineStatusPointer->stateTimer -= NormalFrameTime;
-
-	/* You must have fired already. */
-
-	if(marineStatusPointer->stateTimer > 0)	{
-		return(SRC_No_Change);
-	}
-	
-	if(range < MARINE_CLOSE_APPROACH_DISTANCE)
-	{
-		/* renew firing, as we are still too close to approach */ 
-		marineStatusPointer->stateTimer = marineStatusPointer->My_Weapon->FiringTime;			 		
-		marineStatusPointer->volleySize = 0;
-		GLOBALASSERT(marineStatusPointer->Target);
-		NPCGetTargetPosition(&(marineStatusPointer->weaponTarget),marineStatusPointer->Target);
-		return(SRC_No_Change);
-	}
-	else
-	{
-		/* we are far enough away, so return to approach */
-
-		return(SRC_Request_Approach);
-	}
-	return(SRC_No_Change);
-}
 
 static STATE_RETURN_CONDITION Execute_MNS_NewDischargeGL(STRATEGYBLOCK *sbPtr)
 {

@@ -81,19 +81,7 @@ void SoundSys_Start(void)
 	
 }
 	
-void SoundSys_End(void)
-{
-	/* end only if we are initialised, regardless of whether we are switched on */
-	if(!SoundInitialised) return;
-		
-	/* stop and remove all sounds */
-	SoundSys_RemoveAll();
-	
-	/* switch off, and de-initillise */
-	PlatEndSoundSys();
-	SoundSys_SwitchOff();
-	SoundInitialised = 0; /* forces call to Soundsys_Start to re-start sound system */	
-}
+
 
 void SoundSys_Management(void)
 {
@@ -213,31 +201,7 @@ static void HandleFadingLevel(void)
 		}
 	}
 }
-void SoundSys_PauseOn(void)
-{
-	int i;
 
-	/* if we're not switched on, should be nothing playing */
-	if(!SoundSwitchedOn) return;
-
-	for(i=0;i<SOUND_MAXACTIVE;i++)
-	{
-		if(ActiveSounds[i].soundIndex!=SID_NOSOUND) ActiveSounds[i].paused = 1;		
-	}
-}
-
-void SoundSys_PauseOff(void)
-{
-	int i;
-
-	/* if we're not switched on, should be nothing playing */
-	if(!SoundSwitchedOn) return;
-
-	for(i=0;i<SOUND_MAXACTIVE;i++)
-	{
-		if(ActiveSounds[i].soundIndex!=SID_NOSOUND) ActiveSounds[i].paused = 0;		
-	}
-}
 
 void SoundSys_StopAll(void)
 {
@@ -289,14 +253,6 @@ void SoundSys_SwitchOn(void)
 	MasterVolumeFadeStatus = FADE_STATUS_READY;
 }
 
-void SoundSys_SwitchOff(void)
-{	
-	/* if already switched off, nothing to do*/
-	if(!SoundSwitchedOn) return; 
-
-	SoundSys_StopAll();
-	SoundSwitchedOn = 0;
-}
 
 int SoundSys_IsOn(void)
 {

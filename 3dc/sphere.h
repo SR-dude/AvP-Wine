@@ -14,11 +14,11 @@ typedef struct
 #define SPHERE_TEXTURE_WRAP 4
 extern VECTORCH SphereVertex[];
 extern VECTORCH SphereRotatedVertex[];
-extern VECTORCH SphereAtmosRotatedVertex[];
+
 extern int SphereAtmosU[];
 extern int SphereAtmosV[];
 extern TRI_FACE SphereFace[];
-extern int SphereVertexHeight[];
+
 
 typedef struct
 {

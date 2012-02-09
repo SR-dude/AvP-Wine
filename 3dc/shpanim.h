@@ -164,19 +164,17 @@ unsigned int SetShapeAnimationSequence (struct displayblock *, SHAPEANIMATIONCON
 unsigned int SetOrphanedShapeAnimationSequence (SHAPEANIMATIONCONTROLLER * sac, SHAPEANIMATIONCONTROLDATA * sacd);
 
 // This sets the next animation (if the current is empty it will set the current)
-unsigned int SetNextShapeAnimationSequence (struct displayblock *, SHAPEANIMATIONCONTROLDATA *);
+//unsigned int SetNextShapeAnimationSequence (struct displayblock *, SHAPEANIMATIONCONTROLDATA *);
 
 // stop_now == 1 will cause the function to ignore the end_frame value
 // set end_frame to -1 for no change to the ending frame of the sequence
-void SetCurrentShapeAnimationToStop (struct displayblock *, unsigned long stop_now, signed long end_frame);
+// void SetCurrentShapeAnimationToStop (struct displayblock *, unsigned long stop_now, signed long end_frame);
 
-SHAPEANIMATIONCONTROLDATA const * GetCurrentShapeAnimationSequenceData (struct displayblock *);
-SHAPEANIMATIONCONTROLDATA const * GetNextShapeAnimationSequenceData (struct displayblock *);
 
 // pause_now == 1 will cause the function to ignore the end_frame value
 // set end_frame to -1 for no change to the ending frame of the sequence
-void PauseCurrentShapeAnimation (struct displayblock *, unsigned long pause_now, signed long end_frame);
-void RestartCurrentShapeAnimation (struct displayblock *);
+//void PauseCurrentShapeAnimation (struct displayblock *, unsigned long pause_now, signed long end_frame);
+//void RestartCurrentShapeAnimation (struct displayblock *);
 
 // Please use these functions, whenever you create a block of each type
 void InitShapeAnimationController (SHAPEANIMATIONCONTROLLER *, struct shapeheader *);

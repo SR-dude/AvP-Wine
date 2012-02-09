@@ -18,7 +18,7 @@
 #include "equipmnt.h"
 
 extern int NormalFrameTime;
-void UpdatePlacedLightState(PLACED_LIGHT_BEHAV_BLOCK* pl_bhv,STRATEGYBLOCK* sbPtr);
+void UpdatePlacedLightState(PLACED_LIGHT_BEHAV_BLOCK* pl_bhv);
 void UpdatePlacedLightColour(PLACED_LIGHT_BEHAV_BLOCK* pl_bhv);
 
 void SetTextureAnimationSequence(int shapeindex,TXACTRLBLK* tac,int sequence)
@@ -149,7 +149,6 @@ void* InitPlacedLight(void* bhdata,STRATEGYBLOCK *sbPtr)
 			POLYHEADER *poly =  (POLYHEADER*)(shptr->items[item_num]);
 			LOCALASSERT(poly);
 
-			SetupPolygonFlagAccessForShape(shptr);
 				
 			if((Request_PolyFlags((void *)poly)) & iflag_txanim)
 				{
@@ -233,7 +232,7 @@ void* InitPlacedLight(void* bhdata,STRATEGYBLOCK *sbPtr)
 	sbPtr->shapeIndex = toolsData->shapeIndex;
 	for(i=0;i<SB_NAME_LENGTH;i++) sbPtr->SBname[i] = toolsData->nameID[i];
 
-	UpdatePlacedLightState(pl_bhv,sbPtr);
+	UpdatePlacedLightState(pl_bhv);
 	
 	/* these must be initialised for respawning objects in multiplayer game */
 	pl_bhv->startingHealth = sbPtr->SBDamageBlock.Health;
@@ -308,7 +307,7 @@ void PlacedLightBehaviour(STRATEGYBLOCK *sbPtr)
 	}
 
 
-	UpdatePlacedLightState(pl_bhv,sbPtr);
+	UpdatePlacedLightState(pl_bhv);
 
 	//if light is near update the colour
 	if(sbPtr->SBdptr)
@@ -419,7 +418,7 @@ void RespawnLight(STRATEGYBLOCK *sbPtr)
 		//need to use the on animation sequence again
 		SetTextureAnimationSequence(sbPtr->shapeIndex,pl_bhv->inan_tac,pl_bhv->sequence);
 		
-		UpdatePlacedLightState(pl_bhv,sbPtr);
+		UpdatePlacedLightState(pl_bhv);
 	}
 
 }
@@ -715,7 +714,7 @@ void SendRequestToPlacedLight(STRATEGYBLOCK* sbptr,BOOL state,int extended_data)
 }
 
 
-void UpdatePlacedLightState(PLACED_LIGHT_BEHAV_BLOCK* pl_bhv,STRATEGYBLOCK* sbPtr)
+void UpdatePlacedLightState(PLACED_LIGHT_BEHAV_BLOCK* pl_bhv)
 {
 	BOOL done=FALSE;
 	GLOBALASSERT(pl_bhv);

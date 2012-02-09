@@ -30,51 +30,15 @@ long				    BackBufferPitch;
 // To describe available video hardware
 int						TotalVideoMemory;
 int						NumAvailableVideoModes;
-VIDEOMODEINFO			AvailableVideoModes[MaxAvailableVideoModes];
-// Must be kept up to date with jump table!!!!
-VIDEOMODEINFO			EngineVideoModes[] = {
-            // Mode 320x200x8
-			320, // width
-			200, // height
-			8,   // colour depth (bits per pixel) 
-            // Mode 320x200x8T
-			320, // width
-			200, // height
-			8,   // colour depth (bits per pixel) 
-			// Mode 320x200x15
-			320, // width
-			200, // height
-			16, // colour depth (bits per pixel)
-            // Mode 320x240x8
-			320, // width
-			240, // height
-			8,   // colour depth (bits per pixel) 
-            // Mode 640x480x8
-			640, // width
-			480, // height
-			8,   // colour depth (bits per pixel) 
-            // Mode 640x480x8T
-			640, // width
-			480, // height
-			8,   // colour depth (bits per pixel) 
-            // Mode 640x480x15
-			640, // width
-			480, // height
-			16,   // colour depth (bits per pixel) 
-            // Mode 640x480x24
-			640, // width
-			480, // height
-			24   // colour depth (bits per pixel) 
-           };
 
+VIDEOMODEINFO			AvailableVideoModes[MaxAvailableVideoModes];
 
 
 // Surface for Backdrop composition
 LPDIRECTDRAWSURFACE lpDDBackdrop;
-// Pointer into Backdrop DD surface 
-unsigned char* BackScreenBuffer;
-// Pitch on auxilliary backdrop surface
-static long BackScreenPitch;
+
+
+//
 DDPIXELFORMAT DisplayPixelFormat;
 
 // For locking against other processes, e.g.
@@ -446,11 +410,6 @@ void GenerateDirectDrawSurface()
 		     ReleaseDirect3D();
 	         exit(ddrval);
 	        }
-		  // Save palette in internal format for
-		  // use later
-		  // Out because it causes problems with
-		  // window mode swapping.
-		  // ConvertDDToInternalPalette((unsigned char*) SystemPalette, TestPalette, 256);
 		 }
 	   else // default to FullScreen
 	     {
@@ -861,64 +820,6 @@ void ColourFillBackBufferQuad(int FillColour, int LeftX,
 	  }
 }
 
-// Note Blt is used rather than BltFast because BltFast will
-// always attempt to invoke an asynchronous blit and this appears
-// to be unstable at present (cf. problems with optimiseblit)
-// CHECK THIS -- WITH DDBLTFASTWAIT???
-// COMMENT ABOVE NOW OBSOLETE...
-
-void BlitToBackBuffer(void* lpBackground, RECT* destRectPtr, RECT* srcRectPtr)
-
-{
-	HRESULT ddrval;
-
-	while (lpDDSBack->GetBltStatus(DDGBS_CANBLT) != DD_OK);
-
-	ddrval = lpDDSBack->Blt(destRectPtr, (LPDIRECTDRAWSURFACE) lpBackground,
-	  srcRectPtr, DDBLT_ASYNC, NULL);
-
-    if (ddrval == DDERR_WASSTILLDRAWING)
-	  ddrval = lpDDSBack->Blt(destRectPtr, (LPDIRECTDRAWSURFACE) lpBackground,
-	             srcRectPtr, DDBLT_WAIT, NULL);
-
-	LOGDXERR(ddrval);
-	if (ddrval != DD_OK)
-	  {
-	   ReleaseDirect3D();
-	   exit(ddrval);
-	  }
-}
-
-// Note Blt is used rather than BltFast because BltFast does not
-// support DDBLTFX and therefore cannot be used to attempt to
-// prevent tearing
-
-void BlitToBackBufferWithoutTearing(void* lpBackground, RECT* destRectPtr, RECT* srcRectPtr)
-
-{
-	HRESULT ddrval;
-	DDBLTFX ddbltfx;
-
-    memset(&ddbltfx, 0, sizeof(ddbltfx));
-	ddbltfx.dwSize = sizeof(ddbltfx);
-	ddbltfx.dwDDFX = DDBLTFX_NOTEARING;
-
-	while (lpDDSBack->GetBltStatus(DDGBS_CANBLT) != DD_OK);
-
-	ddrval = lpDDSBack->Blt(destRectPtr, (LPDIRECTDRAWSURFACE) lpBackground,
-	  srcRectPtr, DDBLT_ASYNC | DDBLT_DDFX, &ddbltfx);
-
-    if (ddrval == DDERR_WASSTILLDRAWING)
-	  ddrval = lpDDSBack->Blt(destRectPtr, (LPDIRECTDRAWSURFACE) lpBackground,
-	             srcRectPtr, DDBLT_WAIT | DDBLT_DDFX, &ddbltfx);
-
-	LOGDXERR(ddrval);
-	if (ddrval != DD_OK)
-	  {
-	   ReleaseDirect3D();
-	   exit(ddrval);
-	  }
-}
 
 
 
@@ -1013,6 +914,7 @@ static BOOL bHardwareDDObj = FALSE;
 static BOOL bNoHardwareDD = FALSE;
 
 
+// adj lpDriverDesc lpDriverName  unused
 BOOL FAR PASCAL EnumDDObjectsCallback(GUID FAR* lpGUID, LPSTR lpDriverDesc,
                                       LPSTR lpDriverName, LPVOID lpContext)
 {
@@ -1241,7 +1143,6 @@ static BOOL ReallyChangeDDObj(void)
 int SelectDirectDrawObject(LPGUID pGUID)
 {
     HRESULT         ddrval;
-	LPDIRECTDRAW    lpDDHardware = NULL;
 
     // Set up DirectDraw object.
 	bNoHardwareDD = TRUE;
@@ -1346,30 +1247,9 @@ BOOL ChangeDirectDrawObject(void)
 
 
 
-BOOL CheckForVideoModes(int TestVideoMode)
 
-{
-	int i=0;
-	BOOL EarlyExit = FALSE;
 
-    do
-	  {
-	   if ((EngineVideoModes[TestVideoMode].Width 
-		   == AvailableVideoModes[i].Width) && 
-		   (EngineVideoModes[TestVideoMode].Height
-		   == AvailableVideoModes[i].Height) && 
-		   (EngineVideoModes[TestVideoMode].ColourDepth
-		   == AvailableVideoModes[i].ColourDepth))
-		  EarlyExit = TRUE;
-	   else
-	      i++;
-	  }	
-	while ((i < NumAvailableVideoModes) &&
-	       (!EarlyExit));
-
-    return(EarlyExit);
-}
-
+// adj Context unused
 HRESULT CALLBACK EnumDisplayModesCallback(LPDDSURFACEDESC pddsd, LPVOID Context)
 {
     AvailableVideoModes[NumAvailableVideoModes].Width = pddsd->dwWidth;
@@ -1488,30 +1368,7 @@ int ChangePalette (unsigned char* NewPalette)
     return Yes;
 }
 
-// At some stage it may be worth expanding this function
-// to get more than video memory, or replacing it
-// with one that uses GetCaps to fill out a general
-// structure.
 
-int GetAvailableVideoMemory(void)
-{
-  DDCAPS          ddcaps;
-  HRESULT         ddrval;
-
-  // Get caps for DirectDraw object
-  memset(&ddcaps, 0, sizeof(ddcaps));
-  ddcaps.dwSize = sizeof(ddcaps);
-  ddrval = lpDD->GetCaps(&ddcaps, NULL);
-	LOGDXERR(ddrval);
-
-  if (ddrval != DD_OK)
-     {
-      ReleaseDirect3D();
-      exit(ddrval);
-     }
-
-  return (int) (ddcaps.dwVidMemFree);
-}
 
 /*
   This is designed to allow for ModeX
@@ -1631,71 +1488,6 @@ void HandleVideoModeRestarts(HINSTANCE hInstance, int nCmdShow)
 	  }
 }
 
-
-// Take a 24 bit RGB colour and return it in the 
-// correct format for the current primary surface
-// We will assume that the primary is NOT in a 
-// palettised mode, since the mapping if we have 
-// already set a palette is undefined.
-
-int GetSingleColourForPrimary(int Colour)
-
-{
-    unsigned long m;
-    int s;
-    int red_shift, red_scale;
-    int green_shift, green_scale;
-    int blue_shift, blue_scale;
-	int RetVal = 0;
-	int r, g ,b;
-
-    // Fail for palettised modes
-	if ((VideoModeTypeScreen == VideoModeType_8)
-	   || (VideoModeTypeScreen == VideoModeType_8T))
-	  return -1;
-
-    // Extra! check for palettised modes
-	if ((DisplayPixelFormat.dwFlags & DDPF_PALETTEINDEXED8)
-	   || (DisplayPixelFormat.dwFlags & DDPF_PALETTEINDEXED4))
-	  return -1;
-
-    // Determine r, g, b masks and scale
-    for (s = 0, m = DisplayPixelFormat.dwRBitMask; 
-       !(m & 1); s++, m >>= 1);
-
-    red_shift = s;
-    red_scale = 255 / (DisplayPixelFormat.dwRBitMask >> s);
-
-    for (s = 0, m = DisplayPixelFormat.dwGBitMask; 
-       !(m & 1); s++, m >>= 1);
-
-    green_shift = s;
-    green_scale = 255 / (DisplayPixelFormat.dwGBitMask >> s);
-
-    for (s = 0, m = DisplayPixelFormat.dwBBitMask; 
-       !(m & 1); s++, m >>= 1);
-
-    blue_shift = s;
-    blue_scale = 255 / (DisplayPixelFormat.dwBBitMask >> s);
-
-    // Extract r,g,b components from input colour
-	r = (Colour >> 16) & 0xff;
-	g = (Colour >> 8) & 0xff;
-	b = Colour & 0xff;
-
-	// Scale and shift each value
-    r /= red_scale;
-    g /= green_scale;
-    b /= blue_scale;
-    RetVal = (r << red_shift) | (g << green_shift) 
-           | (b << blue_shift);
-
-    return(RetVal);
-}
-
-
-
-
 /* new versions of these functions, provided by neil */
 static int GDIObjectReferenceCount = 0;
 BOOL GetGDISurface(void)
@@ -1741,7 +1533,6 @@ BOOL GetGDISurface(void)
 
 BOOL LeaveGDISurface(void)
 {
-	HRESULT hr = DD_OK;
 
 	if(WindowMode == WindowModeSubWindow) return TRUE;
 		

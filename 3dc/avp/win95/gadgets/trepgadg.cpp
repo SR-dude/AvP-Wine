@@ -346,6 +346,7 @@ void TextReportGadget :: ClearQueue(void)
 	// clears the queue of buffered messages; could be handy if you've
 	// started a listing of 300 module names
 
+// adj unused
 	int NumKilled = RefList_SCString_ToAppear . NumEntries();
 
 	RefList_SCString_ToAppear . EmptyYourself();

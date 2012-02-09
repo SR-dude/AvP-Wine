@@ -28,13 +28,13 @@ VECTORCH OctantVertex[(SPHERE_ORDER+1)*(SPHERE_ORDER+2)/2];
 VECTORCH SphereVertex[SPHERE_VERTICES];
 
 VECTORCH SphereRotatedVertex[SPHERE_VERTICES];
-VECTORCH SphereAtmosRotatedVertex[SPHERE_VERTICES];
+
 int SphereAtmosU[SPHERE_VERTICES];
 int SphereAtmosV[SPHERE_VERTICES];
 
 
 TRI_FACE SphereFace[SPHERE_FACES];
-int SphereVertexHeight[SPHERE_VERTICES];
+
 
 static void Generate_SphereOctant(void)
 {

@@ -355,7 +355,7 @@ extern void ProveHModel(HMODELCONTROLLER *controller, struct displayblock *dptr)
 extern void ProveHModel_Far(HMODELCONTROLLER *controller, struct strategyblock *sbPtr);
 extern void Dispel_HModel(HMODELCONTROLLER *controller);
 extern int Prune_HModel_Virtual(SECTION_DATA *top_section);
-extern void Correlate_HModel_Instances(SECTION_DATA *victim,SECTION_DATA *templat);
+
 extern int GetSequenceID(int sequence_type,int sub_sequence);
 extern SEQUENCE *GetSequencePointer(int sequence_type,int sub_sequence,SECTION *this_section);
 extern SECTION_ATTACHMENT *GetThisSectionAttachment(char *riffname,char *section_name,char *hierarchy_name);

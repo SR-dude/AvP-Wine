@@ -50,7 +50,7 @@ typedef RECT	RECT_AVP;
 typedef struct	LONGLONGCH
 {
 	unsigned int	lo32;
-	int				hi32;
+	int hi32;
 } LONGLONGCH;
 
 /*
@@ -94,8 +94,8 @@ extern void		LoadAndChangeToPalette(char *);
  */
 typedef struct	videomodeinfo
 {
-	int Width;				/* in pixels */
-	int Height;				/* in pixels */
+	int Width; /* in pixels */
+	int Height; /* in pixels */
 	int ColourDepth;		/* in bits per pixel */
 } VIDEOMODEINFO;
 
@@ -111,10 +111,10 @@ typedef struct	videomodeinfo
 #define CharHeight		10	/* In PIXELS, not bytes */
 #define CharVertSep		(CharHeight + 0)	/* In PIXELS, not bytes */
 
-#define FontStart		33					/* random squiggle in standard ASCII */
-#define FontEnd			127					/* different random squiggle in standard ASCII */
+#define FontStart		33 	/* random squiggle in standard ASCII */
+#define FontEnd			127 	/* different random squiggle in standard ASCII */
 
-#define FontInvisValue	0x00				/* value to be colour keyed out of font blit */
+#define FontInvisValue	0x00 /* value to be colour keyed out of font blit */
 
 typedef struct	printqueueitem
 {
@@ -283,7 +283,7 @@ enum KEY_ID
 	KEY_DIACRITIC_ACUTE,
 	KEY_DIACRITIC_CARET,
 	KEY_DIACRITIC_UMLAUT,
-	KEY_VOID					= 255,		/* used to indicate a blank spot in the key config */
+	KEY_VOID 	= 255,		/* used to indicate a blank spot in the key config */
 	MAX_NUMBER_OF_INPUT_KEYS,
 };
 
@@ -330,7 +330,7 @@ typedef enum
 	MaxVideoModes
 } VIDEOMODES;
 
-#define MaxScreenWidth	1600				/* Don't get this wrong! */
+#define MaxScreenWidth	1600 /* Don't get this wrong! */
 
 /*
  * Max no of palettes -- at present there is NO code for palette switching and ALL
@@ -415,25 +415,25 @@ typedef enum { SystemMemoryPreferred, VideoMemoryPreferred } DXMEMORYMODES;
 typedef struct bmpheader
 {
 	unsigned short	BMP_ID;			/* Contains 'BM' */
-	int				BMP_Size;
+	int BMP_Size;
 
 	short			BMP_Null1;
 	short			BMP_Null2;
 
-	int				BMP_Image;		/* Byte offset of image start relative to offset 14 */
-	int				BMP_HeadSize;	/* Size of header (40 for Windows, 12 for OS/2) */
-	int				BMP_Width;		/* Width of image in pixels */
-	int				BMP_Height;		/* Height of image in pixels */
+	int BMP_Image;		/* Byte offset of image start relative to offset 14 */
+	int BMP_HeadSize;	/* Size of header (40 for Windows, 12 for OS/2) */
+	int BMP_Width;		/* Width of image in pixels */
+	int BMP_Height;		/* Height of image in pixels */
 
 	short			BMP_Planes;		/* Number of image planes (must be 1) */
 	short			BMP_Bits;		/* Number of bits per pixel (1,4,8 or 24) */
 
-	int				BMP_Comp;		/* Compression type */
-	int				BMP_CSize;		/* Size in bytes of compressed image */
-	int				BMP_Hres;		/* Horizontal resolution in pixels/meter */
-	int				BMP_Vres;		/* Vertical resolution in pixels/meter */
-	int				BMP_Colours;	/* Number of colours used, below (N) */
-	int				BMP_ImpCols;	/* Number of important colours */
+	int BMP_Comp;		/* Compression type */
+	int BMP_CSize;		/* Size in bytes of compressed image */
+	int BMP_Hres;		/* Horizontal resolution in pixels/meter */
+	int BMP_Vres;		/* Vertical resolution in pixels/meter */
+	int BMP_Colours;	/* Number of colours used, below (N) */
+	int BMP_ImpCols;	/* Number of important colours */
 } BMPHEADER;
 
 /* Types of texture files that can be requested from the main D3D texture loader. */
@@ -500,46 +500,42 @@ typedef struct	trianglearray
  * Windows functionality. Note current DirectInput functions are also here since
  * they are really part of the Win32 multimedia library.
  */
-long				GetWindowsTickCount(void);
-void				CheckForWindowsMessages(void);
-BOOL				ExitWindowsSystem(void);
-BOOL				InitialiseWindowsSystem(HANDLE hInstance, int nCmdShow, int WinInitMode);
-void				KeyboardHandlerKeyDown(WPARAM wParam);
-void				KeyboardHandlerKeyUp(WPARAM wParam);
-void				MouseVelocityHandler(UINT message, LPARAM lParam);
-void				MousePositionHandler(UINT message, LPARAM lParam);
-int					ReadJoystick(void);
-int					CheckForJoystick(void);
-BOOL				SpawnRasterThread();
-BOOL				WaitForRasterThread();
+
+void CheckForWindowsMessages(void);
+BOOL ExitWindowsSystem(void);
+BOOL InitialiseWindowsSystem(HANDLE hInstance, int nCmdShow, int WinInitMode);
+void KeyboardHandlerKeyDown(WPARAM wParam);
+void KeyboardHandlerKeyUp(WPARAM wParam);
+void MouseVelocityHandler(UINT message, LPARAM lParam);
+void MousePositionHandler(UINT message, LPARAM lParam);
+int 	ReadJoystick(void);
+int 	CheckForJoystick(void);
 
 /* DirectDraw */
-void				finiObjects(void);
-void				GenerateDirectDrawSurface(void);
-void				LockSurfaceAndGetBufferPointer(void);
-void				UnlockSurface(void);
-void				finiObjects(void);
-void				ColourFillBackBuffer(int FillColour);
-void				ColourFillBackBufferQuad(int FillColour, int LeftX, int TopY, int RightX, int BotY);
-void				FlipBuffers(void);
-void				BlitToBackBuffer(void *lpBackground, RECT *destRectPtr, RECT *srcRectPtr);
-void				BlitToBackBufferWithoutTearing(void *lpBackground, RECT *destRectPtr, RECT *srcRectPtr);
-void				BlitWin95Char(int x, int y, unsigned char toprint);
-void				ReleaseDDSurface(void *DDSurface);
-BOOL				InitialiseDirectDrawObject(void);
-BOOL				ChangeDirectDrawObject(void);
-BOOL				CheckForVideoModes(int TestVideoMode);
-void				finiObjectsExceptDD(void);
-BOOL				TestMemoryAccess(void);
-int					ChangePalette(unsigned char *NewPalette);
-int					GetAvailableVideoMemory(void);
-void				HandleVideoModeRestarts(HINSTANCE hInstance, int nCmdShow);
-void				*MakeBackdropSurface(void);
-void				ReleaseBackdropSurface(void);
-void				LockBackdropSurface(void);
-void				UnlockBackdropSurface(void);
-void				ComposeBackdropBackBuffer(void);
-int					GetSingleColourForPrimary(int Colour);
+void finiObjects(void);
+void GenerateDirectDrawSurface(void);
+void LockSurfaceAndGetBufferPointer(void);
+void UnlockSurface(void);
+void finiObjects(void);
+void ColourFillBackBuffer(int FillColour);
+void ColourFillBackBufferQuad(int FillColour, int LeftX, int TopY, int RightX, int BotY);
+void FlipBuffers(void);
+
+
+void BlitWin95Char(int x, int y, unsigned char toprint);
+void ReleaseDDSurface(void *DDSurface);
+BOOL InitialiseDirectDrawObject(void);
+BOOL ChangeDirectDrawObject(void);
+
+void finiObjectsExceptDD(void);
+BOOL TestMemoryAccess(void);
+int 	ChangePalette(unsigned char *NewPalette);
+void HandleVideoModeRestarts(HINSTANCE hInstance, int nCmdShow);
+void *MakeBackdropSurface(void);
+void ReleaseBackdropSurface(void);
+void LockBackdropSurface(void);
+void UnlockBackdropSurface(void);
+void ComposeBackdropBackBuffer(void);
 
 /* DirectX functionality only available in C++ under Watcom at present */
 #ifdef __cplusplus
@@ -548,104 +544,91 @@ BOOL FAR PASCAL		EnumDDObjectsCallback(GUID FAR *lpGUID, LPSTR lpDriverDesc, LPS
 #endif
 
 /* Direct 3D Immediate Mode Rasterisation Module */
-BOOL				InitialiseDirect3DImmediateMode(void);
-BOOL				LockExecuteBuffer(void);
-BOOL				UnlockExecuteBufferAndPrepareForUse(void);
-BOOL				BeginD3DScene(void);
-BOOL				EndD3DScene(void);
-BOOL				ExecuteBuffer(void);
-BOOL				RenderD3DScene(void);
-void				ReleaseDirect3D(void);
-void				WritePolygonToExecuteBuffer(int *itemptr);
-void				WriteGouraudPolygonToExecuteBuffer(int *itemptr);
-void				Write2dTexturedPolygonToExecuteBuffer(int *itemptr);
-void				WriteGouraud2dTexturedPolygonToExecuteBuffer(int *itemptr);
-void				Write3dTexturedPolygonToExecuteBuffer(int *itemptr);
-void				WriteGouraud3dTexturedPolygonToExecuteBuffer(int *itemptr);
-void				WriteBackdrop2dTexturedPolygonToExecuteBuffer(int *itemptr);
-void				WriteBackdrop3dTexturedPolygonToExecuteBuffer(int *itemptr);
-void				WriteEndCodeToExecuteBuffer(void);
-void				ReleaseD3DTexture(void *D3DTexture);
-void				ReleaseDirect3DNotDD(void);
-void				ReleaseDirect3DNotDDOrImages(void);
-BOOL				SetExecuteBufferDefaults(void);
-void				SelectD3DDriverAndDrawMode(void);
-BOOL				TestInitD3DObject(void);
+BOOL InitialiseDirect3DImmediateMode(void);
+BOOL LockExecuteBuffer(void);
+BOOL UnlockExecuteBufferAndPrepareForUse(void);
+BOOL BeginD3DScene(void);
+BOOL EndD3DScene(void);
+BOOL ExecuteBuffer(void);
+BOOL RenderD3DScene(void);
+void ReleaseDirect3D(void);
 
-BOOL				CreateD3DZBuffer(void);
-void				FlushD3DZBuffer(void);
-void				WriteZBPolygonToExecuteBuffer(int *itemptr);
-void				WriteZBGouraudPolygonToExecuteBuffer(int *itemptr);
-void				WriteZB2dTexturedPolygonToExecuteBuffer(int *itemptr);
-void				WriteZBGouraud2dTexturedPolygonToExecuteBuffer(int *itemptr);
-void				WriteZB3dTexturedPolygonToExecuteBuffer(int *itemptr);
-void				WriteZBGouraud3dTexturedPolygonToExecuteBuffer(int *itemptr);
+void WriteEndCodeToExecuteBuffer(void);
+void ReleaseD3DTexture(void *D3DTexture);
+void ReleaseDirect3DNotDD(void);
+void ReleaseDirect3DNotDDOrImages(void);
+BOOL SetExecuteBufferDefaults(void);
+void SelectD3DDriverAndDrawMode(void);
+BOOL TestInitD3DObject(void);
+
+BOOL CreateD3DZBuffer(void);
+void FlushD3DZBuffer(void);
+
+
 
 #ifdef __cplusplus
 HRESULT WINAPI		DeviceEnumerator
-					(
-						LPGUID			lpGuid,
-						LPSTR			lpDeviceDescription,
-						LPSTR			lpDeviceName,
-						LPD3DDEVICEDESC lpHWDesc,
-						LPD3DDEVICEDESC lpHELDesc,
-						LPVOID			lpContext
-					);
+ 	(
+ 		LPGUID			lpGuid,
+ 		LPSTR			lpDeviceDescription,
+ 		LPSTR			lpDeviceName,
+ 		LPD3DDEVICEDESC lpHWDesc,
+ 		LPD3DDEVICEDESC lpHELDesc,
+ 		LPVOID			lpContext
+ 	);
 HRESULT CALLBACK	TextureFormatsEnumerator(LPDDSURFACEDESC lpDDSD, LPVOID lpContext);
 #endif
 
 /* KJL 11:28:31 9/9/97 - Direct Input prototypes */
-BOOL				InitialiseDirectInput(void);
-void				ReleaseDirectInput(void);
-BOOL				InitialiseDirectKeyboard();
-void				DirectReadKeyboard(void);
-void				ReleaseDirectKeyboard(void);
-BOOL				InitialiseDirectMouse();
-void				DirectReadMouse(void);
-void				ReleaseDirectMouse(void);
+BOOL InitialiseDirectInput(void);
+void ReleaseDirectInput(void);
+BOOL InitialiseDirectKeyboard();
+void DirectReadKeyboard(void);
+void ReleaseDirectKeyboard(void);
+BOOL InitialiseDirectMouse();
+void DirectReadMouse(void);
+void ReleaseDirectMouse(void);
 
 /* Internal */
-int					textprint(const char *t, ...);
+int 	textprint(const char *t, ...);
 
-void				MakePaletteShades(VGAPALETTEENTRY *vga_palptr, int hue, int pal_shades_per_hue);
-void				ConvertToDDPalette(unsigned char *src, unsigned char *dst, int length, int flags);
-int					textprintXY(int x, int y, const char *t, ...);
-void				LoadSystemFonts(char *fname);
-void				DisplayWin95String(int x, int y, unsigned char *buffer);
-void				WriteStringToTextBuffer(int x, int y, unsigned char *buffer);
-void				FlushTextprintBuffer(void);
-void				InitPrintQueue(void);
-void				InitJoysticks(void);
-void				ReadJoysticks(void);
-int					ChangeDisplayModes
-					(
-						HINSTANCE	hInst,
-						int			nCmd,
-						int			NewVideoMode,
-						int			NewWindowMode,
-						int			NewZBufferMode,
-						int			NewRasterisationMode,
-						int			NewSoftwareScanDrawMode,
-						int			NewDXMemoryMode
-					);
-int					DeallocateAllImages(void);
-int					MinimizeAllImages(void);
-int					RestoreAllImages(void);
-void				ConvertDDToInternalPalette(unsigned char *src, unsigned char *dst, int length);
+void MakePaletteShades(VGAPALETTEENTRY *vga_palptr, int hue, int pal_shades_per_hue);
+void ConvertToDDPalette(unsigned char *src, unsigned char *dst, int length, int flags);
+int 	textprintXY(int x, int y, const char *t, ...);
+void LoadSystemFonts(char *fname);
+void DisplayWin95String(int x, int y, unsigned char *buffer);
+void WriteStringToTextBuffer(int x, int y, unsigned char *buffer);
+void FlushTextprintBuffer(void);
+void InitPrintQueue(void);
+void InitJoysticks(void);
+void ReadJoysticks(void);
+int 	ChangeDisplayModes
+ 	(
+ 		HINSTANCE	hInst,
+ 		int			nCmd,
+ 		int			NewVideoMode,
+ 		int			NewWindowMode,
+ 		int			NewZBufferMode,
+ 		int			NewRasterisationMode,
+ 		int			NewSoftwareScanDrawMode,
+ 		int			NewDXMemoryMode
+ 	);
+int 	DeallocateAllImages(void);
+int 	MinimizeAllImages(void);
+
+
 PROCESSORTYPES		ReadProcessorType(void);
 
 /* EXTERNS FOR GLOBALS GO HERE !!!!!! */
 extern DDCAPS		direct_draw_caps;
 
 /* Jake's image functions */
-void				*CopyD3DTexture(struct imageheader *iheader);
+void *CopyD3DTexture(struct imageheader *iheader);
 
 /* Project callbacks */
-void				ExitGame(void);
+void ExitGame(void);
 
-void				ProjectSpecificBufferFlipPostProcessing();
-
-void				ProjectSpecificItemListPostProcessing();
+void ProjectSpecificBufferFlipPostProcessing();
 
 #ifdef __cplusplus
 };

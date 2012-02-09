@@ -9,7 +9,6 @@
 #include "dynamics.h"
 #include "pfarlocs.h"
 #include "pvisible.h"
-#include "load_shp.h"
 #include "particle.h"
 
 #include "bh_types.h"

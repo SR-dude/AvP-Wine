@@ -109,7 +109,6 @@ void * InitXenoMorphRoom (void * bhdata, STRATEGYBLOCK * sbptr)
 		int shape_num = my_mod->m_mapptr->MapShape;
 		SHAPEHEADER *shptr = GetShapeData(shape_num);
  
-		SetupPolygonFlagAccessForShape(shptr);
 
 		pptxactrlblk = &xmrd->tacb;
 

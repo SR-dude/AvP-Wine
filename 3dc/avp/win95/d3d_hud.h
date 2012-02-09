@@ -54,7 +54,7 @@ typedef struct
 
  
 extern void D3D_DrawHUDFontCharacter(HUDCharDesc *charDescPtr);
-extern void D3D_DrawHUDDigit(HUDCharDesc *charDescPtr);
+
 
 
 extern void D3D_BlitWhiteChar(int x, int y, unsigned char c);

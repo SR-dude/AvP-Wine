@@ -248,7 +248,7 @@ void ParticleGeneratorBehaveFun(STRATEGYBLOCK* sbptr)
 }
 
 
-void SendRequestToParticleGenerator(STRATEGYBLOCK* sbptr,BOOL state,int extended_data)
+void SendRequestToParticleGenerator(STRATEGYBLOCK* sbptr,BOOL state)
 {
 	PARTICLE_GENERATOR_BEHAV_BLOCK* pargen = sbptr->SBdataptr;
 	LOCALASSERT(pargen);

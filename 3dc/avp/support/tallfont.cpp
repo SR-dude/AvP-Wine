@@ -119,7 +119,7 @@ IndexedFont_Proportional_Column :: RenderChar_Unclipped
 
 			RECT tempnonConstRECTSoThatItCanWorkWithMicrosoft = WindowsRectForOffset[ theOffset ];
 
-
+// adj ddrval is unused
 			HRESULT ddrval = lpDDSBack->Blt
 			(
 				&destRect,
@@ -468,7 +468,7 @@ IndexedFont_Proportional_Column :: bAnyNonTransparentPixelsInColumn
 				(R2Pos_TopOfColumn . x * BytesPerPixel)
 			)
 		);
-
+// adj all three are unused
 		int R = Pixel & lpDDSurfaceDesc -> ddpfPixelFormat . dwRBitMask;
 		int G = Pixel & lpDDSurfaceDesc -> ddpfPixelFormat . dwGBitMask;
 		int B = Pixel & lpDDSurfaceDesc -> ddpfPixelFormat . dwBBitMask;
@@ -1261,6 +1261,8 @@ IndexedFont_Kerned_Column :: bAnyNonTransparentPixelsInColumn
 				(R2Pos_TopOfColumn . x * BytesPerPixel)
 			)
 		);
+
+// adj all three are unused
 
 		int R = Pixel & lpDDSurfaceDesc -> ddpfPixelFormat . dwRBitMask;
 		int G = Pixel & lpDDSurfaceDesc -> ddpfPixelFormat . dwGBitMask;

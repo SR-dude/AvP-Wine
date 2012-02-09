@@ -84,9 +84,6 @@
 	extern void GADGET_Render(void);
 		/* expects to be called within the rendering part of the main loop */
 
-	extern void GADGET_ScreenModeChange_Setup(void);
-		/* expects to be called immediately before anything happens to the screen
-		mode */
 
 	extern void GADGET_ScreenModeChange_Cleanup(void);
 		/* expects to be called immediately after anything happens to the screen

@@ -56,12 +56,8 @@ typedef struct sound3ddata
 #define PITCH_MAX		(6144)	
 #define PITCH_MIN		(-6144)
 
-/* Patrick 5/6/97 --------------------------------------------------------------
-  SoundSys_Start() & SoundSys_End(): initialise and de-initialise the sound 
-  system.
-  -----------------------------------------------------------------------------*/
 extern void SoundSys_Start(void);
-extern void SoundSys_End(void);
+
 /* Patrick 5/6/97 --------------------------------------------------------------
   The management function: cleans up sounds that have finished playing, and 
   updates 3d sounds. This must be called during the game loop, whenever sounds
@@ -81,7 +77,7 @@ extern void SoundSys_RemoveAll(void);
   only succeeds if the sound system has been initialised succesfully.
   -----------------------------------------------------------------------------*/
 extern void SoundSys_SwitchOn(void);
-extern void SoundSys_SwitchOff(void);
+
 /* Patrick 5/6/97 --------------------------------------------------------------
   IsOn returns true (1) if the sound system is currently switched on, 
   or false (0) otherwise.  

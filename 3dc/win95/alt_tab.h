@@ -16,17 +16,11 @@ typedef void (* AT_PFN_RESTORETEXTURE) (D3DTexture * pTexture, void * pUser);
 typedef void (* AT_PFN_RESTORESURFACE) (DDSurface * pSurface, void * pUser);
 
 	extern void _ATIncludeTexture(D3DTexture * pTexture, AW_BACKUPTEXTUREHANDLE hBackup, char const * pszFile, unsigned nLine, char const * pszDebugString);
-	extern void _ATIncludeTextureEx(D3DTexture * pTexture, AT_PFN_RESTORETEXTURE pfnRestore, void * pUser, char const * pszFile, unsigned nLine, char const * pszFuncName, char const * pszDebugString);
 	extern void _ATIncludeSurface(DDSurface * pSurface, AW_BACKUPTEXTUREHANDLE hBackup, char const * pszFile, unsigned nLine, char const * pszDebugString);
-	extern void _ATIncludeSurfaceEx(DDSurface * pSurface, AT_PFN_RESTORESURFACE pfnRestore, void * pUser, char const * pszFile, unsigned nLine, char const * pszFuncName, char const * pszDebugString);
 	#define ATIncludeTexture(p,h) _ATIncludeTexture(p,h,__FILE__,__LINE__,NULL)
-	#define ATIncludeTextureEx(p,f,u) _ATIncludeTextureEx(p,f,u,__FILE__,__LINE__,#f ,NULL)
 	#define ATIncludeSurface(p,h) _ATIncludeSurface(p,h,__FILE__,__LINE__,NULL)
-	#define ATIncludeSurfaceEx(p,f,u) _ATIncludeSurfaceEx(p,f,u,__FILE__,__LINE__,#f ,NULL)
 	#define ATIncludeTextureDb(p,h,d) _ATIncludeTexture(p,h,__FILE__,__LINE__,d)
-	#define ATIncludeTextureExDb(p,f,u,d) _ATIncludeTextureEx(p,f,u,__FILE__,__LINE__,#f ,d)
 	#define ATIncludeSurfaceDb(p,h,d) _ATIncludeSurface(p,h,__FILE__,__LINE__,d)
-	#define ATIncludeSurfaceExDb(p,f,u,d) _ATIncludeSurfaceEx(p,f,u,__FILE__,__LINE__,#f ,d)
 
 
 extern void ATRemoveTexture(D3DTexture * pTexture);

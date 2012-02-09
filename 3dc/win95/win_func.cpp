@@ -34,23 +34,6 @@ extern BOOL bActive;
 // dd_proj.cpp etc.
 
 
-// GetTickCount is the standard windows return
-// millisecond time function, which isn't actually
-// accurate to a millisecond.  In order to get FRI
-// to work properly with GetTickCount at high frame 
-// rates, you will have to switch KalmanTimer to Yes
-// at the start of io.c to turn on a filtering algorithm
-// in the frame counter handler.  
-// Alternately, we can use the mm function 
-// timeGetTime to get the time accurate to a millisecond.
-// There is still enough variation in this to make
-// the kalman filter probably worthwhile, however.
-
-long GetWindowsTickCount(void)
-
-{
-	return timeGetTime();
-}
 
 // This function is set up using a PeekMessage check,
 // with a return on a failure of GetMessage, on the
@@ -104,108 +87,6 @@ void CheckForWindowsMessages(void)
 		}
 	}
 		while (!bActive);
-}
-
-
-
-
-// Experimental functions to handle a separate
-// thread to run rasterisation on hardware at low
-// priority.
-
-// Note that the RenderD3DScene function does not need
-// to call ExitThread explictly - the return at the
-// end of the function will do this for this, giving
-// thread exit code equal to the return value from
-// the function.
-
-/*
-  Note that this assumes DrawPerFrame mode!!!
-  necessary for some hardware accelerators anyway
-  (deferred texturing problem!!!)
-*/
-
-BOOL SpawnRasterThread()
-
-{
-	DWORD RasterThreadId;
-	// Stack size of new thread in bytes.
-	// For the moment, we will set it to
-	// 128K, the normal size for the engine
-	// process.
-	// Note that this is in bytes.
-	// Note that stack size should grow as 
-	// necessary.  We hope.
-	DWORD StackSize = 128 * 1024;
-
-
-    // Create the thread
-    RasterThread = CreateThread(
-	   NULL,     // no security
-	   StackSize,        // default stack size
-	   (LPTHREAD_START_ROUTINE) RenderD3DScene,
-	   0,        // no argument for function
-	   0,        // default creation flags
-	   &RasterThreadId); // get thread ID
-
-    if (RasterThread == NULL)
-	  {
-	   ReleaseDirect3D();
-	   exit(0xabab);
-	  }
-
- 	// Set the priority on the thread to
-	// below normal, since we want this thread
-	// to be unimportant --- it is only monitoring
-	// the hardware rasteriser.  Hopefully.
-	// Note that this priority value maybe should
-	// be THREAD_PRIORITY_LOWEST or THREAD_PRIORITY_IDLE,
-	// or maybe we shouldn't call this function at all.
-	// Also, we must have a THREAD_SET_INFORMATION
-	// access right associated with the thread for this
-	// to work.  Hopefully, this should be the default
-	// when using CreateThread.
-	SetThreadPriority(RasterThread, 
-	   THREAD_PRIORITY_NORMAL);
-
-	return TRUE;
-}
-
-BOOL WaitForRasterThread()
-
-{
-    BOOL RetVal;
-	DWORD ThreadStatus;
-	int i;
-
-    // Note that if this is to work the 
-    // rasterisation thread must have a
-	// THREAD_QUERY_INFORMATION access right,
-	// but we believe CreateThread should supply
-	// this as a default.
-
-    // Note!!! At some stage we may want to put a
-	// delay loop in the statement below, in the
-	// time honoured Saturn fashion, depending on how
-	// much impact calling GetExitCodeThread has on the
-	// rest of the system - hopefully not much...
-
-    do
-	  {
-       RetVal = GetExitCodeThread(RasterThread,
-	                    &ThreadStatus);
-	  }
-	while ((RetVal == TRUE) && 
-	      (ThreadStatus == STILL_ACTIVE));
-
-    // Failed to get a status report on the thread
-	if (RetVal == FALSE)
-	  {
-	   ReleaseDirect3D();
-	   exit(0xabbb);
-	  }
-
-	return TRUE;
 }
 
 

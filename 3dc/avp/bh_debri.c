@@ -7,7 +7,6 @@
 #include "dynblock.h"
 #include "dynamics.h"
 #include "comp_shp.h"
-#include "load_shp.h"
 #include "bh_types.h"
 #include "bh_debri.h"
 #include "bh_weap.h"
@@ -419,7 +418,6 @@ void SetupSimpleAnimation(int counter, STRATEGYBLOCK *sbPtr)
 	shptr = GetShapeData(shape_num);
 	pptxactrlblk = &osab->tac_os;
 	
-	SetupPolygonFlagAccessForShape(shptr);
 
 	/*
 	the bhdata is a ptr to the SHAPEHEADER each 
@@ -468,7 +466,6 @@ void SetupSimpleAnimation(int counter, STRATEGYBLOCK *sbPtr)
 
 void AlienFragFun(STRATEGYBLOCK *sptr)
 {
-	int a;
 	DYNAMICSBLOCK *dynptr;
 	COLLISIONREPORT *reportptr;
     SMOKEGEN_BEHAV_BLOCK *sgbhv;    
@@ -500,7 +497,6 @@ void AlienFragFun(STRATEGYBLOCK *sptr)
 	}
 	sgbhv->counter -= NormalFrameTime;
 
-	a=0;
 
 	while (reportptr) {
 
@@ -614,6 +610,7 @@ void MakeFragments (STRATEGYBLOCK * sbptr)
 	int i=0;
 	VECTORCH * posPtr;
 	VECTORCH diff;
+// adj unused
 	int massfact;
 
 		int mslpos;
@@ -1431,7 +1428,6 @@ void Pop_Section(STRATEGYBLOCK *sbPtr,SECTION_DATA *section_data, VECTORCH *blas
 void HierarchicalFragmentBehaviour(STRATEGYBLOCK *sptr)
 {
 	/* CDF 5/3/99 A new function for all Hierarchical Fragments. */
-	int a;
 	COLLISIONREPORT *reportptr;
     HDEBRIS_BEHAV_BLOCK *hdbhv;
  	DYNAMICSBLOCK *dynPtr;
@@ -1473,7 +1469,6 @@ void HierarchicalFragmentBehaviour(STRATEGYBLOCK *sptr)
 
 	hdbhv->counter -= NormalFrameTime;
 
-	a=0;
 
 	if (reportptr==NULL) {
 		hdbhv->bouncelastframe=0;

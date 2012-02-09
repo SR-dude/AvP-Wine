@@ -553,7 +553,6 @@ after the approriate call in doObjectVisibility, or a separate
 function can be used (as for aliens)
 -------------------------------------------------------------------*/
 
-HMODELCONTROLLER DropShipHModelController;
 
 void MakeObjectNear(STRATEGYBLOCK *sbPtr)
 {
@@ -653,7 +652,6 @@ static int EmergencyRelocateObject(STRATEGYBLOCK *sbPtr)
         nearest invisible module that has entry point locations, and relocate to one of 
         these locations. */
         {       
-                extern SCENE Global_Scene;
                 extern SCENEMODULE **Global_ModulePtr;
                 
                 AIMODULE *targetModule = 0;
@@ -1281,7 +1279,6 @@ void InitInanimateObject(void* bhdata, STRATEGYBLOCK *sbPtr)
                         POLYHEADER *poly =  (POLYHEADER*)(shptr->items[item_num]);
                         LOCALASSERT(poly);
 
-                        SetupPolygonFlagAccessForShape(shptr);
                                 
                         if((Request_PolyFlags((void *)poly)) & iflag_txanim)
                                 {
@@ -1897,33 +1894,6 @@ void KillFragmentalObjectForRespawn(STRATEGYBLOCK *sbPtr)
 
 }
 
-void RespawnAllObjects(void)
-{
-        int i;
-
-        LOCALASSERT(AvP.Network!=I_No_Network);
-
-        for (i=0; i<NumActiveStBlocks; i++)
-        {
-                STRATEGYBLOCK *sbPtr = ActiveStBlockList[i];
-
-                if(sbPtr->I_SBtype == I_BehaviourInanimateObject)
-                {
-                        INANIMATEOBJECT_STATUSBLOCK* objectStatusPtr = sbPtr->SBdataptr;
-                        LOCALASSERT(objectStatusPtr);
-                        
-                        if(objectStatusPtr->respawnTimer!=0)
-                        {
-                                RespawnInanimateObject(sbPtr);
-                                objectStatusPtr->respawnTimer=0;        
-                        }
-                }
-                else if(sbPtr->I_SBtype == I_BehaviourPlacedLight)
-                {
-                        RespawnLight(sbPtr);
-                }
-        }               
-}
 
 void RespawnAllPickups(void)
 {

@@ -11,7 +11,7 @@
 
 extern void* TrackObjectBehaveInit(void* bhdata, STRATEGYBLOCK* sbptr);
 extern void  TrackObjectBehaveFun(STRATEGYBLOCK* sbptr);
-extern void  TrackObjectIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple);
+extern void  TrackObjectIsDamaged(STRATEGYBLOCK *sbPtr/*, DAMAGE_PROFILE *damage, int multiple*/);
 
 extern int TrackObjectGetSynchData(STRATEGYBLOCK* sbptr);
 extern void TrackObjectSetSynchData(STRATEGYBLOCK* sbptr,int status);

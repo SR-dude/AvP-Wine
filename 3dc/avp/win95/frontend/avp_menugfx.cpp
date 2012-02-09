@@ -527,7 +527,6 @@ static int RenderSmallFontString(char *textPtr,int sx,int sy,int alpha, int red,
 	DDSURFACEDESC ddsdimage;
    	unsigned short *destPtr;
 	unsigned short *srcPtr;
-	int extra = 0;
 	int alphaR = MUL_FIXED(alpha,red);
 	int alphaG = MUL_FIXED(alpha,green);
 	int alphaB = MUL_FIXED(alpha,blue);
@@ -610,7 +609,6 @@ extern void RenderSmallFontString_Wrapped(char *textPtr,RECT* area,int alpha,int
 	DDSURFACEDESC ddsdimage;
    	unsigned short *destPtr;
 	unsigned short *srcPtr;
-	int extra = 0;
 	AVPMENUGFX *gfxPtr;
 	LPDIRECTDRAWSURFACE surface;
 	int wordWidth;

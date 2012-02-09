@@ -25,7 +25,6 @@
 #include "bh_xeno.h"
 #include "psnd.h"
 #include "weapons.h"
-#include "load_shp.h"
 #include "particle.h"
 #include "sfx.h"
 #include "huddefs.h"
@@ -681,7 +680,7 @@ void CorpseBehaveFun(STRATEGYBLOCK *sbPtr)
 	if (corpseDataPtr->destructTimer>=0) {
 		corpseDataPtr->destructTimer-=NormalFrameTime;
 		if (corpseDataPtr->destructTimer<=0) {
-			StartPredatorSelfDestructExplosion(sbPtr);
+			StartPredatorSelfDestructExplosion();
 			corpseDataPtr->GibbFactor=ONE_FIXED;
 			corpseDataPtr->destructTimer=-1;
 		}
@@ -705,7 +704,7 @@ void SetCorpseAnimSequence_Core(STRATEGYBLOCK *sbPtr,HMODEL_SEQUENCE_TYPES type,
 	/* Might be unset... */
 }
 
-void CorpseIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple, int wounds,SECTION_DATA *Section,VECTORCH *incoming) {
+void CorpseIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple, int wounds) {
 
 	NETCORPSEDATABLOCK *corpseDataPtr;
 	int tkd,deathtype;

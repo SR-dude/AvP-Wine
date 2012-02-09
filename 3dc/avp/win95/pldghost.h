@@ -87,7 +87,6 @@ extern void MaintainGhostFireStatus(STRATEGYBLOCK *sbPtr, int IsOnFire);
 
 extern void NetGhostBehaviour(STRATEGYBLOCK *sbPtr);
 extern void KillGhost(STRATEGYBLOCK *sbPtr, int objectId);
-extern int Deduce_PlayerDeathSequence(void);
 extern STRATEGYBLOCK *MakeNewCorpse();
 extern void ApplyGhostCorpseDeathAnim(STRATEGYBLOCK *sbPtr,int deathId);
 extern void ApplyCorpseDeathAnim(STRATEGYBLOCK *sbPtr,int deathId);

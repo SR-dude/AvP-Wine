@@ -131,9 +131,6 @@ extern DISPLAYBLOCK *ActiveBlockList[];
 static VECTORCH *ViewpointDirectionPtr;
 static VECTORCH *ViewpointPositionPtr;
 
-static int ObjectVisiblityTest(DISPLAYBLOCK *objectPtr,VECTORCH *positionPtr,int maxRange);
-
-
 /*KJL****************************************************************************************
 *                                     CODE STARTS HERE!                                     *
 ****************************************************************************************KJL*/
@@ -673,22 +670,5 @@ void CheckForRayIntersectionWithObject(DISPLAYBLOCK *dPtr)
 	}
     return;
 }
-
-/* KJL 15:35:58 14/05/98 - IsObjectVisibleFromThisPoint
-
-	Returns a non-zero value if an object can be seen from a given point in world space
-	(viewpointPositionPtr), with a given field of view (fieldOfView) about a given
-	direction (viewpointDirectionPtr).
-*/
-int IsObjectVisibleFromThisPoint(DISPLAYBLOCK *dispPtr, VECTORCH *viewpointDirectionPtr, VECTORCH *viewpointPositionPtr, int fieldOfView)
-{
-
-	return 0;
-}
-
-
-
-
-
 
 

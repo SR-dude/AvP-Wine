@@ -83,7 +83,7 @@ void QueenMove_RightSwipe(STRATEGYBLOCK *sbPtr);
 void QueenMove_Charge(STRATEGYBLOCK *sbPtr);
 void QueenMove_Close(STRATEGYBLOCK *sbPtr);
 void Execute_Queen_Dying(STRATEGYBLOCK *sbPtr);
-void KillQueen(STRATEGYBLOCK *sbPtr,DAMAGE_PROFILE *damage, int multiple,SECTION_DATA *Section, VECTORCH *incoming);
+void KillQueen(STRATEGYBLOCK *sbPtr,DAMAGE_PROFILE *damage/*, int multiple,SECTION_DATA *Section, VECTORCH *incoming*/);
 void QueenForceReconsider(STRATEGYBLOCK *sbPtr);
 static BOOL TargetIsFiringFlamethrowerAtQueen(STRATEGYBLOCK *sbPtr);
 static void MakeNonFragable(HMODELCONTROLLER *controller);
@@ -1086,7 +1086,6 @@ void QueenMove_Walk(STRATEGYBLOCK *sbPtr) {
 			else
 			{
 				VECTORCH velocity;
-				int walkSpeed;
 	
 				velocity.vx=sbPtr->DynPtr->OrientMat.mat31;
 				velocity.vy=0;
@@ -2244,7 +2243,7 @@ void QueenMove_Close(STRATEGYBLOCK *sbPtr) {
 
 }
 
-void QueenIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple,SECTION_DATA *Section, VECTORCH *incoming, VECTORCH *point) {
+void QueenIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple,SECTION_DATA *Section, VECTORCH *incoming/*, VECTORCH *point*/) {
 
 	QUEEN_STATUS_BLOCK *queenStatusPointer;
 
@@ -2255,7 +2254,7 @@ void QueenIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple,S
 	/* Ouch. */
 	if (sbPtr->SBDamageBlock.Health <= 0) {
 		if (queenStatusPointer->QueenState!=QBS_Dead) {
-			KillQueen(sbPtr,damage,multiple,Section,incoming);
+			KillQueen(sbPtr,damage);
 		}
 		return;
 	}
@@ -2346,7 +2345,7 @@ void Execute_Queen_Dying(STRATEGYBLOCK *sbPtr) {
 
 }
 
-void KillQueen(STRATEGYBLOCK *sbPtr,DAMAGE_PROFILE *damage, int multiple,SECTION_DATA *Section, VECTORCH *incoming)
+void KillQueen(STRATEGYBLOCK *sbPtr,DAMAGE_PROFILE *damage/*, int multiple,SECTION_DATA *Section, VECTORCH *incoming*/)
 {	
 	QUEEN_STATUS_BLOCK *queenStatusPointer;
 	int tkd;
@@ -4512,7 +4511,6 @@ static BOOL TargetIsFiringFlamethrowerAtQueen(STRATEGYBLOCK *sbPtr)
 static void MakeNonFragable_Recursion(SECTION_DATA *this_section_data)
 {
 	SECTION_DATA *sdptr;
-	int health_increment;
 
 	sdptr=NULL;
 

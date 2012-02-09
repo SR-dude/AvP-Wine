@@ -8,10 +8,7 @@
 extern void InitialisePlayersInventory(PLAYER_STATUS *playerStatusPtr);
 extern void MaintainPlayersInventory(void);
 
-/*-------------------------------Patrick 11/3/97--------------------------------
-  Protoypes for a couple of little functions: see inventry.c for details...
-  ------------------------------------------------------------------------------*/
-extern void SetPlayerSecurityClearance(STRATEGYBLOCK *sbPtr, unsigned int securityLevel);
+
 extern int ReturnPlayerSecurityClearance(STRATEGYBLOCK *sbPtr, unsigned int securityLevel);
 
 

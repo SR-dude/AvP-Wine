@@ -461,19 +461,10 @@ BOOL TestMemoryAccess(void)
 			BOOL BlitFloodFill;
 			BOOL BlitAsyncQueue;
 			BOOL BankSwitched;
-			// Timing factors
-			int TimeForVramWrite;
-			int TimeForSysMemWrite;
-			unsigned char* SurfacePtr;
+
             // DirectX intfc
             DDCAPS              ddcaps;
             HRESULT             ddrval;
-			LPDIRECTDRAWSURFACE lpTestSurf;
-			DDSURFACEDESC       ddsd;
-			// etc
-			int i;
-			int TestSurfHeight = 480;
-			int TestSurfWidth = 640;
 
             // Get caps on the DirectDraw object
             memset(&ddcaps, 0, sizeof(ddcaps));

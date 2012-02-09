@@ -47,7 +47,7 @@ extern void Convert_Xenoborg_To_Corpse(STRATEGYBLOCK *sbPtr,DEATH_DATA *this_dea
 extern void CorpseBehaveFun(STRATEGYBLOCK *sbPtr);
 extern void MakeCorpseNear(STRATEGYBLOCK *sbPtr);
 extern void MakeCorpseFar(STRATEGYBLOCK *sbPtr);
-extern void CorpseIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple, int wounds,SECTION_DATA *Section,VECTORCH *incoming);
+extern void CorpseIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple, int wounds);
 
 #define CORPSE_EXPIRY_TIME		(ONE_FIXED*10)
 #define CORPSE_VALIDITY_TIME	(ONE_FIXED>>2)

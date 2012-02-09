@@ -30,7 +30,6 @@ rounds fired etc etc etc*/
 
 void InitialisePlayersInventory(PLAYER_STATUS *playerStatusPtr);
 void MaintainPlayersInventory(void);
-void SetPlayerSecurityClearance(STRATEGYBLOCK *sbPtr, unsigned int securityLevel);
 int SlotForThisWeapon(enum WEAPON_ID weaponID);
 
 static int AbleToPickupAmmo(enum AMMO_ID ammoID);
@@ -1367,21 +1366,7 @@ static int AbleToPickupMTrackerUpgrade(int mtrackerID)
   NB valid security levels are 0 to 31.
   --------------------------------------------------------------------*/
 
-void SetPlayerSecurityClearance(STRATEGYBLOCK *sbPtr, unsigned int securityLevel)
-{
-	PLAYER_STATUS *playerStatusPtr = (PLAYER_STATUS *)(Player->ObStrategyBlock->SBdataptr);
-	GLOBALASSERT(playerStatusPtr);	
-	GLOBALASSERT(securityLevel<32);
 
-	/* completely horrible hack: if you're the predator, and level 1 is passed,
-	you get all levels except for one. Of course. Obvious isn't it. */
-	
-	if((AvP.PlayerType==I_Predator)&&(securityLevel==1))
-	{
-		playerStatusPtr->securityClearances|=0xfffffffe;
-	}
-	else playerStatusPtr->securityClearances|=(1<<securityLevel);
-}
 
 int ReturnPlayerSecurityClearance(STRATEGYBLOCK *sbPtr, unsigned int securityLevel)
 {

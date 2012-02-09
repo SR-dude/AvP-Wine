@@ -32,9 +32,6 @@
 
 */
 
-	TEXTURE *ImageBuffer;							/* Memory Resident Image Data */
-
-
 	
 	int NumImages = 0;								/* # current images */
 	IMAGEHEADER *ImageHeaderPtrs[MaxImages];	/* Ptrs to Image Header Blocks */
@@ -963,12 +960,6 @@ static void MinimizeImageHeader(IMAGEHEADER * ihptr)
 	}
 }
 
-static void RestoreImageHeader(IMAGEHEADER * ihptr)
-{
-	if (ScanDrawDirectDraw != ScanDrawMode)
-		ReloadImageIntoD3DImmediateSurface(ihptr);
-}
-
 
 
 int DeallocateAllImages(void)
@@ -1006,24 +997,6 @@ int MinimizeAllImages(void)
 
 	return Yes; /* ok for the moment */
 }
-
-int RestoreAllImages(void)
-{
-	int i;
-	IMAGEHEADER *ihptr;
-
-	if (NumImages)
-	{
-		ihptr = ImageHeaderArray;
-		for (i = NumImages; i!=0; i--)
-		{
-			RestoreImageHeader(ihptr++);
-		}		
-	}
-
-	return Yes; /* ok for the moment */
-}
-
 
 
 

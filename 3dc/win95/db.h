@@ -326,8 +326,7 @@ extern void db_set_log_file_ex(const char *strP);
  */
 extern void db_set_mode_ex(int mode, void *modeInfoP, void *newFontP);
 
-/* Called to set whether exceptions or brakepoints are called. */
-extern void DbUseBrakepoints(BOOL use_brakepoints);
+
 
 /* Call this to de-allocate memory used to store the debugging font. This
  * fn does nothing unless you are in DirectDraw mode, since this is the 

@@ -1038,7 +1038,6 @@ static int FindMyFloorPoly(VECTORCH* currentPosition, MODULE* currentModule);
 static int CheckMyFloorPoly(VECTORCH* currentPosition, MODULE* currentModule);
 static int VectorIntersects2dZVector(VECTORCH *vecStart,VECTORCH *vecEnd, int zExtent);
 extern int SetupPolygonAccessFromShapeIndex(int shapeIndex);
-extern int SetupPointAccessFromShapeIndex(int shapeIndex);
 
 /* These globals are filled out by FindMyFloorPoly() */
 static VECTORCH GMD_myPolyPoints[4];
@@ -2191,6 +2190,7 @@ DEATH_DATA *GetThisDeath(HMODELCONTROLLER *controller,SECTION *TemplateRoot,DEAT
         return(retval);
 }
 
+// adj controller unused
 DEATH_DATA *GetThisDeath_FromCode(HMODELCONTROLLER *controller,DEATH_DATA *FirstDeath,int code) {
 
         /* Extract 'code' from the valid deaths. */
@@ -2506,27 +2506,6 @@ ATTACK_DATA *GetThisAttack_FromUniqueCode(int code)
 }
 
 
-ATTACK_DATA *GetThisAttack_FromCode(HMODELCONTROLLER *controller,ATTACK_DATA *FirstAttack,int code) {
-
-        /* Extract 'code' from the valid attacks. */
-        ATTACK_DATA *retval;
-        ATTACK_DATA *this_attack;
-
-        retval=NULL;
-
-        this_attack=FirstAttack;
-
-        while (this_attack->Sequence_Type>=0) {
-                if (this_attack->Multiplayer_Code==code) {
-                        retval=this_attack;
-                        break;
-                }
-                this_attack++;
-        }
-
-        GLOBALASSERT(retval);
-        return(retval);
-}
 
 ATTACK_DATA *GetAttackSequence(HMODELCONTROLLER *controller,ATTACK_DATA *FirstAttack,int wound_flags,int crouching, int pouncing) {
 
@@ -2605,6 +2584,7 @@ AIMODULE *NearNPC_GetTargetAIModuleForRetreat(STRATEGYBLOCK *sbPtr, NPC_MOVEMENT
         AIMODULE **AdjModuleRefPtr;
         AIMODULE* targetModule = (AIMODULE *)0;
         unsigned int targetSmell = PlayerSmell + 1;     /* should be higher than any smell anywhere this frame */
+// adj unused
         unsigned int targetNumAdj = 0;
         int targetEpDot=-ONE_FIXED;
         VECTORCH lastVelocityDirection;
@@ -2690,7 +2670,7 @@ AIMODULE *NearNPC_GetTargetAIModuleForRetreat(STRATEGYBLOCK *sbPtr, NPC_MOVEMENT
         return targetModule;
 }
 
-AIMODULE *General_GetRetreatModule_Core(STRATEGYBLOCK *sbPtr,AIMODULE *source,int max_depth) {
+AIMODULE *General_GetRetreatModule_Core(AIMODULE *source,int max_depth) {
         
         AIMODULE **AdjModuleRefPtr;
         AIMODULE *deepest_target;
@@ -2819,7 +2799,7 @@ AIMODULE *General_GetAIModuleForRetreat(STRATEGYBLOCK *sbPtr,AIMODULE *fearModul
                 AIMODULE *targetModule;
 
                 RouteFinder_CallsThisFrame++;
-                targetModule=General_GetRetreatModule_Core(sbPtr,my_module,max_depth);
+                targetModule=General_GetRetreatModule_Core(my_module,max_depth);
                 return(targetModule);
 
         }
@@ -2912,7 +2892,7 @@ AIMODULE *General_GetAIModuleForRetreat(STRATEGYBLOCK *sbPtr,AIMODULE *fearModul
         /* By now, we should have broken out... or maxed out the range. */
         if (success) {
                 AIMODULE *targetModule;
-                targetModule=General_GetRetreatModule_Core(sbPtr,my_module,max_depth);
+                targetModule=General_GetRetreatModule_Core(my_module,max_depth);
                 return(targetModule);
         } else {
                 return(NULL);
@@ -3402,7 +3382,6 @@ int New_GetAvoidanceDirection(STRATEGYBLOCK *sbPtr, NPC_AVOIDANCEMANAGER *manage
                         {
                                 // What follows is an attempt to make sure we don't jump off any cliffs...
                                 VECTORCH test_location;
-                                int test_distance = this_distance / 2;
                                 testDirn.vx *= this_distance;
                                 testDirn.vy *= this_distance;
                                 testDirn.vz *= this_distance;

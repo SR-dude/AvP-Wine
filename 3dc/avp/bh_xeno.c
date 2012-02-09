@@ -72,8 +72,8 @@ void SetXenoborgShapeAnimSequence(STRATEGYBLOCK *sbPtr,HMODEL_SEQUENCE_TYPES typ
 void XenoborgHandleMovingAnimation(STRATEGYBLOCK *sbPtr);
 
 static void ComputeDeltaValues(STRATEGYBLOCK *sbPtr);
-static void KillXeno(STRATEGYBLOCK *sbPtr,int wounds,DAMAGE_PROFILE *damage, int multiple,VECTORCH *incoming);
-void CreateXenoborg(VECTORCH *Position,int type);
+static void KillXeno(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple,VECTORCH *incoming);
+void CreateXenoborg(VECTORCH *Position);
 void Xenoborg_ActivateAllDeltas(STRATEGYBLOCK *sbPtr);
 void Xenoborg_DeactivateAllDeltas(STRATEGYBLOCK *sbPtr);
 STRATEGYBLOCK *Xenoborg_GetNewTarget(VECTORCH *xenopos, STRATEGYBLOCK *me);
@@ -154,11 +154,11 @@ void CastXenoborg(void) {
 	position.vy+=MUL_FIXED(Player->ObStrategyBlock->DynPtr->OrientMat.mat32,BOTRANGE);		
 	position.vz+=MUL_FIXED(Player->ObStrategyBlock->DynPtr->OrientMat.mat33,BOTRANGE);		
 
-	CreateXenoborg(&position, 0);
+	CreateXenoborg(&position);
 
 }
 
-void CreateXenoborg(VECTORCH *Position,int type)
+void CreateXenoborg(VECTORCH *Position)
 {
 	STRATEGYBLOCK* sbPtr;
 	int i;
@@ -1109,7 +1109,7 @@ void XenoborgIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multipl
 		/* Oh yes, kill them, too. */
 		if (xenoStatusPointer->behaviourState!=XS_Dying) {
 			CurrentGameStats_CreatureKilled(sbPtr,NULL);
-			KillXeno(sbPtr,wounds,damage,multiple,incoming);
+			KillXeno(sbPtr, damage,multiple,incoming);
 		}
 	}	
 
@@ -1126,7 +1126,7 @@ void XenoborgIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multipl
 /* patrick 29/7/97 -----------------------------------
 Thess functions to be called only from behaviour
 ------------------------------------------------------*/
-static void KillXeno(STRATEGYBLOCK *sbPtr,int wounds,DAMAGE_PROFILE *damage, int multiple,VECTORCH *incoming)
+static void KillXeno(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple,VECTORCH *incoming)
 {	  
 	XENO_STATUS_BLOCK *xenoStatusPointer;    	
 	int deathtype,tkd;
@@ -1856,7 +1856,6 @@ void Xeno_TurnAndTarget(STRATEGYBLOCK *sbPtr, int *ref_anglex,int *ref_angley) {
 void Xeno_Limbs_ShootTheRoof(STRATEGYBLOCK *sbPtr) {
 
 	XENO_STATUS_BLOCK *xenoStatusPointer;
-	int anglex,angley;
 
 	LOCALASSERT(sbPtr);
 	xenoStatusPointer = (XENO_STATUS_BLOCK *)(sbPtr->SBdataptr);    	
@@ -4006,7 +4005,6 @@ void Execute_Xeno_TurnToFace_Far(STRATEGYBLOCK *sbPtr)
 void Execute_Xeno_Follow_Far(STRATEGYBLOCK *sbPtr)
 {
 	XENO_STATUS_BLOCK *xenoStatusPointer;
-	int anglex,angley;
 
 	LOCALASSERT(sbPtr);
 	xenoStatusPointer = (XENO_STATUS_BLOCK *)(sbPtr->SBdataptr);    	
@@ -4164,7 +4162,6 @@ void Execute_Xeno_Return_Far(STRATEGYBLOCK *sbPtr)
 void Execute_Xeno_Avoidance_Far(STRATEGYBLOCK *sbPtr)
 {
 	XENO_STATUS_BLOCK *xenoStatusPointer;    
-	int anglex,angley;
 	
 	LOCALASSERT(sbPtr);
 	xenoStatusPointer = (XENO_STATUS_BLOCK *)(sbPtr->SBdataptr);    

@@ -31,6 +31,6 @@ typedef struct toolsdata_video_screen
 
 void* InitVideoScreen(void* bhdata,STRATEGYBLOCK *sbPtr);
 void VideoScreenBehaviour(STRATEGYBLOCK *sbPtr);
-void VideoScreenIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple);
+void VideoScreenIsDamaged(STRATEGYBLOCK *sbPtr/*, DAMAGE_PROFILE *damage, int multiple*/);
 
 #endif

@@ -13,7 +13,7 @@ extern SHAPEHEADER ** mainshapelist;
 
 extern MAPBLOCK8 Player_and_Camera_Type8[];
 extern MAPBLOCK6 Empty_Object_Type6;
-extern MAPBLOCK6 Term_Type6;
+
 
 extern MODULEMAPBLOCK AvpCompiledMaps[];
 
@@ -113,20 +113,7 @@ MAPBLOCK6 Empty_Object_Type6 = {
 };
 
 
-MAPBLOCK6 Term_Type6 = {
 
-/* map end */
-
-	MapType_Term,
-	0,
-	0,0,0,
-	0,0,0,
-	0,						/* Flags */
-	
-	0,						/* VDB Definition */
-	0,						/* Interior Type */
-
-};
 
 /****************************************************************************/
 

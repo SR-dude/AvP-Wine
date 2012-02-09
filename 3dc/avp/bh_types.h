@@ -5,7 +5,6 @@
 #include "equipmnt.h"
 #endif
 
-#include "gameflow.h"
 #include "pmove.h"
 
 
@@ -244,10 +243,6 @@ typedef struct player_status
 	ranges from 0 (useless) to ONE_FIXED (practically invisible) */
 	int CloakingEffectiveness; 
 	
-	// John 28/7/97 Game Flow stuff
-	PLAYERMISSION CurrentMission;
-	unsigned long StateChangeObjectFlags;
-
 	/* Encumberance */
 	ENCUMBERANCE_STATE Encumberance;
 	STRATEGYBLOCK *MyFaceHugger;

@@ -30,8 +30,6 @@ extern void KDraw_Item_Gouraud2dTexturePolygon(int *itemptr);
 extern void KDraw_Item_Gouraud3dTexturePolygon(int *itemptr);
 
 
-extern void MakeViewingWindowSmaller(void);
-extern void MakeViewingWindowLarger(void);
 
 /* routines to draw a star filled sky */
 extern void CreateStarArray(void);

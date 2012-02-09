@@ -49,7 +49,6 @@ extern int NormalFrameTime;
 
 extern SHAPEHEADER *Global_ShapeHeaderPtr;
 extern int *Global_ShapePoints;
-extern int **Global_ShapeItems;
 extern int *Global_ShapeNormals;
 extern int *Global_ShapeVNormals;
 extern int **Global_ShapeTextures;
@@ -58,7 +57,6 @@ extern MATRIXCH LToVMat;
 extern EULER LToVMat_Euler;
 extern MATRIXCH WToLMat;
 extern VECTORCH LocalView;
-extern VECTORCH LocalLightCH;
 
 extern int NumLightSourcesForObject;
 extern LIGHTBLOCK *LightSourcesForObject[];
@@ -75,8 +73,6 @@ extern SHAPEHEADER **mainshapelist;
 int MirroringActive=0;
 int MirroringAxis=-149*2;
 
-VECTORCHF FogPosition;
-float FogMagnitude;
 #define UNDERWATER 0 
 #define SPATIAL_SHOCKWAVE 0
 float CameraZoomScale;
@@ -89,22 +85,13 @@ void SetupShapePipeline(void);
 void ShapePipeline(SHAPEHEADER *shapePtr);
 
 static void GouraudPolygon_Construct(POLYHEADER *polyPtr);
-static void GouraudPolygon_Output(POLYHEADER *inputPolyPtr, RENDERVERTEX *renderVerticesPtr);
-
-static void TexturedPolygon_Construct(POLYHEADER *polyPtr);
-static void TexturedPolygon_Output(POLYHEADER *inputPolyPtr, RENDERVERTEX *renderVerticesPtr);
-
-
 static void GouraudTexturedPolygon_Construct(POLYHEADER *polyPtr);
 
 static void (*VertexIntensity)(RENDERVERTEX *renderVertexPtr);
-static void VertexIntensity_Hierarchical(RENDERVERTEX *renderVertexPtr);
-static void VertexIntensity_PreLit(RENDERVERTEX *renderVertexPtr);
 static void VertexIntensity_Pred_Thermal(RENDERVERTEX *renderVertexPtr);
 static void VertexIntensity_Pred_SeeAliens(RENDERVERTEX *renderVertexPtr);
 static void VertexIntensity_Pred_SeePredatorTech(RENDERVERTEX *renderVertexPtr);
 static void VertexIntensity_ImageIntensifier(RENDERVERTEX *renderVertexPtr);
-static void VertexIntensity_Standard(RENDERVERTEX *renderVertexPtr);
 static void VertexIntensity_Alien_Sense(RENDERVERTEX *renderVertexPtr);
 
 static void VertexIntensity_Standard_Opt(RENDERVERTEX *renderVertexPtr);
@@ -137,19 +124,12 @@ void DrawWaterFallPoly(VECTORCH *v);
 extern int sine[];
 extern int cosine[];
 
-/*KJL************************************************************************************
-* N.B. All the following global variables have their first elements initialised so that *
-* they will end up in high memory on the Saturn.                                        *
-************************************************************************************KJL*/
-
-VECTORCH Global_LightVector={1,}; 
 
 /*
  Global variables and arrays
 */
 
 VECTORCH RotatedPts[maxrotpts]={1,};
-int ItemColour=1;
 VECTORCH MorphedPts[maxmorphPts];
 static COLOURINTENSITIES ColourIntensityArray[maxrotpts];
 														
@@ -158,7 +138,6 @@ RENDERVERTEX VerticesBuffer[9]={1,};
 static RENDERVERTEX TriangleVerticesBuffer[3]={1,};
 static int *VertexNumberPtr=(int*)1;
 
-extern struct KItem KItemList[maxpolyptrs];
 extern int *MorphedObjectPointsPtr;
 
 #define MAX_NO_OF_TRANSLUCENT_POLYGONS 1000
@@ -178,7 +157,6 @@ HEATSOURCE HeatSourceList[MAX_NUMBER_OF_HEAT_SOURCES];
 int NumberOfHeatSources;
 int CloakingMode;
 char CloakedPredatorIsMoving;
-static VECTORCH LocalCameraZAxis;
 
 static int ObjectCounter;
 
@@ -791,9 +769,9 @@ void PredatorThermalVision_ShapePipeline(SHAPEHEADER *shapePtr)
 				GouraudPolygon_ClipWithPositiveX();
 				if(RenderPolygon.NumberOfVertices<3) continue;
 			
-  				D3D_PredatorThermalVisionPolygon_Output(polyPtr,RenderPolygon.Vertices);
+  				D3D_PredatorThermalVisionPolygon_Output(RenderPolygon.Vertices);
   			}
-  			else D3D_PredatorThermalVisionPolygon_Output(polyPtr,VerticesBuffer);
+  			else D3D_PredatorThermalVisionPolygon_Output(VerticesBuffer);
 		}
 	}
 	while(--numitems);
@@ -2602,39 +2580,6 @@ TXANIMHEADER* GetTxAnimDataZ(int shape, int item, int sequence)
 
 }
 
-
-
-
-/*
-
- For some animated textures each sequence will represent a different view
- of a sprite. When each sequence has the same number of frames there is no
- problem transferring the value from one "txa_currentframe" to the other.
- However if the new sequence has a different number of frames a scaling must
- be done.
-
-*/
-
-void ChangeSequence(TXANIMHEADER *txah_old, TXANIMHEADER *txah_new)
-
-{
-
-	if(txah_new->txa_numframes == txah_old->txa_numframes) {
-
-		txah_new->txa_currentframe = txah_old->txa_currentframe;
-
-	}
-
-	else {
-
-		txah_new->txa_currentframe =
-
-		WideMulNarrowDiv(txah_old->txa_currentframe,
-								txah_new->txa_maxframe,
-								txah_old->txa_maxframe);
-
-	}
-}
 
 
 /*
@@ -4907,15 +4852,6 @@ void OutputTranslucentPolyList(void)
 }
 
 
-int CuboidPolyVertexList[][4] =
-{
-	{0,3,7,4},	 //+ve y
-	{6,7,3,2},	 //+ve z
-	{6,7,4,5},	 //-ve x
-	{0,1,5,4},	 //-ve z
-	{0,1,2,3},	 //+ve x
-};
-EULER CubeOrient = {0,0,0};
 int CuboidPolyVertexU[][4] =
 {
 	{1,1,1,1},
@@ -4938,88 +4874,6 @@ int CuboidPolyVertexV[][4] =
 
 #include "chnktexi.h"
 
-void CubeSky(void)
-{
-	#define CUBESCALE 1024
-	VECTORCH vertices[8]=
-	{
-		{+CUBESCALE,-CUBESCALE*2,-CUBESCALE},
-		{+CUBESCALE,0,-CUBESCALE},
-		{+CUBESCALE,0,+CUBESCALE},
-		{+CUBESCALE,-CUBESCALE*2,+CUBESCALE},
-		{-CUBESCALE,-CUBESCALE*2,-CUBESCALE},
-		{-CUBESCALE,0,-CUBESCALE},
-		{-CUBESCALE,0,+CUBESCALE},
-		{-CUBESCALE,-CUBESCALE*2,+CUBESCALE},
-	};
-	VECTORCH translatedPts[8];
-
-	POLYHEADER fakeHeader;
-	int polyNumber;
-
-	{
-		extern int BackdropImage;
-		fakeHeader.PolyFlags = 0;
-		fakeHeader.PolyColour =BackdropImage;
-	}
-
-	{
-
-		int i = 7;
-		do
-		{
-			translatedPts[i] = vertices[i];
-			RotateVector(&translatedPts[i],&(Global_VDB_Ptr->VDB_Mat));
-			translatedPts[i].vy = MUL_FIXED(translatedPts[i].vy,87381);
-		}
-	   	while(i--);
-   	}
-
-	for(polyNumber=0; polyNumber<5; polyNumber++)
-	{
-		{
-			int i;
-			for (i=0; i<4; i++) 
-			{
-				int v = CuboidPolyVertexList[polyNumber][i];
-				VerticesBuffer[i].A = 0;
-				VerticesBuffer[i].X	= translatedPts[v].vx;
-				VerticesBuffer[i].Y	= translatedPts[v].vy;
-				VerticesBuffer[i].Z	= translatedPts[v].vz;
-				VerticesBuffer[i].U = CuboidPolyVertexU[polyNumber][i]<<16;
-				VerticesBuffer[i].V = CuboidPolyVertexV[polyNumber][i]<<16;
-
-
-				VerticesBuffer[i].R = 127;
-				VerticesBuffer[i].G	= 127;
-				VerticesBuffer[i].B = 127;
-			}
-			RenderPolygon.NumberOfVertices=4;
-		}
-		{
-			int outcode = QuadWithinFrustrum();
-											  
-			if (outcode)
-			{		 
-				if (outcode!=2)
-				{
-					GouraudTexturedPolygon_ClipWithZ();
-					if(RenderPolygon.NumberOfVertices<3) continue;
-					GouraudTexturedPolygon_ClipWithNegativeX();
-					if(RenderPolygon.NumberOfVertices<3) continue;
-					GouraudTexturedPolygon_ClipWithPositiveY();
-					if(RenderPolygon.NumberOfVertices<3) continue;
-					GouraudTexturedPolygon_ClipWithNegativeY();
-					if(RenderPolygon.NumberOfVertices<3) continue;
-					GouraudTexturedPolygon_ClipWithPositiveX();
-					if(RenderPolygon.NumberOfVertices<3) continue;
-					D3D_BackdropPolygon_Output(&fakeHeader,RenderPolygon.Vertices);
-	  			}
-				else D3D_BackdropPolygon_Output(&fakeHeader,VerticesBuffer);
-			}
-		}
-	}	
-}
 				   
 
 void RenderMirrorSurface(void)
@@ -5140,78 +4994,8 @@ void RenderMirrorSurface2(void)
 	if(RenderPolygon.NumberOfVertices<3) return;
 	D3D_ZBufferedGouraudTexturedPolygon_Output(&fakeHeader,RenderPolygon.Vertices);
 }
-void RenderSmokeTest(void)
-{
- 	int mirrorUV[]=
-	{
-		64<<16, 0,
-		64<<16, 31<<16,
-		95<<16, 31<<16,
-		95<<16, 0
-	};
- 	POLYHEADER fakeHeader;
-	int a = GetSin(CloakingPhase&4095);
-	int image;
-
-	a = MUL_FIXED(MUL_FIXED(a,a),255);
-	{
-		extern int SpecialFXImageNumber;
-		fakeHeader.PolyFlags = iflag_transparent;
-		fakeHeader.PolyColour = SpecialFXImageNumber;
-	}
-
- 	for (image = 0; image<=1; image++)
- 	{
-	 	{
-			VECTORCH translatedPts[4] =
-			{
-				{45300,0+-1000, 26000+-1000},
-				{45300,0+-1000, 26000+ 1000},
-				{45300,0+ 1000, 26000+ 1000},
-				{45300,0+ 1000, 26000+-1000},
-					
-			};
-			extern int CurrentLightAtPlayer;
-			int i;
-
-			if (image) a = 255-a;
-			for (i=0; i<4; i++) 
-			{
-				VerticesBuffer[i].A = a/2;
-
-				TranslatePointIntoViewspace(&translatedPts[i]);
-				VerticesBuffer[i].X	= translatedPts[i].vx;
-				VerticesBuffer[i].Y	= translatedPts[i].vy;
-				VerticesBuffer[i].Z	= translatedPts[i].vz;
-				VerticesBuffer[i].U = mirrorUV[i*2];
-				VerticesBuffer[i].V = mirrorUV[i*2+1]+image*(32<<16);
 
 
-				VerticesBuffer[i].R = 255;
-				VerticesBuffer[i].G	= 255;
-				VerticesBuffer[i].B = 255;
-				VerticesBuffer[i].SpecularR = 0;
-				VerticesBuffer[i].SpecularG = 0;
-				VerticesBuffer[i].SpecularB = 0;
-
-			}
-			RenderPolygon.NumberOfVertices=4;
-			RenderPolygon.TranslucencyMode = TRANSLUCENCY_GLOWING;
-		}
-				
-		GouraudTexturedPolygon_ClipWithZ();
-		if(RenderPolygon.NumberOfVertices<3) return;
-		GouraudTexturedPolygon_ClipWithNegativeX();
-		if(RenderPolygon.NumberOfVertices<3) return;
-		GouraudTexturedPolygon_ClipWithPositiveY();
-		if(RenderPolygon.NumberOfVertices<3) return;
-		GouraudTexturedPolygon_ClipWithNegativeY();
-		if(RenderPolygon.NumberOfVertices<3) return;
-		GouraudTexturedPolygon_ClipWithPositiveX();
-		if(RenderPolygon.NumberOfVertices<3) return;
-		D3D_ZBufferedGouraudTexturedPolygon_Output(&fakeHeader,RenderPolygon.Vertices);
-	}
-}
 #define OCTAVES 3
 int u[OCTAVES];
 int v[OCTAVES];
@@ -5349,109 +5133,7 @@ void RenderSky(void)
 	}
 	}
 }
-void RenderWaterFall(int xOrigin, int yOrigin, int zOrigin)
-{
-	int i,z;
-	VECTORCH v[4];
 
-	{
-		int waterfallX[9];
-		int waterfallY[9];
-		int waterfallZ[9];
-		int waterfallZScale[9];
-		for (i=0; i<9; i++)
-		{
-
-			int u = (i*65536)/8;
-
-			int b = MUL_FIXED(2*u,(65536-u));
-			int c = MUL_FIXED(u,u);
-			int y3 = (4742-yOrigin);
-			int x3 = 2000;
-			int y2 = 2000;
-			int x2 = 1500;
-			
-			waterfallX[i] = MUL_FIXED(b,x2)+MUL_FIXED(c,x3);
-			waterfallY[i] = yOrigin+MUL_FIXED(b,y2)+MUL_FIXED(c,y3);
-		 	waterfallZ[i] = zOrigin+MUL_FIXED((66572-zOrigin),u);
-			waterfallZScale[i] = ONE_FIXED+b/2-c;
-			if (i!=8)
-			{
-				waterfallZScale[i]+=(FastRandom()&8191);
-				waterfallY[i]-=(FastRandom()&127);
-			}
-
-		}
-		for (z=0; z<8; z++)
-		for (i=0; i<8; i++)
-		{
-			v[0].vx = xOrigin+MUL_FIXED(waterfallX[i],waterfallZScale[z]);
-			v[1].vx = xOrigin+MUL_FIXED(waterfallX[i],waterfallZScale[z+1]);
-			v[2].vx = xOrigin+MUL_FIXED(waterfallX[i+1],waterfallZScale[z+1]);
-			v[3].vx = xOrigin+MUL_FIXED(waterfallX[i+1],waterfallZScale[z]);
-			v[0].vy = waterfallY[i];
-			v[1].vy = waterfallY[i];
-			v[2].vy = waterfallY[i+1];
-			v[3].vy = waterfallY[i+1];
-		 
-
-		 	v[0].vz = waterfallZ[z];
-			v[1].vz = waterfallZ[z+1];
-			v[2].vz = v[1].vz;
-			v[3].vz = v[0].vz;
-			
-			DrawWaterFallPoly(v);
-		}
-		for (z=0; z<3; z++)
-		{
-			v[0].vx = xOrigin+MUL_FIXED(waterfallX[8],waterfallZScale[z+1]);
-			v[1].vx = xOrigin+MUL_FIXED(waterfallX[8],waterfallZScale[z]);
-			v[2].vx = 179450;
-			v[3].vx = 179450;
-
-			v[0].vy = 4742;
-			v[1].vy = 4742;
-			v[2].vy = 4742;
-			v[3].vy = 4742;
-
-		 	v[0].vz = waterfallZ[z];
-			v[1].vz = waterfallZ[z+1];
-			v[2].vz = v[1].vz;
-			v[3].vz = v[0].vz;
-			
-			DrawWaterFallPoly(v);
-		}
-
-		for (z=0; z<8; z++)
-		for (i=0; i<16; i++)
-		{
-			int xOffset,xOffset2;
-			if (z<3) xOffset = 179450;
-			else xOffset = xOrigin+MUL_FIXED(waterfallX[8],waterfallZScale[z]);
-			if (z<2) xOffset2 = 179450;
-			else xOffset2 = xOrigin+MUL_FIXED(waterfallX[8],waterfallZScale[z+1]);
-
-			v[0].vx = xOffset;
-			v[1].vx = xOffset2;
-			v[2].vx = xOffset2;
-			v[3].vx = xOffset;
-			
-			v[0].vy = 4742+i*4096;
-			v[1].vy = 4742+i*4096;
-			v[2].vy = 4742+(i+1)*4096;
-			v[3].vy = 4742+(i+1)*4096;
-		 
-
-		 	v[0].vz = waterfallZ[z];
-			v[1].vz = waterfallZ[z+1];
-			v[2].vz = v[1].vz;
-			v[3].vz = v[0].vz;
-			
-			DrawWaterFallPoly(v);
-		}
-
-	}
-}
 
 void DrawWaterFallPoly(VECTORCH *v)
 {
@@ -5745,9 +5427,6 @@ void RenderPredatorPlasmaCasterCharge(int value, VECTORCH *worldOffsetPtr, MATRI
 
 
 
-
-
-int LightFlareAlpha = 65535;
 void RenderLightFlare(VECTORCH *positionPtr, unsigned int colour)
 {
 	int centreX,centreY,sizeX,sizeY,z;
@@ -5827,7 +5506,6 @@ void RenderLightFlare(VECTORCH *positionPtr, unsigned int colour)
 int Alpha[SPHERE_VERTICES];
 void RenderExplosionSurface(VOLUMETRIC_EXPLOSION *explosionPtr)
 {
-	extern D3DTEXTUREHANDLE FMVTextureHandle[];
 	int red,green,blue;
 
 	switch (CurrentVisionMode)

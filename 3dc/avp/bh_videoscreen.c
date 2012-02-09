@@ -109,7 +109,6 @@ void* InitVideoScreen(void* bhdata,STRATEGYBLOCK *sbPtr)
 			POLYHEADER *poly =  (POLYHEADER*)(shptr->items[item_num]);
 			LOCALASSERT(poly);
 
-			SetupPolygonFlagAccessForShape(shptr);
 				
 			if((Request_PolyFlags((void *)poly)) & iflag_txanim)
 				{
@@ -196,7 +195,7 @@ void VideoScreenBehaviour(STRATEGYBLOCK *sbPtr)
 
 
 
-void VideoScreenIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple)
+void VideoScreenIsDamaged(STRATEGYBLOCK *sbPtr/*, DAMAGE_PROFILE *damage, int multiple*/)
 {
 	VIDEO_SCREEN_BEHAV_BLOCK* videoScreen;
 	GLOBALASSERT(sbPtr);

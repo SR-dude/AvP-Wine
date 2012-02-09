@@ -29,7 +29,7 @@ extern int NumImages;
 
 void PlayFMV(char *filenamePtr);
 static int NextSmackerFrame(Smack *smackHandle);
-static UpdatePalette(Smack *smackHandle);
+//static UpdatePalette(Smack *smackHandle);
 
 static int GetSmackerPixelFormat(DDPIXELFORMAT *pixelFormatPtr);
 void FindLightingValueFromFMV(unsigned short *bufferPtr);

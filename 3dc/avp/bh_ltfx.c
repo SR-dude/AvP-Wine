@@ -185,6 +185,7 @@ void LightFXBehaveFun (STRATEGYBLOCK* sbptr)
 {
 	LIGHT_FX_BEHAV_BLOCK * lfxbb;
 	DISPLAYBLOCK* dptr;
+// adj unused
 	MODULE *mptr;
 	
  	GLOBALASSERT(sbptr);

@@ -56,7 +56,6 @@ void InitialiseEnergyBoltBehaviour(DAMAGE_PROFILE *damage, int factor);
 static void InitialiseFlameThrowerBehaviour(void);
 void InitialiseDiscBehaviour(STRATEGYBLOCK *target,SECTION_DATA *disc_section);
 static void InitialiseAlienSpitBehaviour(void);
-static void InitialiseFragmentationGrenade(VECTORCH *originPtr);
 STRATEGYBLOCK* InitialiseEnergyBoltBehaviourKernel(VECTORCH *position,MATRIXCH *orient, int player, DAMAGE_PROFILE *damage, int factor);
 static void InitialiseFrisbeeBehaviour(void);
 STRATEGYBLOCK* InitialiseFrisbeeBoltBehaviourKernel(VECTORCH *position,MATRIXCH *orient, int player, DAMAGE_PROFILE *damage, int factor);
@@ -65,7 +64,6 @@ static void GetGunDirection(VECTORCH *gunDirectionPtr, VECTORCH *positionPtr);
 void PredDisc_GetFirstTarget(PC_PRED_DISC_BEHAV_BLOCK *bptr, DISPLAYBLOCK *target, VECTORCH *position);
 int PredDisc_TargetFilter(STRATEGYBLOCK *candidate);
 void EulerAnglesHoming(VECTORCH *source, VECTORCH *Target, EULER *eulr, int rate);
-void SetEulerAngles(VECTORCH *source, VECTORCH *Target, EULER *eulr);
 STRATEGYBLOCK *PredDisc_GetNewTarget(PC_PRED_DISC_BEHAV_BLOCK *bptr,VECTORCH *discpos, STRATEGYBLOCK *prevtarg, int mine);
 int ObjectIsOnScreen(DISPLAYBLOCK *object);
 void Frisbee_Hit_Environment(STRATEGYBLOCK *sbPtr,COLLISIONREPORT *reportPtr);
@@ -204,7 +202,7 @@ void FireProjectileAmmo(enum AMMO_ID AmmoID)
 
 /* CDF 12/7/99 Smart Frisbee for expansion pack? */
 
-int FrisbeeSight_FrustrumReject(STRATEGYBLOCK *sbPtr,VECTORCH *localOffset,STRATEGYBLOCK *target) {
+int FrisbeeSight_FrustrumReject(STRATEGYBLOCK *sbPtr,VECTORCH *localOffset/*,STRATEGYBLOCK *target*/) {
 
 	FRISBEE_BEHAV_BLOCK *frisbeeStatusPointer;
 	VECTORCH fixed_offset;
@@ -338,7 +336,6 @@ static STRATEGYBLOCK* InitialiseFrisbeeBehaviour_ForLoad() {
 	DISPLAYBLOCK *dispPtr;
 	DYNAMICSBLOCK *dynPtr;
   	FRISBEE_BEHAV_BLOCK *bblk;
-	int a;
 	
 		
 	/* make displayblock with correct shape, etc */
@@ -444,7 +441,6 @@ STRATEGYBLOCK* CreateFrisbeeKernel(VECTORCH *position, MATRIXCH *orient, int fro
 	/* Create HModel. */
 	{
 		SECTION *root_section;
-		SECTION_DATA *local_disc;
 
 		root_section=GetNamedHierarchyFromLibrary("mdisk","Mdisk");
 				
@@ -1250,64 +1246,7 @@ extern void ClusterGrenadeBehaviour(STRATEGYBLOCK *sbPtr)
 	}
 }
 
-static void InitialiseFragmentationGrenade(VECTORCH *originPtr)
-{
-	DISPLAYBLOCK *dispPtr;
-	DYNAMICSBLOCK *dynPtr;
-	VECTORCH position;
-	
-	/* calculate the position */
-	position = *originPtr;
-	
-	/* make displayblock with correct shape, etc */
-	dispPtr = MakeObject(I_BehaviourFragmentationGrenade,&position);
-	if (dispPtr == 0) return;		 // Failed to allocate display block
-	
-	/* make displayblock a dynamic module object */
-	dispPtr->ObFlags3 |= ObFlag3_DynamicModuleObject;
-	
-	/* give grenade a maximum lifetime */
-	dispPtr->ObStrategyBlock->SBdataptr=AllocateMem(sizeof(GRENADE_BEHAV_BLOCK));
-	
-	if (dispPtr->ObStrategyBlock->SBdataptr == 0) 
-	{
-		// Failed to allocate a strategy block data pointer
-		RemoveBehaviourStrategy(dispPtr->ObStrategyBlock);
-		return;
-	}
-			
-	((GRENADE_BEHAV_BLOCK *)dispPtr->ObStrategyBlock->SBdataptr)->counter = FRAG_LIFETIME;
-	((GRENADE_BEHAV_BLOCK *)dispPtr->ObStrategyBlock->SBdataptr)->bouncelastframe = 0;
 
-	dynPtr = AllocateDynamicsBlock(DYNAMICS_TEMPLATE_GRENADE);
-
-	if (dynPtr == 0) 
-	{
-		// Failed to allocate a dynamics block
-		RemoveBehaviourStrategy(dispPtr->ObStrategyBlock);
-		return;
-	}
-
-	/* setup dynamics block */
-	dispPtr->ObStrategyBlock->DynPtr = dynPtr;
-
-	/* align grenade to launcher */
-	dynPtr->Position=position;
-	dynPtr->OrientMat = PlayersWeapon.ObMat;
-	dynPtr->PrevOrientMat = dynPtr->OrientMat;
-	/* and convert to an euler */
- 	MatrixToEuler(&dynPtr->OrientMat, &dynPtr->OrientEuler);
-
-	/* align velocity too */	
-    dynPtr->LinImpulse.vx = ((FastRandom()&16383)-8192);
-    dynPtr->LinImpulse.vy = -(FastRandom()&16383)-8192;
-    dynPtr->LinImpulse.vz = ((FastRandom()&16383)-8192);
-    dynPtr->AngImpulse.EulerX = ((FastRandom()&2047)-1024)*4;
-    dynPtr->AngImpulse.EulerY = ((FastRandom()&2047)-1024)*4;
-    dynPtr->AngImpulse.EulerZ = ((FastRandom()&2047)-1024)*8;
-
-	if(AvP.Network != I_No_Network)	AddNetGameObjectID(dispPtr->ObStrategyBlock);
-}
 extern void ProximityGrenadeBehaviour(STRATEGYBLOCK *sbPtr) 
 {
 	DYNAMICSBLOCK *dynPtr = sbPtr->DynPtr;
@@ -2752,8 +2691,7 @@ static STRATEGYBLOCK* InitialiseDiscBehaviour_ForLoad() {
 	DISPLAYBLOCK *dispPtr;
 	DYNAMICSBLOCK *dynPtr;
   	PC_PRED_DISC_BEHAV_BLOCK *bblk;
-	int a;
-	
+
 		
 	/* make displayblock with correct shape, etc */
 	dispPtr = MakeObject(I_BehaviourPredatorDisc_SeekTrack,&zeroVect);
@@ -3533,27 +3471,6 @@ extern void DiscBehaviour_SeekTrack(STRATEGYBLOCK *sbPtr)
 	}		  
 }
 
-void SetEulerAngles(VECTORCH *source, VECTORCH *Target, EULER *eulr) {
-
-	int offsetx,offsety,offsetz;
-
-	offsetx=(Target->vx)-(source->vx);
-	offsety=(Target->vz)-(source->vz);
-	 
-	eulr->EulerY=ArcTan(offsetx,offsety);
-	eulr->EulerY&=wrap360;
-	
-	/* That was for the first plane. Now the second. */
-
-	offsetz=SqRoot32((offsetx*offsetx)+(offsety*offsety));
-	offsety=-((Target->vy)-(source->vy));
-
-	eulr->EulerX=ArcTan(offsety,offsetz);
-	eulr->EulerX&=wrap360;
-
-	eulr->EulerZ=0;
-
-}
 
 void EulerAnglesHoming(VECTORCH *source, VECTORCH *Target, EULER *eulr, int rate) {
 

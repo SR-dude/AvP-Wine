@@ -151,6 +151,7 @@ void GetPolygonVertices(struct ColPolyTag *polyPtr)
 
     return;
 }
+	
 void GetPolygonNormal(struct ColPolyTag *polyPtr)
 {	  
 	if (ShapeIsMorphed)
@@ -196,7 +197,6 @@ void GetPolygonNormal(struct ColPolyTag *polyPtr)
     }
     return;
 }	
-
 /*-----------------------Patrick 1/12/96--------------------------
   I have added this function to initialise polygon access for a
   module based on the shape index specified in its mapblock....
@@ -230,112 +230,12 @@ static VECTORCH patPointData;
 static int patPolyVertexIndices[4];
 static VECTORCH *patShapePointsPtr;
 
-int SetupPointAccessFromShapeIndex(int shapeIndex)
-{
-	SHAPEHEADER *shapePtr;
-
-	shapePtr = GetShapeData(shapeIndex);
-	patShapePointsPtr  = (VECTORCH *)(*shapePtr->points);
-	    
-    return shapePtr->numpoints;
-}
-
-
-VECTORCH* AccessNextPoint(void)
-{
-	patPointData = *patShapePointsPtr++;
-	return &patPointData;
-}
-
-VECTORCH* AccessPointFromIndex(int index)
-{
-	patPointData = patShapePointsPtr[index];
-	return &patPointData;
-}		
-
-/* KJL 18:51:08 21/11/98 - similiar function for polys */									 
-POLYHEADER *AccessPolyFromIndex(int index)
-{
-	int *itemPtr = *(ItemArrayPtr+index);
-	PolyheaderPtr = (POLYHEADER *) itemPtr;
-	return PolyheaderPtr;
-}
-
-void DestroyPolygon(int shapeIndex,int polyIndex)
-{
-	SHAPEHEADER *shapePtr = GetShapeData(shapeIndex);
-	shapePtr->numitems--;
-	*(ItemArrayPtr+polyIndex) = *(ItemArrayPtr+shapePtr->numitems);
-}
-
-void ReplaceVertexInPolygon(int polyIndex, int oldVertex, int newVertex)
-{
-	int *vertexNumberPtr;
-	int *itemPtr = *(ItemArrayPtr+polyIndex);
-	PolyheaderPtr = (POLYHEADER *) itemPtr;
 	
-	vertexNumberPtr = &PolyheaderPtr->Poly1stPt;
-
-    while(*vertexNumberPtr != Term)
-	{
-    	if (*vertexNumberPtr == oldVertex)
-		{
-			*vertexNumberPtr = newVertex;
-		}
-		vertexNumberPtr++; 
-	}
-
-	{
-		VECTORCH newNormal;
-		VECTORCH *pointPtr[3];
-		int *vertexNumPtr = &PolyheaderPtr->Poly1stPt;
-		pointPtr[0] = (ShapePointsPtr + *vertexNumPtr++);
-		pointPtr[1] = (ShapePointsPtr + *vertexNumPtr++);
-		pointPtr[2] = (ShapePointsPtr + *vertexNumPtr);
-		MakeNormal
-		(
-			pointPtr[0],
-			pointPtr[1],
-			pointPtr[2],
-			&newNormal
-		);
-	   	*(VECTORCH*)(ShapeNormalsPtr + PolyheaderPtr->PolyNormalIndex)=newNormal;
-	}
-    	
-
-}
-VECTORCH *GetPolygonNormalFromIndex(void)
-{
-	return (VECTORCH*)(ShapeNormalsPtr + PolyheaderPtr->PolyNormalIndex);
-}
-
-int *GetPolygonVertexIndices(void)
-{
-	int *vertexNumberPtr = &PolyheaderPtr->Poly1stPt;
-    int numberOfVertices=0;
-
-    patPolyVertexIndices[3]	= -1;
-
-    while(*vertexNumberPtr != Term)
-	{
-    	patPolyVertexIndices[numberOfVertices++] = (*vertexNumberPtr);
-		vertexNumberPtr++; 
-	}
-
-    return &patPolyVertexIndices[0];
-}
-
 
 /*--------------------Roxby 3/7/97----------------------------
   I have added some more shape data access functions......
   taken from PSX versions 
   ----------------------------------------------------------------*/
-
-
-void SetupPolygonFlagAccessForShape(SHAPEHEADER *shape) 
-{
-}
-		
 		
 int Request_PolyFlags(void *polygon) 
 {

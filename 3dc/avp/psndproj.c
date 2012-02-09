@@ -28,17 +28,11 @@
 -----------------------------------------------------------------------------*/
 int weaponHandle = SOUND_NOACTIVEINDEX;
 
-static int weaponReloading = 0;
 static int sadarReloadTimer = 0;
 static int weaponPitchTimer = 0;
-static int backgroundHandle = SOUND_NOACTIVEINDEX;
 static int playOneShotWS = 1;
 static int oldRandomValue = -1;
 
-
-			
-static unsigned int playerZone = -1;
-static VECTORCH backgroundSoundPos={0,0,0};
 
 /* Has the player made a noise? */
 int playerNoise;
@@ -49,30 +43,12 @@ int playerNoise;
 extern int NormalFrameTime;
 extern ACTIVESOUNDSAMPLE ActiveSounds[];
 
-/* Patrick 5/6/97 -------------------------------------------------------------
-  Function definitions 
-  ----------------------------------------------------------------------------*/
-
-/* Patrick 16/6/97 ----------------------------------------------------------------
-  A.N.Other background sound management function  
-------------------------------------------------------------------------------*/
-
-static void DoPredatorBackgroundLoop(void)
-{
-	if (backgroundHandle == SOUND_NOACTIVEINDEX)
-  {
-    Sound_Play(SID_VISION_LOOP,"evl",&backgroundHandle,75);
-  }
-}
-
 
 
 void DoPlayerSounds(void)
 {
 	PLAYER_STATUS *playerStatusPtr;
 	PLAYER_WEAPON_DATA *weaponPtr;
-	VECTORCH *playerPos;
-
  
 		
 	/* do weapon sound */

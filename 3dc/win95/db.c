@@ -18,9 +18,6 @@
 #include <stdarg.h>	/* For variable arguments. */
 
 
-/* Have external linkage. */
-volatile BOOL DZ_NULL;
-
 /* This variable dictates whether macros ending _opt get executed. */
 int db_option = 0; /* Default is off. */
 	
@@ -400,11 +397,7 @@ void db_set_mode_ex(int mode, void *modeInfoP, void *newFontP)
 
 }
 
-/* Called to set whether exceptions or brakepoints are called. */
-void DbUseBrakepoints(BOOL use_brakepoints)
-{
-	db_use_brakepoints = use_brakepoints;
-}
+
 
 int db_get_mode(void** modeInfoPP, void **FontPP)
 {

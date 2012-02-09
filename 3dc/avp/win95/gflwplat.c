@@ -6,7 +6,35 @@
 #include "gamedef.h"
 #include "bh_types.h"
 #include "gameplat.h"
-#include "gameflow.h"
+
+// adj from gameflow.h
+// largely unused
+typedef enum
+{
+	MarineMission_NoneAsYet,
+	MarineMission_DisableLifts,
+	MarineMission_GoToSP2,
+	MarineMission_LeaveRnDs,
+	MarineMission_GoToCMC6,
+	MarineMission_GoToCMC2,
+	MarineMission_DestructBase,
+	MarineMission_Won,
+	
+	PredMission_DestroyComputers,
+	PredMission_GetShipGen3,
+	PredMission_GetShipCMC2,
+	PredMission_KillPredAlien,
+	PredMission_KillQueen,
+	PredMission_ReturnToShip,
+	
+	AlienMission_DestroyMarines,
+	AlienMission_DestroyMarinesWithSpit,
+	AlienMission_DestoryOtherBaddies,
+	AlienMission_DestroyQueen,
+	
+	PlayerMissions_Last,
+	
+} PLAYERMISSION;
 
 static char * messages[PlayerMissions_Last]=
 {
@@ -100,47 +128,9 @@ TECHNOLOGY LAB.\n",
 extern SCREENDESCRIPTORBLOCK ScreenDescriptorBlock;
 
 
-void DoStartMissionSequence (PLAYERMISSION mission)
-{
-	
-	char buffer[1024];
 
-	sprintf(buffer, "%s\n\nPress Return\n", messages[mission]);
 
-	ColourFillBackBuffer(0);
-	textprint ("%s", buffer);
-	FlushTextprintBuffer();
-	FlipBuffers();
-	
-}
 
-char * GetCurrentMissionString ()
-{
-	if (PlayerStatusPtr->CurrentMission < PlayerMissions_Last)
-	{
-		return(messages[PlayerStatusPtr->CurrentMission]);
-	}
-	else
-	{
-		return(0);
-	}
-}
-
-void ShowMissionMessage ()
-{
-	char buffer[1024];
-	
-	if (!messages[PlayerStatusPtr->CurrentMission])
-	{
-		return;
-	}
-	
-	sprintf(buffer, "%s\nSecurity %x Flags %x\n", messages[PlayerStatusPtr->CurrentMission], 
-						PlayerStatusPtr->securityClearances,
-						PlayerStatusPtr->StateChangeObjectFlags);
-	
-	textprint ("%s", buffer);
-}
 
 // this will only print one string from the top of the screen
 

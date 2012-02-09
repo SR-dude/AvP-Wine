@@ -42,7 +42,6 @@ extern "C"
 
 	extern void DrawInternationalizedString(MENU_TEXT_ITEM *itemPtr, int highlighted);
 	extern void DrawMenuBackdrop(void);
-	extern void (*UpdateScreen[]) (void);
  	extern int IDemandSelect(void); // not in any header file!!!
 
 /**********************/
@@ -334,8 +333,6 @@ static unsigned int sel_vidmode_index[VM3_MAX]; // a call to intialize this valu
                                       // and if it is still available, reselected on re-running app
 static Ordered_Heap<VidModeInfo> avail_vidmodes[VM3_MAX]; // two lists, zero for not d3d, one for d3d
 
-static int notreporting_vga = 0;
-static VidModeInfo vga_mode(320,200,8);
 
 // SHADING
 static SHADING sel_shading[VM3_MAX];
@@ -351,21 +348,11 @@ static BOOL mipmap_avail[VM3_MAX];
 // BILINEAR FILTER?
 static BOOL bilin_filter_avail;
 
-/* KJL 15:57:04 05/04/97 - I've added these strings here for simplicity's sake.
-The	memory could be allocated/deallocated during run-time to save some space,
-but it's only a few bytes. They have to be long to contain any required message. */
-static char DisplayModeString[16];
-static char TextureDepthString[16];
-
-/******************/
-/* PUBLIC GLOBALS */
-/******************/
-
-SHADING desired_shading = SHADE_GOURAUD;
 
 /*********************/
 /* PRIVATE FUNCTIONS */
 /*********************/
+
 
 static inline int BitsPerPixel(D3DTEXTUREFORMAT const * texfmt)
 {
@@ -388,6 +375,7 @@ static inline int BitsPerPixel(TexFmt f)
 			return 0;
 	}
 }
+
 
 static void LoadVideoModeSettings(void)
 {
@@ -432,12 +420,6 @@ static void LoadVideoModeSettings(void)
 }
 
 
-static size_t IsNotEnoughVidMemForBytes(size_t required)
-{
-	return 0;
-// adj stub
-}
-
 static BOOL IsNotEnoughVidMemForScreenDepth(int s_depth)
 {
 // adj stub
@@ -447,6 +429,7 @@ static BOOL IsNotEnoughVidMemForScreenDepth(int s_depth)
 /********************/
 /* PUBLIC FUNCTIONS */
 /********************/
+
 
 BOOL PreferTextureFormat(D3DTEXTUREFORMAT const * oldfmt,D3DTEXTUREFORMAT const * newfmt)
 {
@@ -467,6 +450,7 @@ BOOL PreferTextureFormat(D3DTEXTUREFORMAT const * oldfmt,D3DTEXTUREFORMAT const 
 	if (newfmt->Palette) return TRUE;
 	else return FALSE;
 }
+
 
 void InitOptionsMenu(void)
 {
@@ -556,6 +540,7 @@ void InitOptionsMenu(void)
 	RasterisationRequestMode = RequestSoftwareRasterisation;
 
 }
+
 
 
 extern int SetGameVideoMode(void)
@@ -810,70 +795,4 @@ extern int SetGameVideoMode(void)
 	return 1;
 }
 
-extern "C"
-{
-/* KJL 17:11:26 19/07/98 - The 3 fns below are the interface between the
-video mode selection and the frontend menus. */
 
-extern char *GetVideoModeDescription(void)
-{
-	const VidModeInfo* pVidModeInfo = &avail_vidmodes[d3d_opt][sel_vidmode_index[d3d_opt]];
-	
-	// Unfortunately, the heap template [] operator gives us a const reference;
-	// we must cast away the constness:
-
-	return ((VidModeInfo*)pVidModeInfo) -> GetDescription()->pProjCh();
-}
-
-extern void PreviousVideoMode(void)
-{
-	if(sel_vidmode_index[d3d_opt] > 0)
-	{
-		sel_vidmode_index[d3d_opt]--;
-	}
-	else
-	{
-		sel_vidmode_index[d3d_opt] = avail_vidmodes[d3d_opt].size() -1;
-	}
-}
-
-extern void NextVideoMode(void)
-{
-	if(sel_vidmode_index[d3d_opt] < (avail_vidmodes[d3d_opt].size()-1))
-	{
-		sel_vidmode_index[d3d_opt]++;
-	}
-	else
-	{
-		sel_vidmode_index[d3d_opt] = 0;
-	}
-}
-extern void SaveVideoModeSettings(void)
-{
-	vidmode[VM3_SCANDRAW] = avail_vidmodes[VM3_SCANDRAW][sel_vidmode_index[VM3_SCANDRAW]];
-	vidmode[VM3_D3D] = avail_vidmodes[VM3_D3D][sel_vidmode_index[VM3_D3D]];
-
-// adj
-	FILE * fp = fopen("AVPVMOPT.BIN","wb");
-	if (!fp) return;
-	fwrite("VMOP",4,1,fp);
-	fwrite(&vidmode[VM3_SCANDRAW].Width,4,1,fp);
-	fwrite(&vidmode[VM3_SCANDRAW].Height,4,1,fp);
-	fwrite(&vidmode[VM3_SCANDRAW].ColourDepth,4,1,fp);
-	fwrite(&vidmode[VM3_D3D].Width,4,1,fp);
-	fwrite(&vidmode[VM3_D3D].Height,4,1,fp);
-	fwrite(&vidmode[VM3_D3D].ColourDepth,4,1,fp);
-	fwrite(&d3d_opt,4,1,fp);
-	fwrite(&hw_avail,4,1,fp);
-	fwrite(&zbufopt[VM3_SCANDRAW],4,1,fp);
-	fwrite(&zbufopt[VM3_D3D],4,1,fp);
-	fwrite(&d3d_desired_tex_fmt,4,1,fp);
-	fwrite(&sel_shading[VM3_SCANDRAW],4,1,fp);
-	fwrite(&sel_shading[VM3_D3D],4,1,fp);
-	fwrite(&BilinearTextureFilter,4,1,fp);
-	fwrite(&mipmap_opt[VM3_SCANDRAW],4,1,fp);
-	fwrite(&mipmap_opt[VM3_D3D],4,1,fp);
-	fclose(fp);
-	return;
-}
-}

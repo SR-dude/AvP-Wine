@@ -25,12 +25,7 @@
 
 
 // :: Render ()
-void AlienHUDGadget :: Render 
-(
-	const struct r2pos& R2Pos,
-	const struct r2rect& R2Rect_Clip,
-	int FixP_Alpha
-)
+void AlienHUDGadget :: Render (/*adj unused*/const struct r2pos& R2Pos , const struct r2rect& R2Rect_Clip, int FixP_Alpha )
 {
 
 	pTextReportGadg -> UpdateLineTimes();
@@ -142,8 +137,9 @@ void AlienHUDGadget :: Key_Tab(void)
 	pTextEntryGadg -> Key_Tab();
 }
 
-void AlienHUDGadget :: Jitter(int FixP_Magnitude)
+void AlienHUDGadget :: Jitter(int)
 {
+// adj
 	// empty for now
 }
 

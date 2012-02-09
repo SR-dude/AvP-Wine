@@ -238,7 +238,7 @@ extern void MakePredatorFar(STRATEGYBLOCK *sbPtr);
 extern void PredatorIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple,SECTION_DATA *Section, VECTORCH *incoming);
 extern void ActivateDormantPredator(STRATEGYBLOCK *sbPtr);
 extern int NPCPredatorIsCloaked(STRATEGYBLOCK *sbPtr);
-extern void StartPredatorSelfDestructExplosion(STRATEGYBLOCK *sbPtr);
+extern void StartPredatorSelfDestructExplosion(/*STRATEGYBLOCK *sbPtr*/ void);
 
 #ifdef __cplusplus
 }

@@ -23,7 +23,7 @@ void InitialiseGammaSettings(int gamma)
 
 void UpdateGammaSettings(void)
 {
-	LPDIRECTDRAWGAMMACONTROL handle=NULL;
+// adj unused
 	DDGAMMARAMP gammaValues;
 
 	if (RequestedGammaSetting==ActualGammaSetting) return;

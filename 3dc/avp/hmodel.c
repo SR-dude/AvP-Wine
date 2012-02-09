@@ -24,7 +24,6 @@
 #include "bh_weap.h"
 #include "weapons.h"
 #include "psnd.h"
-#include "load_shp.h"
 #include "plat_shp.h"
 #include "avp_userprofile.h"
 
@@ -353,7 +352,6 @@ void Setup_Texture_Animation_For_Section(SECTION_DATA *this_section_data)
 				POLYHEADER *poly =  (POLYHEADER*)(shptr->items[item_num]);
 				LOCALASSERT(poly);
 
-				SetupPolygonFlagAccessForShape(shptr);
 					
 				if((Request_PolyFlags((void *)poly)) & iflag_txanim)
 					{
@@ -1329,7 +1327,6 @@ void Process_Section(HMODELCONTROLLER *controller,SECTION_DATA *this_section_dat
 		&&(render)) {
 		/* Unreal things don't get plotted, either. */
 	
-		extern MATRIXCH IdentityMatrix;
 
 		DISPLAYBLOCK dummy_displayblock;
 		SHAPEHEADER *shape_to_use;
@@ -2363,6 +2360,7 @@ int Prune_Recursion_Virtual(SECTION_DATA *this_section_data) {
 
 int Prune_HModel_Virtual(SECTION_DATA *top_section) {
 
+// adj unused
 	SECTION *this_section;
 	int sol;
 
@@ -2381,51 +2379,6 @@ int Prune_HModel_Virtual(SECTION_DATA *top_section) {
 
 }
 
-void Correlation_Recursion(SECTION_DATA *this_section_data, SECTION_DATA *alt_section_data) {
-
-	/* Correlate existance. */
-
-	if (alt_section_data->flags&section_data_notreal) {
-		this_section_data->flags|=section_data_notreal;
-	}
-
-	if (alt_section_data->flags&section_data_terminate_here) {
-		this_section_data->flags|=section_data_terminate_here;
-		this_section_data->gore_timer=0; /* As good a time as any. */
-	}
-
-	/* Now call recursion... */
-
-	if ((this_section_data->First_Child!=NULL)
-		&&( (this_section_data->flags&section_data_terminate_here)==0)) {
-		
-		SECTION_DATA *child_list_ptr,*alt_child_list_ptr;
-
-		child_list_ptr=this_section_data->First_Child;
-		alt_child_list_ptr=alt_section_data->First_Child;
-
-		while (child_list_ptr!=NULL) {
-			Correlation_Recursion(child_list_ptr,alt_child_list_ptr);
-			child_list_ptr=child_list_ptr->Next_Sibling;
-			alt_child_list_ptr=alt_child_list_ptr->Next_Sibling;
-		}
-	}
-}
-
-void Correlate_HModel_Instances(SECTION_DATA *victim,SECTION_DATA *templat) {
-
-	GLOBALASSERT(victim->sempai==templat->sempai);
-
-	/* You'd better not be being silly. */
-
-	/* The top section must be a false root. */
-
-	victim->flags|=section_data_false_root;
-
-	/* Start recursion. */
-
-	Correlation_Recursion(victim,templat);
-}
 
 void MulQuat(QUAT *q1,QUAT *q2,QUAT *output) {
 
@@ -3836,6 +3789,7 @@ void TrimToTemplate(STRATEGYBLOCK *sbPtr,HMODELCONTROLLER *controller,SECTION *n
 int HModelSequence_Exists(HMODELCONTROLLER *controller,int sequence_type,int sub_sequence) {
 
 	int sequence_id,a;
+// adj unused
 	SEQUENCE *sequence_pointer;
 
 	sequence_id=GetSequenceID(sequence_type,sub_sequence);

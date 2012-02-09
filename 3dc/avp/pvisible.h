@@ -122,8 +122,6 @@
 	
 	void MakeObjectNear(STRATEGYBLOCK *sbPtr);
 	void MakeObjectFar(STRATEGYBLOCK *sbPtr);
-	/* KJL 14:34:25 24/05/98 - does what it says */
-	void RespawnAllObjects(void);
 
 	void RespawnAllPickups(void);
 	/*--------------------------------------------------

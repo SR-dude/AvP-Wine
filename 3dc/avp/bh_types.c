@@ -12,8 +12,6 @@
 #include "comp_shp.h"
 #include "inventry.h"
 #include "triggers.h"
-#include "mslhand.h"
-
 #include "dynblock.h"
 #include "dynamics.h"
 
@@ -34,7 +32,6 @@
 #include "bh_swdor.h"
 #include "bh_ldoor.h"
 #include "bh_plift.h"
-#include "load_shp.h"
 #include "bh_weap.h"
 #include "bh_debri.h"
 #include "lighting.h"
@@ -978,7 +975,6 @@ static void* SimpleAnimationBehaveInit(void* bhdata, STRATEGYBLOCK* sbptr)
 	GLOBALASSERT(shptr);
 	GLOBALASSERT(shptr->numitems > 0);
 
-	SetupPolygonFlagAccessForShape(shptr);
 
 	sabhv = (SIMPLE_ANIM_BEHAV_BLOCK*)AllocateMem(sizeof(SIMPLE_ANIM_BEHAV_BLOCK));
 	if(!sabhv) 
@@ -2540,7 +2536,7 @@ void RequestState(STRATEGYBLOCK* sbptr, int message, STRATEGYBLOCK * SBRequester
 				}
 			case I_BehaviourParticleGenerator:
 				{
-					SendRequestToParticleGenerator(sbptr,state,message>>1);
+					SendRequestToParticleGenerator(sbptr,state);
 						
 					break;
 				}

@@ -9,7 +9,6 @@
 #include "comp_shp.h"
 #include "inventry.h"
 #include "triggers.h"
-#include "mslhand.h"
 #include "huddefs.h"
 
 #include "dynblock.h"
@@ -22,7 +21,6 @@
 #include "pmove.h"
 #include "pvisible.h"
 #include "bh_swdor.h"
-#include "load_shp.h"
 #include "lighting.h"
 #include "bh_lnksw.h"
 #include "bh_binsw.h"
@@ -46,7 +44,7 @@ MODULE Old_Pos_Module;
 
 
 
-static void TeleportFloorSwitches(MODULE* dest, MODULE* src, LIFT_CONTROL_BLOCK* liftCtrl);
+static void TeleportFloorSwitches(MODULE* dest, MODULE* src);
 
 
 
@@ -340,6 +338,7 @@ void LiftBehaveFun(STRATEGYBLOCK* sbptr)
 
 							if(BadGuyInModuleOrNoPlayer())
 							{
+// adj unreachable
 								lift_ctrl->state = I_ls_opening_door;
 								lift_ctrl->dest_station = -1;
 								lift_ctrl->delay_between_floors = -1;
@@ -374,6 +373,7 @@ void LiftBehaveFun(STRATEGYBLOCK* sbptr)
 				{
 					int curr_station_num = lift_ctrl->curr_station;
 					LIFT_STATION *pos_stn = lift_ctrl->lift_stations[lift_ctrl->curr_station];
+// adj unused
 					MODULE* mptr;
 					mptr = pos_stn->lift_module;
 
@@ -484,6 +484,7 @@ void LiftBehaveFun(STRATEGYBLOCK* sbptr)
 							 	//this should never happen in a seperate env
 							 	LIFT_STATION *lift_stn_new = lift_ctrl->lift_stations[lift_ctrl->curr_station];
 							 	LIFT_STATION *lift_stn_old = lift_ctrl->lift_stations[lift_ctrl->prev_station];
+// adj unused
 							 	MODULE* old_pos, *new_pos;
 							 	// to trap button presses when moving between floors -
 							 	// not really ness and it complecates things
@@ -745,8 +746,7 @@ void CleanUpLiftControl()
 		TeleportFloorSwitches
 		(
 			lift_stn_new->lift_module,
-			lift_stn_new->lift_floor_switch->containingModule,
-			lift_ctrl			
+			lift_stn_new->lift_floor_switch->containingModule
 		);
 		
   		InitPreservedSBs();
@@ -760,8 +760,7 @@ void CleanUpLiftControl()
 static void TeleportFloorSwitches
 (
 	MODULE* dest,
-	MODULE* src,
-	LIFT_CONTROL_BLOCK * liftCtrl
+	MODULE* src
 )
 {
 	if(dest != src)

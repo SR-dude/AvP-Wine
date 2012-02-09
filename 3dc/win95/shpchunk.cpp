@@ -2755,11 +2755,11 @@ void Anim_Shape_Sequence_Chunk::GenerateInterpolatedFrames()
 
 	if(!strcmp(parent->identifier,"REBSHAPE"))
 	{
-		sequence_data_store->GenerateInterpolatedFrames(&((Shape_Chunk*)parent)->shape_data);
+		sequence_data_store->GenerateInterpolatedFrames();
 	}
 	else if(!strcmp(parent->identifier,"SUBSHAPE"))
 	{
-		sequence_data_store->GenerateInterpolatedFrames(&((Shape_Sub_Shape_Chunk*)parent)->shape_data);
+		sequence_data_store->GenerateInterpolatedFrames();
 	}
 }
 /////////////////////////////////////////

@@ -46,7 +46,6 @@
 
 /* externs for commonly used global variables and arrays */
 extern int	VideoMode;
-extern void (*UpdateScreen[]) (void);
 extern DISPLAYBLOCK			*ActiveBlockList[];
 extern SCREENDESCRIPTORBLOCK	ScreenDescriptorBlock;
 extern void (*SetVideoMode[]) (void);

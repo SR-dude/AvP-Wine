@@ -24,7 +24,6 @@
 #include "bh_weap.h"
 #include "weapons.h"
 #include "psnd.h"
-#include "load_shp.h"
 
 #define UseLocalAssert Yes
 #include "ourasert.h"

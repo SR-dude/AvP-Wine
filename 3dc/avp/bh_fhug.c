@@ -51,7 +51,6 @@ static int HuggerShouldAttackPlayer(void);
 static void SetHuggerAnimationSequence(STRATEGYBLOCK *sbPtr, HUGGER_SUBSEQUENCES seq, int length);
 static void KillFaceHugger(STRATEGYBLOCK *sbPtr,DAMAGE_PROFILE *damage);
 
-static int InContactWithPlayer(DYNAMICSBLOCK *dynPtr);
 static void JumpAtPlayer(STRATEGYBLOCK *sbPtr);
 
 extern SECTION *GetHierarchyFromLibrary(const char *rif_name);
@@ -354,7 +353,7 @@ void MakeFacehuggerFar(STRATEGYBLOCK *sbPtr)
 	sbPtr->DynPtr->LinVelocity.vz = 0;	
 }
 
-void FacehuggerIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple)
+void FacehuggerIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage)
 {
 	FACEHUGGER_STATUS_BLOCK *facehuggerStatusPointer;    
 
@@ -871,22 +870,6 @@ static int HuggerShouldAttackPlayer(void)
 	return 1;
 }
 
-static int InContactWithPlayer(DYNAMICSBLOCK *dynPtr)
-{
-	struct collisionreport *nextReport;
-
-	LOCALASSERT(dynPtr);
-	nextReport = dynPtr->CollisionReportPtr;
-	
-	/* walk the collision report list, looking for collisions against the player */
-	while(nextReport)
-	{
-		if(nextReport->ObstacleSBPtr == Player->ObStrategyBlock) return 1;
-		nextReport = nextReport->NextCollisionReportPtr;
-	}
-	
-	return 0;	
-}
 
 static void JumpAtPlayer(STRATEGYBLOCK *sbPtr)
 {

@@ -68,8 +68,6 @@ struct DpExtHeader
  */
 extern BOOL DpExtInit(DWORD cGrntdBufs, DWORD cBytesPerBuf, BOOL bErrChcks);
 
-/* Un-initialises the DpExt module. */ 
-extern void DpExtUnInit(void);
 
 /* This fn has the same parameters as the standard DirectPlay Send() fn. 
  * However, you *must* leave DPEXT_HEADER_SIZE bytes free at the start of

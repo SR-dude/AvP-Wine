@@ -274,8 +274,6 @@ static void ProcessGameMessage(DPID senderId, char *msgP,unsigned int msgSize);
 static void AddPlayerToGame(DPID id, char*name);
 static void AddPlayerAndObjectUpdateMessages(void);
 static void UpdateNetworkGameScores(DPID playerKilledId, DPID killerId,NETGAME_CHARACTERTYPE playerKilledType,NETGAME_CHARACTERTYPE killerType);
-static void InitFinalNetGameScores(void);
-static void ConvertNetNameToUpperCase(char *strPtr);
 
 static void ProcessNetMsg_GameDescription(NETMESSAGE_GAMEDESCRIPTION *msgPtr);
 static void ProcessNetMsg_PlayerDescription(NETMESSAGE_PLAYERDESCRIPTION *msgPtr, DPID senderId);
@@ -377,85 +375,7 @@ void CheckStateOfObservedPlayer();
 /*----------------------------------------------------------------------
   Initalisation of net game
   ----------------------------------------------------------------------*/
-void InitAVPNetGame(void)
-{
-	extern int QuickStartMultiplayer;
-	/* init garry's dp extended */
-	DpExtInit(0,0,0);
 
-	/* init the send message buffer */
-	InitialiseSendMessageBuffer();
-
-	/* base initialisation of game description */	
-	{
-		int i,j;
-		for(i=0;i<(NET_MAXPLAYERS);i++)
-		{
-			netGameData.playerData[i].playerId = NULL;		
-			for(j=0;j<(NET_PLAYERNAMELENGTH);j++) netGameData.playerData[i].name[j] = '\0';
-			netGameData.playerData[i].characterType = NGCT_Marine;
-			netGameData.playerData[i].characterSubType = NGSCT_General;
-			for(j=0;j<(NET_MAXPLAYERS);j++) netGameData.playerData[i].playerFrags[j] = 0;
-			netGameData.playerData[i].playerScore=0;
-			netGameData.playerData[i].playerScoreAgainst=0;
-			netGameData.playerData[i].aliensKilled[0]=0;
-			netGameData.playerData[i].aliensKilled[1]=0;
-			netGameData.playerData[i].aliensKilled[2]=0;
-			netGameData.playerData[i].deathsFromAI=0;
-			netGameData.playerData[i].playerAlive=1;
-			netGameData.playerData[i].playerHasLives=1;
-			netGameData.playerData[i].startFlag = 0;		
-		}
-		for(j=0;j<3;j++) netGameData.teamScores[j] = 0;
-		netGameData.myGameState = NGS_Joining;
-		switch (QuickStartMultiplayer)
-		{
-			default:
-			case 1:
-				netGameData.myCharacterType = NGCT_Marine;
-				netGameData.myNextCharacterType = NGCT_Marine;
-				break;
-
-			case 2:
-				netGameData.myCharacterType = NGCT_Alien;
-				netGameData.myNextCharacterType = NGCT_Alien;
-				break;
-
-			case 3:
-				netGameData.myCharacterType = NGCT_Predator;
-				netGameData.myNextCharacterType = NGCT_Predator;
-				break;
-		}
-
-		netGameData.myStartFlag = 0;
-		netGameData.gameType = NGT_Individual;
-		netGameData.levelNumber = 0;
-		netGameData.scoreLimit = 0;
-		netGameData.timeLimit = 0;
-		netGameData.invulnerableTime = 5;
-		netGameData.GameTimeElapsed = 0;
-
-		netGameData.LMS_AlienIndex=-1;
-		netGameData.stateCheckTimeDelay=0;
-		netGameData.LMS_RestartTimer=0;
-	}
-
-	myNetworkKillerId = AVPDPNetID;	/* init global id of player who killed me last */
-	netNextLocalObjectId = 1;	/* init local object network id */
-	numMessagesReceived = 0;	/* these are for testing */
-	numMessagesTransmitted = 0;
-
-	/* If I'm the host, add myself to the game data */
-	if(AvP.Network==I_Host)
-	{
-		netGameData.playerData[0].playerId = AVPDPNetID;
-		strncpy(netGameData.playerData[0].name,AVPDPplayerName.lpszShortNameA,NET_PLAYERNAMELENGTH-1);
-		netGameData.playerData[0].name[NET_PLAYERNAMELENGTH-1] = '\0';
-//		ConvertNetNameToUpperCase(netGameData.playerData[0].name);
-	}
-
-
-}
 
 void InitAVPNetGameForHost(int species, int gamestyle, int level)
 {
@@ -1013,7 +933,6 @@ static void AddPlayerToGame(DPID id, char* name)
 	
 	strncpy(netGameData.playerData[freePlayerIndex].name,name,NET_PLAYERNAMELENGTH-1);
 	netGameData.playerData[freePlayerIndex].name[NET_PLAYERNAMELENGTH-1] = '\0';
-//	ConvertNetNameToUpperCase(netGameData.playerData[freePlayerIndex].name);
 				
 	netGameData.playerData[freePlayerIndex].characterType = NGCT_Marine;
 	netGameData.playerData[freePlayerIndex].characterSubType = NGSCT_General;
@@ -1764,14 +1683,6 @@ static void AddPlayerAndObjectUpdateMessages(void)
   ----------------------------------------------------------------------*/
 void EndAVPNetGame(void)
 {
-	HRESULT hres;
-
-	/* garry's dp extended clean up */
-	if(!netGameData.skirmishMode)
-	{
-		DpExtUnInit();	
-	}
-	
 
 	RemovePlayerFromGame(AVPDPNetID);
 	TransmitPlayerLeavingNetMsg();
@@ -3097,10 +3008,6 @@ void AddNetMsg_SpeciesScores()
 	}
 }
 
-/* for sending information about bullet ricochets and plasma impacts */
-void AddNetMsg_LocalRicochet(AVP_BEHAVIOUR_TYPE behaviourType, VECTORCH *position, VECTORCH *direction)
-{
-}
 
 void AddNetMsg_LocalObjectState(STRATEGYBLOCK *sbPtr)
 {
@@ -3678,35 +3585,6 @@ void AddNetMsg_ObjectPickedUp(char* objectName)
 	COPY_NAME((&messagePtr->name[0]),objectName);
 }
 
-void AddNetMsg_EndGame(void)
-{
-	NETMESSAGEHEADER *headerPtr;
-	int headerSize = sizeof(NETMESSAGEHEADER);
-
-	/* should be sent by host only, in endGame state */
-	LOCALASSERT(AvP.Network==I_Host);
-	/* yes: need to send this before changing state, as we need to know our previous state,
-	and sendMessage requires one of these two states anyway */
-	LOCALASSERT((netGameData.myGameState==NGS_StartUp)||(netGameData.myGameState==NGS_Playing)||(netGameData.myGameState==NGS_Joining));
-
-	/* check there's enough room in the send buffer */
-	{
-		int numBytesReqd = headerSize;
-		int numBytesLeft = NET_MESSAGEBUFFERSIZE - ((int)(endSendBuffer - &sendBuffer[0]));
-		if(numBytesReqd > numBytesLeft)
-		{
-			LOCALASSERT(1==0);
-			/* don't add it */
-			return;
-		}
-	}
-	
-	/* set up pointers to header and message structures */
-	headerPtr = (NETMESSAGEHEADER *)endSendBuffer;
-	endSendBuffer += headerSize;
-	/* fill out the header */
-	headerPtr->type = (unsigned char)NetMT_EndGame;
-}
 
 void AddNetMsg_LOSRequestBinarySwitch(STRATEGYBLOCK *sbPtr)
 {
@@ -7175,7 +7053,6 @@ static void ProcessNetMsg_StrategySynch(NETMESSAGE_STRATEGYSYNCH *messagePtr)
 	for (i=0; i<NumActiveStBlocks; i++)
 	{
 		STRATEGYBLOCK *sbPtr = ActiveStBlockList[i];
-		int status;
 
 		if(sbPtr->I_SBtype == I_BehaviourBinarySwitch ||
 		   sbPtr->I_SBtype == I_BehaviourLinkSwitch ||
@@ -7686,9 +7563,6 @@ static void ProcessNetMsg_Gibbing(NETMESSAGE_GIBBING *messagePtr,DPID senderId)
 	}
 	else
 	{
-		SECTION_DATA *section_data=NULL;
-		HMODELCONTROLLER *controller=NULL;
-		
 		ghostData = (NETGHOSTDATABLOCK *)sbPtr->SBdataptr;
 
 		//only interested in gibbing corpses
@@ -8101,26 +7975,6 @@ void DoNetScoresForHostDeath(NETGAME_CHARACTERTYPE myType,NETGAME_CHARACTERTYPE 
 	UpdateNetworkGameScores(AVPDPNetID,myNetworkKillerId,myType,killerType);
 }
 
-int AddUpPlayerFrags(int playerId)
-{
-	int score = 0;
-	int j;
-	LOCALASSERT(netGameData.playerData[playerId].playerId!=NULL);
-	for(j=0;j<(NET_MAXPLAYERS);j++) score+=netGameData.playerData[playerId].playerFrags[j];
-	return score;
-}
-
-static void ConvertNetNameToUpperCase(char *strPtr)
-{
-	int count = 0;
-	while((count<(NET_PLAYERNAMELENGTH-1))&&(strPtr[count]!='\0'))
-	{
-		strPtr[count] = toupper(strPtr[count]);
-		count++;
-	}
-
-}
-
 
 /* Patrick 11/7/97 ----------------------------------------------
 Functions for determining our sequence for player update messages
@@ -8278,7 +8132,6 @@ static MARINE_SEQUENCE GetMyMarineSequence(void)
 static ALIEN_SEQUENCE GetMyAlienSequence(void)
 {
 	extern STRATEGYBLOCK *Biting;
-	extern int Bit;
 	int playerIsMoving = 0;
 	int playerIsFiring = 0;
 	int playerIsCrouching = 0;
@@ -8735,19 +8588,6 @@ void TransmitPlayerLeavingNetMsg(void)
 	}
 }
 
-void TransmitStartGameNetMsg(void)
-{
-	int i;
-	/* first of, initialise the send buffer: this means that we may loose some stacked
-	messages, but this should be ok.*/
-	InitialiseSendMessageBuffer();
-
-	for(i=0;i<NET_MESSAGEITERATIONS;i++)
-	{
-		AddNetMsg_StartGame();
-		NetSendMessages();
-	}
-}
 
 /* Patrick 29/7/97 --------------------------------------------------
 Stuff for assigning starting positions to network players
@@ -8757,8 +8597,6 @@ void TeleportNetPlayerToAStartingPosition(STRATEGYBLOCK *playerSbPtr, int startO
 {
 	int numStartPositions;
 	MULTIPLAYER_START* startPositions;
-
-	int sbIndex = 0;
 
 	int start_index;
 	int numChecked=0;
@@ -9706,13 +9544,7 @@ static void Handle_LastManStanding_Restart(DPID alienID,int seed)
 			netGameData.playerData[i].characterType=NGCT_Marine;
 		}
 	}
-	/*
-	//go to an new start position
-	StartOfGame_PlayerPlacement(Player->ObStrategyBlock,seed);
-	
-	//restore all the destroyed objects.
-	RespawnAllObjects();
-	*/
+
 
 	MultiplayerRestartSeed=seed;
 	AvP.RestartLevel=1;
@@ -10475,7 +10307,7 @@ static void CheckForPointBasedObjectRespawn()
 
 static int CountMultiplayerLivesLeft()
 {
-	int i,j;
+	int i;
 	int livesUsed=0;
 	
 	

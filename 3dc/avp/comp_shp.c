@@ -1,14 +1,10 @@
 #include "3dc.h"
 #include "module.h"
-
 #include "stratdef.h"
 #include "gamedef.h"
 #include "comp_shp.h"
 
-#include "mslhand.h"
-
 #define UseLocalAssert Yes
-
 #include "ourasert.h"
 
 /*

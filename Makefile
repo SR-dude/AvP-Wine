@@ -59,7 +59,6 @@ all: $(TARGET)
 	$(RC) $(CPPFLAGS) -o $@ -i $<
 
 SOURCE_FILES= \
-	3dc/afont.c \
 	3dc/avp/win95/gadgets/ahudgadg.cpp \
 	3dc/avp/ai_sight.c \
 	3dc/win95/alt_tab.cpp \
@@ -165,7 +164,6 @@ SOURCE_FILES= \
 	3dc/win95/enumsch.cpp \
 	3dc/win95/envchunk.cpp \
 	3dc/avp/equipmnt.c \
-	3dc/avp/equiputl.cpp \
 	3dc/avp/extents.c \
 	3dc/win95/fail.c \
 	3dc/avp/win95/ffread.cpp \
@@ -176,7 +174,6 @@ SOURCE_FILES= \
 	3dc/avp/game.c \
 	3dc/avp/game_statistics.c \
 	3dc/avp/gamecmds.cpp \
-	3dc/avp/gameflow.c \
 	3dc/avp/gamevars.cpp \
 	3dc/avp/win95/gammacontrol.cpp \
 	3dc/avp/win95/gflwplat.c \
@@ -200,7 +197,6 @@ SOURCE_FILES= \
 	3dc/avp/win95/langplat.c \
 	3dc/avp/language.c \
 	3dc/avp/lighting.c \
-	3dc/avp/load_shp.c \
 	3dc/avp/los.c \
 	3dc/win95/ltchunk.cpp \
 	3dc/map.c \
@@ -218,7 +214,6 @@ SOURCE_FILES= \
 	3dc/avp/win95/mousecentreing.cpp \
 	3dc/avp/movement.c \
 	3dc/avp/mp_launch.c \
-	3dc/mslhand.c \
 	3dc/avp/win95/npcsetup.cpp \
 	3dc/win95/obchunk.cpp \
 	3dc/object.c \
@@ -409,7 +404,6 @@ HEADER_FILES= \
 	3dc/win95/envchunk.hpp \
 	3dc/avp/equates.h \
 	3dc/avp/equipmnt.h \
-	3dc/avp/equiputl.hpp \
 	3dc/avp/support/expvar.hpp \
 	3dc/avp/extents.h \
 	3dc/win95/fail.h \
@@ -421,7 +415,6 @@ HEADER_FILES= \
 	3dc/avp/win95/gadgets/gadget.h \
 	3dc/avp/game_statistics.h \
 	3dc/avp/gamedef.h \
-	3dc/avp/gameflow.h \
 	3dc/avp/win95/gameplat.h \
 	3dc/avp/win95/gammacontrol.h \
 	3dc/win95/gsprchnk.hpp \
@@ -453,7 +446,6 @@ HEADER_FILES= \
 	3dc/avp/language.h \
 	3dc/avp/lighting.h \
 	3dc/win95/list_tem.hpp \
-	3dc/avp/load_shp.h \
 	3dc/avp/los.h \
 	3dc/win95/ltchunk.hpp \
 	3dc/avp/ltfx_exp.h \
@@ -467,7 +459,6 @@ HEADER_FILES= \
 	3dc/avp/missions.hpp \
 	3dc/win95/mmx_math.h \
 	3dc/avp/win95/modcmds.hpp \
-	3dc/mslhand.h \
 	3dc/avp/win95/multmenu.h \
 	3dc/avp/win95/npcsetup.h \
 	3dc/win95/obchunk.hpp \

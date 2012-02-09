@@ -12,7 +12,6 @@
 #include "bh_types.h"
 #include "inventry.h"
 #include "comp_shp.h"
-#include "load_shp.h"
 #include "huddefs.h"
 
 #define UseLocalAssert Yes
@@ -274,7 +273,6 @@ int FireNonAutomaticSecondaryAmmo(PLAYER_WEAPON_DATA *weaponPtr);
 int GrenadeLauncherChangeAmmo(PLAYER_WEAPON_DATA *weaponPtr);
 int PredDiscChangeMode(PLAYER_WEAPON_DATA *weaponPtr);
 int SmartgunSecondaryFire(PLAYER_WEAPON_DATA *weaponPtr);
-int DamageObjectInLineOfSight(PLAYER_WEAPON_DATA *weaponPtr);
 int MeleeWeapon_180Degree_Front(PLAYER_WEAPON_DATA *weaponPtr);
 int MeleeWeapon_90Degree_Front(PLAYER_WEAPON_DATA *weaponPtr);
 int FireEmptyMinigun(PLAYER_WEAPON_DATA *weaponPtr);
@@ -282,7 +280,6 @@ int FireEmptyMinigun(PLAYER_WEAPON_DATA *weaponPtr);
 int Staff_Manager(DAMAGE_PROFILE *damage,SECTION_DATA *section1,SECTION_DATA *section2,SECTION_DATA *section3,
 	STRATEGYBLOCK *wielder);
 
-static void FireLineOfSightAmmo(enum AMMO_ID AmmoID, VECTORCH* sourcePtr, VECTORCH* directionPtr, int multiple);
 static void PlayerFireLineOfSightAmmo(enum AMMO_ID AmmoID, int multiple);
 extern void FireProjectileAmmo(enum AMMO_ID AmmoID);
 
@@ -298,8 +295,7 @@ void PositionPlayersWeaponMuzzleFlash(void);
 
 void MeleeWeaponNullTrajectory(void *playerStatus, PLAYER_WEAPON_DATA *weaponPtr);
 
-void AlienClawTrajectory(void *playerStatus, PLAYER_WEAPON_DATA *weaponPtr);
-void AlienClawEndTrajectory(void *playerStatus, PLAYER_WEAPON_DATA *weaponPtr);
+
 void AlienTailTrajectory(void *playerStatus, PLAYER_WEAPON_DATA *weaponPtr);
 
 void PredWristbladeTrajectory(void *playerStatus, PLAYER_WEAPON_DATA *weaponPtr);
@@ -2201,7 +2197,7 @@ void CauseDamageToObject(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multi
 		}
 		case I_BehaviourVideoScreen:
 		{
-			VideoScreenIsDamaged(sbPtr,damage,use_multiple);
+			VideoScreenIsDamaged(sbPtr);
 			break;
 		}
 		case I_BehaviourPlacedLight:
@@ -2211,7 +2207,7 @@ void CauseDamageToObject(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multi
 		}
 		case I_BehaviourTrackObject:
 		{
-			TrackObjectIsDamaged(sbPtr,damage,use_multiple);
+			TrackObjectIsDamaged(sbPtr);
 			break;
 		}
 		case I_BehaviourPredator:
@@ -2232,7 +2228,7 @@ void CauseDamageToObject(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multi
 		}
 		case I_BehaviourQueenAlien:
 		{
-			QueenIsDamaged(sbPtr,damage,use_multiple,NULL,incoming,NULL);
+			QueenIsDamaged(sbPtr,damage,use_multiple,NULL,incoming);
 			break;
 		}
 		case I_BehaviourPredatorAlien:
@@ -2243,7 +2239,7 @@ void CauseDamageToObject(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multi
 		}	    
 		case I_BehaviourFaceHugger:
 		{
-			FacehuggerIsDamaged(sbPtr,damage,use_multiple);
+			FacehuggerIsDamaged(sbPtr,damage);
 			break;
 		}	    
 	  case I_BehaviourGrenade:
@@ -2277,7 +2273,7 @@ void CauseDamageToObject(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multi
 		}
 		case I_BehaviourNetCorpse:
 		{
-			CorpseIsDamaged(sbPtr,damage,use_multiple,0,NULL,incoming);
+			CorpseIsDamaged(sbPtr,damage,use_multiple,0);
 			break;
 		}
 		default:
@@ -2363,7 +2359,6 @@ void HandleEffectsOfExplosion(STRATEGYBLOCK *objectToIgnorePtr, VECTORCH *centre
 					}
 				 	/* effect of explosion on object's dynamics */
 					{
-						VECTORCH directionOfForce;
 						EULER rotation;
 	 					int magnitudeOfForce = 5000*damage/dynPtr->Mass;
 						
@@ -2502,7 +2497,6 @@ void MakeMatrixFromDirection(VECTORCH *directionPtr, MATRIXCH *matrixPtr)
 *************KJL*/
 /* values which are evaluated at runtime */
 VECTORCH CentreOfMuzzleOffset;
-int MuzzleFlashLength;
 
 void PositionPlayersWeapon(void)
 {
@@ -3065,26 +3059,6 @@ void FindEndOfShape(VECTORCH* endPositionPtr, int shapeIndex)
 }
 
 
-
-static void FireLineOfSightAmmo(enum AMMO_ID AmmoID, VECTORCH* sourcePtr, VECTORCH* directionPtr, int multiple)
-{
-	FindPolygonInLineOfSight(directionPtr,sourcePtr,0,NULL);
-
-	if (LOS_ObjectHitPtr)
-	{
-		/* this fn needs updating to take amount of damage into account etc. */
-		if (LOS_ObjectHitPtr->ObStrategyBlock) {
-			if ((LOS_ObjectHitPtr->ObStrategyBlock->SBdptr)&&(LOS_HModel_Section)) {
-				GLOBALASSERT(LOS_ObjectHitPtr->ObStrategyBlock->SBdptr->HModelControlBlock==LOS_HModel_Section->my_controller);
-			}
-		}
-
-		HandleWeaponImpact(&LOS_Point,LOS_ObjectHitPtr->ObStrategyBlock,AmmoID,directionPtr, multiple*ONE_FIXED, LOS_HModel_Section);
-	}
-}
-
-
-
 static void CalculateTorque(EULER *rotationPtr, VECTORCH *directionPtr, STRATEGYBLOCK *sbPtr)
 {
 	VECTORCH point,absPoint;
@@ -3318,75 +3292,7 @@ void MeleeWeaponNullTrajectory(void *playerStatus, PLAYER_WEAPON_DATA *weaponPtr
 	weaponPtr->PositionOffset.vz = -100000;
 }
 
-void AlienClawTrajectory(void *playerStatus, PLAYER_WEAPON_DATA *weaponPtr)
-{
-//    TEMPLATE_WEAPON_DATA *twPtr = &TemplateWeapon[weaponPtr->WeaponIDNumber];
-	VECTORCH startDir = {-65536,0,0};
-	VECTORCH endDir = {-2,0,65535};
-	VECTORCH direction;
-	int timeLeft = weaponPtr->StateTimeOutCounter;
-	int timeDone = 65536-timeLeft;
-	
-	weaponPtr->PositionOffset.vx = MUL_FIXED(timeDone,600);
-	weaponPtr->PositionOffset.vy = MUL_FIXED(timeDone,-200);
-	weaponPtr->PositionOffset.vz = MUL_FIXED(timeDone,400);
-	
-	direction.vx = WideMul2NarrowDiv(startDir.vx, timeLeft, endDir.vx, timeDone, ONE_FIXED);
-	direction.vy = WideMul2NarrowDiv(startDir.vy, timeLeft, endDir.vy, timeDone, ONE_FIXED);
-	direction.vz = WideMul2NarrowDiv(startDir.vz, timeLeft, endDir.vz, timeDone, ONE_FIXED);
-	Normalise(&direction);	
-//	direction = endDir;
-	
-	MakeMatrixFromDirection(&direction,&(PlayersWeapon.ObMat));
-	{
-		extern VIEWDESCRIPTORBLOCK *ActiveVDBList[];
-		VIEWDESCRIPTORBLOCK *VDBPtr = ActiveVDBList[0];
-		MATRIXCH matrix	= VDBPtr->VDB_Mat;
-		 
-		TransposeMatrixCH(&matrix);
-		MatrixMultiply(&matrix,&PlayersWeapon.ObMat,&PlayersWeapon.ObMat);
-	}
-	PlayersWeapon.ObMat.mat21 = -PlayersWeapon.ObMat.mat21;
-	PlayersWeapon.ObMat.mat22 = -PlayersWeapon.ObMat.mat22;
-	PlayersWeapon.ObMat.mat23 = -PlayersWeapon.ObMat.mat23;
-	PlayersWeapon.ObMat.mat11 = -PlayersWeapon.ObMat.mat11;
-	PlayersWeapon.ObMat.mat12 = -PlayersWeapon.ObMat.mat12;
-	PlayersWeapon.ObMat.mat13 = -PlayersWeapon.ObMat.mat13;
-}
-void AlienClawEndTrajectory(void *playerStatus, PLAYER_WEAPON_DATA *weaponPtr)
-{
-//    TEMPLATE_WEAPON_DATA *twPtr = &TemplateWeapon[weaponPtr->WeaponIDNumber];
-	VECTORCH startDir = {-2,0,65535};
-	VECTORCH endDir = {-2,0,65535};
-	VECTORCH direction;
-	int timeLeft = weaponPtr->StateTimeOutCounter;
-	int timeDone = 65536-timeLeft;
 
-	weaponPtr->PositionOffset.vx = 600+MUL_FIXED(timeDone,200);
-	weaponPtr->PositionOffset.vy = -200+MUL_FIXED(timeDone,300);
-	weaponPtr->PositionOffset.vz = 400+MUL_FIXED(timeDone,-400);
-	
-	direction.vx = WideMul2NarrowDiv(startDir.vx, timeLeft, endDir.vx, timeDone, ONE_FIXED);
-	direction.vy = WideMul2NarrowDiv(startDir.vy, timeLeft, endDir.vy, timeDone, ONE_FIXED);
-	direction.vz = WideMul2NarrowDiv(startDir.vz, timeLeft, endDir.vz, timeDone, ONE_FIXED);
-	Normalise(&direction);	
-
-	MakeMatrixFromDirection(&direction,&(PlayersWeapon.ObMat));
-	{
-		extern VIEWDESCRIPTORBLOCK *ActiveVDBList[];
-		VIEWDESCRIPTORBLOCK *VDBPtr = ActiveVDBList[0];
-		MATRIXCH matrix	= VDBPtr->VDB_Mat;
-		 
-		TransposeMatrixCH(&matrix);
-		MatrixMultiply(&matrix,&PlayersWeapon.ObMat,&PlayersWeapon.ObMat);
-	}
-	PlayersWeapon.ObMat.mat21 = -PlayersWeapon.ObMat.mat21;
-	PlayersWeapon.ObMat.mat22 = -PlayersWeapon.ObMat.mat22;
-	PlayersWeapon.ObMat.mat23 = -PlayersWeapon.ObMat.mat23;
-	PlayersWeapon.ObMat.mat11 = -PlayersWeapon.ObMat.mat11;
-	PlayersWeapon.ObMat.mat12 = -PlayersWeapon.ObMat.mat12;
-	PlayersWeapon.ObMat.mat13 = -PlayersWeapon.ObMat.mat13;
-}
 
 void PredWristbladeTrajectory(void *playerStatus, PLAYER_WEAPON_DATA *weaponPtr)
 {
@@ -3430,50 +3336,7 @@ void PredWristbladeTrajectory(void *playerStatus, PLAYER_WEAPON_DATA *weaponPtr)
 #define ACTIVATION_X_RANGE 2000
 #define ACTIVATION_Y_RANGE 2000
 
-int DamageObjectInLineOfSight(PLAYER_WEAPON_DATA *weaponPtr)
-{
-	int numberOfObjects = NumOnScreenBlocks;
-	enum AMMO_ID AmmoID=TemplateWeapon[weaponPtr->WeaponIDNumber].PrimaryAmmoID;
-	
-	while (numberOfObjects)
-	{
-		DISPLAYBLOCK* objectPtr = OnScreenBlockList[--numberOfObjects];
-		STRATEGYBLOCK *sbPtr = objectPtr->ObStrategyBlock;
-		GLOBALASSERT(objectPtr);
-		
-		/* does object have a strategy block? */
-		if (sbPtr)
-		{		
-			/* is it in range? */
-			if (objectPtr->ObView.vz > 0 && objectPtr->ObView.vz < ACTIVATION_Z_RANGE)
-			{
-				int screenX = objectPtr->ObView.vx;
-			   	int screenY = objectPtr->ObView.vy;
 
-				if (screenX<0) screenX=-screenX;
-				if (screenY<0) screenY=-screenY;
-				screenX-=objectPtr->ObMaxX;
-				screenY-=objectPtr->ObMaxY;
-
-				if (screenX < ACTIVATION_X_RANGE && screenY < ACTIVATION_Y_RANGE)
-				{
-					DYNAMICSBLOCK *dynPtr = sbPtr->DynPtr;
-			  	  	if (dynPtr)
-					{
-						int magnitudeOfForce = (5000*TemplateAmmo[AmmoID].MaxDamage[AvP.Difficulty].Cutting) / dynPtr->Mass;
-				  	  	dynPtr->LinImpulse.vx += MUL_FIXED(Player->ObMat.mat31,magnitudeOfForce);
-						dynPtr->LinImpulse.vy += MUL_FIXED(Player->ObMat.mat32,magnitudeOfForce);
-				  	  	dynPtr->LinImpulse.vz += MUL_FIXED(Player->ObMat.mat33,magnitudeOfForce);
-			  			CauseDamageToObject(sbPtr, &TemplateAmmo[AmmoID].MaxDamage[AvP.Difficulty], ONE_FIXED,NULL);
-					}
-			  	}
-			}
-		}
-	}
-
- 
-	return(1);
-}
 
 
 void PredDiscThrowTrajectory(void *playerStatus, PLAYER_WEAPON_DATA *weaponPtr)
@@ -3828,7 +3691,6 @@ void InitThisWeapon(PLAYER_WEAPON_DATA *pwPtr) {
 
 		pptxactrlblk = &pwPtr->TxAnimCtrl;
 
-		SetupPolygonFlagAccessForShape(shptr);
 
 		for(item_num = 0; item_num < shptr->numitems; item_num ++)
 		{
@@ -6137,7 +5999,7 @@ DISPLAYBLOCK *CauseDamageToHModel(HMODELCONTROLLER *HMC_Ptr, STRATEGYBLOCK *sbPt
 		}
 		case I_BehaviourQueenAlien:
 		{
-			QueenIsDamaged(sbPtr,damage,multiple,this_section_data,incoming,position);
+			QueenIsDamaged(sbPtr,damage,multiple,this_section_data,incoming);
 			break;
 		}
 		case I_BehaviourPredatorAlien:
@@ -6147,7 +6009,7 @@ DISPLAYBLOCK *CauseDamageToHModel(HMODELCONTROLLER *HMC_Ptr, STRATEGYBLOCK *sbPt
 		}	    
 		case I_BehaviourFaceHugger:
 		{
-			FacehuggerIsDamaged(sbPtr,damage,multiple);
+			FacehuggerIsDamaged(sbPtr,damage);
 			break;
 		}	    
 		case I_BehaviourNetGhost:
@@ -6160,7 +6022,7 @@ DISPLAYBLOCK *CauseDamageToHModel(HMODELCONTROLLER *HMC_Ptr, STRATEGYBLOCK *sbPt
 		}
 		case I_BehaviourNetCorpse:
 		{
-			CorpseIsDamaged(sbPtr,damage,multiple,wounds,this_section_data,incoming);
+			CorpseIsDamaged(sbPtr,damage,multiple,wounds);
 			break;
 		}
 		default:
@@ -7900,7 +7762,6 @@ void PlasmaCaster_Recoil(void *playerStatus, PLAYER_WEAPON_DATA *weaponPtr) {
 
 	if (weaponPtr->StateTimeOutCounter == WEAPONSTATE_INITIALTIMEOUTCOUNT) {
 		
-		int multiplyer,a;
 
 		if (playerStatusPtr->PlasmaCasterCharge<Caster_MinCharge) {
 			/* Don't fire at all! */
@@ -7972,27 +7833,6 @@ void PlasmaCaster_Recoil(void *playerStatus, PLAYER_WEAPON_DATA *weaponPtr) {
 	}
 }
 
-#define FIREPREDPISTOL_FIELDCHARGE (ONE_FIXED>>2)
-
-int FirePredPistol(PLAYER_WEAPON_DATA *weaponPtr)
-{
-	TEMPLATE_WEAPON_DATA *twPtr=&TemplateWeapon[weaponPtr->WeaponIDNumber];
-
-	PLAYER_STATUS *playerStatusPtr= (PLAYER_STATUS *) (Player->ObStrategyBlock->SBdataptr);
-	LOCALASSERT(playerStatusPtr);
-
-    if (playerStatusPtr->FieldCharge>=FIREPREDPISTOL_FIELDCHARGE)
-    {
-		FireProjectileAmmo(twPtr->PrimaryAmmoID);
-		playerStatusPtr->FieldCharge-=FIREPREDPISTOL_FIELDCHARGE;
-		CurrentGameStats_ChargeUsed(FIREPREDPISTOL_FIELDCHARGE);
-		return(1);
-    }
-    else /* instantaneous line of sight */
-    {
-		return(0);
-	}	
-}	
 
 #define FIRESPEARGUN_FIELDCHARGE (0)
 #define SPEAR_PLAYER_IMPULSE 	(-8000)
@@ -8620,23 +8460,6 @@ void GenericPredatorWeapon_Idle(void *playerStatus, PLAYER_WEAPON_DATA *weaponPt
 
 }
 
-void GenericPredatorWeapon_Firing(void *playerStatus, PLAYER_WEAPON_DATA *weaponPtr) {
-
-	TEMPLATE_WEAPON_DATA *twPtr;
-
-    twPtr = &TemplateWeapon[weaponPtr->WeaponIDNumber];
-
-	if (weaponPtr->StateTimeOutCounter == WEAPONSTATE_INITIALTIMEOUTCOUNT) {
-
-		int time;
-
-		time=DIV_FIXED(ONE_FIXED,twPtr->TimeOutRateForState[WEAPONSTATE_FIRING_PRIMARY]);
-		time-=(ONE_FIXED>>4);
-
-		InitHModelTweening(&PlayersWeaponHModelController,(ONE_FIXED>>3),HMSQT_PredatorHUD,(int)PHSS_Attack_Primary,time,1);
-	}
-
-}
 
 void SpearGun_Recoil(void *playerStatus, PLAYER_WEAPON_DATA *weaponPtr) {
 
@@ -8656,23 +8479,7 @@ void SpearGun_Recoil(void *playerStatus, PLAYER_WEAPON_DATA *weaponPtr) {
 
 }
 
-void GenericPredatorWeapon_Firing_Secondary(void *playerStatus, PLAYER_WEAPON_DATA *weaponPtr) {
 
-	TEMPLATE_WEAPON_DATA *twPtr;
-    
-    twPtr = &TemplateWeapon[weaponPtr->WeaponIDNumber];
-
-	if (weaponPtr->StateTimeOutCounter == WEAPONSTATE_INITIALTIMEOUTCOUNT) {
-
-		int time;
-
-		time=DIV_FIXED(ONE_FIXED,twPtr->TimeOutRateForState[WEAPONSTATE_FIRING_SECONDARY]);
-		time-=(ONE_FIXED>>4);												   
-
-		InitHModelTweening(&PlayersWeaponHModelController,(ONE_FIXED>>3),HMSQT_PredatorHUD,(int)PHSS_Attack_Secondary,time,1);
-	}
-
-}
 
 void GenericPredatorWeapon_Reload(void *playerStatus, PLAYER_WEAPON_DATA *weaponPtr) {
 
@@ -10279,6 +10086,7 @@ int PlayerFirePredPistolFlechettes(PLAYER_WEAPON_DATA *weaponPtr) {
 int PredPistolSecondaryFire(PLAYER_WEAPON_DATA *weaponPtr) {
 
 	TEMPLATE_WEAPON_DATA *twPtr=&TemplateWeapon[weaponPtr->WeaponIDNumber];
+// adj unused
   	TEMPLATE_AMMO_DATA *templateAmmoPtr = &TemplateAmmo[twPtr->SecondaryAmmoID];
 	PLAYER_STATUS *playerStatusPtr= (PLAYER_STATUS *) (Player->ObStrategyBlock->SBdataptr);
 
@@ -10947,8 +10755,6 @@ int FireMarineTwoPistols(PLAYER_WEAPON_DATA *weaponPtr, int secondary)
 	DELTA_CONTROLLER *FireRight;
 	DELTA_CONTROLLER *FireLeft;
 
-	EULER judder;
-	MATRIXCH juddermat;
 
 	/* Deduce which pistol can fire, if either? */
 

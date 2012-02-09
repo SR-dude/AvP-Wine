@@ -161,7 +161,7 @@ extern int NPCSetVelocity(STRATEGYBLOCK *sbPtr, VECTORCH* targetDirn, int in_spe
 extern int NPCOrientateToVector(STRATEGYBLOCK *sbPtr, VECTORCH *zAxisVector, int turnspeed, VECTORCH *offset);
 extern void NPCGetMovementTarget(STRATEGYBLOCK *sbPtr, STRATEGYBLOCK *target, VECTORCH *targetPosition, int* targetIsAirduct,int alien);
 extern void NPCGetMovementDirection(STRATEGYBLOCK *sbPtr, VECTORCH *velocityDirection, VECTORCH* target, WAYPOINT_MANAGER *waypointManager);
-static int FindMyFloorPoly(VECTORCH* currentPosition, MODULE* currentModule);
+//static int FindMyFloorPoly(VECTORCH* currentPosition, MODULE* currentModule);
 extern void NPC_InitWanderData(NPC_WANDERDATA *wanderData);
 extern void NPC_FindWanderTarget(STRATEGYBLOCK *sbPtr, NPC_WANDERDATA *wanderData, NPC_MOVEMENTDATA *moveData);
 extern void NPC_FindAIWanderTarget(STRATEGYBLOCK *sbPtr, NPC_WANDERDATA *wanderData, NPC_MOVEMENTDATA *moveData, int alien);
@@ -188,7 +188,6 @@ extern DEATH_DATA *GetXenoborgDeathSequence(HMODELCONTROLLER *controller,SECTION
 extern DEATH_DATA *GetThisDeath_FromCode(HMODELCONTROLLER *controller,DEATH_DATA *FirstDeath,int code);
 extern DEATH_DATA *GetThisDeath_FromUniqueCode(int code);
 
-extern ATTACK_DATA *GetThisAttack_FromCode(HMODELCONTROLLER *controller,ATTACK_DATA *FirstAttack,int code);
 extern ATTACK_DATA *GetAttackSequence(HMODELCONTROLLER *controller,ATTACK_DATA *FirstAttack,int wound_flags,int crouching, int pouncing);
 extern ATTACK_DATA *GetAlienAttackSequence(HMODELCONTROLLER *controller,int wound_flags,int crouching);
 extern ATTACK_DATA *GetAlienPounceAttack(HMODELCONTROLLER *controller,int wound_flags,int crouching);

@@ -10,7 +10,7 @@
 
 extern void*  ParticleGeneratorBehaveInit(void* bhdata, STRATEGYBLOCK* sbptr);
 extern void  ParticleGeneratorBehaveFun(STRATEGYBLOCK* sbptr);
-extern void SendRequestToParticleGenerator(STRATEGYBLOCK* sbptr,BOOL state,int extended_data);
+extern void SendRequestToParticleGenerator(STRATEGYBLOCK* sbptr,BOOL state);
 
 typedef enum particle_generator_type
 {

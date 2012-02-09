@@ -9,9 +9,7 @@ extern "C" {
 
 #include "datatype.h"
 
-BYTE GetByte(FILE *fp);
-WORD GetLittleWord(FILE *fp);
-DWORD GetLittleDword(FILE *fp);
+
 
 VOID PutByte(BYTE v, FILE *fp);
 VOID PutLittleWord(WORD v, FILE *fp);

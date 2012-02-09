@@ -190,6 +190,7 @@
 
 		OurBool bCanRender( ProjChar ProjCh_In ) const
 		{
+// adj ProjCh_In unused
 			return Yes;
 		}
 

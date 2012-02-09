@@ -180,28 +180,20 @@ typedef struct pffont
 #endif
 
 // platform independent externs
-extern void LoadAllFonts();
+
 extern void LoadPFFont(int fontnum);
 
  // platform dependent callbacks for loading
 extern void LoadFont(PFFONT *pffont);
-extern void UnloadFont(PFFONT *pffont);
+
 
 extern void FillCharacterSlot(int u, int v, int width, int height,
 								int charnum, PFFONT *font);
-
-extern int BLTFontOffsetToHUD(PFFONT* font , int xdest, int ydest, int offset);
-
 
 /* to lock a font and get the raw data - pPitch receives the pitch of the surface */
 extern void * FontLock(PFFONT const * pFont, unsigned * pPitch);
 extern void FontUnlock(PFFONT const * pFont);
 
-
-// drawing functions
-
-extern void BLTWholeFont(int fontnum, int x , int y, int win_width);
-extern void BLTString(FONT_DESC str_packet);
 
 
 // the array of all the Fonts int the game

@@ -48,11 +48,8 @@ extern DPID MultiplayerObservedPlayer;
 MORPHDISPLAY MorphDisplay;
 
 SCENEMODULE **Global_ModulePtr = 0;
-MODULE *Global_MotherModule;
 char *ModuleCurrVisArray = 0;
-char *ModulePrevVisArray = 0;
 char *ModuleTempArray = 0;
-char *ModuleLocalVisArray = 0;
 int ModuleArraySize = 0;
 
 /* KJL 11:12:10 06/06/97 - orientation */
@@ -62,7 +59,6 @@ MATRIXCH WToLMat = {1,};
 VECTORCH LocalView;
 
 /* KJL 11:16:37 06/06/97 - lights */
-VECTORCH LocalLightCH;
 int NumLightSourcesForObject;
 LIGHTBLOCK *LightSourcesForObject[MaxLightsPerObject];
 int GlobalAmbience;
@@ -70,7 +66,6 @@ int LightScale=ONE_FIXED;
 int DrawingAReflection;
 
 int *Global_ShapePoints;
-int **Global_ShapeItems;
 int *Global_ShapeNormals;
 int *Global_ShapeVNormals;
 int **Global_ShapeTextures;
@@ -94,7 +89,6 @@ extern int sine[];
 int LeanScale;
 EULER deathTargetOrientation={0,0,0};
 
-extern int GetSingleColourForPrimary(int Colour);
 extern void ColourFillBackBuffer(int FillColour);
 
 static void ModifyHeadOrientation(void);
@@ -842,55 +836,6 @@ void CheckIfMirroringIsRequired(void)
 				MirroringAxis = -5596*2;
 			}
 		}
-	}
-}
-
-#define MinChangeInXSize 8
-void MakeViewingWindowSmaller(void)
-{
-	extern VIEWDESCRIPTORBLOCK *Global_VDB_Ptr;
-	int MinChangeInYSize = (ScreenDescriptorBlock.SDB_Height*MinChangeInXSize)/ScreenDescriptorBlock.SDB_Width;
-	
-	if (Global_VDB_Ptr->VDB_ClipLeft<ScreenDescriptorBlock.SDB_Width/2-16)
-	{
-		Global_VDB_Ptr->VDB_ClipLeft +=MinChangeInXSize;
-		Global_VDB_Ptr->VDB_ClipRight -=MinChangeInXSize;
-		Global_VDB_Ptr->VDB_ClipUp +=MinChangeInYSize;
-		Global_VDB_Ptr->VDB_ClipDown -=MinChangeInYSize;
-	}
-	if(AvP.PlayerType == I_Alien)
-	{
-		Global_VDB_Ptr->VDB_ProjX = (Global_VDB_Ptr->VDB_ClipRight - Global_VDB_Ptr->VDB_ClipLeft)/4;
-		Global_VDB_Ptr->VDB_ProjY = (Global_VDB_Ptr->VDB_ClipDown - Global_VDB_Ptr->VDB_ClipUp)/4;
-	}
-	else
-	{
-		Global_VDB_Ptr->VDB_ProjX = (Global_VDB_Ptr->VDB_ClipRight - Global_VDB_Ptr->VDB_ClipLeft)/2;
-		Global_VDB_Ptr->VDB_ProjY = (Global_VDB_Ptr->VDB_ClipDown - Global_VDB_Ptr->VDB_ClipUp)/2;
-	}
-}
-
-void MakeViewingWindowLarger(void)
-{
-	extern VIEWDESCRIPTORBLOCK *Global_VDB_Ptr;
-	int MinChangeInYSize = (ScreenDescriptorBlock.SDB_Height*MinChangeInXSize)/ScreenDescriptorBlock.SDB_Width;
-
-	if (Global_VDB_Ptr->VDB_ClipLeft>0)
-	{
-		Global_VDB_Ptr->VDB_ClipLeft -=MinChangeInXSize;
-		Global_VDB_Ptr->VDB_ClipRight +=MinChangeInXSize;
-		Global_VDB_Ptr->VDB_ClipUp -=MinChangeInYSize;
-		Global_VDB_Ptr->VDB_ClipDown +=MinChangeInYSize;
-	}
-	if(AvP.PlayerType == I_Alien)
-	{
-		Global_VDB_Ptr->VDB_ProjX = (Global_VDB_Ptr->VDB_ClipRight - Global_VDB_Ptr->VDB_ClipLeft)/4;
-		Global_VDB_Ptr->VDB_ProjY = (Global_VDB_Ptr->VDB_ClipDown - Global_VDB_Ptr->VDB_ClipUp)/4;
-	}
-	else
-	{
-		Global_VDB_Ptr->VDB_ProjX = (Global_VDB_Ptr->VDB_ClipRight - Global_VDB_Ptr->VDB_ClipLeft)/2;
-		Global_VDB_Ptr->VDB_ProjY = (Global_VDB_Ptr->VDB_ClipDown - Global_VDB_Ptr->VDB_ClipUp)/2;
 	}
 }
 

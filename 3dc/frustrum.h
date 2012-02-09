@@ -41,7 +41,7 @@ extern void (*GouraudTexturedPolygon_ClipWithPositiveX)(void);
 
 /* FRUSTRUM TESTS */
 extern int PolygonWithinFrustrum(POLYHEADER *polyPtr);
-extern int PolygonShouldBeDrawn(POLYHEADER *polyPtr);
+
 extern int (*ObjectWithinFrustrum)(DISPLAYBLOCK *dbPtr);
 extern int (*ObjectCompletelyWithinFrustrum)(DISPLAYBLOCK *dbPtr);
 extern int (*VertexWithinFrustrum)(RENDERVERTEX *vertexPtr);

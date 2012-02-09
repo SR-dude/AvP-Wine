@@ -79,7 +79,6 @@ MODULEDOORTYPE ModuleIsADoor(MODULE* target);
 MODULEDOORTYPE AIModuleIsADoor(AIMODULE* target);
 int ModuleIsPhysical(MODULE* target);
 int AIModuleIsPhysical(AIMODULE* target);
-int ModuleInModule(MODULE* target1, MODULE* target2);
 int NumAdjacentModules(AIMODULE* target);
 FARENTRYPOINT *GetModuleEP(MODULE* thisModule, MODULE*fromModule);
 FARENTRYPOINT *GetAIModuleEP(AIMODULE* thisModule, AIMODULE*fromModule);

@@ -181,9 +181,8 @@ extern void BLTMotionTrackerBlipToHUD(int x, int y, int brightness);
 * brightness=65536 means brightest blip, 0 means darkest blip      		*
 ********************************************************************KJL*/
 
-extern void BLTMarineNumericsToHUD(enum MARINE_HUD_DIGIT digitsToDraw);
-extern void BLTPredatorNumericsToHUD(void);
-extern void BLTAlienNumericsToHUD(void);
+
+
 /*KJL********************************************************************
 * Draws ALL the numeric digits (pertinent to the Marine) to the HUD.    *
 *                                                                       *
@@ -195,6 +194,7 @@ extern void BLTAlienNumericsToHUD(void);
 * single digit, ie. a value from 0 to 9 inclusive. For example,         *
 * ValueOfHUDDigit[MARINE_HUD_HEALTH_TENS] holds the 'tens' digit of the *
 * players health, say 5 if the players health was 152. So, the function *
+unused and removed
 * BLTMarineNumericsToHUD() simply goes through the array blitting each  *
 * digit to its correct position on screen. I do this by having another  *
 * array which holds the X,Y coords and font number for each digit, and  *
@@ -212,12 +212,7 @@ extern void BLTGunSightToScreen(int screenX, int screenY, enum GUNSIGHT_SHAPE gu
 
 extern void InitHUD(void);
 
-extern void BLTAlienOverlayToHUD(void);
-/*KJL**************************
-* Draw simple graphic overlay *
-**************************KJL*/
 
-extern void BLTPredatorOverlayToHUD(void);
 /*KJL**************************
 * Draw simple graphic overlay *
 **************************KJL*/
@@ -240,11 +235,7 @@ extern void NewOnScreenMessage(unsigned char *messagePtr);
 * still being displayed will be overwritten.                            *
 ********************************************************************KJL*/
 
-extern void DrawOnScreenMessage(unsigned char *messagePtr);
-/*KJL*********************************************************************
-* This is a platform specific fn which draws the required message to the *
-* screen. Implemented in ddplat.cpp on the PC.                           *
-*********************************************************************KJL*/
+
 
 	#ifdef __cplusplus
 		};	/* end of C-Linkage spec */

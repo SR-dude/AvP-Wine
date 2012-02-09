@@ -35,11 +35,6 @@ extern void EndMenuBackgroundBink(void);
 
 extern int IDemandSelect(void);
 
-extern char *GetVideoModeDescription(void);
-extern void PreviousVideoMode(void);
-extern void NextVideoMode(void);
-extern void SaveVideoModeSettings(void);
-
 
 extern void MakeSelectSessionMenu(void);
 
@@ -385,15 +380,6 @@ void HandlePreGameFMVs(void)
 	}
 }
 
-extern void QuickSplashScreens(void)
-{
-	SelectMenuDisplayMode();
-	if (AvP.LevelCompleted)
-	{
-		Show_WinnerScreen();
-	}
-	ShowSplashScreens();
-}
 
 extern void AvP_TriggerInGameMenus(void)
 {
@@ -576,9 +562,6 @@ extern void AvP_UpdateMenus(void)
 				char buffer2[100];
 				int nLen = 80;
 
-				time_t time_of_day;
-
-			    time_of_day = time( NULL );
 
 				nLen = GetDateFormat(GetThreadLocale(), DATE_LONGDATE, &profilePtr->TimeLastUpdated,NULL,buffer,nLen);
 				nLen = GetTimeFormat(GetThreadLocale(), 0, &profilePtr->TimeLastUpdated,NULL,buffer2,100);
@@ -1616,9 +1599,6 @@ static void RenderUserProfileSelectMenu(void)
 				char buffer[100];
 				char buffer2[100];
 				int nLen = 80;
-				time_t time_of_day;
-
-			    time_of_day = time( NULL );
 
 				nLen = GetDateFormat(GetThreadLocale(), DATE_LONGDATE, &profilePtr->TimeLastUpdated,
 				NULL,buffer,
@@ -2771,7 +2751,6 @@ static void InteractWithMenuElement(enum AVPMENU_ELEMENT_INTERACTION_ID interact
 		{
 			if (interactionID == AVPMENU_ELEMENT_INTERACTION_SELECT)
 			{
-				extern int MP_LevelNumber;
 				AvPMenus.MenusState = MENUSSTATE_STARTGAME;
 				netGameData.myStartFlag = 1;	    
 				if(netGameData.gameType==NGT_Coop)
@@ -4652,22 +4631,7 @@ int WhiteOfBrightness(int brightness)
 	return a;
 }
 
-void RenderPixel(int x,int y,int r,int g,int b)
-{
-	extern DDPIXELFORMAT DisplayPixelFormat;
-	extern unsigned char *ScreenBuffer;
-	extern long BackBufferPitch;
 
-	unsigned short colour;
-
-	colour  = MUL_FIXED(DisplayPixelFormat.dwRBitMask,r<<8) & DisplayPixelFormat.dwRBitMask;
-	colour |= MUL_FIXED(DisplayPixelFormat.dwGBitMask,g<<8) & DisplayPixelFormat.dwGBitMask;
-	colour |= MUL_FIXED(DisplayPixelFormat.dwBBitMask,b<<8) & DisplayPixelFormat.dwBBitMask;
-	
-	
-	*(unsigned short*) (ScreenBuffer + (x)*2 + (y)*BackBufferPitch)  = colour;
-	
-}
 #if 0 /* adj interesting code  here*/
 void BezierCurve(void)
 {

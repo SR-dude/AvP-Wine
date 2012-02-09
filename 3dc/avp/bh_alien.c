@@ -10,7 +10,6 @@
 #include "dynblock.h"
 #include "dynamics.h"
 #include "comp_shp.h"
-#include "load_shp.h"
 #include "bh_types.h"
 #include "bh_debri.h"
 #include "bh_far.h"
@@ -56,7 +55,7 @@ extern int ShowHiveState;
 
 /* prototypes for this file */
 
-void KillAlien(STRATEGYBLOCK *sbPtr, int wounds, DAMAGE_PROFILE *damage, int multiple,VECTORCH *incoming);
+void KillAlien(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple,VECTORCH *incoming);
 void Execute_Alien_Dying(STRATEGYBLOCK *sbPtr);
 STRATEGYBLOCK *Alien_GetNewTarget(VECTORCH *alienpos, STRATEGYBLOCK *me);
 void CreateAlienBot(VECTORCH *Position,int type);
@@ -1191,7 +1190,6 @@ static void DoAlienAIHiss(STRATEGYBLOCK *sbPtr) {
 
 	DYNAMICSBLOCK *dynPtr;
 	int pitch = (FastRandom() & 255) - 128;
-	SOUNDINDEX soundIndex;
 	ALIEN_STATUS_BLOCK *alienStatusPointer;
 
 	GLOBALASSERT(sbPtr);
@@ -1201,9 +1199,6 @@ static void DoAlienAIHiss(STRATEGYBLOCK *sbPtr) {
 	LOCALASSERT(dynPtr);
 	GLOBALASSERT(alienStatusPointer->soundHandle2==SOUND_NOACTIVEINDEX);
 
-	/* This one is for ALIEN DAMAGE SCREAM. */
-
-	soundIndex=SID_NOSOUND;
 
 	if (alienStatusPointer->soundHandle2==SOUND_NOACTIVEINDEX) {
 		PlayAlienSound((int)alienStatusPointer->Type,ASC_Scream_Hurt,pitch,
@@ -1222,7 +1217,6 @@ static void DoAlienAIHiss(STRATEGYBLOCK *sbPtr) {
 static void DoAlienDeathScream(STRATEGYBLOCK *sbPtr) {
 
 	DYNAMICSBLOCK *dynPtr;
-	SOUNDINDEX soundIndex;
 	ALIEN_STATUS_BLOCK *alienStatusPointer;
 
 	GLOBALASSERT(sbPtr);
@@ -1231,12 +1225,6 @@ static void DoAlienDeathScream(STRATEGYBLOCK *sbPtr) {
 	dynPtr = sbPtr->DynPtr;
 	LOCALASSERT(dynPtr);
 	GLOBALASSERT(alienStatusPointer->soundHandle2==SOUND_NOACTIVEINDEX);
-
-	soundIndex=SID_NOSOUND;
-
-	/* This one is for ALIEN DEATH SCREAM. */
-
-	soundIndex=SID_NOSOUND;
 
 	if (alienStatusPointer->soundHandle2==SOUND_NOACTIVEINDEX) {
 		PlayAlienSound((int)alienStatusPointer->Type,ASC_Scream_Dying,0,
@@ -1254,7 +1242,6 @@ static void DoAlienDeathScream(STRATEGYBLOCK *sbPtr) {
 static void DoAlienDeathSound(STRATEGYBLOCK *sbPtr) {
 
 	DYNAMICSBLOCK *dynPtr;
-	SOUNDINDEX soundIndex;
 	ALIEN_STATUS_BLOCK *alienStatusPointer;
 
 	GLOBALASSERT(sbPtr);
@@ -1263,11 +1250,6 @@ static void DoAlienDeathSound(STRATEGYBLOCK *sbPtr) {
 	dynPtr = sbPtr->DynPtr;
 	LOCALASSERT(dynPtr);
 
-	soundIndex=SID_NOSOUND;
-
-	/* This one is for ALIEN DEATH SOUND. */
-
-	soundIndex=SID_NOSOUND;
 
 	PlayAlienSound((int)alienStatusPointer->Type,ASC_Death,0,
 		NULL,&sbPtr->DynPtr->Position);
@@ -1331,7 +1313,7 @@ void AlienIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple, 
 				if (AvP.PlayerType!=I_Alien) {
 					CurrentGameStats_CreatureKilled(sbPtr,Section);
 				}
-				KillAlien(sbPtr,wounds,damage,multiple,incoming);
+				KillAlien(sbPtr, damage,multiple,incoming);
 			}
 
 		} else {
@@ -1466,7 +1448,7 @@ This function to be called only from behaviour
 -- ChrisF 1/4/98 What a stupid idea. This function ---
 -- to be called only from AlienIsDamaged. ------------
 ------------------------------------------------------*/
-void KillAlien(STRATEGYBLOCK *sbPtr,int wounds,DAMAGE_PROFILE *damage, int multiple,VECTORCH *incoming)
+void KillAlien(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple,VECTORCH *incoming)
 {	
 	ALIEN_STATUS_BLOCK *alienStatusPointer;
 	int tkd,deathtype;

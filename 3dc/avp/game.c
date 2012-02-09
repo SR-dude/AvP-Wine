@@ -52,7 +52,6 @@ different way on the consoles, so I won't worry the PSX guys for now.
 Extern Engine Varibles
 ******************/
 
-extern void (*UpdateScreen[]) (void);
 extern int VideoMode;
 extern void (*SetVideoMode[]) (void);
 extern int FrameRate;
@@ -70,9 +69,10 @@ EXPORTED GLOBALS
 
 AVP_GAME_DESC AvP;		 /* game description */
 
+// adj
 char projectsubdirectory[] = {"avp/"};
-int SavedFrameRate;
-int SavedNormalFrameTime;
+
+
 
 
 /* Andy 13/10/97

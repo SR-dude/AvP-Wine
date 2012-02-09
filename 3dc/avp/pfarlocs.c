@@ -34,10 +34,8 @@ extern int ModuleArraySize;
 
 /* prototypes for external functions */
 int SetupPolygonAccessFromShapeIndex(int shapeIndex);
-int SetupPointAccessFromShapeIndex(int shapeIndex);
-	VECTORCH* AccessNextPoint(void);
-	VECTORCH* AccessPointFromIndex(int index);
-int *GetPolygonVertexIndices(void);
+
+
 
 /* globals for this file */
 FARENTRYPOINTSHEADER *FALLP_EntryPoints=(FARENTRYPOINTSHEADER*)0;
@@ -319,24 +317,7 @@ int AIModuleIsPhysical(AIMODULE* target)
 	return 1;
 }
 
-/*-----------------------Patrick 20/12/96---------------------------
-Takes 2 modules, and returns TRUE if the centre of the target module
-is within the bounding box of the source;
--------------------------------------------------------------------*/
-int ModuleInModule(MODULE* source, MODULE* target)
-{
-	
-	if(target->m_world.vx < (source->m_world.vx + source->m_minx)) return 0;
-	if(target->m_world.vx > (source->m_world.vx + source->m_maxx)) return 0;
 
-	if(target->m_world.vy < (source->m_world.vy + source->m_miny)) return 0;
-	if(target->m_world.vy > (source->m_world.vy + source->m_maxy)) return 0;
-
-	if(target->m_world.vz < (source->m_world.vz + source->m_minz)) return 0;
-	if(target->m_world.vz > (source->m_world.vz + source->m_maxz)) return 0;
-
-	return 1;
-}
 
 /*-----------------------Patrick 20/12/96---------------------------
 Returns the number of entries in a given module's adjacency list
@@ -428,165 +409,6 @@ int PointIsInModule(MODULE* thisModule, VECTORCH* thisPoint)
 						if(thisPoint->vz >= thisModule->m_minz - 50)
 							return 1;	
 	return 0;
-}
-
-
-
-
-
-/*-----------------------Patrick 20/12/96---------------------------
-LOCAL FUNCTIONS FOR MODULE ENTRY POINT SUPPORT
--------------------------------------------------------------------*/
-
-/* a structure and globals for the entry point calculations */
-typedef struct epbbextents
-{
-	int	maxX;
-	int	minX;
-	int	maxY;
-	int	minY;
-	int	maxZ;
-	int	minZ;
-} EPBBEXTENTS;
-
-static EPBBEXTENTS MI_Volume1;
-static EPBBEXTENTS MI_Volume2;
-static EPBBEXTENTS MI_Volume3;
-
-static int GetModulesIntersection(MODULE *thisModule, MODULE *targetModule);
-static int GetModulePointBox(MODULE *thisModule, EPBBEXTENTS *extents);
-static void AddModuleEP(MODULE* thisModule, MODULE*fromModule, VECTORCH *posn);
-
-
-
-/*-----------------------Patrick 28/2/96---------------------------
-  This function calculates the bounding box intersection volume
-  between 2 adjacent modules (in world space coords).
-  
-  Returns 1 if the bounding box is valis, 0 if not.
-  ------------------------------------------------------------------*/ 
-static int GetModulesIntersection(MODULE *thisModule, MODULE *targetModule)
-{
-	int thisExtent, targetExtent;
-
-	/* do x extents */
-	thisExtent = (thisModule->m_maxx + thisModule->m_world.vx + EPBB_XTRA);
-	targetExtent = (targetModule->m_maxx + targetModule->m_world.vx + EPBB_XTRA);
-	if(thisExtent < targetExtent) MI_Volume1.maxX = thisExtent;
-	else MI_Volume1.maxX = targetExtent;
-	thisExtent = (thisModule->m_minx + thisModule->m_world.vx - EPBB_XTRA);
-	targetExtent = (targetModule->m_minx + targetModule->m_world.vx - EPBB_XTRA);
-	if(thisExtent > targetExtent) MI_Volume1.minX = thisExtent;
-	else MI_Volume1.minX = targetExtent;
-	if(!(MI_Volume1.maxX > MI_Volume1.minX)) return 0;
-
-	/* do y extents */
-	thisExtent = (thisModule->m_maxy + thisModule->m_world.vy + EPBB_XTRA);
-	targetExtent = (targetModule->m_maxy + targetModule->m_world.vy + EPBB_XTRA);
-	if(thisExtent < targetExtent) MI_Volume1.maxY = thisExtent;
-	else MI_Volume1.maxY = targetExtent;
-	thisExtent = (thisModule->m_miny + thisModule->m_world.vy - EPBB_XTRA);
-	targetExtent = (targetModule->m_miny + targetModule->m_world.vy - EPBB_XTRA);
-	if(thisExtent > targetExtent) MI_Volume1.minY = thisExtent;
-	else MI_Volume1.minY = targetExtent;
-	if(!(MI_Volume1.maxY > MI_Volume1.minY)) return 0;
-
-	/* do z extents */
-	thisExtent = (thisModule->m_maxz + thisModule->m_world.vz + EPBB_XTRA);
-	targetExtent = (targetModule->m_maxz+ targetModule->m_world.vz + EPBB_XTRA);
-	if(thisExtent < targetExtent) MI_Volume1.maxZ = thisExtent;
-	else MI_Volume1.maxZ = targetExtent;
-	thisExtent = (thisModule->m_minz + thisModule->m_world.vz - EPBB_XTRA);
-	targetExtent = (targetModule->m_minz + targetModule->m_world.vz - EPBB_XTRA);
-	if(thisExtent > targetExtent) MI_Volume1.minZ = thisExtent;
-	else MI_Volume1.minZ = targetExtent;
-	if(!(MI_Volume1.maxZ > MI_Volume1.minZ)) return 0;
-	
-	return 1;
-}
-
-
-/*-----------------------Patrick 28/2/97---------------------------
-Generates a volume defined by the module's points inside the 
-mutual intersection volume (in world space)
--------------------------------------------------------------------*/
-static int GetModulePointBox(MODULE *thisModule, EPBBEXTENTS *extents)
-{
-	int numPtsFound = 0;
-	int pointCounter;
-
-	/* initialise the extents */
-	extents->minX = thisModule->m_maxx + thisModule->m_world.vx;
-	extents->maxX = thisModule->m_minx + thisModule->m_world.vx;
-	extents->minY = thisModule->m_maxy + thisModule->m_world.vy;
-	extents->maxY = thisModule->m_miny + thisModule->m_world.vy;
-	extents->minZ = thisModule->m_maxz + thisModule->m_world.vz;
-	extents->maxZ = thisModule->m_minz + thisModule->m_world.vz;
-
-	/* go through each point in the shape */
-	pointCounter = SetupPointAccessFromShapeIndex(thisModule->m_mapptr->MapShape);
-	while(pointCounter>0)
-	{
-			VECTORCH* thisPt = AccessNextPoint();
-			VECTORCH thisWorldPoint;
-
-		thisWorldPoint.vx = thisPt->vx + thisModule->m_world.vx;
-		thisWorldPoint.vy = thisPt->vy + thisModule->m_world.vy;
-		thisWorldPoint.vz = thisPt->vz + thisModule->m_world.vz;
-
-		if(	(thisWorldPoint.vx >= MI_Volume1.minX)&&
-		   	(thisWorldPoint.vx <= MI_Volume1.maxX)&&
-		   	(thisWorldPoint.vy >= MI_Volume1.minY)&&
-		   	(thisWorldPoint.vy <= MI_Volume1.maxY)&&
-		   	(thisWorldPoint.vz >= MI_Volume1.minZ)&&
-		   	(thisWorldPoint.vz <= MI_Volume1.maxZ))
-		{
-			numPtsFound++;
-
-			if(thisWorldPoint.vx > extents->maxX) extents->maxX = thisWorldPoint.vx;
-			if(thisWorldPoint.vx < extents->minX) extents->minX = thisWorldPoint.vx;
-			if(thisWorldPoint.vy > extents->maxY) extents->maxY = thisWorldPoint.vy;
-			if(thisWorldPoint.vy < extents->minY) extents->minY = thisWorldPoint.vy;
-			if(thisWorldPoint.vz > extents->maxZ) extents->maxZ = thisWorldPoint.vz;
-			if(thisWorldPoint.vz < extents->minZ) extents->minZ = thisWorldPoint.vz;
-		}
-		pointCounter--;
-	}
-	return numPtsFound;
-}
-
-
-
-
-
-
-/*-----------------------Patrick 20/12/96---------------------------
-Adds an entry point to the list	for this module, 
--------------------------------------------------------------------*/
-static void AddModuleEP(MODULE* thisModule, MODULE*fromModule, VECTORCH *posn)
-{
-	FARENTRYPOINTSHEADER *epHeader = &FALLP_EntryPoints[thisModule->m_index];
-	FARENTRYPOINT *epList = epHeader->entryPointsList;
-
-	if(epHeader->numEntryPoints==(NumAdjacentModules(thisModule)))
-	{
-		/* no room for any more eps. This may occur where two modules are not
-		mutually linked as adjacent... specifically, the target is missing the
-		link. This shouldn't really happen, and if it does it means there's an
-		error in the visibility and/or adjacency links which requires attention.
-		The effective result is that the linked module will get an ep from the 
-		unlinked module, but not the other way round....
-		*/
-		return;
-	}
-
-	LOCALASSERT(epHeader->numEntryPoints<(NumAdjacentModules(thisModule)));
-	
-	epList[epHeader->numEntryPoints].position = *posn;
-	epList[epHeader->numEntryPoints].donorIndex = fromModule->m_index;
-
-	(epHeader->numEntryPoints)++;
-
 }
 
 

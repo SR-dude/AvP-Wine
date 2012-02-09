@@ -726,10 +726,3 @@ void AssignNewSBName(STRATEGYBLOCK *sbPtr) {
 
 }
 
-void GivePlayerCloakAway(void) {
-
-	PLAYER_STATUS *playerStatusPtr= (PLAYER_STATUS *) (Player->ObStrategyBlock->SBdataptr);
-
-	playerStatusPtr->cloakPositionGivenAway = 1;
-	playerStatusPtr->cloakPositionGivenAwayTimer = PLAYERCLOAK_POSTIONGIVENAWAYTIME;
-}

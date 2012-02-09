@@ -17,7 +17,7 @@ extern SCENE Global_Scene;
 extern int NumActiveBlocks;
 extern DISPLAYBLOCK *ActiveBlockList[];
 extern DISPLAYBLOCK *dptr_last;
-extern unsigned char KeyASCII;
+
 
 /**** Protos ****/
 
@@ -280,18 +280,6 @@ int ThisObjectIsInAModuleVisibleFromCurrentlyVisibleModules(STRATEGYBLOCK *sbPtr
 	return 0;
 }
 
-
-
-
-
-void ModuleFunctions(MODULE *mptr, MFUNCTION mf)
-{
-	switch(mf) 
-	{
-		case mfun_null:
-			break;
-	}
-}
 
 
 void AllocateModuleObject(MODULE *mptr)
@@ -879,21 +867,6 @@ int CompareName(char *name1, char *name2)
 }
 
 
-void PrintName(char *name)
-
-{
-
-	char m_name[5];
-
-
-	m_name[0] = name[0];
-	m_name[1] = name[1];
-	m_name[2] = name[2];
-	m_name[3] = name[3];
-	m_name[4] = 0;
-	textprint(m_name);
-
-}
 
 
 int IsModuleVisibleFromModule(MODULE *source, MODULE *target) {

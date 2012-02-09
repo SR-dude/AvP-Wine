@@ -86,11 +86,6 @@ const char * SubShps_Directory = "SubShps\\All\\";
 // const char * GenTex_Directory = 0;
 const char * FixTex_Directory = "\\\\Kate\\Kate Share\\avp\\Fix-Tex\\";
 const char * GameTex_Directory = "\\\\Kate\\Kate Share\\avp\\game-tex\\";
-// these link with pcmenus.cpp
-const char * GenTex4bit_Directory = "\\\\Kate\\Kate Share\\avp\\G4bitTex\\";
-const char * GenTex8bit_Directory = "\\\\Kate\\Kate Share\\avp\\GenG-Tex\\";
-const char * GenTex75pc_Directory = "\\\\Kate\\Kate Share\\avp\\Gen34Tex\\";
-const char * GenTex50pc_Directory = "\\\\Kate\\Kate Share\\avp\\Gen12Tex\\";
 
 // new directories for new-style graphics - to be determined properly
 char const * FirstTex_Directory = "Graphics"; // currently relative to cwd
@@ -1843,7 +1838,6 @@ BOOL copy_rif_data (RIFFHANDLE h, int flags,int progress_start,int progress_inte
 					int start_shape_no = rt_temp.start_list_pos;
 					int list_pos = rt_temp.main_list_pos;
 					db_logf3(("Shape copied to %d",list_pos));
-					MORPHCTRL * mc = rt_temp.mc;
 
 					int AnimationShape=-1;
 					if (shplif()->lookup_single_child("TEXTANIM"))
@@ -2819,6 +2813,7 @@ void DeallocateLoadedShapeheader(SHAPEHEADER * shp)
 void DeallocateModules()
 {
 	
+// adj unused
 	MODULE ** m_arrayPtr = MainScene.sm_marray;
 	
 	MainScene.sm_module=0;

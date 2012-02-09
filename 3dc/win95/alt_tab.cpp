@@ -57,7 +57,7 @@ class AltTabUserRestore : public AltTabRestore<DX_PTR>
 			AltTabUserRestore(PFN_RESTORE pfnRestore, void * pUser, char const * pszFuncName) : m_pfnRestore(pfnRestore), m_pUser(pUser), m_pszFuncName(pszFuncName) {}
 	private:
 		PFN_RESTORE m_pfnRestore;
-		void * m_pUser;
+	void * m_pUser;
 		char const * m_pszFuncName;
 	protected:
 		virtual void DoRestore(DX_PTR * pDxGraphic);
@@ -144,7 +144,7 @@ struct AltTabDebugLists : AltTabLists
 }
 	g_atlists;
 
-	void _ATIncludeTexture(D3DTexture * pTexture, AW_BACKUPTEXTUREHANDLE hBackup, char const * pszFile, unsigned nLine, char const * pszDebugString)
+void _ATIncludeTexture(D3DTexture * pTexture, AW_BACKUPTEXTUREHANDLE hBackup, char const * pszFile, unsigned nLine, char const * pszDebugString)
 
 {
 	db_assert1(pTexture);
@@ -166,7 +166,7 @@ struct AltTabDebugLists : AltTabLists
 	g_atlists.m_listTextures.AddAsserted(pNewNode);
 }
 
-	void _ATIncludeSurface(DDSurface * pSurface, AW_BACKUPTEXTUREHANDLE hBackup, char const * pszFile, unsigned nLine, char const * pszDebugString)
+void _ATIncludeSurface(DDSurface * pSurface, AW_BACKUPTEXTUREHANDLE hBackup, char const * pszFile, unsigned nLine, char const * pszDebugString)
 {
 	db_assert1(pSurface);
 	db_assert1(hBackup);
@@ -187,46 +187,7 @@ struct AltTabDebugLists : AltTabLists
 	g_atlists.m_listSurfaces.AddAsserted(pNewNode);
 }
 
-	void _ATIncludeTextureEx(D3DTexture * pTexture, AT_PFN_RESTORETEXTURE pfnRestore, void * pUser, char const * pszFile, unsigned nLine, char const * pszFuncName, char const * pszDebugString)
 
-{
-	db_assert1(pTexture);
-	db_assert1(pfnRestore);
-	HashTable<AltTabEntry<D3DTexture> >::Node * pNewNode = g_atlists.m_listTextures.NewNode();
-	pNewNode->d.m_pDxGraphic = pTexture;
-		pNewNode->d.m_pRestore = new AltTabUserRestore<D3DTexture>(pfnRestore,pUser,pszFuncName);
-		pNewNode->d.m_pszFile = pszFile;
-		pNewNode->d.m_nLine = nLine;
-		if (pszDebugString)
-		{
-			pNewNode->d.m_pszDebugString = new char [strlen(pszDebugString)+1];
-			strcpy(pNewNode->d.m_pszDebugString,pszDebugString);
-		}
-		else
-			pNewNode->d.m_pszDebugString = NULL;
-	
-	g_atlists.m_listTextures.AddAsserted(pNewNode);
-}
-
-	void _ATIncludeSurfaceEx(DDSurface * pSurface, AT_PFN_RESTORESURFACE pfnRestore, void * pUser, char const * pszFile, unsigned nLine, char const * pszFuncName, char const * pszDebugString)
-{
-	db_assert1(pSurface);
-	db_assert1(pfnRestore);
-	HashTable<AltTabEntry<DDSurface> >::Node * pNewNode = g_atlists.m_listSurfaces.NewNode();
-	pNewNode->d.m_pDxGraphic = pSurface;
-		pNewNode->d.m_pRestore = new AltTabUserRestore<DDSurface>(pfnRestore,pUser,pszFuncName);
-		pNewNode->d.m_pszFile = pszFile;
-		pNewNode->d.m_nLine = nLine;
-		if (pszDebugString)
-		{
-			pNewNode->d.m_pszDebugString = new char [strlen(pszDebugString)+1];
-			strcpy(pNewNode->d.m_pszDebugString,pszDebugString);
-		}
-		else
-			pNewNode->d.m_pszDebugString = NULL;
-
-	g_atlists.m_listSurfaces.AddAsserted(pNewNode);
-}
 
 void ATRemoveTexture(D3DTexture * pTexture)
 {

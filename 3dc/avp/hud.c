@@ -149,7 +149,6 @@ static void DisplayMarinesAmmo(void);
 
 static void DoMotionTracker(void);
 static int DoMotionTrackerBlips(void);
-static void UpdateMarineStatusValues(void);
 
 static void HandleMarineWeapon(void);
 static void AimGunSight(int aimingSpeed, TEMPLATE_WEAPON_DATA *twPtr);
@@ -162,7 +161,6 @@ void CentreGunSight(void);
 
 
 static void InitPredatorHUD();
-static int FindPredatorThreats(void);
 static void HandlePredatorWeapon(void);
 
 static void HandleAlienWeapon(void);
@@ -1403,7 +1401,6 @@ void DrawWristDisplay(void)
 {
 	extern HMODELCONTROLLER PlayersWeaponHModelController;
 	SECTION_DATA *sectionPtr;
-	int i;
 
  	char *sectionName[]= {"Dum bar display","Dum 1 display","Dum 2 display","Dum 3 display","Dum 4 display"};
 
@@ -1517,7 +1514,6 @@ static void DrawAlienTeeth(void)
 
 	if (AlienTeethOffset)
 	{
-		extern int CloakingPhase;
 		int offsetY;
 
 	   	DISPLAYBLOCK displayblock;
@@ -1589,11 +1585,6 @@ static void DrawAlienTeeth(void)
 
 }
 
-
-
-/*KJL**************
-* Some useful fns *
-**************KJL*/
 
 /* returns approx. magnitude */
 int Fast2dMagnitude(int dx, int dy)
@@ -1677,37 +1668,6 @@ static void AimGunSight(int aimingSpeed, TEMPLATE_WEAPON_DATA *twPtr)
 	return;
 }
 
-/* returns approx. 9 times the magnitude of the vector */
-int Fast3dMagnitude(VECTORCH *v)
-{
-	int dx,dy,dz;
-
-	dx = v->vx;
-	if (dx<0) dx = -dx;
-	
-	dy = v->vy;
-	if (dy<0) dy = -dy;
-	
-	dz = v->vz*3;	 	 
-	if (dz<0) dz = -dz;
-						 
-	{
-		int temp;
-		
-		if (dx>dy)
-			temp = 3*dx+dy;
-		else
-			temp = 3*dy+dx;
-		
-		if (temp>dz)
-			return 3*temp+dz;
-		else
-			return 3*dz+temp;
-	}
-}
-
-
-static int CurrentCameraZoomLevel=0;
 
 static float ZoomLevels[] = {1.0f,0.4f,0.1f,0.02f};
 

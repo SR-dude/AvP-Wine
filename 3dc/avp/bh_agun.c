@@ -17,7 +17,6 @@
 #include "comp_shp.h"
 #include "inventry.h"
 #include "triggers.h"
-#include "mslhand.h"
 
 #define UseLocalAssert Yes
 
@@ -27,7 +26,6 @@
 #include "pvisible.h"
 #include "bh_swdor.h"
 #include "bh_plift.h"
-#include "load_shp.h"
 #include "bh_weap.h"
 #include "bh_debri.h"
 #include "lighting.h"
@@ -66,7 +64,7 @@ extern int NormalFrameTime;
 extern unsigned char Null_Name[8];
 extern ACTIVESOUNDSAMPLE ActiveSounds[];
 extern SECTION * GetNamedHierarchyFromLibrary(const char * rif_name, const char * hier_name);
-void CreateSentrygun(VECTORCH *Position,int type);
+void CreateSentrygun(VECTORCH *Position);
 
 void AGunMovement_ScanLeftRight(STRATEGYBLOCK *sbPtr,int rate);
 void AGunMovement_Centre(STRATEGYBLOCK *sbPtr,int rate);
@@ -90,31 +88,7 @@ SOUND3DDATA SentryWhirr_SoundData={
 
 /* Begin Code! */
 
-void CreatePlayerAutogun(void) {
-	/* Yow, this actually gets called! */
-}
-
-void CastSentrygun(void) {
-
-	#define BOTRANGE 2000
-
-	VECTORCH position;
-
-	if (AvP.Network!=I_No_Network) {
-		NewOnScreenMessage("NO SENTRYGUNS IN MULTIPLAYER MODE");
-		return;
-	}
-
-	position=Player->ObStrategyBlock->DynPtr->Position;
-	position.vx+=MUL_FIXED(Player->ObStrategyBlock->DynPtr->OrientMat.mat31,BOTRANGE);		
-	position.vy+=MUL_FIXED(Player->ObStrategyBlock->DynPtr->OrientMat.mat32,BOTRANGE);		
-	position.vz+=MUL_FIXED(Player->ObStrategyBlock->DynPtr->OrientMat.mat33,BOTRANGE);		
-
-	CreateSentrygun(&position, 0);
-
-}
-
-void CreateSentrygun(VECTORCH *Position,int type)
+void CreateSentrygun(VECTORCH *Position)
 {
 	STRATEGYBLOCK* sbPtr;
 	int i;
@@ -1366,8 +1340,6 @@ void AGun_MaintainGun(STRATEGYBLOCK *sbPtr)
 	}
 	agunStatusPointer->roundsFired+=multiple;
 	
-	multiple;
-	
 	/* End of volley? */
 	if (agunStatusPointer->volleyFired==(AGUN_VOLLEYSIZE<<ONE_FIXED_SHIFT)) {
 		agunStatusPointer->volleyFired=0;
@@ -1489,7 +1461,8 @@ void Execute_AGun_Dying(STRATEGYBLOCK *sbPtr)
 	agunStatusPointer->stateTimer -= NormalFrameTime;
 }
 
-static void KillAGun(STRATEGYBLOCK *sbPtr,int wounds,DAMAGE_PROFILE *damage, int multiple,VECTORCH *incoming)
+// adj unused  parameters     int wounds,DAMAGE_PROFILE *damage, int multiple,VECTORCH *incoming
+static void KillAGun(STRATEGYBLOCK *sbPtr)
 {	  
 	AUTOGUN_STATUS_BLOCK *agunStatusPointer;    	
 
@@ -1536,7 +1509,7 @@ void AGunIsDamaged(STRATEGYBLOCK *sbPtr, DAMAGE_PROFILE *damage, int multiple, i
 
 		/* Oh yes, kill them, too. */
 		if (agunStatusPointer->behaviourState!=I_disabled) {
-			KillAGun(sbPtr,wounds,damage,multiple,incoming);
+			KillAGun(sbPtr);
 		}
 	}	
 

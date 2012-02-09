@@ -76,7 +76,7 @@ extern void DeActivateHive(void);
 extern void ForceAGenerator_Shell(void);
 extern void StrikeTime(int time);
 extern void AlienStrikeTime(int time);
-extern void CastSentrygun(void);
+
 extern void CastDummy(void);
 extern void StartPlayerTaunt(void);
 extern void Console_ZoneAlert(int input);

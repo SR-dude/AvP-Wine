@@ -110,15 +110,6 @@ extern void GADGET_Render(void)
 }
 
 
-extern void GADGET_ScreenModeChange_Setup(void)
-{
-	/* expects to be called immediately before anything happens to the screen
-	mode */
-
-// adj stub
-}
-
-
 extern void GADGET_ScreenModeChange_Cleanup(void)
 {
 	/* expects to be called immediately after anything happens to the screen

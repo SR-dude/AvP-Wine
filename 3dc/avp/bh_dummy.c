@@ -15,7 +15,6 @@
 #include "comp_shp.h"
 #include "inventry.h"
 #include "triggers.h"
-#include "mslhand.h"
 
 #define UseLocalAssert Yes
 
@@ -25,7 +24,6 @@
 #include "pvisible.h"
 #include "bh_swdor.h"
 #include "bh_plift.h"
-#include "load_shp.h"
 #include "bh_weap.h"
 #include "bh_debri.h"
 #include "lighting.h"

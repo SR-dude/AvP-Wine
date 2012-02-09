@@ -74,7 +74,6 @@
 		void DumpVideoMode(void);
 	};
 
-	static void davehook_HandleStatusPanelControls(void);
 
 	static int bFirstFrame = No;
 

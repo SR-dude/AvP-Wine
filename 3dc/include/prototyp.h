@@ -1912,24 +1912,13 @@ void DeallocateStrategyBlock(struct strategyblock *sptr);
 struct strategyblock* CreateActiveStrategyBlock(void);
 int DestroyActiveStrategyBlock(struct strategyblock*dblockptr);
 
-
-
-
 void InitialiseTxAnimBlocks(void);
 TXACTRLBLK* AllocateTxAnimBlock(void);
 void DeallocateTxAnimBlock(TXACTRLBLK *TxAnimblockptr);
-void AddTxAnimBlock(DISPLAYBLOCK *dptr, TXACTRLBLK *taptr);
 TXANIMHEADER* GetTxAnimHeaderFromShape(TXACTRLBLK *taptr, int shape);
 void UpdateTxAnim(TXANIMHEADER *txah);
 void ChangeSequence(TXANIMHEADER *txah_old, TXANIMHEADER *txah_new);
 void ControlTextureAnimation(DISPLAYBLOCK *dptr);
-
-
-
-
-
-int DisplayAndLightBlockDeallocation(void);
-
 
 void InitialiseLightBlocks(void);
 
@@ -2003,39 +1992,17 @@ VECTORCH *v2,
 VECTORCH *v3,
 VECTORCH *v4);
 
-void GetNormalVector(VECTORCH *v1, VECTORCH *v2, VECTORCH *v3);
 
 void Normalise(VECTORCH *nvector);
 void MNormalise(MATRIXCH *m);
-
 void Normalise2d(VECTOR2D *nvector);
-
 int LineColinearity(LINE *l0, LINE *l1);
-
-void Renormalise(VECTORCH *nvector);
-
 int Magnitude(VECTORCH *v);
 
-
-
 int VectorDistance(VECTORCH *v1, VECTORCH *v2);
-int OutcodeVectorDistance(VECTORCH *v1, VECTORCH *v2, int d);
-
 void MatrixFromZVector(VECTORCH *v, MATRIXCH *m);
-
-
 int PointInPolygon(int *point, int *polygon, int c, int ppsize);
-
-void PolyAveragePoint(POLYHEADER *pheader, int *spts, VECTORCH *apt);
-
-int FindShift32(int value, int limit);
-int FindShift64(LONGLONGCH *value, LONGLONGCH *limit);
-
 void MaxLONGLONGCH(LONGLONGCH *llarrayptr, int llarraysize, LONGLONGCH *llmax);
-
-int MaxInt(int *iarray, int iarraysize);
-int MinInt(int *iarray, int iarraysize);
-
 
 
 
@@ -2046,52 +2013,23 @@ int MinInt(int *iarray, int iarraysize);
 */
 
 void CreateEulerMatrix(EULER *e, MATRIXCH *m1);
-void CreateEulerVector(EULER *e, VECTORCH *v);
-
-
-
-void MatrixMultiply(
-
-MATRIXCH *m1,
-MATRIXCH *m2,
-MATRIXCH *m3);
-
+void MatrixMultiply( MATRIXCH *m1, MATRIXCH *m2, MATRIXCH *m3);
 void TransposeMatrixCH(MATRIXCH *m1);
-
 void CopyVector(VECTORCH *v1, VECTORCH *v2);
 void CopyLocation(VECTORCH *v1, VECTORCH *v2);
-
-
 void CopyEuler(EULER *e1, EULER *e2);
 void CopyMatrix(MATRIXCH *m1, MATRIXCH *m2);
-
 void MakeVector(VECTORCH *v1, VECTORCH *v2, VECTORCH *v3);
 void AddVector(VECTORCH *v1, VECTORCH *v2);
 void SubVector(VECTORCH *v1, VECTORCH *v2);
 void QuatToMat(QUAT *q,MATRIXCH *m);
 
-
-void _RotateVector(
-
-	VECTORCH *v,
-	MATRIXCH *m);
-
-
-void _RotateAndCopyVector(
-
-	VECTORCH *v1,
-	VECTORCH *v2,
-	MATRIXCH *m);
-
-
+void _RotateVector( VECTORCH *v, MATRIXCH *m);
+void _RotateAndCopyVector( VECTORCH *v1, VECTORCH *v2, MATRIXCH *m);
 void MakeVectorLocal(VECTORCH *v1, VECTORCH *v2, VECTORCH *v3, MATRIXCH *m);
 
-
-
-
-
 void MatrixToEuler(MATRIXCH *m, EULER *e);
-void MatrixToEuler2(MATRIXCH *m, EULER *e);
+
 
 int ArcCos(int);
 int ArcSin(int);
@@ -2113,19 +2051,10 @@ int Distance_3d(VECTORCH *v0, VECTORCH *v1);
 */
 
 void SetupShapeLanguage(SHAPEHEADER *shapeheaderptr);
-
-void ShapePointsInstr(SHAPEINSTR *shapeinstrptr);
-
-
 void ShapeSpritePointsInstr(SHAPEINSTR *shapeinstrptr);
 void ShapeSpriteRPointsInstr(SHAPEINSTR *shapeinstrptr);
 
-
 void BackFaceCullPointOutcodeFlagging(void);
-
-
-
-
 
 
 /*
@@ -2135,25 +2064,15 @@ void BackFaceCullPointOutcodeFlagging(void);
 */
 
 void InitialiseSystem(HINSTANCE hInstance, int nCmdShow);
-
-
 void InitialiseRenderer(void);
-
 void ExitSystem(void);
-
 void InitialVideoMode(void);
-
 void ResetFrameCounter(void);
 void FrameCounterHandler(void);
 
-
-void DirectWriteD3DLine(VECTOR2D* LineStart, VECTOR2D* LineEnd, int LineColour);
-void* LoadImageIntoDirectDrawSurface(char *fname, IMAGEHEADER *iheader,
-      int ImageLoadMode, BOOL Sysmem);
-void* LoadImageIntoD3DImmediateSurface(char *fname, IMAGEHEADER *iheader,
-      int TextureFileType);
-void* LoadImageIntoD3DTexture(char *fname, IMAGEHEADER *iheader,
-      int TextureFileType);
+void* LoadImageIntoDirectDrawSurface(char *fname, IMAGEHEADER *iheader, int ImageLoadMode, BOOL Sysmem);
+void* LoadImageIntoD3DImmediateSurface(char *fname, IMAGEHEADER *iheader, int TextureFileType);
+void* LoadImageIntoD3DTexture(char *fname, IMAGEHEADER *iheader, int TextureFileType);
 void ReloadImageIntoD3DImmediateSurface(IMAGEHEADER* iheader);
 void* ReloadImageIntoD3DTexture(IMAGEHEADER* iheader);
 int GetTextureHandle(IMAGEHEADER *imageHeaderPtr);
@@ -2350,41 +2269,17 @@ void MakeTextureLightingTable8T(void);
 void CreatePaletteRemapTable(unsigned char *palette);
 unsigned char GetRemappedPaletteColour(int r, int g, int b, int bitsize);
 
-int NearestColour(int rs, int gs, int bs, unsigned char *palette);
-
-
 int InitialiseTextures(void);
 
-
 void MakeShapeTexturesGlobal(SHAPEHEADER *shptr, int TxIndex, int LTxIndex);
-void MakeTxAnimFrameTexturesGlobal(SHAPEHEADER *sptr,
-												POLYHEADER *pheader,
-												int LTxIndex, int TxIndex);
-
+void MakeTxAnimFrameTexturesGlobal(SHAPEHEADER *sptr, POLYHEADER *pheader, int LTxIndex, int TxIndex);
 void SpriteResizing(SHAPEHEADER *sptr);
-
 void FindImageExtents(IMAGEHEADER *ihdr, int numuvs, int *uvdata, IMAGEEXTENTS *e, IMAGEEXTENTS *e_curr);
-
-
 int GetMVSIndex(TXANIMHEADER *txah, EULER *e);
-
-
 IMAGEHEADER* GetImageHeader(void);
-
 void* GetTexture(int texindex);
-
 TEXTURE* GetTextureMemory(int txsize);
 void ReturnTextureMemory(TEXTURE *txptr);
-
-
-void GetProjectFilename(char *fname, char *image);
-
-
-int CompareStringCH(char *string1, char *string2);
-
-void GetDOSFilename(char *fnameptr);
-int CompareFilenameCH(char *string1, char *string2);
-
 void CopyMemoryCH(void *source, void *dest, int c);
 
 TEXTURE* LoadImageCH(char *fname, IMAGEHEADER *iheader);
@@ -2396,7 +2291,6 @@ void MakeTextureLightingTableRaw256(unsigned char *palette);
 
 void Create_MIP_Map(IMAGEHEADER *iheader);
 
-
 int** ShadingTables(SHAPEHEADER **sh_list);
 PALCREATIONDATA* CreatePaletteCH(SHAPEHEADER **sh_list, int pstart, int pent, unsigned char *pal);
 PALCREATIONDATA* CreateRaw256PaletteCH(SHAPEHEADER **sh_list, unsigned char *pal);
@@ -2405,20 +2299,11 @@ void RemapShapesForCreatePaletteCH(SHAPEHEADER **sh_list);
 void ClearShadingTables(void);
 void ClearPaletteShadingTables(void);
 
-int NextLowPower2(int i);
-
-
-void PlotPixelTest(int x, int y, unsigned char col);
-
-
 /* User Input */
 
 void ReadUserInput(void);
 
 void InitMouse(void);
-void ReadMouse(void);
-
-
 
 typedef struct mousedata {
 
@@ -2430,21 +2315,12 @@ typedef struct mousedata {
 
 } MOUSEDATA;
 
-
-void ReadKeyboard(void);
-
-
 void WaitForReturn(void);
-
 void CursorHome(void);
-
 void InitialiseItemLists(void);
-
 void InitialiseItemPointers(void);
 void InitialiseItemData(void);
-
 void* AllocateItemData(int itemsize);
-
 
 int GetZForZBuffer(int z);
 void FlushZBuffer(VIEWDESCRIPTORBLOCK *vdb);
@@ -2472,10 +2348,8 @@ void Draw_Item_ZB_Gouraud3dTexturePolygon(int *itemptr);
 int* GetTxAnimArrayZ(int shape, int item);
 TXANIMHEADER* GetTxAnimDataZ(int shape, int item, int sequence);
 
-
 int GT_LL(LONGLONGCH *a, LONGLONGCH *b);
 int LT_LL(LONGLONGCH *a, LONGLONGCH *b);
-
 
 void SetFastRandom(void);
 int FastRandom(void);
@@ -2512,13 +2386,10 @@ typedef enum {
 
 
 void UpdateMorphing(MORPHCTRL *mcptr);
-void UpdateMorphingDptr(DISPLAYBLOCK *dptr);
 void GetMorphDisplay(MORPHDISPLAY *md, DISPLAYBLOCK *dptr);
-void CopyMorphCtrl(MORPHCTRL *src, MORPHCTRL *dst);
+
 
 VECTORCH* GetMorphedPts(DISPLAYBLOCK *dptr, MORPHDISPLAY *md);
-
-
 
 
 /* KJL 15:07:39 01/08/97 - Returns the magnitude of the 
@@ -2532,7 +2403,6 @@ void CrossProduct(VECTORCH *a, VECTORCH *b, VECTORCH *c);
 /* KJL 12:01:08 7/16/97 - returns the magnitude of a vector - max error about 13%, though average error
    less than half this. Very fast compared to other approaches. */
 int Approximate3dMagnitude(VECTORCH *v);
-
 
 
 

@@ -2,10 +2,7 @@
 
 #include "3dc.h"
 
-void ADD_LL(LONGLONGCH *a, LONGLONGCH *b, LONGLONGCH *c);
 void ADD_LL_PP(LONGLONGCH *c, LONGLONGCH *a);
-void SUB_LL(LONGLONGCH *a, LONGLONGCH *b, LONGLONGCH *c);
-void SUB_LL_MM(LONGLONGCH *c, LONGLONGCH *a);
 void MUL_I_WIDE(int a, int b, LONGLONGCH *c);
 int CMP_LL(LONGLONGCH *a, LONGLONGCH *b);
 void EQUALS_LL(LONGLONGCH *a, LONGLONGCH *b);
@@ -46,54 +43,6 @@ static void ConvertFromLongLong(LONGLONGCH* llch, const __int64* ll)
 }
 #endif
 
-void ADD_LL(LONGLONGCH *a, LONGLONGCH *b, LONGLONGCH *c)
-{
-/*
-	_asm
-	{
-		mov esi,a
-		mov edi,b
-		mov ebx,c
-		mov	eax,[esi]
-		mov	edx,[esi+4]
-		add	eax,[edi]
-		adc	edx,[edi+4]
-		mov	[ebx],eax
-		mov	[ebx+4],edx
-	}
-*/
-#if defined(ASM386)
-int dummy1, dummy2;
-__asm__("movl	0(%%esi), %0		\n\t"
-	"movl	4(%%esi), %1		\n\t"
-	"addl	0(%%edi), %0		\n\t"
-	"adcl	4(%%edi), %1		\n\t"
-	"movl	%0, 0(%%ebx)		\n\t"
-	"movl	%1, 4(%%ebx)		\n\t"
-	: "=&r" (dummy1), "=&r" (dummy2)
-	: "S" (a), "D" (b), "b" (c)
-	: "memory", "cc"
-	);
-
-/*
-__asm__("movl	0(%%esi), %%eax		\n\t"
-	"movl	4(%%esi), %%edx		\n\t"
-	"addl	0(%%edi), %%eax		\n\t"
-	"adcl	4(%%edi), %%edx		\n\t"
-	: "=a" (c->lo32), "=d" (c->hi32)
-	: "S" (a), "D" (b)
-	);
-*/
-#else
-	__int64 aa = ConvertToLongLong(a);
-	__int64 bb = ConvertToLongLong(b);
-	
-	__int64 cc = aa + bb;
-	
-	ConvertFromLongLong(c, &cc);
-#endif
-
-}
 
 /* ADD ++ */
 
@@ -131,80 +80,7 @@ __asm__("movl	0(%%esi), %0		\n\t"
 #endif
 }
 
-/* SUB */
 
-void SUB_LL(LONGLONGCH *a, LONGLONGCH *b, LONGLONGCH *c)
-{
-/*
-	_asm
-	{
-		mov esi,a
-		mov edi,b
-		mov ebx,c
-		mov	eax,[esi]
-		mov	edx,[esi+4]
-		sub	eax,[edi]
-		sbb	edx,[edi+4]
-		mov	[ebx],eax
-		mov	[ebx+4],edx
-	}
-*/
-#if defined(ASM386)
-int dummy1, dummy2;
-__asm__("movl	0(%%esi), %0		\n\t"
-	"movl	4(%%esi), %1		\n\t"
-	"subl	0(%%edi), %0		\n\t"
-	"sbbl	4(%%edi), %1		\n\t"
-	"movl	%0, 0(%%ebx)		\n\t"
-	"movl	%1, 4(%%ebx)		\n\t"
-	: "=&r" (dummy1), "=&r" (dummy2)
-	: "S" (a), "D" (b), "b" (c)
-	: "memory", "cc"
-	);
-#else
-	__int64 aa = ConvertToLongLong(a);
-	__int64 bb = ConvertToLongLong(b);
-	
-	__int64 cc = aa - bb;
-	
-	ConvertFromLongLong(c, &cc);
-#endif
-}
-
-/* SUB -- */
-
-void SUB_LL_MM(LONGLONGCH *c, LONGLONGCH *a)
-{
-/*
-	_asm
-	{
-		mov edi,c
-		mov esi,a
-		mov	eax,[esi]
-		mov	edx,[esi+4]
-		sub	[edi],eax
-		sbb	[edi+4],edx
-	}
-*/
-#if defined(ASM386)
-int dummy1, dummy2;
-__asm__("movl	0(%%esi), %0		\n\t"
-	"movl	4(%%esi), %1		\n\t"
-	"subl	%0, 0(%%edi)		\n\t"
-	"sbbl	%1, 4(%%edi)		\n\t"
-	: "=&r" (dummy1), "=&r" (dummy2)
-	: "D" (c), "S" (a)
-	: "memory", "cc"
-	);
-#else
-	__int64 cc = ConvertToLongLong(c);
-	__int64 aa = ConvertToLongLong(a);
-	
-	cc -= aa;
-	
-	ConvertFromLongLong(c, &cc);
-#endif
-}
 
 /*
 

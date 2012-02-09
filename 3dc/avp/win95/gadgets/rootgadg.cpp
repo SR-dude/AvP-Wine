@@ -96,7 +96,6 @@ void RootGadget :: RefreshHUD(void)
 			{
 				pHUDGadg = HUDGadget :: MakeHUD
 				(
-					AvP.PlayerType // I_PLAYER_TYPE IPlayerType_ToMake
 				);
 			}
 		}

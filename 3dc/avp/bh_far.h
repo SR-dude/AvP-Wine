@@ -33,7 +33,6 @@ extern void FarAlienBehaviour(STRATEGYBLOCK *sbPtr);
 extern void BuildFarModuleLocs(void);
 extern void KillFarModuleLocs(void);
 
-extern void LocateFarNPCInModule(STRATEGYBLOCK *sbPtr, MODULE *targetModule);
 extern void LocateFarNPCInAIModule(STRATEGYBLOCK *sbPtr, AIMODULE *targetModule);
 extern NPC_TARGETMODULESTATUS GetTargetAIModuleStatus(STRATEGYBLOCK *sbPtr, AIMODULE *targetModule, int alien);
 
